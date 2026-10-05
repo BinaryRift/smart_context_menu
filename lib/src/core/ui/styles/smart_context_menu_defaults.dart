@@ -66,12 +66,24 @@ abstract final class SmartContextMenuDefaults {
       );
 
   /// Screen dimming behind the menu.
-  static const Color backgroundColor = Color(0x42000000);
+  static const CupertinoDynamicColor backgroundColor =
+      CupertinoDynamicColor.withBrightness(
+        color: Color(0x42000000),
+        darkColor: Color(0x66000000),
+      );
 
   /// Background of disabled items.
-  static const Color disabledItemColor = Color(0x1F000000);
+  static const CupertinoDynamicColor disabledItemColor =
+      CupertinoDynamicColor.withBrightness(
+        color: Color(0x1F000000),
+        darkColor: Color(0x1FFFFFFF),
+      );
 
-  static const Color dividerColor = Color(0x999E9E9E);
+  static const CupertinoDynamicColor dividerColor =
+      CupertinoDynamicColor.withBrightness(
+        color: Color(0x999E9E9E),
+        darkColor: Color(0x99545458),
+      );
 
   // Shadows
 

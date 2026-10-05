@@ -85,7 +85,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
           .withValues(alpha: alpha);
     }
     if (_item.isDisabled) {
-      return SmartContextMenuDefaults.disabledItemColor;
+      return _resolve(SmartContextMenuDefaults.disabledItemColor);
     }
     return _isHighlight
         ? _resolve(SmartContextMenuDefaults.textColor).withValues(alpha: 0.1)
@@ -205,7 +205,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
     return Divider(
       height: 1,
       thickness: 0.5,
-      color: SmartContextMenuDefaults.dividerColor,
+      color: _resolve(SmartContextMenuDefaults.dividerColor),
     );
   }
 

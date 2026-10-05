@@ -419,7 +419,10 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
     return Divider(
       height: 1,
       thickness: 0.5,
-      color: SmartContextMenuDefaults.dividerColor,
+      color: CupertinoDynamicColor.resolve(
+        SmartContextMenuDefaults.dividerColor,
+        context,
+      ),
     );
   }
 
