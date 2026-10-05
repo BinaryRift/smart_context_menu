@@ -1,4 +1,4 @@
-part of '../view/smart_context_menu_view.dart';
+part of '../view/smart_context_menu_level_view.dart';
 
 final class _PaginationTrigger extends StatefulWidget {
   final VoidCallback onVisible;

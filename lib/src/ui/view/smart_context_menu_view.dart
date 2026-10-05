@@ -1,6 +1,4 @@
-import 'dart:ui' show ImageFilter;
-import 'package:flutter/cupertino.dart'
-    show CupertinoActivityIndicator, CupertinoDynamicColor;
+import 'package:flutter/cupertino.dart' show CupertinoDynamicColor;
 import 'package:flutter/material.dart';
 
 import '../../core/ui/styles/smart_context_menu_defaults.dart';
@@ -9,20 +7,16 @@ import '../../core/ui/motion/tokens/motion_durations.dart';
 import '../../core/ui/motion/tokens/motion_slides.dart';
 import '../../core/ui/motion/tokens/motion_traslation.dart';
 import '../../controllers/smart_context_menu_overlay_controller.dart';
-import '../../core/ui/motion/transitions/tricky_transition.dart';
 import '../../domain/smart_context_menu_navigator.dart';
-import '../keys/service_item_key.dart';
 import '../state/smart_context_menu_hover_controller.dart';
 import '../state/smart_context_menu_stretch_controller.dart';
 import '../widgets/smart_context_menu_blur_box.dart';
 import '../widgets/smart_context_menu_pointer_tracker.dart';
-import 'smart_context_menu_item_view.dart';
+import 'smart_context_menu_level_view.dart';
 import '../../domain/smart_context_menu_config.dart';
 import '../../domain/smart_context_menu_item.dart';
 import '../widgets/smart_context_menu_shadow_box.dart';
 import '../widgets/widget_size_listener.dart';
-
-part '../widgets/pagination_trigger.dart';
 
 final class SmartContextMenuView extends StatefulWidget {
   final List<SmartContextMenuItem> initialItems;
@@ -136,8 +130,11 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
                     duration: MotionDurations.standard,
                     layoutBuilder: _layoutBuilder,
                     transitionBuilder: _transitionBuilder,
-                    child: _buildMenuContent(
+                    child: SmartContextMenuLevelView(
                       key: ValueKey(_controller.stackLength),
+                      controller: _controller,
+                      config: _config,
+                      hoverController: _hoverController,
                     ),
                   ),
                 ),
@@ -184,228 +181,6 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
           ).animate(slideAnimation),
           child: child,
         ),
-      ),
-    );
-  }
-
-  Widget _buildMenuContent({required Key key}) {
-    final currentLevel = _controller.currentLevel;
-    final bool hasBack = _controller.stackLength > 1;
-    final bool hasPaging = currentLevel.hasPaging;
-    final bool hasError = currentLevel.hasError;
-    final int itemsCount = currentLevel.items.length;
-    final int headerOffset = hasBack ? 1 : 0;
-    final int totalCount = _controller.calculateTotalItemCount();
-
-    return Stack(
-      key: key,
-      children: [
-        ListView.builder(
-          key: key,
-          shrinkWrap: true,
-          padding: EdgeInsets.zero,
-          physics: const BouncingScrollPhysics(),
-          itemCount: totalCount,
-          itemBuilder: (context, index) => _routeItem(
-            index: index,
-            hasBack: hasBack,
-            headerOffset: headerOffset,
-            itemsCount: itemsCount,
-            hasPaging: hasPaging,
-            hasError: hasError,
-          ),
-        ),
-        if (hasBack)
-          Positioned(
-            top: -0.5,
-            left: 0,
-            right: 0,
-            child: GestureDetector(
-              onPanStart: (_) {},
-              behavior: HitTestBehavior.opaque,
-              child: _buildBluredBackButton(),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _routeItem({
-    required int index,
-    required bool hasBack,
-    required int headerOffset,
-    required int itemsCount,
-    required bool hasPaging,
-    required bool hasError,
-  }) {
-    if (hasBack && index == 0) {
-      return Visibility.maintain(
-        visible: false,
-        child: IgnorePointer(
-          child: _buildBackButton(key: ServiceItemKey.backPlaceholder),
-        ),
-      );
-    }
-
-    final int relativeIndex = index - headerOffset;
-
-    final Widget child;
-    final bool isTransitionState;
-
-    if (_controller.isLoading && itemsCount == 0) {
-      child = _buildInitialLoader();
-      isTransitionState = true;
-    } else if (hasError && relativeIndex == itemsCount) {
-      child = _buildRetryButton(hasPaging);
-      isTransitionState = true;
-    } else if (!hasError && hasPaging && relativeIndex == itemsCount) {
-      child = _buildPagingTrigger(itemsCount);
-      isTransitionState = true;
-    } else {
-      child = _buildMenuItem(relativeIndex, itemsCount);
-      isTransitionState = false;
-    }
-
-    return AnimatedSwitcher(
-      duration: isTransitionState ? MotionDurations.fast : Duration.zero,
-      transitionBuilder: (child, animation) {
-        return isTransitionState
-            ? TrickyTransition(animation: animation, child: child)
-            : child;
-      },
-      child: child,
-    );
-  }
-
-  Widget _buildMenuItem(int relativeIndex, int itemsCount) {
-    final items = _controller.currentLevel.items;
-
-    if (relativeIndex < 0 || relativeIndex >= itemsCount) {
-      return const SizedBox.shrink();
-    }
-
-    final item = items[relativeIndex];
-    if (item.asyncItem != null) {
-      final parentId = item.id;
-      return SmartContextMenuItemView.async(
-        key: ValueKey(item.id),
-        item: item,
-        config: _config,
-        onTap: _controller.handleItemTap,
-        cachedItem: _controller.cache.resolvedItems[parentId],
-        onLoaded: (item) => _controller.cache.resolvedItems[parentId] = item,
-        hoverController: _hoverController,
-      );
-    }
-    return SmartContextMenuItemView(
-      key: ValueKey(item.id),
-      onTap: _controller.handleItemTap,
-      item: item,
-      config: _config,
-      hoverController: _hoverController,
-    );
-  }
-
-  Widget _buildBluredBackButton() {
-    Widget child = Container(
-      decoration: BoxDecoration(
-        color: _menuColor,
-        borderRadius: _config.backButtonBorderRadius,
-      ),
-      child: _buildBackButton(key: ServiceItemKey.back),
-    );
-
-    if (_config.backButtonBlur != null) {
-      return ClipRRect(
-        borderRadius: _config.backButtonBorderRadius,
-        clipBehavior: Clip.antiAlias,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: _config.backButtonBlur!.sigmaX,
-            sigmaY: _config.backButtonBlur!.sigmaY,
-          ),
-          child: child,
-        ),
-      );
-    }
-    return child;
-  }
-
-  Widget _buildBackButton({required Key key}) {
-    return SmartContextMenuItemView(
-      key: key,
-      onTap: (_) => _controller.popSubmenu(),
-      config: _config,
-      hoverController: _hoverController,
-      item: SmartContextMenuItem.simple(
-        closeOnTap: false,
-        title: _config.labels.back,
-        titleStyle: SmartContextMenuDefaults.textStyle.copyWith(
-          fontWeight: FontWeight.w600,
-        ),
-        leading: Icon(
-          SmartContextMenuDefaults.backIcon,
-          size: _config.defaultIconSize,
-          color: CupertinoDynamicColor.maybeResolve(
-            _config.defaultIconColor,
-            context,
-          ),
-        ),
-        hasDivider: true,
-        customDivider: _buildDivider(),
-      ),
-    );
-  }
-
-  Widget _buildRetryButton(bool hasPagination) {
-    return SmartContextMenuItemView.error(
-      key: ServiceItemKey.retry,
-      onRetry: () => _controller.onRetryLoad(hasPagination),
-      config: _config,
-      hoverController: _hoverController,
-      item: SmartContextMenuItem.simple(
-        title: _config.labels.retry,
-        leading: Icon(
-          SmartContextMenuDefaults.errorIcon,
-          size: _config.defaultIconSize,
-        ),
-        trailing: Icon(
-          SmartContextMenuDefaults.retryIcon,
-          size: _config.defaultIconSize,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInitialLoader() =>
-      _buildLoader(key: const ValueKey("initial_loader"));
-
-  Widget _buildPagingTrigger(int itemsCount) {
-    return _PaginationTrigger(
-      key: ValueKey("paging_trigger_${itemsCount}_${_controller.stackLength}"),
-      onVisible: _controller.handlePagination,
-      child: _buildLoader(),
-    );
-  }
-
-  Widget _buildLoader({Key? key}) {
-    return Container(
-      key: key ?? const ValueKey("menu_loader"),
-      padding: const EdgeInsets.symmetric(
-        vertical: SmartContextMenuDefaults.loaderVerticalPadding,
-      ),
-      alignment: Alignment.center,
-      child: const CupertinoActivityIndicator(radius: 12),
-    );
-  }
-
-  Widget _buildDivider() {
-    return Divider(
-      height: 1,
-      thickness: 0.5,
-      color: CupertinoDynamicColor.resolve(
-        SmartContextMenuDefaults.dividerColor,
-        context,
       ),
     );
   }
