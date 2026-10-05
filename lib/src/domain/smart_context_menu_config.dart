@@ -91,4 +91,37 @@ final class SmartContextMenuConfig {
     this.menuGap = SmartContextMenuDefaults.menuGap,
     this.style = const SmartContextMenuStyle(),
   });
+
+  /// Creates a copy of this config with the given fields replaced.
+  ///
+  /// ```dart
+  /// final manualConfig = menuConfig.copyWith(
+  ///   activationMode: SmartContextMenuActivationMode.manual,
+  /// );
+  /// ```
+  SmartContextMenuConfig copyWith({
+    SmartContextMenuLabels? labels,
+    bool? enableHaptics,
+    bool? enableSwipeBack,
+    bool? barrierDismissible,
+    SmartContextMenuActivationMode? activationMode,
+    double? menuWidth,
+    double? menuHeightFactor,
+    EdgeInsets? screenPadding,
+    double? menuGap,
+    SmartContextMenuStyle? style,
+  }) {
+    return SmartContextMenuConfig(
+      labels: labels ?? this.labels,
+      enableHaptics: enableHaptics ?? this.enableHaptics,
+      enableSwipeBack: enableSwipeBack ?? this.enableSwipeBack,
+      barrierDismissible: barrierDismissible ?? this.barrierDismissible,
+      activationMode: activationMode ?? this.activationMode,
+      menuWidth: menuWidth ?? this.menuWidth,
+      menuHeightFactor: menuHeightFactor ?? this.menuHeightFactor,
+      screenPadding: screenPadding ?? this.screenPadding,
+      menuGap: menuGap ?? this.menuGap,
+      style: style ?? this.style,
+    );
+  }
 }

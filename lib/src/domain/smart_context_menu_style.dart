@@ -169,4 +169,54 @@ final class SmartContextMenuStyle {
     this.backIcon = SmartContextMenuDefaults.backIcon,
     this.loaderVerticalPadding = SmartContextMenuDefaults.loaderVerticalPadding,
   });
+
+  /// Creates a copy of this style with the given fields replaced.
+  ///
+  /// Null arguments keep the current values, so nullable fields such as
+  /// [menuBlur] cannot be reset to null with it.
+  SmartContextMenuStyle copyWith({
+    Color? menuColor,
+    Color? borderColor,
+    BorderRadiusGeometry? borderRadius,
+    Decoration? menuDecoration,
+    SmartContextMenuBlur? menuBlur,
+    Color? backgroundColor,
+    SmartContextMenuBlur? backgroundBlur,
+    SmartContextMenuBlur? backButtonBlur,
+    BorderRadiusGeometry? backButtonBorderRadius,
+    TextStyle? textStyle,
+    Color? secondaryTextColor,
+    Color? destructiveColor,
+    Color? disabledItemColor,
+    Color? dividerColor,
+    double? defaultIconSize,
+    Color? defaultIconColor,
+    IconData? submenuIcon,
+    IconData? backIcon,
+    double? loaderVerticalPadding,
+  }) {
+    return SmartContextMenuStyle(
+      menuColor: menuColor ?? this.menuColor,
+      borderColor: borderColor ?? this.borderColor,
+      borderRadius: borderRadius ?? this.borderRadius,
+      menuDecoration: menuDecoration ?? this.menuDecoration,
+      menuBlur: menuBlur ?? this.menuBlur,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      backgroundBlur: backgroundBlur ?? this.backgroundBlur,
+      backButtonBlur: backButtonBlur ?? this.backButtonBlur,
+      backButtonBorderRadius:
+          backButtonBorderRadius ?? this.backButtonBorderRadius,
+      textStyle: textStyle ?? this.textStyle,
+      secondaryTextColor: secondaryTextColor ?? this.secondaryTextColor,
+      destructiveColor: destructiveColor ?? this.destructiveColor,
+      disabledItemColor: disabledItemColor ?? this.disabledItemColor,
+      dividerColor: dividerColor ?? this.dividerColor,
+      defaultIconSize: defaultIconSize ?? this.defaultIconSize,
+      defaultIconColor: defaultIconColor ?? this.defaultIconColor,
+      submenuIcon: submenuIcon ?? this.submenuIcon,
+      backIcon: backIcon ?? this.backIcon,
+      loaderVerticalPadding:
+          loaderVerticalPadding ?? this.loaderVerticalPadding,
+    );
+  }
 }

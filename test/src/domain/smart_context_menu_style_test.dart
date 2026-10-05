@@ -1,0 +1,134 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show Icons;
+import 'package:flutter_test/flutter_test.dart';
+import 'package:smart_context_menu/smart_context_menu.dart';
+
+void main() {
+  group('copyWith', () {
+    const original = SmartContextMenuStyle(
+      menuColor: Color(0xFF000001),
+      borderColor: Color(0xFF000002),
+      borderRadius: BorderRadius.all(Radius.circular(1)),
+      menuDecoration: BoxDecoration(color: Color(0xFF000003)),
+      menuBlur: SmartContextMenuBlur(1),
+      backgroundColor: Color(0xFF000004),
+      backgroundBlur: SmartContextMenuBlur(2),
+      backButtonBlur: SmartContextMenuBlur(3),
+      backButtonBorderRadius: BorderRadius.all(Radius.circular(2)),
+      textStyle: TextStyle(fontSize: 11),
+      secondaryTextColor: Color(0xFF000005),
+      destructiveColor: Color(0xFF000006),
+      disabledItemColor: Color(0xFF000007),
+      dividerColor: Color(0xFF000008),
+      defaultIconSize: 11,
+      defaultIconColor: Color(0xFF000009),
+      submenuIcon: Icons.arrow_forward_ios,
+      backIcon: Icons.arrow_back_ios_new,
+      loaderVerticalPadding: 11,
+    );
+
+    final fields = <String, Object? Function(SmartContextMenuStyle)>{
+      'menuColor': (s) => s.menuColor,
+      'borderColor': (s) => s.borderColor,
+      'borderRadius': (s) => s.borderRadius,
+      'menuDecoration': (s) => s.menuDecoration,
+      'menuBlur': (s) => s.menuBlur,
+      'backgroundColor': (s) => s.backgroundColor,
+      'backgroundBlur': (s) => s.backgroundBlur,
+      'backButtonBlur': (s) => s.backButtonBlur,
+      'backButtonBorderRadius': (s) => s.backButtonBorderRadius,
+      'textStyle': (s) => s.textStyle,
+      'secondaryTextColor': (s) => s.secondaryTextColor,
+      'destructiveColor': (s) => s.destructiveColor,
+      'disabledItemColor': (s) => s.disabledItemColor,
+      'dividerColor': (s) => s.dividerColor,
+      'defaultIconSize': (s) => s.defaultIconSize,
+      'defaultIconColor': (s) => s.defaultIconColor,
+      'submenuIcon': (s) => s.submenuIcon,
+      'backIcon': (s) => s.backIcon,
+      'loaderVerticalPadding': (s) => s.loaderVerticalPadding,
+    };
+
+    const color = Color(0xFFFFFFFF);
+    const radius = BorderRadius.all(Radius.circular(9));
+    const blur = SmartContextMenuBlur(9);
+    const decoration = BoxDecoration(color: color);
+    const textStyle = TextStyle(fontSize: 19);
+    final changes = <String, (Object, SmartContextMenuStyle Function())>{
+      'menuColor': (color, () => original.copyWith(menuColor: color)),
+      'borderColor': (color, () => original.copyWith(borderColor: color)),
+      'borderRadius': (radius, () => original.copyWith(borderRadius: radius)),
+      'menuDecoration': (
+        decoration,
+        () => original.copyWith(menuDecoration: decoration),
+      ),
+      'menuBlur': (blur, () => original.copyWith(menuBlur: blur)),
+      'backgroundColor': (
+        color,
+        () => original.copyWith(backgroundColor: color),
+      ),
+      'backgroundBlur': (blur, () => original.copyWith(backgroundBlur: blur)),
+      'backButtonBlur': (blur, () => original.copyWith(backButtonBlur: blur)),
+      'backButtonBorderRadius': (
+        radius,
+        () => original.copyWith(backButtonBorderRadius: radius),
+      ),
+      'textStyle': (textStyle, () => original.copyWith(textStyle: textStyle)),
+      'secondaryTextColor': (
+        color,
+        () => original.copyWith(secondaryTextColor: color),
+      ),
+      'destructiveColor': (
+        color,
+        () => original.copyWith(destructiveColor: color),
+      ),
+      'disabledItemColor': (
+        color,
+        () => original.copyWith(disabledItemColor: color),
+      ),
+      'dividerColor': (color, () => original.copyWith(dividerColor: color)),
+      'defaultIconSize': (19.0, () => original.copyWith(defaultIconSize: 19)),
+      'defaultIconColor': (
+        color,
+        () => original.copyWith(defaultIconColor: color),
+      ),
+      'submenuIcon': (
+        CupertinoIcons.chevron_right,
+        () => original.copyWith(submenuIcon: CupertinoIcons.chevron_right),
+      ),
+      'backIcon': (
+        CupertinoIcons.chevron_left,
+        () => original.copyWith(backIcon: CupertinoIcons.chevron_left),
+      ),
+      'loaderVerticalPadding': (
+        19.0,
+        () => original.copyWith(loaderVerticalPadding: 19),
+      ),
+    };
+
+    test('covers every field', () {
+      expect(changes.keys, unorderedEquals(fields.keys));
+    });
+
+    test('without arguments keeps every field', () {
+      final copy = original.copyWith();
+      for (final MapEntry(key: name, value: get) in fields.entries) {
+        expect(get(copy), get(original), reason: name);
+      }
+    });
+
+    for (final MapEntry(key: changed, value: (value, copyWith))
+        in changes.entries) {
+      test('changes only $changed', () {
+        final copy = copyWith();
+        for (final MapEntry(key: name, value: get) in fields.entries) {
+          expect(
+            get(copy),
+            name == changed ? value : get(original),
+            reason: name,
+          );
+        }
+      });
+    }
+  });
+}

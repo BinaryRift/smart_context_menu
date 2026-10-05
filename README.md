@@ -238,6 +238,21 @@ Colors may be `CupertinoDynamicColor`s: they follow the light and dark theme.
 A plain `Color` is used as is in both themes. The default values are available
 in `SmartContextMenuDefaults`.
 
+To change a few settings of a shared config for one menu, use `copyWith`.
+`SmartContextMenuStyle` has it too:
+
+```dart
+SmartContextMenu(
+  config: menuConfig.copyWith(
+    activationMode: SmartContextMenuActivationMode.manual,
+    style: menuConfig.style.copyWith(menuBlur: SmartContextMenuBlur.small),
+  ),
+  controller: controller,
+  items: items,
+  child: child,
+)
+```
+
 #### Custom item content
 
 `customBuilder` replaces the content of an item. The item padding, press highlight
