@@ -10,6 +10,7 @@ import '../../core/ui/motion/transitions/tricky_transition.dart';
 import '../../domain/smart_context_menu_config.dart';
 import '../../domain/smart_context_menu_item.dart';
 import '../../domain/smart_context_menu_item_state.dart';
+import '../../domain/smart_context_menu_style.dart';
 import '../keys/item_content_key.dart';
 import '../state/smart_context_menu_hover_controller.dart';
 import '../widgets/smart_context_menu_divider.dart';
@@ -73,11 +74,12 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
       widget.onTap != null;
   SmartContextMenuItem get _item => _resolvedItem ?? widget.item;
   SmartContextMenuConfig get _config => widget.config;
+  SmartContextMenuStyle get _style => widget.config.style;
 
   Color _resolve(Color color) => CupertinoDynamicColor.resolve(color, context);
 
   Color get _baseTextColor =>
-      _config.textStyle.color ?? SmartContextMenuDefaults.textColor;
+      _style.textStyle.color ?? SmartContextMenuDefaults.textColor;
 
   Color get _overlayColor {
     if (_item.isDestructive) {
@@ -86,11 +88,11 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
           : _isHighlight
               ? 0.24
               : 0.12;
-      return _resolve(_config.destructiveColor)
+      return _resolve(_style.destructiveColor)
           .withValues(alpha: alpha);
     }
     if (_item.isDisabled) {
-      return _resolve(_config.disabledItemColor);
+      return _resolve(_style.disabledItemColor);
     }
     return _isHighlight
         ? _resolve(_baseTextColor).withValues(alpha: 0.1)
@@ -99,14 +101,14 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
 
   Color get _textColor {
     if (_item.isDestructive) {
-      return _resolve(_config.destructiveColor).withValues(
+      return _resolve(_style.destructiveColor).withValues(
         alpha: _item.isDisabled
             ? MotionOpacity.medium.value
             : MotionOpacity.visible.value,
       );
     }
     if (_item.isDisabled) {
-      return _resolve(_config.secondaryTextColor);
+      return _resolve(_style.secondaryTextColor);
     }
     return _resolve(
       _item.titleStyle?.color ?? _baseTextColor,
@@ -170,7 +172,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
         children: [
           if (_item.hasDivider && _item.dividerPosition == SmartContextMenuDividerPosition.top)
             _item.customDivider ??
-                SmartContextMenuDivider(color: _config.dividerColor),
+                SmartContextMenuDivider(color: _style.dividerColor),
           AnimatedContainer(
             duration: _highlightDuration,
             color: _overlayColor,
@@ -185,7 +187,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
           if (_item.hasDivider &&
               _item.dividerPosition == SmartContextMenuDividerPosition.bottom)
             _item.customDivider ??
-                SmartContextMenuDivider(color: _config.dividerColor),
+                SmartContextMenuDivider(color: _style.dividerColor),
         ],
       ),
     );
@@ -213,7 +215,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
         Expanded(
           child: Text(
             item.title ?? "",
-            style: (item.titleStyle ?? _config.textStyle).copyWith(
+            style: (item.titleStyle ?? _style.textStyle).copyWith(
               color: _textColor,
             ),
             maxLines: 2,
@@ -227,12 +229,12 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
         if (item.showTransitionIcon) ...[
           SizedBox(width: item.childrenGap),
           Icon(
-            SmartContextMenuDefaults.submenuIcon,
-            size: _config.defaultIconSize,
+            _style.submenuIcon,
+            size: _style.defaultIconSize,
             color: item.isDisabled
-                ? _resolve(_config.secondaryTextColor)
+                ? _resolve(_style.secondaryTextColor)
                 : CupertinoDynamicColor.maybeResolve(
-                    _config.defaultIconColor,
+                    _style.defaultIconColor,
                     context,
                   ),
           ),
@@ -276,11 +278,11 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
       title: _config.labels.retry,
       leading: Icon(
         SmartContextMenuDefaults.errorIcon,
-        size: _config.defaultIconSize,
+        size: _style.defaultIconSize,
       ),
       trailing: Icon(
         SmartContextMenuDefaults.retryIcon,
-        size: _config.defaultIconSize,
+        size: _style.defaultIconSize,
       ),
     );
     return KeyedSubtree(

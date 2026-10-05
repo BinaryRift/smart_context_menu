@@ -2,12 +2,12 @@ import 'package:flutter/material.dart' show immutable;
 
 /// The strength of a Gaussian blur used by the menu.
 ///
-/// Used by [SmartContextMenuConfig.backgroundBlur],
-/// [SmartContextMenuConfig.menuBlur] and
-/// [SmartContextMenuConfig.backButtonBlur]. Pick a preset or create your own:
+/// Used by [SmartContextMenuStyle.backgroundBlur],
+/// [SmartContextMenuStyle.menuBlur] and
+/// [SmartContextMenuStyle.backButtonBlur]. Pick a preset or create your own:
 ///
 /// ```dart
-/// const SmartContextMenuConfig(menuBlur: SmartContextMenuBlur(10))
+/// const SmartContextMenuStyle(menuBlur: SmartContextMenuBlur(10))
 /// ```
 @immutable
 final class SmartContextMenuBlur {

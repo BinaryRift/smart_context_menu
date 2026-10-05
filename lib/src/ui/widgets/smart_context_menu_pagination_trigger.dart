@@ -7,8 +7,13 @@ import 'smart_context_menu_loader.dart';
 /// Calls [onVisible] once it is built.
 final class SmartContextMenuPaginationTrigger extends StatefulWidget {
   final VoidCallback onVisible;
+  final double loaderVerticalPadding;
 
-  const SmartContextMenuPaginationTrigger({super.key, required this.onVisible});
+  const SmartContextMenuPaginationTrigger({
+    super.key,
+    required this.onVisible,
+    required this.loaderVerticalPadding,
+  });
 
   @override
   State<SmartContextMenuPaginationTrigger> createState() =>
@@ -26,5 +31,6 @@ final class _SmartContextMenuPaginationTriggerState
   }
 
   @override
-  Widget build(BuildContext context) => const SmartContextMenuLoader();
+  Widget build(BuildContext context) =>
+      SmartContextMenuLoader(verticalPadding: widget.loaderVerticalPadding);
 }

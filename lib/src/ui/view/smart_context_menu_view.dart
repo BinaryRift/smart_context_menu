@@ -1,13 +1,11 @@
 import 'package:flutter/cupertino.dart' show CupertinoDynamicColor;
 import 'package:flutter/material.dart';
 
-import '../../core/ui/styles/smart_context_menu_defaults.dart';
 import '../../core/ui/motion/tokens/motion_curves.dart';
 import '../../core/ui/motion/tokens/motion_durations.dart';
 import '../../core/ui/motion/tokens/motion_traslation.dart';
 import '../../controllers/smart_context_menu_overlay_controller.dart';
 import '../../domain/smart_context_menu_navigator.dart';
-import '../extensions/smart_context_menu_config_ext.dart';
 import '../state/smart_context_menu_hover_controller.dart';
 import '../state/smart_context_menu_stretch_controller.dart';
 import '../widgets/smart_context_menu_blur_box.dart';
@@ -46,13 +44,10 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
   SmartContextMenuConfig get _config => widget.config;
 
   BoxDecoration get _defaultDecoration => BoxDecoration(
-    color: _config.resolveMenuColor(context),
-    borderRadius: _config.borderRadius,
+    color: CupertinoDynamicColor.resolve(_config.style.menuColor, context),
+    borderRadius: _config.style.borderRadius,
     border: Border.all(
-      color: CupertinoDynamicColor.resolve(
-        _config.borderColor ?? SmartContextMenuDefaults.borderColor,
-        context,
-      ),
+      color: CupertinoDynamicColor.resolve(_config.style.borderColor, context),
     ),
   );
 
@@ -96,10 +91,10 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
     return WidgetSizeListener(
       onSizeChanged: _onSizeChanged,
       child: SmartContextMenuShadowBox(
-        borderRadius: _config.borderRadius,
+        borderRadius: _config.style.borderRadius,
         child: SmartContextMenuBlurBox(
-          blur: _config.menuBlur,
-          borderRadius: _config.borderRadius,
+          blur: _config.style.menuBlur,
+          borderRadius: _config.style.borderRadius,
           child: ListenableBuilder(
             listenable: _stretchController,
             builder: (context, child) => AnimatedContainer(
@@ -108,7 +103,7 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
               transformAlignment: Alignment.center,
               transform: _stretchController.transform,
               width: _config.menuWidth,
-              decoration: _config.menuDecoration ?? _defaultDecoration,
+              decoration: _config.style.menuDecoration ?? _defaultDecoration,
               clipBehavior: Clip.antiAlias,
               child: child,
             ),

@@ -92,7 +92,10 @@ final class SmartContextMenuLevelView extends StatelessWidget {
     final bool isTransitionState;
 
     if (controller.isLoading && itemsCount == 0) {
-      child = const SmartContextMenuLoader(key: ServiceItemKey.loader);
+      child = SmartContextMenuLoader(
+        key: ServiceItemKey.loader,
+        verticalPadding: config.style.loaderVerticalPadding,
+      );
       isTransitionState = true;
     } else if (hasError && relativeIndex == itemsCount) {
       child = SmartContextMenuRetryItem(
@@ -105,6 +108,7 @@ final class SmartContextMenuLevelView extends StatelessWidget {
       child = SmartContextMenuPaginationTrigger(
         key: ServiceItemKey.pagingTrigger(itemsCount),
         onVisible: controller.handlePagination,
+        loaderVerticalPadding: config.style.loaderVerticalPadding,
       );
       isTransitionState = true;
     } else {

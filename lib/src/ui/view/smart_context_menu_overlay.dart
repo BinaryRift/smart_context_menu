@@ -160,20 +160,20 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
 
   Widget _buildBackground(BuildContext context) {
     final backgroundColor =
-        CupertinoDynamicColor.resolve(_config.backgroundColor, context);
+        CupertinoDynamicColor.resolve(_config.style.backgroundColor, context);
 
     return Positioned.fill(
       child: FadeTransition(
         opacity: _backgroundAnimation,
-        child: _config.backgroundBlur != null
+        child: _config.style.backgroundBlur != null
             ? AnimatedBuilder(
                 animation: _backgroundCurve,
                 builder: (context, child) {
                   return BackdropFilter(
                     filter: ui.ImageFilter.blur(
-                      sigmaX: _config.backgroundBlur!.sigmaX *
+                      sigmaX: _config.style.backgroundBlur!.sigmaX *
                           _backgroundCurve.value,
-                      sigmaY: _config.backgroundBlur!.sigmaY *
+                      sigmaY: _config.style.backgroundBlur!.sigmaY *
                           _backgroundCurve.value,
                     ),
                     child: child,

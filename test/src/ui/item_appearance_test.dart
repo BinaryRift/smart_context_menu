@@ -1,12 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Divider;
+import 'package:flutter/material.dart' show Divider, Icons;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
 
 import '../../helpers/menu_tester.dart';
 
 void main() {
-  const customConfig = SmartContextMenuConfig(
+  const customStyle = SmartContextMenuStyle(
     textStyle: TextStyle(
       fontFamily: 'Custom',
       fontSize: 13,
@@ -17,6 +19,7 @@ void main() {
     disabledItemColor: Color(0xFF000004),
     dividerColor: Color(0xFF000005),
   );
+  const customConfig = SmartContextMenuConfig(style: customStyle);
 
   final items = [
     SmartContextMenuItem.simple(title: 'Enabled', hasDivider: true),
@@ -44,7 +47,7 @@ void main() {
 
   Color light(CupertinoDynamicColor color) => color.color;
 
-  group('without config', () {
+  group('without style', () {
     testWidgets('uses the default text style and colors', (tester) async {
       await tester.pumpMenu(items: items, brightness: Brightness.light);
       await tester.openMenu();
@@ -74,7 +77,7 @@ void main() {
     });
   });
 
-  group('with config', () {
+  group('with style', () {
     testWidgets('applies the text style', (tester) async {
       await tester.pumpMenu(items: items, config: customConfig);
       await tester.openMenu();
@@ -82,7 +85,7 @@ void main() {
       final enabled = titleStyleOf(tester, 'Enabled');
       expect(enabled.fontFamily, 'Custom');
       expect(enabled.fontSize, 13);
-      expect(enabled.color, isSameColorAs(customConfig.textStyle.color!));
+      expect(enabled.color, isSameColorAs(customStyle.textStyle.color!));
     });
 
     testWidgets('uses the default text color if the style has none', (
@@ -91,7 +94,7 @@ void main() {
       await tester.pumpMenu(
         items: items,
         config: const SmartContextMenuConfig(
-          textStyle: TextStyle(fontSize: 13),
+          style: SmartContextMenuStyle(textStyle: TextStyle(fontSize: 13)),
         ),
         brightness: Brightness.light,
       );
@@ -111,17 +114,17 @@ void main() {
 
       expect(
         titleStyleOf(tester, 'Disabled').color,
-        isSameColorAs(customConfig.secondaryTextColor),
+        isSameColorAs(customStyle.secondaryTextColor),
       );
       expect(
         titleStyleOf(tester, 'Destructive').color,
-        isSameColorAs(customConfig.destructiveColor),
+        isSameColorAs(customStyle.destructiveColor),
       );
       expect(
         backgroundOf(tester, 'Disabled'),
-        isSameColorAs(customConfig.disabledItemColor),
+        isSameColorAs(customStyle.disabledItemColor),
       );
-      expect(dividerColorOf(tester), isSameColorAs(customConfig.dividerColor));
+      expect(dividerColorOf(tester), isSameColorAs(customStyle.dividerColor));
     });
 
     testWidgets('resolves dynamic colors for the theme', (tester) async {
@@ -132,7 +135,7 @@ void main() {
       await tester.pumpMenu(
         items: items,
         config: const SmartContextMenuConfig(
-          textStyle: TextStyle(color: textColor),
+          style: SmartContextMenuStyle(textStyle: TextStyle(color: textColor)),
         ),
         brightness: Brightness.dark,
       );
@@ -180,7 +183,99 @@ void main() {
       expect(back.fontFamily, 'Custom');
       expect(back.fontSize, 13);
       expect(back.fontWeight, FontWeight.w600);
-      expect(back.color, isSameColorAs(customConfig.textStyle.color!));
+      expect(back.color, isSameColorAs(customStyle.textStyle.color!));
+    });
+  });
+
+  group('icons', () {
+    final submenu = [
+      SmartContextMenuItem.submenu(
+        title: 'More',
+        children: [SmartContextMenuItem.simple(title: 'Child')],
+      ),
+    ];
+
+    testWidgets('uses the default icons', (tester) async {
+      await tester.pumpMenu(items: submenu);
+      await tester.openMenu();
+      expect(find.byIcon(SmartContextMenuDefaults.submenuIcon), findsOneWidget);
+
+      await tester.tap(find.text('More'));
+      await tester.settleMenu();
+      expect(find.byIcon(SmartContextMenuDefaults.backIcon), findsWidgets);
+    });
+
+    testWidgets('applies the submenu and back icons', (tester) async {
+      await tester.pumpMenu(
+        items: submenu,
+        config: const SmartContextMenuConfig(
+          style: SmartContextMenuStyle(
+            submenuIcon: Icons.arrow_forward_ios,
+            backIcon: Icons.arrow_back_ios_new,
+          ),
+        ),
+      );
+      await tester.openMenu();
+      expect(find.byIcon(Icons.arrow_forward_ios), findsOneWidget);
+      expect(find.byIcon(SmartContextMenuDefaults.submenuIcon), findsNothing);
+
+      await tester.tap(find.text('More'));
+      await tester.settleMenu();
+      expect(find.byIcon(Icons.arrow_back_ios_new), findsWidgets);
+      expect(find.byIcon(SmartContextMenuDefaults.backIcon), findsNothing);
+    });
+  });
+
+  group('loader', () {
+    Future<EdgeInsetsGeometry> loaderPaddingOf(
+      WidgetTester tester, {
+      SmartContextMenuConfig config = const SmartContextMenuConfig(),
+    }) async {
+      final completer = Completer<List<SmartContextMenuItem>>();
+      await tester.pumpMenu(
+        config: config,
+        items: [
+          SmartContextMenuItem.asyncSubmenu(
+            title: 'More',
+            asyncChildren: () => completer.future,
+          ),
+        ],
+      );
+      await tester.openMenu();
+      await tester.tap(find.text('More'));
+      await tester.settleMenu();
+
+      return tester
+          .widget<Padding>(
+            find
+                .ancestor(
+                  of: find.byType(CupertinoActivityIndicator),
+                  matching: find.byType(Padding),
+                )
+                .first,
+          )
+          .padding;
+    }
+
+    testWidgets('uses the default vertical padding', (tester) async {
+      expect(
+        await loaderPaddingOf(tester),
+        const EdgeInsets.symmetric(
+          vertical: SmartContextMenuDefaults.loaderVerticalPadding,
+        ),
+      );
+    });
+
+    testWidgets('applies the vertical padding', (tester) async {
+      expect(
+        await loaderPaddingOf(
+          tester,
+          config: const SmartContextMenuConfig(
+            style: SmartContextMenuStyle(loaderVerticalPadding: 16),
+          ),
+        ),
+        const EdgeInsets.symmetric(vertical: 16),
+      );
     });
   });
 }

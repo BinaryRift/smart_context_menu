@@ -10,6 +10,7 @@
 /// * [SmartContextMenuItem] is an entry of the menu: an action, a submenu,
 ///   an async or paginated submenu, or an item loaded on the fly.
 /// * [SmartContextMenuConfig] sets the behavior and appearance of the menu.
+/// * [SmartContextMenuStyle] sets the appearance, as part of the config.
 /// * [SmartContextMenuController] opens and closes the menu from code.
 ///
 /// Supporting types:
@@ -31,4 +32,5 @@ export 'src/domain/smart_context_menu_item.dart';
 export 'src/domain/smart_context_menu_item_state.dart';
 export 'src/domain/smart_context_menu_labels.dart';
 export 'src/domain/smart_context_menu_paging_metadata.dart';
+export 'src/domain/smart_context_menu_style.dart';
 export 'src/ui/view/smart_context_menu.dart';

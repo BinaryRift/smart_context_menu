@@ -1,10 +1,8 @@
 import 'package:flutter/cupertino.dart' show CupertinoDynamicColor;
 import 'package:flutter/widgets.dart';
 
-import '../../core/ui/styles/smart_context_menu_defaults.dart';
 import '../../domain/smart_context_menu_config.dart';
 import '../../domain/smart_context_menu_item.dart';
-import '../extensions/smart_context_menu_config_ext.dart';
 import '../keys/service_item_key.dart';
 import '../state/smart_context_menu_hover_controller.dart';
 import '../view/smart_context_menu_item_view.dart';
@@ -19,7 +17,7 @@ final class SmartContextMenuBackItem extends StatelessWidget {
 
   /// The back item pinned to the top of a submenu.
   ///
-  /// Has the menu background and [SmartContextMenuConfig.backButtonBlur],
+  /// Has the menu background and [SmartContextMenuStyle.backButtonBlur],
   /// and keeps drags on it from scrolling the items below.
   const SmartContextMenuBackItem({
     super.key,
@@ -39,6 +37,7 @@ final class SmartContextMenuBackItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final style = config.style;
     final item = SmartContextMenuItemView(
       key: _isPlaceholder
           ? ServiceItemKey.backPlaceholder
@@ -49,14 +48,14 @@ final class SmartContextMenuBackItem extends StatelessWidget {
       item: SmartContextMenuItem.simple(
         closeOnTap: false,
         title: config.labels.back,
-        titleStyle: config.textStyle.copyWith(
+        titleStyle: style.textStyle.copyWith(
           fontWeight: FontWeight.w600,
         ),
         leading: Icon(
-          SmartContextMenuDefaults.backIcon,
-          size: config.defaultIconSize,
+          style.backIcon,
+          size: style.defaultIconSize,
           color: CupertinoDynamicColor.maybeResolve(
-            config.defaultIconColor,
+            style.defaultIconColor,
             context,
           ),
         ),
@@ -75,12 +74,12 @@ final class SmartContextMenuBackItem extends StatelessWidget {
       onPanStart: (_) {},
       behavior: HitTestBehavior.opaque,
       child: SmartContextMenuBlurBox(
-        blur: config.backButtonBlur,
-        borderRadius: config.backButtonBorderRadius,
+        blur: style.backButtonBlur,
+        borderRadius: style.backButtonBorderRadius,
         child: Container(
           decoration: BoxDecoration(
-            color: config.resolveMenuColor(context),
-            borderRadius: config.backButtonBorderRadius,
+            color: CupertinoDynamicColor.resolve(style.menuColor, context),
+            borderRadius: style.backButtonBorderRadius,
           ),
           child: item,
         ),

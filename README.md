@@ -14,7 +14,7 @@ drag-to-select and rich submenus.
 - **Submenus**: static, loaded asynchronously or paginated, with a back item.
 - **Async items** that show a loading state and a retry item on failure, with optional custom views.
 - **Light and dark themes** out of the box.
-- **Customizable**: size, colors, blur, decoration, labels and custom item content.
+- **Customizable**: size, colors, text, icons, blur, decoration, labels and custom item content.
 - **Programmatic control**: open and close the menu from code with `SmartContextMenuController`,
   or turn off the long press and open the menu only from code.
 
@@ -196,24 +196,26 @@ Dispose it when it is no longer needed.
 
 ### Customization
 
-All settings live in `SmartContextMenuConfig`. Create it once and reuse it to keep
-the menus in the app consistent.
+All settings live in `SmartContextMenuConfig`, and the appearance in its `style`.
+Create the config once and reuse it to keep the menus in the app consistent.
 
 ```dart
 const menuConfig = SmartContextMenuConfig(
   menuWidth: 250,
-  menuBlur: SmartContextMenuBlur.small,
-  backgroundBlur: SmartContextMenuBlur(10),
-  borderRadius: BorderRadius.all(Radius.circular(20)),
   enableHaptics: false,
+  style: SmartContextMenuStyle(
+    menuBlur: SmartContextMenuBlur.small,
+    backgroundBlur: SmartContextMenuBlur(10),
+    borderRadius: BorderRadius.all(Radius.circular(20)),
+  ),
 );
 ```
 
-The text and colors of items follow the config too, so the menu can match
-the app theme:
+`SmartContextMenuStyle` also sets the text, colors and icons of items, so the menu
+can match the app theme:
 
 ```dart
-const menuConfig = SmartContextMenuConfig(
+const menuStyle = SmartContextMenuStyle(
   textStyle: TextStyle(
     fontFamily: 'Montserrat',
     fontSize: 17,
@@ -223,6 +225,8 @@ const menuConfig = SmartContextMenuConfig(
   destructiveColor: Color(0xFFFF453A),
   disabledItemColor: Color(0x1F000000),
   dividerColor: Color(0x999E9E9E),
+  submenuIcon: Icons.arrow_forward_ios,
+  backIcon: Icons.arrow_back_ios_new,
 );
 ```
 

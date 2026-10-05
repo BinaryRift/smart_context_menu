@@ -84,7 +84,7 @@ final class SmartContextMenuItem {
 
   /// The style of [title].
   ///
-  /// Defaults to [SmartContextMenuConfig.textStyle]. Its color is used
+  /// Defaults to [SmartContextMenuStyle.textStyle]. Its color is used
   /// only while the item is enabled and not destructive.
   final TextStyle? titleStyle;
 
@@ -108,7 +108,7 @@ final class SmartContextMenuItem {
 
   /// Whether the item performs a destructive action.
   ///
-  /// Destructive items are shown in [SmartContextMenuConfig.destructiveColor].
+  /// Destructive items are shown in [SmartContextMenuStyle.destructiveColor].
   final bool isDestructive;
 
   /// Whether the item is disabled.
