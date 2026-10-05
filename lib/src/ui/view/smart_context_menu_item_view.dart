@@ -155,8 +155,6 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
       isDisabled: _item.isDisabled,
       isDestructive: _item.isDestructive,
       textColor: _textColor,
-      isLoading: _isLoading,
-      hasError: _error != null,
     );
 
     return MetaData(
@@ -189,16 +187,14 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
   }
 
   Widget _buildContent(SmartContextMenuItemState state) {
-    Widget child = _body(_item);
-
-    if (_isLoading) child = _buildLoadingBody();
-    if (_error != null) child = _buildErrorBody();
+    if (_isLoading) return _buildLoadingBody(state);
+    if (_error != null) return _buildErrorBody(state);
 
     if (_item.customBuilder != null) {
       return _item.customBuilder!(context, state);
     }
 
-    return child;
+    return _body(_item);
   }
 
   Widget _buildDivider() {
@@ -247,7 +243,15 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
     );
   }
 
-  Widget _buildLoadingBody() {
+  Widget _buildLoadingBody(SmartContextMenuItemState state) {
+    final loadingBuilder = _item.loadingBuilder;
+    if (loadingBuilder != null) {
+      return KeyedSubtree(
+        key: const ValueKey("loading_item"),
+        child: loadingBuilder(context, state),
+      );
+    }
+
     final loadingItem = SmartContextMenuItem.simple(
       title: _item.title ?? _config.labels.loading,
       titleStyle: _item.titleStyle,
@@ -261,7 +265,15 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
     );
   }
 
-  Widget _buildErrorBody() {
+  Widget _buildErrorBody(SmartContextMenuItemState state) {
+    final errorBuilder = _item.errorBuilder;
+    if (errorBuilder != null) {
+      return KeyedSubtree(
+        key: const ValueKey("error_item"),
+        child: errorBuilder(context, state),
+      );
+    }
+
     final errorItem = SmartContextMenuItem.simple(
       title: _config.labels.retry,
       leading: Icon(

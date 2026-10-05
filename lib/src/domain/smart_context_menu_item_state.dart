@@ -6,8 +6,6 @@ final class SmartContextMenuItemState {
   final bool isDisabled;
   final bool isDestructive;
   final Color textColor;
-  final bool isLoading;
-  final bool hasError;
 
   @internal
   const SmartContextMenuItemState({
@@ -15,7 +13,5 @@ final class SmartContextMenuItemState {
     required this.isDisabled,
     required this.isDestructive,
     required this.textColor,
-    required this.isLoading,
-    required this.hasError,
   });
 }

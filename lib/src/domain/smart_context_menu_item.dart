@@ -181,6 +181,22 @@ final class SmartContextMenuItem {
   /// and taps are handled as usual.
   final SmartContextMenuItemBuilder? customBuilder;
 
+  /// Builds the content of the placeholder while [asyncItem] is loading.
+  ///
+  /// The item [padding] and divider are still applied. If null, the
+  /// placeholder shows [title] (or [SmartContextMenuLabels.loading]),
+  /// [leading] and an activity indicator.
+  /// Set by [SmartContextMenuItem.async].
+  final SmartContextMenuItemBuilder? loadingBuilder;
+
+  /// Builds the content of the placeholder after [asyncItem] has failed.
+  ///
+  /// Tapping the placeholder retries loading. The item [padding], press
+  /// highlight and divider are still applied. If null, the placeholder
+  /// shows [SmartContextMenuLabels.retry] with error and retry icons.
+  /// Set by [SmartContextMenuItem.async].
+  final SmartContextMenuItemBuilder? errorBuilder;
+
   /// Whether the item shows a submenu chevron.
   @internal
   bool get showTransitionIcon =>
@@ -212,6 +228,8 @@ final class SmartContextMenuItem {
     this.loadingTimeout,
     this.pagingMetadata,
     this.customBuilder,
+    this.loadingBuilder,
+    this.errorBuilder,
     EdgeInsets? padding,
     this.childrenGap = SmartContextMenuDefaults.childrenGap,
     this.closeOnTap = true,
@@ -431,8 +449,9 @@ final class SmartContextMenuItem {
   ///
   /// [timeout] defaults to [SmartContextMenuDefaults.loadingTimeout].
   ///
-  /// The divider and [padding] apply to the placeholder only;
-  /// the loaded item uses its own.
+  /// Use [loadingBuilder] and [errorBuilder] to replace the default loading
+  /// and error content. The divider and [padding] apply to the placeholder
+  /// only; the loaded item uses its own.
   ///
   /// ```dart
   /// SmartContextMenuItem.async(
@@ -457,6 +476,8 @@ final class SmartContextMenuItem {
     Widget? leading,
     String? loadingTitle,
     TextStyle? titleStyle,
+    SmartContextMenuItemBuilder? loadingBuilder,
+    SmartContextMenuItemBuilder? errorBuilder,
     double childrenGap = SmartContextMenuDefaults.childrenGap,
     SmartContextMenuDividerPosition? dividerPosition,
   }) {
@@ -471,6 +492,8 @@ final class SmartContextMenuItem {
       padding: padding,
       leading: leading,
       titleStyle: titleStyle,
+      loadingBuilder: loadingBuilder,
+      errorBuilder: errorBuilder,
       childrenGap: childrenGap,
       dividerPosition: dividerPosition ?? SmartContextMenuDividerPosition.bottom,
     );
