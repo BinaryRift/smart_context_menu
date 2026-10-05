@@ -110,7 +110,6 @@ final class _SmartContextMenuState extends State<SmartContextMenu>
     _setupAnimations();
     _setupRecognizers();
     _bindController();
-    if (_items.isEmpty) debugPrint("Context menu info: menu is empty");
   }
 
   @override
@@ -281,7 +280,7 @@ final class _SmartContextMenuState extends State<SmartContextMenu>
 
   void _bindController() {
     widget.controller?.attach(
-      open: _handleControllerOpen,
+      open: _openMenu,
       close: _closeMenu,
       isOpen: _session.isMenuVisible,
     );
@@ -314,10 +313,6 @@ final class _SmartContextMenuState extends State<SmartContextMenu>
     if (mounted) {
       await _openMenu();
     }
-  }
-
-  Future<void> _handleControllerOpen() {
-    return _openMenu();
   }
 
   Future<void> _openMenu() {
