@@ -40,7 +40,6 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
   Future<List<SmartContextMenuItem>>? _activeLoadTask;
 
   final double _translateZ = MotionTranslationFactor.none.dz;
-  Offset? _startPosition;
   double _scaleX = MotionScale.none.x;
   double _scaleY = MotionScale.none.y;
   double _translateX = MotionTranslationFactor.none.dx;
@@ -54,7 +53,6 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
   SmartContextMenuCache get cache => _cache;
 
   double get translateZ => _translateZ;
-  Offset? get startPosition => _startPosition;
   double get scaleX => _scaleX;
   double get scaleY => _scaleY;
   double get translateX => _translateX;
@@ -334,10 +332,6 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
     });
   }
 
-  void setPointerStartPosition(Offset? value) {
-    _startPosition = value;
-  }
-
   void calculateMenuStretch(Offset delta, Size boxSize) {
     final maxTranslation = MotionTranslationFactor.full;
     final double relX = (delta.dx / boxSize.width).clamp(
@@ -359,7 +353,6 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
   }
 
   void resetMenuStretch() {
-    _startPosition = null;
     _scaleX = MotionScale.none.x;
     _scaleY = MotionScale.none.y;
     _translateX = MotionTranslationFactor.none.dx;

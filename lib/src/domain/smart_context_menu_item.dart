@@ -178,7 +178,8 @@ final class SmartContextMenuItem {
   /// Builds the item content instead of [leading], [title] and [trailing].
   ///
   /// The item [padding], press highlight and divider are still applied,
-  /// and taps are handled as usual.
+  /// and taps are handled as usual. Interactive widgets inside, such as
+  /// buttons, handle their own taps: the item is not triggered over them.
   final SmartContextMenuItemBuilder? customBuilder;
 
   /// Builds the content of the placeholder while [asyncItem] is loading.

@@ -2,8 +2,6 @@ import 'dart:ui' show ImageFilter;
 import 'package:flutter/cupertino.dart'
     show CupertinoActivityIndicator, CupertinoDynamicColor;
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart'
-    show RenderMetaData, RenderPointerListener;
 
 import '../../core/ui/styles/smart_context_menu_defaults.dart';
 import '../../core/ui/motion/tokens/motion_curves.dart';
@@ -17,6 +15,7 @@ import '../../domain/smart_context_menu_navigator.dart';
 import '../keys/service_item_key.dart';
 import '../state/smart_context_menu_hover_controller.dart';
 import '../widgets/smart_context_menu_blur_box.dart';
+import '../widgets/smart_context_menu_pointer_tracker.dart';
 import 'smart_context_menu_item_view.dart';
 import '../../domain/smart_context_menu_config.dart';
 import '../../domain/smart_context_menu_item.dart';
@@ -47,8 +46,6 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
     implements SmartContextMenuNavigator {
   late final SmartContextMenuOverlayController _controller;
   late final SmartContextMenuHoverController _hoverController;
-  ValueNotifier<bool>? _scrollingNotifier;
-  RenderBox? _menuRenderBox;
 
   SmartContextMenuConfig get _config => widget.config;
 
@@ -80,19 +77,7 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _scrollingNotifier?.removeListener(_onScrollChanged);
-    final scrollable = Scrollable.maybeOf(context);
-    if (scrollable != null) {
-      _scrollingNotifier = scrollable.position.isScrollingNotifier;
-      _scrollingNotifier?.addListener(_onScrollChanged);
-    }
-  }
-
-  @override
   void dispose() {
-    _scrollingNotifier?.removeListener(_onScrollChanged);
     _controller.removeListener(_onControllerUpdate);
     _controller.dispose();
     _hoverController.dispose();
@@ -145,11 +130,10 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
                 constraints: BoxConstraints(
                   maxHeight: screenHeight * _config.menuHeightFactor,
                 ),
-                child: Listener(
-                  onPointerDown: _onPointerEvent,
-                  onPointerMove: _onPointerEvent,
-                  onPointerUp: _onPointerEvent,
-                  onPointerCancel: _onPointerEvent,
+                child: SmartContextMenuPointerTracker(
+                  hoverController: _hoverController,
+                  onDrag: _setMenuEffect,
+                  onRelease: _resetMenuEffect,
                   child: AnimatedSwitcher(
                     duration: MotionDurations.standard,
                     layoutBuilder: _layoutBuilder,
@@ -439,112 +423,12 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
     }
   }
 
-  void _onPointerEvent(PointerEvent event) {
-    if (event is PointerDownEvent) {
-      _handlePointerDown(event);
-    } else if (event is PointerMoveEvent) {
-      _handlePointerMove(event);
-    } else if (event is PointerUpEvent || event is PointerCancelEvent) {
-      _handlePointerReset();
-    }
-  }
-
-  void _handlePointerDown(PointerDownEvent event) {
-    _controller.setPointerStartPosition(event.position);
-    _updateTopmostItem(event.position);
-  }
-
-  void _handlePointerMove(PointerMoveEvent event) {
-    if (_controller.startPosition == null) return;
-    _updateTopmostItem(event.position);
-    _setMenuEffect(event.position);
-  }
-
-  void _handlePointerReset() {
-    final isScrolling = _scrollingNotifier?.value ?? false;
-    if (_hoverController.value != null && !isScrolling) {
-      _hoverController.setReleased();
-    }
-
-    Future.microtask(() {
-      _hoverController.update(null);
-      _resetMenuEffect();
-      _controller.setPointerStartPosition(null);
-    });
-  }
-
-  void _updateTopmostItem(Offset globalPosition) {
-    final bool isScrolling = _scrollingNotifier?.value ?? false;
-
-    if (isScrolling) {
-      if (_hoverController.value != null) _hoverController.update(null);
-      return;
-    }
-
-    _menuRenderBox ??= context.findRenderObject() as RenderBox?;
-    final RenderBox? menuBox = _menuRenderBox;
-    if (menuBox == null || !menuBox.hasSize) return;
-
-    Key? foundKey;
-    bool isChildIntercepted = false;
-
-    bool scan(RenderObject object) {
-      if (object is RenderBox && !object.hasSize) return false;
-
-      if (object is! RenderBox) {
-        bool found = false;
-        object.visitChildren((child) {
-          if (!found) found = scan(child);
-        });
-        return found;
-      }
-
-      final Offset offset = object.localToGlobal(Offset.zero);
-      final Rect rect = offset & object.size;
-
-      // Pointer is outside the bounds: skip the whole subtree.
-      if (!rect.contains(globalPosition)) return false;
-
-      // Check for interactive elements.
-      if (object is RenderPointerListener ||
-          object is RenderSemanticsGestureHandler) {
-        isChildIntercepted = true;
-      }
-
-      if (object is RenderMetaData && object.metaData is Key) {
-        foundKey = object.metaData as Key;
-        isChildIntercepted = false;
-        return true;
-      }
-
-      final List<RenderObject> children = [];
-      object.visitChildren((child) => children.add(child));
-
-      for (final child in children.reversed) {
-        if (scan(child)) return true;
-      }
-
-      return false;
-    }
-
-    scan(menuBox);
-
-    final finalKey = isChildIntercepted ? null : foundKey;
-
-    if (_hoverController.value != finalKey) {
-      _hoverController.update(finalKey);
-    }
-  }
-
-  void _setMenuEffect(Offset position) {
+  void _setMenuEffect(Offset delta) {
     final RenderObject? renderObject = context.findRenderObject();
     if (renderObject is! RenderBox) return;
 
     final RenderBox? box = renderObject as RenderBox?;
     if (box == null || !box.hasSize) return;
-    if (_controller.startPosition == null) return;
-
-    final Offset delta = position - _controller.startPosition!;
 
     _controller.calculateMenuStretch(delta, box.size);
 
@@ -559,9 +443,4 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
     widget.previewMotionNotifier.value = MotionTranslation.none.toOffset;
   }
 
-  void _onScrollChanged() {
-    if (_scrollingNotifier?.value == true) {
-      _hoverController.update(null);
-    }
-  }
 }

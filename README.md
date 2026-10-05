@@ -216,8 +216,9 @@ in `SmartContextMenuDefaults`.
 #### Custom item content
 
 `customBuilder` replaces the content of an item. The item padding, press highlight
-and divider are kept, and taps work as usual. The builder receives the item state,
-including the title color for the current state and theme.
+and divider are kept, and taps work as usual. Interactive widgets inside, such as
+buttons, handle their own taps: the item is not triggered over them. The builder
+receives the item state, including the title color for the current state and theme.
 
 ```dart
 SmartContextMenuItem.simple(
