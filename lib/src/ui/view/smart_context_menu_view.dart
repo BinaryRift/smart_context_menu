@@ -8,6 +8,7 @@ import '../../core/ui/motion/tokens/motion_slides.dart';
 import '../../core/ui/motion/tokens/motion_traslation.dart';
 import '../../controllers/smart_context_menu_overlay_controller.dart';
 import '../../domain/smart_context_menu_navigator.dart';
+import '../extensions/smart_context_menu_config_ext.dart';
 import '../state/smart_context_menu_hover_controller.dart';
 import '../state/smart_context_menu_stretch_controller.dart';
 import '../widgets/smart_context_menu_blur_box.dart';
@@ -44,13 +45,8 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
 
   SmartContextMenuConfig get _config => widget.config;
 
-  Color get _menuColor => CupertinoDynamicColor.resolve(
-    _config.menuColor ?? SmartContextMenuDefaults.menuColor,
-    context,
-  );
-
   BoxDecoration get _defaultDecoration => BoxDecoration(
-    color: _menuColor,
+    color: _config.resolveMenuColor(context),
     borderRadius: _config.borderRadius,
     border: Border.all(
       color: CupertinoDynamicColor.resolve(
@@ -102,7 +98,8 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
       child: SmartContextMenuShadowBox(
         borderRadius: _config.borderRadius,
         child: SmartContextMenuBlurBox(
-          config: _config,
+          blur: _config.menuBlur,
+          borderRadius: _config.borderRadius,
           child: ListenableBuilder(
             listenable: _stretchController,
             builder: (context, child) => AnimatedContainer(

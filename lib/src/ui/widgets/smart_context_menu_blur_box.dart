@@ -1,32 +1,35 @@
 import 'dart:ui' show ImageFilter;
 
-import 'package:flutter/material.dart';
-import '../../domain/smart_context_menu_config.dart';
+import 'package:flutter/widgets.dart';
 
+import '../../domain/smart_context_menu_blur.dart';
+
+/// Blurs what is behind [child] within [borderRadius].
+///
+/// Without [blur], shows [child] as is.
 final class SmartContextMenuBlurBox extends StatelessWidget {
-  final SmartContextMenuConfig config;
+  final SmartContextMenuBlur? blur;
+  final BorderRadiusGeometry borderRadius;
   final Widget child;
 
   const SmartContextMenuBlurBox({
     super.key,
-    required this.config,
+    required this.blur,
+    required this.borderRadius,
     required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
-    if (config.menuBlur != null) {
-      return ClipRRect(
-        borderRadius: config.borderRadius,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: config.menuBlur!.sigmaX,
-            sigmaY: config.menuBlur!.sigmaY,
-          ),
-          child: child,
-        ),
-      );
-    }
-    return child;
+    final blur = this.blur;
+    if (blur == null) return child;
+
+    return ClipRRect(
+      borderRadius: borderRadius,
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: blur.sigmaX, sigmaY: blur.sigmaY),
+        child: child,
+      ),
+    );
   }
 }

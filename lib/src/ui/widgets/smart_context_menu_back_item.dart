@@ -1,0 +1,90 @@
+import 'package:flutter/cupertino.dart' show CupertinoDynamicColor;
+import 'package:flutter/widgets.dart';
+
+import '../../core/ui/styles/smart_context_menu_defaults.dart';
+import '../../domain/smart_context_menu_config.dart';
+import '../../domain/smart_context_menu_item.dart';
+import '../extensions/smart_context_menu_config_ext.dart';
+import '../keys/service_item_key.dart';
+import '../state/smart_context_menu_hover_controller.dart';
+import '../view/smart_context_menu_item_view.dart';
+import 'smart_context_menu_blur_box.dart';
+
+/// The item that returns to the parent menu level.
+final class SmartContextMenuBackItem extends StatelessWidget {
+  final SmartContextMenuConfig config;
+  final SmartContextMenuHoverController hoverController;
+  final VoidCallback onTap;
+  final bool _isPlaceholder;
+
+  /// The back item pinned to the top of a submenu.
+  ///
+  /// Has the menu background and [SmartContextMenuConfig.backButtonBlur],
+  /// and keeps drags on it from scrolling the items below.
+  const SmartContextMenuBackItem({
+    super.key,
+    required this.config,
+    required this.hoverController,
+    required this.onTap,
+  }) : _isPlaceholder = false;
+
+  /// The invisible copy that reserves the space of the pinned back item
+  /// at the top of the submenu list.
+  const SmartContextMenuBackItem.placeholder({
+    super.key,
+    required this.config,
+    required this.hoverController,
+    required this.onTap,
+  }) : _isPlaceholder = true;
+
+  @override
+  Widget build(BuildContext context) {
+    final item = SmartContextMenuItemView(
+      key: _isPlaceholder
+          ? ServiceItemKey.backPlaceholder
+          : ServiceItemKey.back,
+      onTap: (_) => onTap(),
+      config: config,
+      hoverController: hoverController,
+      item: SmartContextMenuItem.simple(
+        closeOnTap: false,
+        title: config.labels.back,
+        titleStyle: SmartContextMenuDefaults.textStyle.copyWith(
+          fontWeight: FontWeight.w600,
+        ),
+        leading: Icon(
+          SmartContextMenuDefaults.backIcon,
+          size: config.defaultIconSize,
+          color: CupertinoDynamicColor.maybeResolve(
+            config.defaultIconColor,
+            context,
+          ),
+        ),
+        hasDivider: true,
+      ),
+    );
+
+    if (_isPlaceholder) {
+      return Visibility.maintain(
+        visible: false,
+        child: IgnorePointer(child: item),
+      );
+    }
+
+    return GestureDetector(
+      onPanStart: (_) {},
+      behavior: HitTestBehavior.opaque,
+      child: SmartContextMenuBlurBox(
+        blur: config.backButtonBlur,
+        borderRadius: config.backButtonBorderRadius,
+        child: Container(
+          decoration: BoxDecoration(
+            color: config.resolveMenuColor(context),
+            borderRadius: config.backButtonBorderRadius,
+          ),
+          child: item,
+        ),
+      ),
+    );
+  }
+}

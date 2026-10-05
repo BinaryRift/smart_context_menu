@@ -10,7 +10,9 @@ import '../../core/ui/motion/transitions/tricky_transition.dart';
 import '../../domain/smart_context_menu_config.dart';
 import '../../domain/smart_context_menu_item.dart';
 import '../../domain/smart_context_menu_item_state.dart';
+import '../keys/item_content_key.dart';
 import '../state/smart_context_menu_hover_controller.dart';
+import '../widgets/smart_context_menu_divider.dart';
 
 final class SmartContextMenuItemView extends StatefulWidget {
   final SmartContextMenuItem item;
@@ -164,9 +166,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
         mainAxisSize: MainAxisSize.min,
         children: [
           if (_item.hasDivider && _item.dividerPosition == SmartContextMenuDividerPosition.top)
-            _item.customDivider != null
-                ? _item.customDivider!
-                : _buildDivider(),
+            _item.customDivider ?? const SmartContextMenuDivider(),
           AnimatedContainer(
             duration: _highlightDuration,
             color: _overlayColor,
@@ -180,7 +180,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
           ),
           if (_item.hasDivider &&
               _item.dividerPosition == SmartContextMenuDividerPosition.bottom)
-            _item.customDivider != null ? _item.customDivider! : _buildDivider()
+            _item.customDivider ?? const SmartContextMenuDivider(),
         ],
       ),
     );
@@ -190,18 +190,11 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
     if (_isLoading) return _buildLoadingBody(state);
     if (_error != null) return _buildErrorBody(state);
 
-    if (_item.customBuilder != null) {
-      return _item.customBuilder!(context, state);
-    }
-
-    return _body(_item);
-  }
-
-  Widget _buildDivider() {
-    return Divider(
-      height: 1,
-      thickness: 0.5,
-      color: _resolve(SmartContextMenuDefaults.dividerColor),
+    return KeyedSubtree(
+      key: ItemContentKey.content,
+      child: _item.customBuilder != null
+          ? _item.customBuilder!(context, state)
+          : _body(_item),
     );
   }
 
@@ -247,7 +240,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
     final loadingBuilder = _item.loadingBuilder;
     if (loadingBuilder != null) {
       return KeyedSubtree(
-        key: const ValueKey("loading_item"),
+        key: ItemContentKey.loading,
         child: loadingBuilder(context, state),
       );
     }
@@ -259,8 +252,8 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
       childrenGap: _item.childrenGap,
       trailing: CupertinoActivityIndicator(),
     );
-    return Container(
-      key: const ValueKey("loading_item"),
+    return KeyedSubtree(
+      key: ItemContentKey.loading,
       child: _body(loadingItem),
     );
   }
@@ -269,7 +262,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
     final errorBuilder = _item.errorBuilder;
     if (errorBuilder != null) {
       return KeyedSubtree(
-        key: const ValueKey("error_item"),
+        key: ItemContentKey.error,
         child: errorBuilder(context, state),
       );
     }
@@ -285,8 +278,8 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
         size: _config.defaultIconSize,
       ),
     );
-    return Container(
-      key: const ValueKey("error_item"),
+    return KeyedSubtree(
+      key: ItemContentKey.error,
       child: _body(errorItem),
     );
   }
