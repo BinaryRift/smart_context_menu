@@ -1,7 +1,25 @@
 /// iOS-style context menu with smart positioning, fluid animations,
 /// drag-to-select and rich submenus.
 ///
-/// Start with [SmartContextMenu].
+/// Start with [SmartContextMenu]: wrap a widget with it and pass the menu
+/// items. The menu opens on long press.
+///
+/// The main classes:
+///
+/// * [SmartContextMenu] attaches a menu to a widget.
+/// * [SmartContextMenuItem] is an entry of the menu: an action, a submenu,
+///   an async or paginated submenu, or an item loaded on the fly.
+/// * [SmartContextMenuConfig] sets the behavior and appearance of the menu.
+/// * [SmartContextMenuController] opens and closes the menu from code.
+///
+/// Supporting types:
+///
+/// * [SmartContextMenuLabels] holds the strings shown by the menu itself.
+/// * [SmartContextMenuBlur] sets the strength of the blurs.
+/// * [SmartContextMenuPagingMetadata] describes a page of a paginated
+///   submenu.
+/// * [SmartContextMenuItemState] is passed to custom item builders.
+/// * [SmartContextMenuDefaults] holds the default values of the menu.
 library;
 
 export 'src/controllers/smart_context_menu_controller.dart';
