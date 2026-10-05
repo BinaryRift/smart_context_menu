@@ -45,3 +45,6 @@ key.properties
 keystore.properties
 **/*.keystore
 **/*.jks
+
+# Local archive of completed/superseded planning docs
+/0_old_docs/
