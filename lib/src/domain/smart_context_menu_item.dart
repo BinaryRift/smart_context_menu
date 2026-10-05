@@ -429,6 +429,8 @@ final class SmartContextMenuItem {
   /// placeholder turns into a retry item. The loaded item is cached by [id]
   /// until the menu closes.
   ///
+  /// [timeout] defaults to [SmartContextMenuDefaults.loadingTimeout].
+  ///
   /// The divider and [padding] apply to the placeholder only;
   /// the loaded item uses its own.
   ///
@@ -448,7 +450,7 @@ final class SmartContextMenuItem {
   factory SmartContextMenuItem.async({
     required SmartContextMenuItemLoader asyncItem,
     String? id,
-    Duration timeout = const Duration(seconds: 15),
+    Duration timeout = SmartContextMenuDefaults.loadingTimeout,
     bool hasDivider = false,
     Widget? customDivider,
     EdgeInsets? padding,

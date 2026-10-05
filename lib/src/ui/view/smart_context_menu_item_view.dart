@@ -296,8 +296,8 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
     });
 
     try {
-      final Duration timeout =
-          widget.item.loadingTimeout ?? const Duration(seconds: 10);
+      final Duration timeout = widget.item.loadingTimeout ??
+          SmartContextMenuDefaults.loadingTimeout;
       final result = await widget.item.asyncItem!().timeout(timeout);
 
       if (mounted) {

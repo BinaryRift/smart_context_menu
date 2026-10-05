@@ -19,6 +19,11 @@ abstract final class SmartContextMenuDefaults {
   static const double loaderVerticalPadding = 12;
   static const double iconSize = 20;
 
+  // Loading
+
+  /// How long [SmartContextMenuItem.async] waits for its item.
+  static const Duration loadingTimeout = Duration(seconds: 10);
+
   // Radii
 
   static const double cornerRadius = 16;
