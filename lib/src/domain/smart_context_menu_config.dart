@@ -2,8 +2,8 @@ import 'package:flutter/widgets.dart'
     show BorderRadiusGeometry, Color, Decoration, EdgeInsets;
 
 import '../core/ui/styles/smart_context_menu_defaults.dart';
-import '../core/ui/motion/tokens/smart_context_menu_blur.dart';
 import 'smart_context_menu_activation_mode.dart';
+import 'smart_context_menu_blur.dart';
 import 'smart_context_menu_labels.dart';
 
 final class SmartContextMenuConfig {

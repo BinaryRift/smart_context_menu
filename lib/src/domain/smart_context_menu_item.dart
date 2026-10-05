@@ -3,6 +3,7 @@
 import 'dart:async' show FutureOr;
 import 'package:flutter/widgets.dart'
     show Widget, BuildContext, EdgeInsets, TextStyle;
+import 'package:meta/meta.dart' show internal;
 
 import '../core/ui/styles/smart_context_menu_defaults.dart';
 import 'smart_context_menu_item_state.dart';
@@ -87,9 +88,12 @@ final class SmartContextMenuItem {
 
   final SmartContextMenuItemBuilder? customBuilder;
 
+  @internal
   bool get showTransitionIcon =>
       children != null || asyncChildren != null || asyncPagingChildren != null;
-  bool get isInternalInterected =>
+
+  @internal
+  bool get isInternalInteracted =>
       asyncItem != null ||
       asyncChildren != null ||
       asyncPagingChildren != null ||
@@ -275,7 +279,7 @@ final class SmartContextMenuItem {
   );
 
   factory SmartContextMenuItem.async({
-    required SmartContextMenuItemLoader builder,
+    required SmartContextMenuItemLoader asyncItem,
     String? id,
     Duration timeout = const Duration(seconds: 15),
     bool hasDivider = false,
@@ -290,7 +294,7 @@ final class SmartContextMenuItem {
     return SmartContextMenuItem._(
       id: id ?? _generateId(),
       title: loadingTitle,
-      asyncItem: builder,
+      asyncItem: asyncItem,
       loadingTimeout: timeout,
       hasDivider: hasDivider,
       closeOnTap: false,

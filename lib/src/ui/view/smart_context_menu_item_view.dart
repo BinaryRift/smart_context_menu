@@ -64,7 +64,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
   bool get _isDisabled => _item.isDisabled || _isLoading || !_hasInteractions;
   bool get _hasInteractions =>
       _item.onTap != null ||
-      _item.isInternalInterected ||
+      _item.isInternalInteracted ||
       _item.closeOnTap ||
       widget.onRetry != null ||
       widget.onTap != null;
