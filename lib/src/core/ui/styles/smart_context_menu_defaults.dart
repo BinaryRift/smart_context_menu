@@ -10,7 +10,6 @@ abstract final class SmartContextMenuDefaults {
 
   static const EdgeInsets screenPadding = EdgeInsets.all(16);
   static const double menuGap = 12;
-  static const double subMenuOffset = 12;
   static const double childrenGap = 12;
   static const EdgeInsets itemPadding = EdgeInsets.symmetric(
     horizontal: 16,

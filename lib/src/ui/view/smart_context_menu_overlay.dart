@@ -318,6 +318,10 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
 
   void _handlePointerUp(PointerUpEvent event) {
     if (_pointerDownPos == null) return;
+    if (!_config.barrierDismissible) {
+      _pointerDownPos = null;
+      return;
+    }
 
     if (_isScrolling) {
       _isScrolling = false;

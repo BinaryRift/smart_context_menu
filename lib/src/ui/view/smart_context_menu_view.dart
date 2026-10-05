@@ -126,6 +126,7 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
     return WidgetSizeListener(
       onSizeChanged: _onSizeChanged,
       child: SmartContextMenuShadowBox(
+        borderRadius: _config.borderRadius,
         child: SmartContextMenuBlurBox(
           config: _config,
           child: AnimatedContainer(
@@ -133,7 +134,7 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
             curve: MotionCurves.quartOut,
             transformAlignment: Alignment.center,
             transform: stretchMatrix,
-            width: _config.maxMenuWidth,
+            width: _config.menuWidth,
             decoration: _config.menuDecoration ?? _defaultDecoration,
             clipBehavior: Clip.antiAlias,
             child: AnimatedSize(

@@ -101,4 +101,31 @@ void main() {
       );
     });
   });
+
+  group('barrierDismissible', () {
+    testWidgets('closes the menu on a tap outside by default', (tester) async {
+      await tester.pumpMenu(
+        items: [SmartContextMenuItem.simple(title: 'Copy')],
+      );
+      await tester.openMenu();
+
+      await tester.tapAt(const Offset(5, 5));
+      await tester.settleMenu();
+
+      expect(find.text('Copy'), findsNothing);
+    });
+
+    testWidgets('keeps the menu open when false', (tester) async {
+      await tester.pumpMenu(
+        config: const SmartContextMenuConfig(barrierDismissible: false),
+        items: [SmartContextMenuItem.simple(title: 'Copy')],
+      );
+      await tester.openMenu();
+
+      await tester.tapAt(const Offset(5, 5));
+      await tester.settleMenu();
+
+      expect(find.text('Copy'), findsOneWidget);
+    });
+  });
 }
