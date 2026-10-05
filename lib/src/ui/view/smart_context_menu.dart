@@ -91,6 +91,7 @@ final class _SmartContextMenuState extends State<SmartContextMenu>
   late final LongPressGestureRecognizer _longPressRecognizer;
   late final TapGestureRecognizer _tapRecognizer;
   late final AnimationController _scaleController;
+  late final CurvedAnimation _scaleCurve;
   late final Animation<double> _scaleAnimation;
 
   late final SmartContextMenuSession _session;
@@ -134,6 +135,7 @@ final class _SmartContextMenuState extends State<SmartContextMenu>
     _session.invalidate();
     widget.controller?.detach();
     _longPressRecognizer.dispose();
+    _scaleCurve.dispose();
     _scaleController.dispose();
     _tapRecognizer.dispose();
     super.dispose();
@@ -248,12 +250,14 @@ final class _SmartContextMenuState extends State<SmartContextMenu>
       duration: _pressDuration,
     );
 
+    _scaleCurve = CurvedAnimation(
+      parent: _scaleController,
+      curve: MotionCurves.standard,
+    );
     _scaleAnimation = Tween<double>(
       begin: MotionScale.none.value,
       end: MotionScale.pressed.value,
-    ).animate(
-      CurvedAnimation(parent: _scaleController, curve: MotionCurves.standard),
-    );
+    ).animate(_scaleCurve);
   }
 
   void _syncRecognizers() {

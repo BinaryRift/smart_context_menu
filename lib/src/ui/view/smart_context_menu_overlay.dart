@@ -44,7 +44,7 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
 
   late final Animation<double> _backgroundAnimation;
   late final CurvedAnimation _backgroundCurve;
-  late final Animation<double> _menuAnimation;
+  late final CurvedAnimation _menuAnimation;
 
   Alignment _menuAlignment = Alignment.topCenter;
   double? _leftPadding;
@@ -73,6 +73,9 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
   @override
   void dispose() {
     _currentMenuHeight.dispose();
+    _previewMotion.dispose();
+    _backgroundCurve.dispose();
+    _menuAnimation.dispose();
     _scrollController.dispose();
     super.dispose();
   }
