@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import '../../core/ui/styles/smart_context_menu_defaults.dart';
 import '../../core/ui/motion/tokens/motion_curves.dart';
 import '../../core/ui/motion/tokens/motion_durations.dart';
-import '../../core/ui/motion/tokens/motion_slides.dart';
 import '../../core/ui/motion/tokens/motion_traslation.dart';
 import '../../controllers/smart_context_menu_overlay_controller.dart';
 import '../../domain/smart_context_menu_navigator.dart';
@@ -12,6 +11,7 @@ import '../extensions/smart_context_menu_config_ext.dart';
 import '../state/smart_context_menu_hover_controller.dart';
 import '../state/smart_context_menu_stretch_controller.dart';
 import '../widgets/smart_context_menu_blur_box.dart';
+import '../widgets/smart_context_menu_level_switcher.dart';
 import '../widgets/smart_context_menu_pointer_tracker.dart';
 import 'smart_context_menu_level_view.dart';
 import '../../domain/smart_context_menu_config.dart';
@@ -123,10 +123,8 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
                   hoverController: _hoverController,
                   onDrag: _setMenuEffect,
                   onRelease: _resetMenuEffect,
-                  child: AnimatedSwitcher(
-                    duration: MotionDurations.standard,
-                    layoutBuilder: _layoutBuilder,
-                    transitionBuilder: _transitionBuilder,
+                  child: SmartContextMenuLevelSwitcher(
+                    isForward: _controller.isForward,
                     child: SmartContextMenuLevelView(
                       key: ValueKey(_controller.stackLength),
                       controller: _controller,
@@ -138,45 +136,6 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
               ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _layoutBuilder(Widget? currentChild, List<Widget> previousChildren) {
-    return Stack(
-      alignment:
-          _controller.isForward ? Alignment.centerRight : Alignment.centerLeft,
-      children: [
-        ...previousChildren,
-        ?currentChild,
-      ],
-    );
-  }
-
-  Widget _transitionBuilder(Widget child, Animation<double> animation) {
-    final fadeAnimation = CurvedAnimation(
-      parent: animation,
-      curve: const Interval(0.0, 0.6, curve: Curves.easeIn),
-      reverseCurve: const Interval(0.4, 1.0, curve: Curves.easeOut),
-    );
-
-    final slideAnimation = CurvedAnimation(
-      parent: animation,
-      curve: MotionCurves.emphasized,
-    );
-
-    return RepaintBoundary(
-      child: FadeTransition(
-        opacity: fadeAnimation,
-        child: SlideTransition(
-          position: Tween<Offset>(
-            begin: _controller.isForward
-                ? MotionSlide.rightHalf.offset
-                : MotionSlide.leftHalf.offset,
-            end: MotionSlide.none.offset,
-          ).animate(slideAnimation),
-          child: child,
         ),
       ),
     );
