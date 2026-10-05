@@ -14,6 +14,7 @@ import '../../core/ui/motion/tokens/motion_traslation.dart';
 import '../../controllers/smart_context_menu_overlay_controller.dart';
 import '../../core/ui/motion/transitions/tricky_transition.dart';
 import '../../domain/smart_context_menu_navigator.dart';
+import '../keys/service_item_key.dart';
 import '../state/smart_context_menu_hover_controller.dart';
 import '../widgets/smart_context_menu_blur_box.dart';
 import 'smart_context_menu_item_view.dart';
@@ -259,7 +260,7 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
       return Visibility.maintain(
         visible: false,
         child: IgnorePointer(
-          child: _buildBackButton(key: const ValueKey("back_button_hidden")),
+          child: _buildBackButton(key: ServiceItemKey.backPlaceholder),
         ),
       );
     }
@@ -329,7 +330,7 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
         color: _menuColor,
         borderRadius: _config.backButtonBorderRadius,
       ),
-      child: _buildBackButton(key: const ValueKey("back_button")),
+      child: _buildBackButton(key: ServiceItemKey.back),
     );
 
     if (_config.backButtonBlur != null) {
@@ -376,7 +377,7 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
 
   Widget _buildRetryButton(bool hasPagination) {
     return SmartContextMenuItemView.error(
-      key: const ValueKey("retry_button"),
+      key: ServiceItemKey.retry,
       onRetry: () => _controller.onRetryLoad(hasPagination),
       config: _config,
       hoverController: _hoverController,
