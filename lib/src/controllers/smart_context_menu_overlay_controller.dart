@@ -1,10 +1,5 @@
 import 'package:flutter/foundation.dart' show ChangeNotifier;
 import 'package:flutter/services.dart' show HapticFeedback;
-import 'package:flutter/widgets.dart' show Offset, Size;
-
-import '../core/ui/motion/tokens/motion_scales.dart';
-import '../core/ui/motion/tokens/motion_translation_factor.dart';
-import '../core/ui/motion/tokens/motion_traslation.dart';
 import '../domain/smart_context_menu_item.dart';
 import '../domain/smart_context_menu_level.dart';
 import '../domain/smart_context_menu_navigator.dart';
@@ -39,24 +34,12 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
   bool _isForward = true;
   Future<List<SmartContextMenuItem>>? _activeLoadTask;
 
-  final double _translateZ = MotionTranslationFactor.none.dz;
-  double _scaleX = MotionScale.none.x;
-  double _scaleY = MotionScale.none.y;
-  double _translateX = MotionTranslationFactor.none.dx;
-  double _translateY = MotionTranslationFactor.none.dy;
-
   List<SmartMenuLevel> get menuStack => _menuStack;
   SmartMenuLevel get currentLevel => _menuStack.last;
   bool get isLoading => _isLoading;
   bool get isForward => _isForward;
   int get stackLength => _menuStack.length;
   SmartContextMenuCache get cache => _cache;
-
-  double get translateZ => _translateZ;
-  double get scaleX => _scaleX;
-  double get scaleY => _scaleY;
-  double get translateX => _translateX;
-  double get translateY => _translateY;
 
   void _pushSubmenuLevel({
     required String parentId,
@@ -330,33 +313,5 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
       }
       level.items.addAll(results);
     });
-  }
-
-  void calculateMenuStretch(Offset delta, Size boxSize) {
-    final maxTranslation = MotionTranslationFactor.full;
-    final double relX = (delta.dx / boxSize.width).clamp(
-      -maxTranslation.dx,
-      maxTranslation.dx,
-    );
-    final double relY = (delta.dy / boxSize.height).clamp(
-      -maxTranslation.dy,
-      maxTranslation.dy,
-    );
-
-    _scaleX = MotionScale.none.x + (relX.abs() * 0.05);
-    _scaleY = MotionScale.none.y + (relY.abs() * 0.04);
-
-    _translateX = relX * MotionTranslation.subtle.dx;
-    _translateY = relY * MotionTranslation.subtle.dy;
-
-    notifyListeners();
-  }
-
-  void resetMenuStretch() {
-    _scaleX = MotionScale.none.x;
-    _scaleY = MotionScale.none.y;
-    _translateX = MotionTranslationFactor.none.dx;
-    _translateY = MotionTranslationFactor.none.dy;
-    notifyListeners();
   }
 }

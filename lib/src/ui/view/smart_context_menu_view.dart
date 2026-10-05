@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import '../../core/ui/styles/smart_context_menu_defaults.dart';
 import '../../core/ui/motion/tokens/motion_curves.dart';
 import '../../core/ui/motion/tokens/motion_durations.dart';
-import '../../core/ui/motion/tokens/motion_scales.dart';
 import '../../core/ui/motion/tokens/motion_slides.dart';
 import '../../core/ui/motion/tokens/motion_traslation.dart';
 import '../../controllers/smart_context_menu_overlay_controller.dart';
@@ -14,6 +13,7 @@ import '../../core/ui/motion/transitions/tricky_transition.dart';
 import '../../domain/smart_context_menu_navigator.dart';
 import '../keys/service_item_key.dart';
 import '../state/smart_context_menu_hover_controller.dart';
+import '../state/smart_context_menu_stretch_controller.dart';
 import '../widgets/smart_context_menu_blur_box.dart';
 import '../widgets/smart_context_menu_pointer_tracker.dart';
 import 'smart_context_menu_item_view.dart';
@@ -46,6 +46,7 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
     implements SmartContextMenuNavigator {
   late final SmartContextMenuOverlayController _controller;
   late final SmartContextMenuHoverController _hoverController;
+  late final SmartContextMenuStretchController _stretchController;
 
   SmartContextMenuConfig get _config => widget.config;
 
@@ -74,6 +75,7 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
       enableHaptics: _config.enableHaptics,
     )..addListener(_onControllerUpdate);
     _hoverController = SmartContextMenuHoverController();
+    _stretchController = SmartContextMenuStretchController();
   }
 
   @override
@@ -81,6 +83,7 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
     _controller.removeListener(_onControllerUpdate);
     _controller.dispose();
     _hoverController.dispose();
+    _stretchController.dispose();
     super.dispose();
   }
 
@@ -99,15 +102,6 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-    final Matrix4 stretchMatrix = Matrix4.identity()
-      ..setTranslationRaw(
-        _controller.translateX,
-        _controller.translateY,
-        _controller.translateZ,
-      )
-      ..setEntry(0, 0, _controller.scaleX)
-      ..setEntry(1, 1, _controller.scaleY)
-      ..setEntry(2, 2, MotionScale.none.value);
 
     return WidgetSizeListener(
       onSizeChanged: _onSizeChanged,
@@ -115,14 +109,18 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
         borderRadius: _config.borderRadius,
         child: SmartContextMenuBlurBox(
           config: _config,
-          child: AnimatedContainer(
-            duration: MotionDurations.fast,
-            curve: MotionCurves.quartOut,
-            transformAlignment: Alignment.center,
-            transform: stretchMatrix,
-            width: _config.menuWidth,
-            decoration: _config.menuDecoration ?? _defaultDecoration,
-            clipBehavior: Clip.antiAlias,
+          child: ListenableBuilder(
+            listenable: _stretchController,
+            builder: (context, child) => AnimatedContainer(
+              duration: MotionDurations.fast,
+              curve: MotionCurves.quartOut,
+              transformAlignment: Alignment.center,
+              transform: _stretchController.transform,
+              width: _config.menuWidth,
+              decoration: _config.menuDecoration ?? _defaultDecoration,
+              clipBehavior: Clip.antiAlias,
+              child: child,
+            ),
             child: AnimatedSize(
               duration: MotionDurations.standard,
               curve: MotionCurves.quartOut,
@@ -430,17 +428,12 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
     final RenderBox? box = renderObject as RenderBox?;
     if (box == null || !box.hasSize) return;
 
-    _controller.calculateMenuStretch(delta, box.size);
-
-    widget.previewMotionNotifier.value = Offset(
-      _controller.translateX,
-      _controller.translateY,
-    );
+    _stretchController.stretch(delta, box.size);
+    widget.previewMotionNotifier.value = _stretchController.translation;
   }
 
   void _resetMenuEffect() {
-    _controller.resetMenuStretch();
+    _stretchController.reset();
     widget.previewMotionNotifier.value = MotionTranslation.none.toOffset;
   }
-
 }
