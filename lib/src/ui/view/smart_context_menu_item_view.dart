@@ -78,28 +78,28 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
           : _isHighlight
               ? 0.24
               : 0.12;
-      return MenuDefaults.destructiveColor.withValues(alpha: alpha);
+      return SmartContextMenuDefaults.destructiveColor.withValues(alpha: alpha);
     }
     if (_item.isDisabled) {
-      return MenuDefaults.disabledItemColor;
+      return SmartContextMenuDefaults.disabledItemColor;
     }
     return _isHighlight
-        ? MenuDefaults.textColor.withValues(alpha: 0.1)
+        ? SmartContextMenuDefaults.textColor.withValues(alpha: 0.1)
         : Colors.transparent;
   }
 
   Color get _textColor {
     if (_item.isDestructive) {
-      return MenuDefaults.destructiveColor.withValues(
+      return SmartContextMenuDefaults.destructiveColor.withValues(
         alpha: _item.isDisabled
             ? MotionOpacity.medium.value
             : MotionOpacity.visible.value,
       );
     }
     if (_item.isDisabled) {
-      return MenuDefaults.secondaryTextColor;
+      return SmartContextMenuDefaults.secondaryTextColor;
     }
-    return MenuDefaults.textColor;
+    return SmartContextMenuDefaults.textColor;
   }
 
   @override
@@ -111,7 +111,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
       _isLoading = false;
     }
 
-    if (widget.item.asyncItemBuilder != null) {
+    if (widget.item.asyncItem != null) {
       if (widget.cachedItem != null) {
         _resolvedItem = widget.cachedItem;
         _isLoading = false;
@@ -199,7 +199,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
     return Divider(
       height: 1,
       thickness: 0.5,
-      color: MenuDefaults.dividerColor,
+      color: SmartContextMenuDefaults.dividerColor,
     );
   }
 
@@ -213,7 +213,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
         Expanded(
           child: Text(
             item.title ?? "",
-            style: (item.titleStyle ?? MenuDefaults.textStyle).copyWith(
+            style: (item.titleStyle ?? SmartContextMenuDefaults.textStyle).copyWith(
               color: _textColor,
             ),
             maxLines: 2,
@@ -227,10 +227,10 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
         if (item.showTransitionIcon) ...[
           SizedBox(width: item.childrenGap),
           Icon(
-            MenuDefaults.submenuIcon,
+            SmartContextMenuDefaults.submenuIcon,
             size: _config.defaultIconSize,
             color: item.isDisabled
-                ? MenuDefaults.secondaryTextColor
+                ? SmartContextMenuDefaults.secondaryTextColor
                 : _config.defaultIconColor,
           ),
         ],
@@ -256,11 +256,11 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
     final errorItem = SmartContextMenuItem.simple(
       title: _config.labels.retry,
       leading: Icon(
-        MenuDefaults.errorIcon,
+        SmartContextMenuDefaults.errorIcon,
         size: _config.defaultIconSize,
       ),
       trailing: Icon(
-        MenuDefaults.retryIcon,
+        SmartContextMenuDefaults.retryIcon,
         size: _config.defaultIconSize,
       ),
     );
@@ -289,7 +289,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
     try {
       final Duration timeout =
           widget.item.loadingTimeout ?? const Duration(seconds: 10);
-      final result = await widget.item.asyncItemBuilder!().timeout(timeout);
+      final result = await widget.item.asyncItem!().timeout(timeout);
 
       if (mounted) {
         widget.onLoaded?.call(result);

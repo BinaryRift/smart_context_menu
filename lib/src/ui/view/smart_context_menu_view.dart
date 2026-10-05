@@ -52,10 +52,10 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
 
   late final BoxDecoration _defaultDecoration = BoxDecoration(
     color: _config.menuColor ??
-        MenuDefaults.menuColor,
+        SmartContextMenuDefaults.menuColor,
     borderRadius: _config.borderRadius,
     border: Border.all(
-      color: _config.borderColor ?? MenuDefaults.borderColor,
+      color: _config.borderColor ?? SmartContextMenuDefaults.borderColor,
     ),
   );
 
@@ -292,7 +292,7 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
     }
 
     final item = items[relativeIndex];
-    if (item.asyncItemBuilder != null) {
+    if (item.asyncItem != null) {
       final parentId = item.id;
       return SmartContextMenuItemView.async(
         key: ValueKey(item.id),
@@ -316,7 +316,7 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
   Widget _buildBluredBackButton() {
     Widget child = Container(
       decoration: BoxDecoration(
-        color: _config.menuColor ?? MenuDefaults.menuColor,
+        color: _config.menuColor ?? SmartContextMenuDefaults.menuColor,
         borderRadius: _config.backButtonBorderRadius,
       ),
       child: _buildBackButton(key: const ValueKey("back_button")),
@@ -347,11 +347,11 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
       item: SmartContextMenuItem.simple(
         closeOnTap: false,
         title: _config.labels.back,
-        titleStyle: MenuDefaults.textStyle.copyWith(
+        titleStyle: SmartContextMenuDefaults.textStyle.copyWith(
           fontWeight: FontWeight.w600,
         ),
         leading: Icon(
-          MenuDefaults.backIcon,
+          SmartContextMenuDefaults.backIcon,
           size: _config.defaultIconSize,
           color: _config.defaultIconColor,
         ),
@@ -370,11 +370,11 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
       item: SmartContextMenuItem.simple(
         title: _config.labels.retry,
         leading: Icon(
-          MenuDefaults.errorIcon,
+          SmartContextMenuDefaults.errorIcon,
           size: _config.defaultIconSize,
         ),
         trailing: Icon(
-          MenuDefaults.retryIcon,
+          SmartContextMenuDefaults.retryIcon,
           size: _config.defaultIconSize,
         ),
       ),
@@ -396,7 +396,7 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
     return Container(
       key: key ?? const ValueKey("menu_loader"),
       padding: const EdgeInsets.symmetric(
-        vertical: MenuDefaults.loaderVerticalPadding,
+        vertical: SmartContextMenuDefaults.loaderVerticalPadding,
       ),
       alignment: Alignment.center,
       child: const CupertinoActivityIndicator(radius: 12),
@@ -407,7 +407,7 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
     return Divider(
       height: 1,
       thickness: 0.5,
-      color: MenuDefaults.dividerColor,
+      color: SmartContextMenuDefaults.dividerColor,
     );
   }
 

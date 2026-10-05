@@ -41,7 +41,7 @@ final class SmartContextMenuItem {
   final FutureOr<void> Function()? onTap;
   final List<SmartContextMenuItem>? children;
   final SmartContextMenuSubmenuLoader? asyncChildren;
-  final SmartContextMenuItemLoader? asyncItemBuilder;
+  final SmartContextMenuItemLoader? asyncItem;
   final Duration? loadingTimeout;
 
   /// Example:
@@ -90,7 +90,7 @@ final class SmartContextMenuItem {
   bool get showTransitionIcon =>
       children != null || asyncChildren != null || asyncPagingChildren != null;
   bool get isInternalInterected =>
-      asyncItemBuilder != null ||
+      asyncItem != null ||
       asyncChildren != null ||
       asyncPagingChildren != null ||
       children != null;
@@ -109,12 +109,12 @@ final class SmartContextMenuItem {
     this.children,
     this.asyncChildren,
     this.asyncPagingChildren,
-    this.asyncItemBuilder,
+    this.asyncItem,
     this.loadingTimeout,
     this.pagingMetadata,
     this.customBuilder,
     EdgeInsets? padding,
-    this.childrenGap = MenuDefaults.childrenGap,
+    this.childrenGap = SmartContextMenuDefaults.childrenGap,
     this.closeOnTap = true,
     this.dividerPosition = SmartContextMenuDividerPosition.bottom,
   }) : assert(
@@ -126,7 +126,7 @@ final class SmartContextMenuItem {
          'or asyncPagingChildren.',
        ),
 
-       padding = padding ?? MenuDefaults.itemPadding;
+       padding = padding ?? SmartContextMenuDefaults.itemPadding;
 
   factory SmartContextMenuItem.simple({
     String? id,
@@ -142,7 +142,7 @@ final class SmartContextMenuItem {
     SmartContextMenuItemBuilder? customBuilder,
     FutureOr<void> Function()? onTap,
     EdgeInsets? padding,
-    double childrenGap = MenuDefaults.childrenGap,
+    double childrenGap = SmartContextMenuDefaults.childrenGap,
     SmartContextMenuPagingMetadata? pagingMetadata,
     SmartContextMenuDividerPosition? dividerPosition,
   }) => SmartContextMenuItem._(
@@ -179,7 +179,7 @@ final class SmartContextMenuItem {
     SmartContextMenuItemBuilder? customBuilder,
     FutureOr<void> Function()? onTap,
     EdgeInsets? padding,
-    double childrenGap = MenuDefaults.childrenGap,
+    double childrenGap = SmartContextMenuDefaults.childrenGap,
     SmartContextMenuDividerPosition? dividerPosition,
   }) => SmartContextMenuItem._(
     id: id ?? _generateId(),
@@ -215,7 +215,7 @@ final class SmartContextMenuItem {
     SmartContextMenuItemBuilder? customBuilder,
     FutureOr<void> Function()? onTap,
     EdgeInsets? padding,
-    double childrenGap = MenuDefaults.childrenGap,
+    double childrenGap = SmartContextMenuDefaults.childrenGap,
     SmartContextMenuDividerPosition? dividerPosition,
   }) => SmartContextMenuItem._(
     id: id ?? _generateId(),
@@ -252,7 +252,7 @@ final class SmartContextMenuItem {
     SmartContextMenuItemBuilder? customBuilder,
     FutureOr<void> Function()? onTap,
     EdgeInsets? padding,
-    double childrenGap = MenuDefaults.childrenGap,
+    double childrenGap = SmartContextMenuDefaults.childrenGap,
     SmartContextMenuDividerPosition? dividerPosition,
   }) => SmartContextMenuItem._(
     id: id ?? _generateId(),
@@ -284,13 +284,13 @@ final class SmartContextMenuItem {
     Widget? leading,
     String? loadingTitle,
     TextStyle? titleStyle,
-    double childrenGap = MenuDefaults.childrenGap,
+    double childrenGap = SmartContextMenuDefaults.childrenGap,
     SmartContextMenuDividerPosition? dividerPosition,
   }) {
     return SmartContextMenuItem._(
       id: id ?? _generateId(),
       title: loadingTitle,
-      asyncItemBuilder: builder,
+      asyncItem: builder,
       loadingTimeout: timeout,
       hasDivider: hasDivider,
       closeOnTap: false,

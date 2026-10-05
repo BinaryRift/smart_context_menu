@@ -1,12 +1,11 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart' show kTouchSlop;
 
 /// Default values for menu configuration: layout, radii, colors,
 /// text style and icons.
 ///
 /// Colors are [CupertinoDynamicColor]s with light and dark variants
 /// and must be resolved with [CupertinoDynamicColor.resolve] before use.
-abstract final class MenuDefaults {
+abstract final class SmartContextMenuDefaults {
   // Layout
 
   static const EdgeInsets screenPadding = EdgeInsets.all(16);
@@ -19,18 +18,6 @@ abstract final class MenuDefaults {
   );
   static const double loaderVerticalPadding = 12;
   static const double iconSize = 20;
-
-  // Gestures
-
-  /// Maximum pointer travel for a gesture to still count as a tap.
-  static const double tapSlop = kTouchSlop;
-
-  /// Tolerance for treating the anchor as horizontally centered.
-  static const double centerThreshold = 6;
-
-  /// Drag resistance of the preview: 0.05 means it moves
-  /// 20 times slower than the finger.
-  static const double dragResistance = 0.05;
 
   // Radii
 

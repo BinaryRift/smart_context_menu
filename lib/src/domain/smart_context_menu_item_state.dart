@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart' show Color;
+import 'package:meta/meta.dart' show internal;
 
 final class SmartContextMenuItemState {
   final bool isPressed;
@@ -7,8 +8,9 @@ final class SmartContextMenuItemState {
   final Color textColor;
   final bool isLoading;
   final bool hasError;
-  
-  SmartContextMenuItemState({
+
+  @internal
+  const SmartContextMenuItemState({
     required this.isPressed,
     required this.isDisabled,
     required this.isDestructive,

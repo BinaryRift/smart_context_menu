@@ -1,10 +1,10 @@
 import 'dart:ui' as ui show Image, ImageFilter;
 import 'package:flutter/material.dart';
+import '../../core/ui/gestures/gesture_thresholds.dart';
 import '../../core/ui/motion/tokens/motion_curves.dart';
 import '../../core/ui/motion/tokens/motion_durations.dart';
 import '../../core/ui/motion/tokens/motion_opacity.dart';
 import '../../core/ui/motion/tokens/motion_traslation.dart';
-import '../../core/ui/styles/smart_context_menu_defaults.dart';
 import '../../domain/smart_context_menu_config.dart';
 import '../../domain/smart_context_menu_item.dart';
 import '../components/smart_menu_reactive_physics.dart';
@@ -285,7 +285,7 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
     final double leftPadding = widget.config.screenPadding.left;
     final double rightPadding = widget.config.screenPadding.right;
 
-    if ((centerX - screenCenter).abs() < MenuDefaults.centerThreshold) {
+    if ((centerX - screenCenter).abs() < GestureThresholds.centerThreshold) {
       _menuAlignment = Alignment.topCenter;
       _leftPadding = null;
       _rightPadding = null;
@@ -323,7 +323,7 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
     // Ignore tiny finger movements: treat as a tap only within tap slop.
     final double distance = (event.position - _pointerDownPos!).distance;
     _pointerDownPos = null;
-    if (distance > MenuDefaults.tapSlop) return;
+    if (distance > GestureThresholds.tapSlop) return;
 
     final bool hitMenu = _isPointInside(event.position, _menuKey);
     final bool hitPreview = _isPointInside(event.position, _previewKey);
@@ -405,11 +405,11 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
 
     final double maxTranslation = MotionTranslation.subtle.dx;
 
-    final double tx = (delta.dx * MenuDefaults.dragResistance).clamp(
+    final double tx = (delta.dx * GestureThresholds.dragResistance).clamp(
       -maxTranslation,
       maxTranslation,
     );
-    final double ty = (delta.dy * MenuDefaults.dragResistance).clamp(
+    final double ty = (delta.dy * GestureThresholds.dragResistance).clamp(
       -maxTranslation,
       maxTranslation,
     );

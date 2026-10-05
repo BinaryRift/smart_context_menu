@@ -10,8 +10,8 @@ final class SmartContextMenuShadowBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        borderRadius: MenuDefaults.borderRadius,
-        boxShadow: MenuDefaults.menuShadows,
+        borderRadius: SmartContextMenuDefaults.borderRadius,
+        boxShadow: SmartContextMenuDefaults.menuShadows,
       ),
       child: child,
     );
