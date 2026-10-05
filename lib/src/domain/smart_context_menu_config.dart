@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart'
-    show BorderRadiusGeometry, Color, Decoration, EdgeInsets;
+    show BorderRadiusGeometry, Color, Decoration, EdgeInsets, TextStyle;
 
 import '../core/ui/styles/smart_context_menu_defaults.dart';
 import 'smart_context_menu_activation_mode.dart';
@@ -119,6 +119,36 @@ final class SmartContextMenuConfig {
   /// Defaults to [SmartContextMenuDefaults.borderColor].
   final Color? borderColor;
 
+  /// The base style of item titles.
+  ///
+  /// Used for items without [SmartContextMenuItem.titleStyle] and for the
+  /// back, retry and loading items. Its color is used only while an item is
+  /// enabled and not destructive, and also tints the press highlight. If the
+  /// style has no color, [SmartContextMenuDefaults.textColor] is used.
+  /// Defaults to [SmartContextMenuDefaults.textStyle].
+  final TextStyle textStyle;
+
+  /// The title and submenu chevron color of a disabled item.
+  ///
+  /// Defaults to [SmartContextMenuDefaults.secondaryTextColor].
+  final Color secondaryTextColor;
+
+  /// The title and press highlight color of a destructive item.
+  ///
+  /// Defaults to [SmartContextMenuDefaults.destructiveColor].
+  final Color destructiveColor;
+
+  /// The background of a disabled item.
+  ///
+  /// Defaults to [SmartContextMenuDefaults.disabledItemColor].
+  final Color disabledItemColor;
+
+  /// The color of the divider between items.
+  ///
+  /// Does not affect [SmartContextMenuItem.customDivider].
+  /// Defaults to [SmartContextMenuDefaults.dividerColor].
+  final Color dividerColor;
+
   /// The size of the icons drawn by the menu itself: the submenu chevron,
   /// the back icon and the error and retry icons.
   ///
@@ -161,6 +191,11 @@ final class SmartContextMenuConfig {
     this.menuBlur,
     this.menuColor,
     this.borderColor,
+    this.textStyle = SmartContextMenuDefaults.textStyle,
+    this.secondaryTextColor = SmartContextMenuDefaults.secondaryTextColor,
+    this.destructiveColor = SmartContextMenuDefaults.destructiveColor,
+    this.disabledItemColor = SmartContextMenuDefaults.disabledItemColor,
+    this.dividerColor = SmartContextMenuDefaults.dividerColor,
     this.defaultIconSize = SmartContextMenuDefaults.iconSize,
     this.defaultIconColor,
     this.borderRadius = SmartContextMenuDefaults.borderRadius,

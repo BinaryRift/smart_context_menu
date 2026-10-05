@@ -209,6 +209,27 @@ const menuConfig = SmartContextMenuConfig(
 );
 ```
 
+The text and colors of items follow the config too, so the menu can match
+the app theme:
+
+```dart
+const menuConfig = SmartContextMenuConfig(
+  textStyle: TextStyle(
+    fontFamily: 'Montserrat',
+    fontSize: 17,
+    color: Color(0xFFFFFFFF),
+  ),
+  secondaryTextColor: Color(0x99FFFFFF),
+  destructiveColor: Color(0xFFFF453A),
+  disabledItemColor: Color(0x1F000000),
+  dividerColor: Color(0x999E9E9E),
+);
+```
+
+The color of `textStyle` is used for enabled items that are not destructive.
+Disabled and destructive items use `secondaryTextColor` and `destructiveColor`.
+An item `titleStyle` replaces `textStyle` for that item.
+
 Colors may be `CupertinoDynamicColor`s: they follow the light and dark theme.
 A plain `Color` is used as is in both themes. The default values are available
 in `SmartContextMenuDefaults`.

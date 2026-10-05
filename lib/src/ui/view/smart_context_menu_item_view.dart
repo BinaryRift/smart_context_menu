@@ -76,6 +76,9 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
 
   Color _resolve(Color color) => CupertinoDynamicColor.resolve(color, context);
 
+  Color get _baseTextColor =>
+      _config.textStyle.color ?? SmartContextMenuDefaults.textColor;
+
   Color get _overlayColor {
     if (_item.isDestructive) {
       final alpha = _item.isDisabled
@@ -83,30 +86,30 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
           : _isHighlight
               ? 0.24
               : 0.12;
-      return _resolve(SmartContextMenuDefaults.destructiveColor)
+      return _resolve(_config.destructiveColor)
           .withValues(alpha: alpha);
     }
     if (_item.isDisabled) {
-      return _resolve(SmartContextMenuDefaults.disabledItemColor);
+      return _resolve(_config.disabledItemColor);
     }
     return _isHighlight
-        ? _resolve(SmartContextMenuDefaults.textColor).withValues(alpha: 0.1)
+        ? _resolve(_baseTextColor).withValues(alpha: 0.1)
         : Colors.transparent;
   }
 
   Color get _textColor {
     if (_item.isDestructive) {
-      return _resolve(SmartContextMenuDefaults.destructiveColor).withValues(
+      return _resolve(_config.destructiveColor).withValues(
         alpha: _item.isDisabled
             ? MotionOpacity.medium.value
             : MotionOpacity.visible.value,
       );
     }
     if (_item.isDisabled) {
-      return _resolve(SmartContextMenuDefaults.secondaryTextColor);
+      return _resolve(_config.secondaryTextColor);
     }
     return _resolve(
-      _item.titleStyle?.color ?? SmartContextMenuDefaults.textColor,
+      _item.titleStyle?.color ?? _baseTextColor,
     );
   }
 
@@ -166,7 +169,8 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
         mainAxisSize: MainAxisSize.min,
         children: [
           if (_item.hasDivider && _item.dividerPosition == SmartContextMenuDividerPosition.top)
-            _item.customDivider ?? const SmartContextMenuDivider(),
+            _item.customDivider ??
+                SmartContextMenuDivider(color: _config.dividerColor),
           AnimatedContainer(
             duration: _highlightDuration,
             color: _overlayColor,
@@ -180,7 +184,8 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
           ),
           if (_item.hasDivider &&
               _item.dividerPosition == SmartContextMenuDividerPosition.bottom)
-            _item.customDivider ?? const SmartContextMenuDivider(),
+            _item.customDivider ??
+                SmartContextMenuDivider(color: _config.dividerColor),
         ],
       ),
     );
@@ -208,7 +213,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
         Expanded(
           child: Text(
             item.title ?? "",
-            style: (item.titleStyle ?? SmartContextMenuDefaults.textStyle).copyWith(
+            style: (item.titleStyle ?? _config.textStyle).copyWith(
               color: _textColor,
             ),
             maxLines: 2,
@@ -225,7 +230,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
             SmartContextMenuDefaults.submenuIcon,
             size: _config.defaultIconSize,
             color: item.isDisabled
-                ? _resolve(SmartContextMenuDefaults.secondaryTextColor)
+                ? _resolve(_config.secondaryTextColor)
                 : CupertinoDynamicColor.maybeResolve(
                     _config.defaultIconColor,
                     context,

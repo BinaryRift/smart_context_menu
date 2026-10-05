@@ -49,7 +49,7 @@ final class SmartContextMenuBackItem extends StatelessWidget {
       item: SmartContextMenuItem.simple(
         closeOnTap: false,
         title: config.labels.back,
-        titleStyle: SmartContextMenuDefaults.textStyle.copyWith(
+        titleStyle: config.textStyle.copyWith(
           fontWeight: FontWeight.w600,
         ),
         leading: Icon(

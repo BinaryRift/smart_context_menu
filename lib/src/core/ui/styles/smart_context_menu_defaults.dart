@@ -3,9 +3,9 @@ import 'package:flutter/cupertino.dart';
 /// Default values of the menu: layout, radii, colors, shadows, text
 /// and icons.
 ///
-/// Many of them are defaults of [SmartContextMenuConfig] and
-/// [SmartContextMenuItem] fields. The rest, such as [disabledItemColor],
-/// [menuShadows] and the icons, are fixed. All are public, so custom
+/// Most of them are defaults of [SmartContextMenuConfig] and
+/// [SmartContextMenuItem] fields. The rest, such as [menuShadows] and
+/// [errorIcon], are fixed. All are public, so custom
 /// content, for example from [SmartContextMenuItem.customBuilder], can match
 /// the default look.
 ///
@@ -74,21 +74,22 @@ abstract final class SmartContextMenuDefaults {
         darkColor: Color(0xFF636366),
       );
 
-  /// The title of an enabled item that is not destructive.
+  /// The title of an enabled item that is not destructive, used when
+  /// [SmartContextMenuConfig.textStyle] has no color.
   static const CupertinoDynamicColor textColor =
       CupertinoDynamicColor.withBrightness(
         color: Color(0xFF000000),
         darkColor: Color(0xFFFAFAFA),
       );
 
-  /// The title and submenu chevron of a disabled item.
+  /// The default of [SmartContextMenuConfig.secondaryTextColor].
   static const CupertinoDynamicColor secondaryTextColor =
       CupertinoDynamicColor.withBrightness(
         color: Color(0x993C3C43),
         darkColor: Color(0x66FFFFFF),
       );
 
-  /// The title and press highlight of a destructive item.
+  /// The default of [SmartContextMenuConfig.destructiveColor].
   static const CupertinoDynamicColor destructiveColor =
       CupertinoDynamicColor.withBrightness(
         color: Color(0xFFFF3B30),
@@ -103,14 +104,14 @@ abstract final class SmartContextMenuDefaults {
         darkColor: Color(0x66000000),
       );
 
-  /// The background of a disabled item.
+  /// The default of [SmartContextMenuConfig.disabledItemColor].
   static const CupertinoDynamicColor disabledItemColor =
       CupertinoDynamicColor.withBrightness(
         color: Color(0x1F000000),
         darkColor: Color(0x1FFFFFFF),
       );
 
-  /// The default divider between items.
+  /// The default of [SmartContextMenuConfig.dividerColor].
   static const CupertinoDynamicColor dividerColor =
       CupertinoDynamicColor.withBrightness(
         color: Color(0x999E9E9E),
@@ -138,9 +139,9 @@ abstract final class SmartContextMenuDefaults {
 
   // Text
 
-  /// The default of [SmartContextMenuItem.titleStyle].
+  /// The default of [SmartContextMenuConfig.textStyle].
   ///
-  /// Has no color: the title color depends on the item state.
+  /// Has no color, so [textColor] is used.
   static const TextStyle textStyle = TextStyle(
     fontSize: 17,
     fontWeight: FontWeight.w400,
