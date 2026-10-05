@@ -1,29 +1,53 @@
 import 'package:flutter/foundation.dart' show ChangeNotifier;
+import 'package:meta/meta.dart' show internal;
 
-typedef SmartContextMenuAction = Future<void> Function();
+typedef _SmartContextMenuAction = Future<void> Function();
 
+/// Opens and closes a [SmartContextMenu] programmatically
+/// and reports whether it is currently open.
+///
+/// Required when [SmartContextMenuConfig.activationMode] is
+/// [SmartContextMenuActivationMode.manual]. Can also be used with
+/// long-press activation to close the menu from code.
+///
+/// Listeners are notified when the menu opens or closes.
+///
+/// A controller can be attached to only one [SmartContextMenu] at a time.
 final class SmartContextMenuController extends ChangeNotifier {
   _SmartContextMenuBinding? _binding;
   bool _isOpen = false;
 
+  /// Whether the menu is currently open.
   bool get isOpen => _isOpen;
+
+  /// Whether the menu is currently closed.
   bool get isClosed => !isOpen;
 
+  /// Opens the menu.
+  ///
+  /// Does nothing if the controller is not attached to a [SmartContextMenu].
+  /// Completes when the menu is closed.
   Future<void> open() async {
     final binding = _binding;
     if (binding == null) return;
     await binding.open();
   }
 
+  /// Closes the menu.
+  ///
+  /// Does nothing if the controller is not attached to a [SmartContextMenu].
+  /// Completes when the closing animation finishes.
   Future<void> close() async {
     final binding = _binding;
     if (binding == null) return;
     await binding.close();
   }
 
+  /// Binds the controller to a menu. Called by [SmartContextMenu].
+  @internal
   void attach({
-    required SmartContextMenuAction open,
-    required SmartContextMenuAction close,
+    required Future<void> Function() open,
+    required Future<void> Function() close,
     required bool isOpen,
   }) {
     _binding = _SmartContextMenuBinding(
@@ -33,11 +57,16 @@ final class SmartContextMenuController extends ChangeNotifier {
     syncVisibility(isOpen);
   }
 
+  /// Unbinds the controller from its menu. Called by [SmartContextMenu].
+  @internal
   void detach() {
     _binding = null;
     syncVisibility(false);
   }
 
+  /// Updates [isOpen] and notifies listeners on change.
+  /// Called by [SmartContextMenu].
+  @internal
   void syncVisibility(bool isOpen) {
     if (_isOpen == isOpen) return;
     _isOpen = isOpen;
@@ -46,8 +75,8 @@ final class SmartContextMenuController extends ChangeNotifier {
 }
 
 final class _SmartContextMenuBinding {
-  final SmartContextMenuAction open;
-  final SmartContextMenuAction close;
+  final _SmartContextMenuAction open;
+  final _SmartContextMenuAction close;
 
   const _SmartContextMenuBinding({
     required this.open,
