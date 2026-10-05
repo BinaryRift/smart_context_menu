@@ -99,7 +99,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
     if (_item.isDisabled) {
       return SmartContextMenuDefaults.secondaryTextColor;
     }
-    return SmartContextMenuDefaults.textColor;
+    return _item.titleStyle?.color ?? SmartContextMenuDefaults.textColor;
   }
 
   @override

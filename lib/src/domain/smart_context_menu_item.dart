@@ -1,5 +1,3 @@
-// ignore_for_file: unintended_html_in_doc_comment
-
 import 'dart:async' show FutureOr;
 import 'package:flutter/widgets.dart'
     show Widget, BuildContext, EdgeInsets, TextStyle;
@@ -9,89 +7,186 @@ import '../core/ui/styles/smart_context_menu_defaults.dart';
 import 'smart_context_menu_item_state.dart';
 import 'smart_context_menu_paging_metadata.dart';
 
+/// Loads one page of items for [SmartContextMenuItem.pagingSubmenu].
+///
+/// Receives the metadata of the page to load.
 typedef SmartContextMenuPageLoader =
     Future<List<SmartContextMenuItem>> Function(
-      SmartContextMenuPagingMetadata? metadata,
+      SmartContextMenuPagingMetadata metadata,
     );
+
+/// Loads all items of a submenu for [SmartContextMenuItem.asyncSubmenu].
 typedef SmartContextMenuSubmenuLoader =
     Future<List<SmartContextMenuItem>> Function();
+
+/// Loads an item for [SmartContextMenuItem.async].
 typedef SmartContextMenuItemLoader = Future<SmartContextMenuItem> Function();
+
+/// Builds the content of an item from its current state.
 typedef SmartContextMenuItemBuilder =
     Widget Function(BuildContext context, SmartContextMenuItemState state);
 
-enum SmartContextMenuDividerPosition { top, bottom }
+/// Where the divider of a [SmartContextMenuItem] is placed.
+enum SmartContextMenuDividerPosition {
+  /// Above the item.
+  top,
 
+  /// Below the item.
+  bottom,
+}
+
+/// An entry of a [SmartContextMenu].
+///
+/// Create items with the factory that matches what the item does:
+///
+/// * [SmartContextMenuItem.simple] runs [onTap].
+/// * [SmartContextMenuItem.submenu] opens a submenu with [children].
+/// * [SmartContextMenuItem.asyncSubmenu] opens a submenu and loads its
+///   items with [asyncChildren].
+/// * [SmartContextMenuItem.pagingSubmenu] opens a submenu and loads its
+///   items page by page with [asyncPagingChildren].
+/// * [SmartContextMenuItem.async] shows a placeholder and replaces it with
+///   the item loaded by [asyncItem].
+///
+/// A submenu replaces the current menu and shows a back item at the top.
+///
+/// ```dart
+/// SmartContextMenuItem.submenu(
+///   title: 'Move to',
+///   leading: const Icon(CupertinoIcons.folder),
+///   children: [
+///     SmartContextMenuItem.simple(
+///       title: 'Documents',
+///       onTap: () => debugPrint('Documents'),
+///     ),
+///     SmartContextMenuItem.simple(
+///       title: 'Archive',
+///       onTap: () => debugPrint('Archive'),
+///     ),
+///   ],
+/// )
+/// ```
 final class SmartContextMenuItem {
   static int _nextId = 0;
   static String _generateId() => "smart_context_menu_item_${_nextId++}";
 
+  /// Identifies the item within the menu.
+  ///
+  /// Loaded submenus and items are cached by [id] until the menu closes,
+  /// so ids must be unique across the menu and all its submenus.
+  /// Factories generate a unique id when none is given.
   final String id;
+
+  /// The text of the item.
+  ///
+  /// Shown in up to two lines and truncated with an ellipsis.
   final String? title;
+
+  /// The style of [title].
+  ///
+  /// Defaults to [SmartContextMenuDefaults.textStyle]. Its color is used
+  /// only while the item is enabled and not destructive.
   final TextStyle? titleStyle;
+
+  /// A widget shown before [title], usually an [Icon].
   final Widget? leading;
+
+  /// A widget shown after [title].
+  ///
+  /// Items that open a submenu also show a chevron after it.
   final Widget? trailing;
+
+  /// The padding around the item content.
+  ///
+  /// Defaults to [SmartContextMenuDefaults.itemPadding].
   final EdgeInsets padding;
+
+  /// The gap between [leading], [title], [trailing] and the submenu chevron.
+  ///
+  /// Defaults to [SmartContextMenuDefaults.childrenGap].
   final double childrenGap;
+
+  /// Whether the item performs a destructive action.
+  ///
+  /// Destructive items are shown in [SmartContextMenuDefaults.destructiveColor].
   final bool isDestructive;
+
+  /// Whether the item is disabled.
+  ///
+  /// Disabled items are dimmed and do not respond to taps.
   final bool isDisabled;
+
+  /// Whether to show a divider next to the item.
+  ///
+  /// The divider is placed according to [dividerPosition].
+  /// Use [customDivider] to replace the default one.
   final bool hasDivider;
+
+  /// Whether the menu closes when the item is tapped.
+  ///
+  /// The menu starts closing before [onTap] is called.
+  /// Ignored for items that open a submenu. Defaults to true.
   final bool closeOnTap;
+
+  /// A widget shown instead of the default divider.
+  ///
+  /// Shown only when [hasDivider] is true.
   final Widget? customDivider;
+
+  /// Where the divider is placed relative to the item.
+  ///
+  /// Defaults to [SmartContextMenuDividerPosition.bottom].
   final SmartContextMenuDividerPosition dividerPosition;
 
+  /// Called when the item is tapped.
+  ///
+  /// If [closeOnTap] is true, the menu starts closing first.
   final FutureOr<void> Function()? onTap;
+
+  /// The items of the submenu opened by this item.
+  ///
+  /// Set by [SmartContextMenuItem.submenu].
   final List<SmartContextMenuItem>? children;
+
+  /// Loads the items of the submenu opened by this item.
+  ///
+  /// Set by [SmartContextMenuItem.asyncSubmenu].
   final SmartContextMenuSubmenuLoader? asyncChildren;
+
+  /// Loads the item shown in place of this placeholder.
+  ///
+  /// Set by [SmartContextMenuItem.async].
   final SmartContextMenuItemLoader? asyncItem;
+
+  /// How long [asyncItem] may take before loading fails.
+  ///
+  /// Set by [SmartContextMenuItem.async].
   final Duration? loadingTimeout;
 
-  /// Example:
+  /// Loads one page of the submenu opened by this item.
   ///
-  /// Future<List<SmartContextMenuItem>> loadPage(
-  ///   SmartContextMenuPagingMetadata? metadata,
-  ///  ) async {
-  ///
-  ///    final data = await api.fetchItems(page: page);
-  ///    Or MOCK:
-  ///    await Future.delayed(const Duration(seconds: 2));
-  ///    final data = List<SmartContextMenuItem>.generate(3, (index) {
-  ///     return SmartContextMenuItem(
-  ///       title: "item_$index",
-  ///       leading: Icon(AppIcons.profile.iconData, size: 20),
-  ///     );
-  ///   });
-  ///
-  ///   return data.map((d) {
-  ///     final isLast = data.indexOf(d) == data.length - 1;
-  ///     final SmartContextMenuPagingMetadata metaData =
-  ///     SmartContextMenuPagingMetadata(
-  ///       page: (metadata?.page ?? 0) + 1,
-  ///     );
-  ///     final nextMetadata = isLast && !(metadata?.page == 10) ? metaData : null;
-  ///     return SmartContextMenuItem(
-  ///       title: "page_${metadata?.page} ${d.title}",
-  ///       pagingMetadata: nextMetadata
-  ///     );
-  ///   }).toList();
-  /// }
-  ///
-  /// Use:
-  ///
-  /// SmartContextMenuItem(
-  ///   title: "Async paging submenu",
-  ///   asyncPagingChildren: (metadata) => loadPage(metadata),
-  ///   pagingMetadata: SmartContextMenuPagingMetadata(page: 1),
-  /// ),
-  ///
+  /// Set by [SmartContextMenuItem.pagingSubmenu].
   final SmartContextMenuPageLoader? asyncPagingChildren;
+
+  /// The metadata of a page of a paginated submenu.
+  ///
+  /// On a [SmartContextMenuItem.pagingSubmenu] item, it describes the first
+  /// page. On the last item of a loaded page, it describes the next page;
+  /// null there marks the last page.
   final SmartContextMenuPagingMetadata? pagingMetadata;
 
+  /// Builds the item content instead of [leading], [title] and [trailing].
+  ///
+  /// The item [padding], press highlight and divider are still applied,
+  /// and taps are handled as usual.
   final SmartContextMenuItemBuilder? customBuilder;
 
+  /// Whether the item shows a submenu chevron.
   @internal
   bool get showTransitionIcon =>
       children != null || asyncChildren != null || asyncPagingChildren != null;
 
+  /// Whether a tap is handled by the menu itself.
   @internal
   bool get isInternalInteracted =>
       asyncItem != null ||
@@ -132,6 +227,10 @@ final class SmartContextMenuItem {
 
        padding = padding ?? SmartContextMenuDefaults.itemPadding;
 
+  /// Creates an item that runs [onTap] when tapped.
+  ///
+  /// Set [pagingMetadata] only on items returned by a
+  /// [SmartContextMenuPageLoader], see [SmartContextMenuItem.pagingSubmenu].
   factory SmartContextMenuItem.simple({
     String? id,
     String? title,
@@ -168,6 +267,7 @@ final class SmartContextMenuItem {
     dividerPosition: dividerPosition ?? SmartContextMenuDividerPosition.bottom,
   );
 
+  /// Creates an item that opens a submenu with [children].
   factory SmartContextMenuItem.submenu({
     required List<SmartContextMenuItem> children,
     String? id,
@@ -178,10 +278,8 @@ final class SmartContextMenuItem {
     bool isDestructive = false,
     bool isDisabled = false,
     bool hasDivider = false,
-    bool closeOnTap = true,
     Widget? customDivider,
     SmartContextMenuItemBuilder? customBuilder,
-    FutureOr<void> Function()? onTap,
     EdgeInsets? padding,
     double childrenGap = SmartContextMenuDefaults.childrenGap,
     SmartContextMenuDividerPosition? dividerPosition,
@@ -194,9 +292,7 @@ final class SmartContextMenuItem {
     isDestructive: isDestructive,
     isDisabled: isDisabled,
     hasDivider: hasDivider,
-    closeOnTap: closeOnTap,
     customDivider: customDivider,
-    onTap: onTap,
     children: children,
     customBuilder: customBuilder,
     padding: padding,
@@ -204,6 +300,26 @@ final class SmartContextMenuItem {
     dividerPosition: dividerPosition ?? SmartContextMenuDividerPosition.bottom,
   );
 
+  /// Creates an item that opens a submenu with items loaded by
+  /// [asyncChildren].
+  ///
+  /// [asyncChildren] is called when the item is tapped. Until it completes,
+  /// the submenu shows an activity indicator; if it fails, a retry item.
+  /// The loaded items are cached by [id] until the menu closes.
+  ///
+  /// ```dart
+  /// SmartContextMenuItem.asyncSubmenu(
+  ///   title: 'Recent files',
+  ///   leading: const Icon(CupertinoIcons.clock),
+  ///   asyncChildren: () async {
+  ///     await Future<void>.delayed(const Duration(seconds: 1));
+  ///     return [
+  ///       SmartContextMenuItem.simple(title: 'Report.pdf'),
+  ///       SmartContextMenuItem.simple(title: 'Photo.png'),
+  ///     ];
+  ///   },
+  /// )
+  /// ```
   factory SmartContextMenuItem.asyncSubmenu({
     required SmartContextMenuSubmenuLoader asyncChildren,
     String? id,
@@ -214,10 +330,8 @@ final class SmartContextMenuItem {
     bool isDestructive = false,
     bool isDisabled = false,
     bool hasDivider = false,
-    bool closeOnTap = true,
     Widget? customDivider,
     SmartContextMenuItemBuilder? customBuilder,
-    FutureOr<void> Function()? onTap,
     EdgeInsets? padding,
     double childrenGap = SmartContextMenuDefaults.childrenGap,
     SmartContextMenuDividerPosition? dividerPosition,
@@ -230,9 +344,7 @@ final class SmartContextMenuItem {
     isDestructive: isDestructive,
     isDisabled: isDisabled,
     hasDivider: hasDivider,
-    closeOnTap: closeOnTap,
     customDivider: customDivider,
-    onTap: onTap,
     asyncChildren: asyncChildren,
     customBuilder: customBuilder,
     padding: padding,
@@ -240,6 +352,39 @@ final class SmartContextMenuItem {
     dividerPosition: dividerPosition ?? SmartContextMenuDividerPosition.bottom,
   );
 
+  /// Creates an item that opens a submenu with items loaded page by page.
+  ///
+  /// [asyncPagingChildren] is called with [initialMetadata] when the item
+  /// is tapped. The [SmartContextMenuItem.pagingMetadata] of the last item
+  /// of each page describes the next page, which is loaded when the user
+  /// scrolls to the end of the submenu. A page that is empty or whose last
+  /// item has no metadata is the last one.
+  ///
+  /// If a page fails to load, the submenu shows a retry item.
+  /// The loaded pages are cached by [id] until the menu closes.
+  ///
+  /// ```dart
+  /// SmartContextMenuItem.pagingSubmenu(
+  ///   title: 'Contacts',
+  ///   leading: const Icon(CupertinoIcons.person_2),
+  ///   initialMetadata: const SmartContextMenuPagingMetadata(limit: 10),
+  ///   asyncPagingChildren: (metadata) async {
+  ///     await Future<void>.delayed(const Duration(seconds: 1));
+  ///     final isLastPage = metadata.page == 5;
+  ///     return List.generate(metadata.limit, (index) {
+  ///       final number = (metadata.page - 1) * metadata.limit + index + 1;
+  ///       final isLastItem = index == metadata.limit - 1;
+  ///       return SmartContextMenuItem.simple(
+  ///         title: 'Contact $number',
+  ///         // The last item of a page describes the next page.
+  ///         pagingMetadata: isLastItem && !isLastPage
+  ///             ? metadata.copyWith(page: metadata.page + 1)
+  ///             : null,
+  ///       );
+  ///     });
+  ///   },
+  /// )
+  /// ```
   factory SmartContextMenuItem.pagingSubmenu({
     required SmartContextMenuPageLoader asyncPagingChildren,
     required SmartContextMenuPagingMetadata initialMetadata,
@@ -251,10 +396,8 @@ final class SmartContextMenuItem {
     bool isDestructive = false,
     bool isDisabled = false,
     bool hasDivider = false,
-    bool closeOnTap = true,
     Widget? customDivider,
     SmartContextMenuItemBuilder? customBuilder,
-    FutureOr<void> Function()? onTap,
     EdgeInsets? padding,
     double childrenGap = SmartContextMenuDefaults.childrenGap,
     SmartContextMenuDividerPosition? dividerPosition,
@@ -269,15 +412,39 @@ final class SmartContextMenuItem {
     isDestructive: isDestructive,
     isDisabled: isDisabled,
     hasDivider: hasDivider,
-    closeOnTap: closeOnTap,
     customDivider: customDivider,
-    onTap: onTap,
     customBuilder: customBuilder,
     padding: padding,
     childrenGap: childrenGap,
     dividerPosition: dividerPosition ?? SmartContextMenuDividerPosition.bottom,
   );
 
+  /// Creates a placeholder that is replaced by the item loaded by
+  /// [asyncItem].
+  ///
+  /// [asyncItem] is called when the placeholder first appears. Until it
+  /// completes, the placeholder shows [loadingTitle] (or
+  /// [SmartContextMenuLabels.loading]) with [leading] and an activity
+  /// indicator. If loading fails or takes longer than [timeout], the
+  /// placeholder turns into a retry item. The loaded item is cached by [id]
+  /// until the menu closes.
+  ///
+  /// The divider and [padding] apply to the placeholder only;
+  /// the loaded item uses its own.
+  ///
+  /// ```dart
+  /// SmartContextMenuItem.async(
+  ///   loadingTitle: 'Checking access',
+  ///   asyncItem: () async {
+  ///     await Future<void>.delayed(const Duration(seconds: 1));
+  ///     return SmartContextMenuItem.simple(
+  ///       title: 'Edit',
+  ///       leading: const Icon(CupertinoIcons.pencil),
+  ///       onTap: () => debugPrint('Edit'),
+  ///     );
+  ///   },
+  /// )
+  /// ```
   factory SmartContextMenuItem.async({
     required SmartContextMenuItemLoader asyncItem,
     String? id,

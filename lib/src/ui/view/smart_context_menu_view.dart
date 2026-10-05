@@ -65,6 +65,7 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
     _controller = SmartContextMenuOverlayController(
       navigator: this,
       initialItems: widget.initialItems,
+      enableHaptics: _config.enableHaptics,
     )..addListener(_onControllerUpdate);
     _hoverController = SmartContextMenuHoverController();
   }

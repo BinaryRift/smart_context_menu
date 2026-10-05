@@ -14,11 +14,13 @@ import '../ui/state/smart_context_menu_cache.dart';
 final class SmartContextMenuOverlayController extends ChangeNotifier {
   final SmartContextMenuNavigator navigator;
   final List<SmartContextMenuItem> initialItems;
+  final bool enableHaptics;
   late final SmartContextMenuCache _cache;
 
   SmartContextMenuOverlayController({
     required this.navigator,
     required this.initialItems,
+    required this.enableHaptics,
   }) {
     _cache = SmartContextMenuCache();
     _menuStack.add(SmartMenuLevel(items: initialItems));
@@ -76,7 +78,7 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
       parentId: parentId,
     ));
     notifyListeners();
-    HapticFeedback.selectionClick();
+    if (enableHaptics) HapticFeedback.selectionClick();
   }
 
   void popLevel() {
@@ -94,7 +96,7 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
     _activeLoadTask = null;
     _menuStack.removeLast();
     notifyListeners();
-    HapticFeedback.selectionClick();
+    if (enableHaptics) HapticFeedback.selectionClick();
   }
 
   int calculateTotalItemCount() {
@@ -138,7 +140,7 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
 
   Future<void> _handleOnTap(SmartContextMenuItem item) async {
     if (item.onTap == null && !item.closeOnTap) return;
-    HapticFeedback.lightImpact();
+    if (enableHaptics) HapticFeedback.lightImpact();
     if (item.closeOnTap) {
       await navigator.dismissWithDelay();
     }
@@ -166,14 +168,17 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
   Future<void> _handleAsyncPagingStart(SmartContextMenuItem item) async {
     if (_tryRestoreSubmenuFromCache(item)) return;
 
-    final task = item.asyncPagingChildren?.call(item.pagingMetadata);
-    if (task == null) return;
+    final loader = item.asyncPagingChildren;
+    final metadata = item.pagingMetadata;
+    if (loader == null || metadata == null) return;
+    final task = loader(metadata);
 
     _pushSubmenuLevel(
       items: [],
       loading: true,
       parentId: item.id,
-      pagingMethod: item.asyncPagingChildren,
+      pagingMethod: loader,
+      initialMetadata: metadata,
     );
 
     await _runAsyncLoad(task, onData: (results) {
@@ -216,26 +221,26 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
 
   Future<void> handlePagination() async {
     final currentLevel = _menuStack.last;
-    if (!_canPaginate(currentLevel) || !hasListeners) return;
+    final pagingMethod = currentLevel.pagingMethod;
+    final metadata = currentLevel.nextMetadata;
+    if (currentLevel.isPaginating ||
+        pagingMethod == null ||
+        metadata == null ||
+        !hasListeners) {
+      return;
+    }
 
     currentLevel.isPaginating = true;
     notifyListeners();
     final List<SmartContextMenuItem> targetList = currentLevel.items;
 
     try {
-      final newItems =
-          await currentLevel.pagingMethod!(currentLevel.nextMetadata);
+      final newItems = await pagingMethod(metadata);
 
       _processPaginationResult(currentLevel, targetList, newItems);
     } catch (e) {
       _handlePaginationError(currentLevel);
     }
-  }
-
-  bool _canPaginate(SmartMenuLevel level) {
-    return !level.isPaginating &&
-        level.pagingMethod != null &&
-        level.nextMetadata != null;
   }
 
   void _processPaginationResult(
@@ -313,31 +318,20 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
 
   Future<void> _retryLevelLoad(SmartMenuLevel level) async {
     if (!hasListeners) return;
+
+    // Paging levels retry through [handlePagination].
+    final task = level.asyncLoader?.call();
+    if (task == null) return;
+
     _isLoading = true;
     notifyListeners();
 
-    final Future<List<SmartContextMenuItem>>? task =
-        level.pagingMethod?.call(level.nextMetadata) ??
-            level.asyncLoader?.call();
-
-    if (task != null) {
-      await _runAsyncLoad(task, onData: (results) {
-        if (level.parentId != null) {
-          if (level.pagingMethod != null) {
-            _cache.paging[level.parentId!] = (
-              List.from(results),
-              results.isNotEmpty ? results.last.pagingMetadata : null
-            );
-          } else {
-            _cache.submenus[level.parentId!] = results;
-          }
-        }
-        level.items.addAll(results);
-        level.nextMetadata = (level.pagingMethod != null && results.isNotEmpty)
-            ? results.last.pagingMetadata
-            : null;
-      });
-    }
+    await _runAsyncLoad(task, onData: (results) {
+      if (level.parentId != null) {
+        _cache.submenus[level.parentId!] = results;
+      }
+      level.items.addAll(results);
+    });
   }
 
   void setPointerStartPosition(Offset? value) {
