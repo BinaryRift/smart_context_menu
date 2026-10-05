@@ -1,21 +1,39 @@
 import 'package:flutter/cupertino.dart';
 
-/// Default values for menu configuration: layout, radii, colors,
-/// text style and icons.
+/// Default values of the menu: layout, radii, colors, shadows, text
+/// and icons.
 ///
-/// Colors are [CupertinoDynamicColor]s with light and dark variants
-/// and must be resolved with [CupertinoDynamicColor.resolve] before use.
+/// Many of them are defaults of [SmartContextMenuConfig] and
+/// [SmartContextMenuItem] fields. The rest, such as [disabledItemColor],
+/// [menuShadows] and the icons, are fixed. All are public, so custom
+/// content, for example from [SmartContextMenuItem.customBuilder], can match
+/// the default look.
+///
+/// Colors are [CupertinoDynamicColor]s with light and dark variants.
+/// Resolve them with [CupertinoDynamicColor.resolve] before use.
 abstract final class SmartContextMenuDefaults {
   // Layout
 
+  /// The default of [SmartContextMenuConfig.screenPadding].
   static const EdgeInsets screenPadding = EdgeInsets.all(16);
+
+  /// The default of [SmartContextMenuConfig.menuGap].
   static const double menuGap = 12;
+
+  /// The default of [SmartContextMenuItem.childrenGap].
   static const double childrenGap = 12;
+
+  /// The default of [SmartContextMenuItem.padding].
   static const EdgeInsets itemPadding = EdgeInsets.symmetric(
     horizontal: 16,
     vertical: 12,
   );
+
+  /// The vertical padding around the activity indicator of a loading
+  /// submenu.
   static const double loaderVerticalPadding = 12;
+
+  /// The default of [SmartContextMenuConfig.defaultIconSize].
   static const double iconSize = 20;
 
   // Loading
@@ -25,64 +43,74 @@ abstract final class SmartContextMenuDefaults {
 
   // Radii
 
+  /// The corner radius of [borderRadius] and [backButtonBorderRadius].
   static const double cornerRadius = 16;
 
+  /// The default of [SmartContextMenuConfig.borderRadius].
   static const BorderRadius borderRadius = BorderRadius.all(
     Radius.circular(cornerRadius),
   );
 
+  /// The default of [SmartContextMenuConfig.backButtonBorderRadius].
   static const BorderRadius backButtonBorderRadius = BorderRadius.vertical(
     top: Radius.circular(cornerRadius),
   );
 
   // Colors
 
-  /// Translucent menu background, shown over the blur.
+  /// The menu background, the default of [SmartContextMenuConfig.menuColor].
+  ///
+  /// Translucent, so [SmartContextMenuConfig.menuBlur] shows through it.
   static const CupertinoDynamicColor menuColor =
       CupertinoDynamicColor.withBrightness(
         color: Color(0xB3F2F2F7),
         darkColor: Color(0xB324252A),
       );
 
+  /// The menu border, the default of [SmartContextMenuConfig.borderColor].
   static const CupertinoDynamicColor borderColor =
       CupertinoDynamicColor.withBrightness(
         color: Color(0xFFC6C6C8),
         darkColor: Color(0xFF636366),
       );
 
+  /// The title of an enabled item that is not destructive.
   static const CupertinoDynamicColor textColor =
       CupertinoDynamicColor.withBrightness(
         color: Color(0xFF000000),
         darkColor: Color(0xFFFAFAFA),
       );
 
-  /// Text and icons of disabled items, submenu chevron.
+  /// The title and submenu chevron of a disabled item.
   static const CupertinoDynamicColor secondaryTextColor =
       CupertinoDynamicColor.withBrightness(
         color: Color(0x993C3C43),
         darkColor: Color(0x66FFFFFF),
       );
 
+  /// The title and press highlight of a destructive item.
   static const CupertinoDynamicColor destructiveColor =
       CupertinoDynamicColor.withBrightness(
         color: Color(0xFFFF3B30),
         darkColor: Color(0xFFF85032),
       );
 
-  /// Screen dimming behind the menu.
+  /// The screen dimming behind the menu, the default of
+  /// [SmartContextMenuConfig.backgroundColor].
   static const CupertinoDynamicColor backgroundColor =
       CupertinoDynamicColor.withBrightness(
         color: Color(0x42000000),
         darkColor: Color(0x66000000),
       );
 
-  /// Background of disabled items.
+  /// The background of a disabled item.
   static const CupertinoDynamicColor disabledItemColor =
       CupertinoDynamicColor.withBrightness(
         color: Color(0x1F000000),
         darkColor: Color(0x1FFFFFFF),
       );
 
+  /// The default divider between items.
   static const CupertinoDynamicColor dividerColor =
       CupertinoDynamicColor.withBrightness(
         color: Color(0x999E9E9E),
@@ -91,6 +119,7 @@ abstract final class SmartContextMenuDefaults {
 
   // Shadows
 
+  /// The shadow under the menu.
   static const List<BoxShadow> menuShadows = [
     // Main soft shadow.
     BoxShadow(
@@ -109,6 +138,9 @@ abstract final class SmartContextMenuDefaults {
 
   // Text
 
+  /// The default of [SmartContextMenuItem.titleStyle].
+  ///
+  /// Has no color: the title color depends on the item state.
   static const TextStyle textStyle = TextStyle(
     fontSize: 17,
     fontWeight: FontWeight.w400,
@@ -116,8 +148,15 @@ abstract final class SmartContextMenuDefaults {
 
   // Icons
 
+  /// The chevron of an item that opens a submenu.
   static const IconData submenuIcon = CupertinoIcons.chevron_forward;
+
+  /// The icon of the back item in a submenu.
   static const IconData backIcon = CupertinoIcons.chevron_back;
+
+  /// The leading icon of a retry item shown after a failed load.
   static const IconData errorIcon = CupertinoIcons.exclamationmark_triangle;
+
+  /// The trailing icon of a retry item shown after a failed load.
   static const IconData retryIcon = CupertinoIcons.refresh;
 }

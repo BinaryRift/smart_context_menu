@@ -128,4 +128,76 @@ void main() {
       expect(find.text('Copy'), findsOneWidget);
     });
   });
+
+  group('activation', () {
+    Widget buildApp({
+      required SmartContextMenuActivationMode mode,
+      SmartContextMenuController? controller,
+      VoidCallback? onTap,
+      VoidCallback? onLongPress,
+    }) {
+      return CupertinoApp(
+        home: Center(
+          child: SmartContextMenu(
+            config: SmartContextMenuConfig(activationMode: mode),
+            controller: controller,
+            items: [SmartContextMenuItem.simple(title: 'Copy')],
+            child: GestureDetector(
+              onTap: onTap,
+              onLongPress: onLongPress,
+              child: const Text(menuTargetText),
+            ),
+          ),
+        ),
+      );
+    }
+
+    testWidgets('longPress keeps taps of the child', (tester) async {
+      var taps = 0;
+      await tester.pumpWidget(
+        buildApp(
+          mode: SmartContextMenuActivationMode.longPress,
+          onTap: () => taps++,
+        ),
+      );
+
+      await tester.tap(find.text(menuTargetText));
+      await tester.settleMenu();
+
+      expect(taps, 1);
+      expect(find.text('Copy'), findsNothing);
+    });
+
+    testWidgets('longPress takes the long press of the child', (tester) async {
+      var longPresses = 0;
+      await tester.pumpWidget(
+        buildApp(
+          mode: SmartContextMenuActivationMode.longPress,
+          onLongPress: () => longPresses++,
+        ),
+      );
+
+      await tester.openMenu();
+
+      expect(longPresses, 0);
+      expect(find.text('Copy'), findsOneWidget);
+    });
+
+    testWidgets('manual leaves the long press to the child', (tester) async {
+      var longPresses = 0;
+      await tester.pumpWidget(
+        buildApp(
+          mode: SmartContextMenuActivationMode.manual,
+          controller: SmartContextMenuController(),
+          onLongPress: () => longPresses++,
+        ),
+      );
+
+      await tester.longPress(find.text(menuTargetText));
+      await tester.settleMenu();
+
+      expect(longPresses, 1);
+      expect(find.text('Copy'), findsNothing);
+    });
+  });
 }
