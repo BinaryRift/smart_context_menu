@@ -1,4 +1,5 @@
 import 'dart:ui' as ui show Image, ImageFilter;
+import 'package:flutter/cupertino.dart' show CupertinoDynamicColor;
 import 'package:flutter/material.dart';
 import '../../core/ui/gestures/gesture_thresholds.dart';
 import '../../core/ui/motion/tokens/motion_curves.dart';
@@ -155,6 +156,9 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
   }
 
   Widget _buildBackground(BuildContext context) {
+    final backgroundColor =
+        CupertinoDynamicColor.resolve(_config.backgroundColor, context);
+
     return Positioned.fill(
       child: FadeTransition(
         opacity: _backgroundAnimation,
@@ -172,9 +176,9 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
                     child: child,
                   );
                 },
-                child: Container(color: _config.backgroundColor),
+                child: Container(color: backgroundColor),
               )
-            : Container(color: _config.backgroundColor),
+            : Container(color: backgroundColor),
       ),
     );
   }

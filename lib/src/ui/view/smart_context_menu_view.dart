@@ -1,5 +1,6 @@
 import 'dart:ui' show ImageFilter;
-import 'package:flutter/cupertino.dart' show CupertinoActivityIndicator;
+import 'package:flutter/cupertino.dart'
+    show CupertinoActivityIndicator, CupertinoDynamicColor;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart'
     show RenderMetaData, RenderPointerListener;
@@ -50,12 +51,19 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
 
   SmartContextMenuConfig get _config => widget.config;
 
-  late final BoxDecoration _defaultDecoration = BoxDecoration(
-    color: _config.menuColor ??
-        SmartContextMenuDefaults.menuColor,
+  Color get _menuColor => CupertinoDynamicColor.resolve(
+    _config.menuColor ?? SmartContextMenuDefaults.menuColor,
+    context,
+  );
+
+  BoxDecoration get _defaultDecoration => BoxDecoration(
+    color: _menuColor,
     borderRadius: _config.borderRadius,
     border: Border.all(
-      color: _config.borderColor ?? SmartContextMenuDefaults.borderColor,
+      color: CupertinoDynamicColor.resolve(
+        _config.borderColor ?? SmartContextMenuDefaults.borderColor,
+        context,
+      ),
     ),
   );
 
@@ -317,7 +325,7 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
   Widget _buildBluredBackButton() {
     Widget child = Container(
       decoration: BoxDecoration(
-        color: _config.menuColor ?? SmartContextMenuDefaults.menuColor,
+        color: _menuColor,
         borderRadius: _config.backButtonBorderRadius,
       ),
       child: _buildBackButton(key: const ValueKey("back_button")),
@@ -354,7 +362,10 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
         leading: Icon(
           SmartContextMenuDefaults.backIcon,
           size: _config.defaultIconSize,
-          color: _config.defaultIconColor,
+          color: CupertinoDynamicColor.maybeResolve(
+            _config.defaultIconColor,
+            context,
+          ),
         ),
         hasDivider: true,
         customDivider: _buildDivider(),

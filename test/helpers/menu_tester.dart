@@ -6,13 +6,17 @@ const String menuTargetText = 'Target';
 
 extension MenuTester on WidgetTester {
   /// Pumps a [SmartContextMenu] with a text child centered on the screen.
+  ///
+  /// [brightness] overrides the app theme brightness.
   Future<void> pumpMenu({
     required List<SmartContextMenuItem> items,
     SmartContextMenuConfig config = const SmartContextMenuConfig(),
     SmartContextMenuController? controller,
+    Brightness? brightness,
   }) {
     return pumpWidget(
       CupertinoApp(
+        theme: CupertinoThemeData(brightness: brightness),
         home: Center(
           child: SmartContextMenu(
             items: items,

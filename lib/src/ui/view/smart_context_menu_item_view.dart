@@ -1,4 +1,5 @@
-import 'package:flutter/cupertino.dart' show CupertinoActivityIndicator;
+import 'package:flutter/cupertino.dart'
+    show CupertinoActivityIndicator, CupertinoDynamicColor;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show HapticFeedback;
 
@@ -71,6 +72,8 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
   SmartContextMenuItem get _item => _resolvedItem ?? widget.item;
   SmartContextMenuConfig get _config => widget.config;
 
+  Color _resolve(Color color) => CupertinoDynamicColor.resolve(color, context);
+
   Color get _overlayColor {
     if (_item.isDestructive) {
       final alpha = _item.isDisabled
@@ -78,28 +81,31 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
           : _isHighlight
               ? 0.24
               : 0.12;
-      return SmartContextMenuDefaults.destructiveColor.withValues(alpha: alpha);
+      return _resolve(SmartContextMenuDefaults.destructiveColor)
+          .withValues(alpha: alpha);
     }
     if (_item.isDisabled) {
       return SmartContextMenuDefaults.disabledItemColor;
     }
     return _isHighlight
-        ? SmartContextMenuDefaults.textColor.withValues(alpha: 0.1)
+        ? _resolve(SmartContextMenuDefaults.textColor).withValues(alpha: 0.1)
         : Colors.transparent;
   }
 
   Color get _textColor {
     if (_item.isDestructive) {
-      return SmartContextMenuDefaults.destructiveColor.withValues(
+      return _resolve(SmartContextMenuDefaults.destructiveColor).withValues(
         alpha: _item.isDisabled
             ? MotionOpacity.medium.value
             : MotionOpacity.visible.value,
       );
     }
     if (_item.isDisabled) {
-      return SmartContextMenuDefaults.secondaryTextColor;
+      return _resolve(SmartContextMenuDefaults.secondaryTextColor);
     }
-    return _item.titleStyle?.color ?? SmartContextMenuDefaults.textColor;
+    return _resolve(
+      _item.titleStyle?.color ?? SmartContextMenuDefaults.textColor,
+    );
   }
 
   @override
@@ -230,8 +236,11 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
             SmartContextMenuDefaults.submenuIcon,
             size: _config.defaultIconSize,
             color: item.isDisabled
-                ? SmartContextMenuDefaults.secondaryTextColor
-                : _config.defaultIconColor,
+                ? _resolve(SmartContextMenuDefaults.secondaryTextColor)
+                : CupertinoDynamicColor.maybeResolve(
+                    _config.defaultIconColor,
+                    context,
+                  ),
           ),
         ],
       ],
