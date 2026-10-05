@@ -17,12 +17,59 @@ import '../../domain/smart_context_menu_item.dart';
 import '../routes/smart_context_menu_route.dart';
 import '../state/smart_context_menu_session.dart';
 
+/// Shows an iOS-style context menu for [child] on long press.
+///
+/// While pressed, [child] shrinks slightly. When the menu opens, [child]
+/// is lifted above the blurred screen and the menu with [items] appears
+/// next to it. The preview is a snapshot of [child] taken at the moment
+/// of opening, so it does not update while the menu is open.
+///
+/// To open the menu from code, pass a [controller]. To turn off the long
+/// press, set [SmartContextMenuConfig.activationMode] to
+/// [SmartContextMenuActivationMode.manual].
+///
+/// ```dart
+/// SmartContextMenu(
+///   items: [
+///     SmartContextMenuItem.simple(
+///       title: 'Copy',
+///       leading: const Icon(CupertinoIcons.doc_on_doc),
+///       onTap: () => debugPrint('Copy'),
+///     ),
+///     SmartContextMenuItem.simple(
+///       title: 'Delete',
+///       leading: const Icon(CupertinoIcons.delete),
+///       isDestructive: true,
+///       onTap: () => debugPrint('Delete'),
+///     ),
+///   ],
+///   child: const Text('Long press me'),
+/// )
+/// ```
 final class SmartContextMenu extends StatefulWidget {
+  /// The widget the menu is attached to.
+  ///
+  /// It receives the long press and is shown as the preview above the menu.
   final Widget child;
+
+  /// The items of the root menu.
+  ///
+  /// If empty, the menu does not open, neither on long press nor via
+  /// [controller].
   final List<SmartContextMenuItem> items;
+
+  /// The behavior and appearance of the menu.
+  ///
+  /// Defaults to `const SmartContextMenuConfig()`.
   final SmartContextMenuConfig config;
+
+  /// Opens and closes the menu from code.
+  ///
+  /// Required when [SmartContextMenuConfig.activationMode] is
+  /// [SmartContextMenuActivationMode.manual].
   final SmartContextMenuController? controller;
 
+  /// Creates a context menu for [child].
   const SmartContextMenu({
     super.key,
     required this.child,
