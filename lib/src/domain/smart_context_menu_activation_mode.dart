@@ -1,0 +1,4 @@
+enum SmartContextMenuActivationMode {
+  longPress,
+  manual;
+}
