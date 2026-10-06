@@ -14,6 +14,7 @@ class SubmenuDemoPage extends StatefulWidget {
 
 class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
   final _loader = DemoLoader();
+  final _menuController = SmartContextMenuController();
   bool _swipeBack = true;
   bool _haptics = true;
   bool _slowAnimations = false;
@@ -25,6 +26,7 @@ class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
 
   @override
   void dispose() {
+    _menuController.dispose();
     timeDilation = 1;
     super.dispose();
   }
@@ -33,7 +35,7 @@ class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       backgroundColor: CupertinoColors.systemGroupedBackground,
-      navigationBar: const CupertinoNavigationBar(middle: Text('Submenus')),
+      navigationBar: const CupertinoNavigationBar(middle: Text('Smart Context Menu')),
       child: SafeArea(
         child: Column(
           children: [
@@ -44,6 +46,11 @@ class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
                   _buildMenu(
                     title: 'All submenu types',
                     subtitle: 'Static, async, paginated and nested',
+                    items: allSubmenuTypes(_loader),
+                  ),
+                  _buildManualMenu(
+                    title: 'Opens from the button',
+                    subtitle: 'All submenu types, no long press',
                     items: allSubmenuTypes(_loader),
                   ),
                   _buildMenu(
@@ -114,6 +121,34 @@ class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
     return CupertinoListTile(
       title: Text(title),
       trailing: CupertinoSwitch(value: value, onChanged: onChanged),
+    );
+  }
+
+  Widget _buildManualMenu({
+    required String title,
+    required String subtitle,
+    required List<SmartContextMenuItem> items,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: SmartContextMenu(
+              controller: _menuController,
+              config: _config.copyWith(
+                activationMode: SmartContextMenuActivationMode.manual,
+              ),
+              items: items,
+              child: _DemoCard(title: title, subtitle: subtitle),
+            ),
+          ),
+          CupertinoButton(
+            onPressed: _menuController.open,
+            child: const Icon(CupertinoIcons.ellipsis_circle),
+          ),
+        ],
+      ),
     );
   }
 
