@@ -233,6 +233,7 @@ const menuStyle = SmartContextMenuStyle(
 The color of `textStyle` is used for enabled items that are not destructive.
 Disabled and destructive items use `secondaryTextColor` and `destructiveColor`.
 An item `titleStyle` replaces `textStyle` for that item.
+Icons in `leading` and `trailing` take the title color unless they set their own.
 
 Colors may be `CupertinoDynamicColor`s: they follow the light and dark theme.
 A plain `Color` is used as is in both themes. The default values are available

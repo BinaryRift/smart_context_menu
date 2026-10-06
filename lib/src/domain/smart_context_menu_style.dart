@@ -125,7 +125,7 @@ final class SmartContextMenuStyle {
 
   /// The color of the submenu chevron and the back icon.
   ///
-  /// If null, the color of the ambient [IconTheme] is used.
+  /// If null, they take the title color of their item.
   final Color? defaultIconColor;
 
   /// The chevron of an item that opens a submenu.

@@ -224,6 +224,73 @@ void main() {
       expect(find.byIcon(Icons.arrow_back_ios_new), findsWidgets);
       expect(find.byIcon(SmartContextMenuDefaults.backIcon), findsNothing);
     });
+
+    Color? iconColorOf(WidgetTester tester, IconData icon) =>
+        IconTheme.of(tester.element(find.byIcon(icon).first)).color;
+
+    testWidgets('tints icons with the title color', (tester) async {
+      await tester.pumpMenu(
+        config: customConfig,
+        items: [
+          SmartContextMenuItem.simple(
+            title: 'Enabled',
+            leading: const Icon(Icons.edit),
+            trailing: const Icon(Icons.star),
+          ),
+          SmartContextMenuItem.simple(
+            title: 'Disabled',
+            isDisabled: true,
+            leading: const Icon(Icons.block),
+          ),
+          SmartContextMenuItem.simple(
+            title: 'Destructive',
+            isDestructive: true,
+            leading: const Icon(Icons.delete),
+          ),
+          ...submenu,
+        ],
+      );
+      await tester.openMenu();
+
+      final textColor = customStyle.textStyle.color!;
+      expect(iconColorOf(tester, Icons.edit), isSameColorAs(textColor));
+      expect(iconColorOf(tester, Icons.star), isSameColorAs(textColor));
+      expect(
+        iconColorOf(tester, Icons.block),
+        isSameColorAs(customStyle.secondaryTextColor),
+      );
+      expect(
+        iconColorOf(tester, Icons.delete),
+        isSameColorAs(customStyle.destructiveColor),
+      );
+      expect(
+        iconColorOf(tester, SmartContextMenuDefaults.submenuIcon),
+        isSameColorAs(textColor),
+      );
+    });
+
+    testWidgets('keeps the color of an icon', (tester) async {
+      const iconColor = Color(0xFF0000FF);
+      await tester.pumpMenu(
+        config: customConfig,
+        items: [
+          SmartContextMenuItem.simple(
+            title: 'Destructive',
+            isDestructive: true,
+            leading: const Icon(Icons.delete, color: iconColor),
+          ),
+        ],
+      );
+      await tester.openMenu();
+
+      final icon = tester.widget<RichText>(
+        find.descendant(
+          of: find.byIcon(Icons.delete),
+          matching: find.byType(RichText),
+        ),
+      );
+      expect(icon.text.style!.color, isSameColorAs(iconColor));
+    });
   });
 
   group('loader', () {

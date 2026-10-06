@@ -89,11 +89,14 @@ final class SmartContextMenuItem {
   final TextStyle? titleStyle;
 
   /// A widget shown before [title], usually an [Icon].
+  ///
+  /// Icons without their own color take the title color.
   final Widget? leading;
 
   /// A widget shown after [title].
   ///
   /// Items that open a submenu also show a chevron after it.
+  /// Icons without their own color take the title color.
   final Widget? trailing;
 
   /// The padding around the item content.
