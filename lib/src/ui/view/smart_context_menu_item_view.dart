@@ -59,7 +59,6 @@ final class SmartContextMenuItemView extends StatefulWidget {
 }
 
 final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemView> {
-  final Duration _highlightDuration = const Duration(milliseconds: 30);
   bool _isHighlight = false;
   SmartContextMenuItem? _resolvedItem;
   bool _isLoading = false;
@@ -165,7 +164,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
             _item.customDivider ??
                 SmartContextMenuDivider(color: _style.dividerColor),
           AnimatedContainer(
-            duration: _highlightDuration,
+            duration: MotionDurations.instant,
             color: _overlayColor,
             padding: _item.padding,
             child: AnimatedSwitcher(

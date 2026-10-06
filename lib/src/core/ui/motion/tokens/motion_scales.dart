@@ -14,5 +14,8 @@ final class MotionScale {
   static const subtle = MotionScale._(1.2, 1.2, 1.2);
   static const medium = MotionScale._(1.5, 1.5, 1.5);
 
+  /// The maximum stretch of the menu while it is dragged.
+  static const stretch = MotionScale._(1.05, 1.04, 1.0);
+
   Offset get offset => Offset(x, y);
 }

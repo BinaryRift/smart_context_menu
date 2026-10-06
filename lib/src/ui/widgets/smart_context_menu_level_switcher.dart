@@ -1,11 +1,13 @@
 import 'package:flutter/widgets.dart';
 
-import '../../core/ui/motion/tokens/motion_curves.dart';
 import '../../core/ui/motion/tokens/motion_durations.dart';
 import '../../core/ui/motion/tokens/motion_slides.dart';
+import '../state/smart_context_menu_level_entry.dart';
+import 'smart_context_menu_level_transition.dart';
 
-/// Switches menu levels: a submenu slides in from the right,
-/// the parent level from the left.
+/// Switches menu levels: a submenu slides in from the right and pushes
+/// the current level to the left; going back, the parent slides in from
+/// the left and pushes the submenu to the right.
 ///
 /// Give each level its own key, so a new level is animated in.
 final class SmartContextMenuLevelSwitcher extends StatefulWidget {
@@ -25,112 +27,93 @@ final class SmartContextMenuLevelSwitcher extends StatefulWidget {
 }
 
 final class _SmartContextMenuLevelSwitcherState
-    extends State<SmartContextMenuLevelSwitcher> {
-  // The builders are state methods, so they stay equal between builds.
-  // AnimatedSwitcher rebuilds the transitions of all levels when its
-  // transitionBuilder changes, and a leaving level must keep the direction
-  // it came in with.
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedSwitcher(
-      duration: MotionDurations.standard,
-      layoutBuilder: _layoutBuilder,
-      transitionBuilder: _transitionBuilder,
-      child: widget.child,
-    );
-  }
-
-  Widget _layoutBuilder(Widget? currentChild, List<Widget> previousChildren) {
-    return Stack(
-      alignment: widget.isForward
-          ? Alignment.centerRight
-          : Alignment.centerLeft,
-      children: [...previousChildren, ?currentChild],
-    );
-  }
-
-  Widget _transitionBuilder(Widget child, Animation<double> animation) {
-    return _LevelTransition(
-      animation: animation,
-      slideBegin: widget.isForward
-          ? MotionSlide.rightHalf.offset
-          : MotionSlide.leftHalf.offset,
-      child: child,
-    );
-  }
-}
-
-/// Fades and slides a level in from [slideBegin].
-final class _LevelTransition extends StatefulWidget {
-  final Animation<double> animation;
-  final Offset slideBegin;
-  final Widget child;
-
-  const _LevelTransition({
-    required this.animation,
-    required this.slideBegin,
-    required this.child,
-  });
-
-  @override
-  State<_LevelTransition> createState() => _LevelTransitionState();
-}
-
-final class _LevelTransitionState extends State<_LevelTransition> {
-  late CurvedAnimation _fade;
-  late CurvedAnimation _slide;
-  late Animation<Offset> _position;
+    extends State<SmartContextMenuLevelSwitcher>
+    with TickerProviderStateMixin {
+  late SmartContextMenuLevelEntry _current;
+  final List<SmartContextMenuLevelEntry> _leaving = [];
 
   @override
   void initState() {
     super.initState();
-    _createAnimations();
+    _current = _createEntry(
+      widget.child,
+      enterFrom: MotionSlide.rightHalf.offset,
+    )..controller.value = 1;
   }
 
   @override
-  void didUpdateWidget(_LevelTransition oldWidget) {
+  void didUpdateWidget(SmartContextMenuLevelSwitcher oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.animation != oldWidget.animation ||
-        widget.slideBegin != oldWidget.slideBegin) {
-      _disposeAnimations();
-      _createAnimations();
+    if (Widget.canUpdate(_current.child, widget.child)) {
+      _current.child = widget.child;
+      return;
     }
+
+    _leave(
+      _current,
+      to: widget.isForward
+          ? MotionSlide.leftHalf.offset
+          : MotionSlide.rightHalf.offset,
+    );
+    _current = _createEntry(
+      widget.child,
+      enterFrom: widget.isForward
+          ? MotionSlide.rightHalf.offset
+          : MotionSlide.leftHalf.offset,
+    )..controller.forward();
   }
 
   @override
   void dispose() {
-    _disposeAnimations();
+    _current.controller.dispose();
+    for (final entry in _leaving) {
+      entry.controller.dispose();
+    }
     super.dispose();
   }
 
-  void _createAnimations() {
-    _fade = CurvedAnimation(
-      parent: widget.animation,
-      curve: const Interval(0.0, 0.6, curve: Curves.easeIn),
-      reverseCurve: const Interval(0.4, 1.0, curve: Curves.easeOut),
+  SmartContextMenuLevelEntry _createEntry(
+    Widget child, {
+    required Offset enterFrom,
+  }) {
+    return SmartContextMenuLevelEntry(
+      child: child,
+      controller: AnimationController(
+        vsync: this,
+        duration: MotionDurations.standard,
+      ),
+      enterFrom: enterFrom,
     );
-    _slide = CurvedAnimation(
-      parent: widget.animation,
-      curve: MotionCurves.emphasized,
-    );
-    _position = Tween<Offset>(
-      begin: widget.slideBegin,
-      end: MotionSlide.none.offset,
-    ).animate(_slide);
   }
 
-  void _disposeAnimations() {
-    _fade.dispose();
-    _slide.dispose();
+  void _leave(SmartContextMenuLevelEntry entry, {required Offset to}) {
+    _leaving.add(entry);
+    entry.leave(to).whenCompleteOrCancel(() {
+      if (!mounted || entry.controller.value != 0) return;
+      setState(() => _leaving.remove(entry));
+      entry.controller.dispose();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return RepaintBoundary(
-      child: FadeTransition(
-        opacity: _fade,
-        child: SlideTransition(position: _position, child: widget.child),
-      ),
+    return Stack(
+      alignment: widget.isForward
+          ? Alignment.centerRight
+          : Alignment.centerLeft,
+      children: [
+        for (final entry in _leaving) _buildEntry(entry),
+        _buildEntry(_current),
+      ],
+    );
+  }
+
+  Widget _buildEntry(SmartContextMenuLevelEntry entry) {
+    return SmartContextMenuLevelTransition(
+      key: ObjectKey(entry),
+      animation: entry.controller,
+      position: entry.position,
+      child: entry.child,
     );
   }
 }

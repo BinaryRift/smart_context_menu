@@ -44,8 +44,11 @@ final class SmartContextMenuStretchController extends ChangeNotifier {
       maxTranslation.dy,
     );
 
-    _scaleX = MotionScale.none.x + (relX.abs() * 0.05);
-    _scaleY = MotionScale.none.y + (relY.abs() * 0.04);
+    final maxScale = MotionScale.stretch;
+    _scaleX =
+        MotionScale.none.x + relX.abs() * (maxScale.x - MotionScale.none.x);
+    _scaleY =
+        MotionScale.none.y + relY.abs() * (maxScale.y - MotionScale.none.y);
 
     _translateX = relX * MotionTranslation.subtle.dx;
     _translateY = relY * MotionTranslation.subtle.dy;

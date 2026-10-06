@@ -275,8 +275,8 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
 
     _menuAnimation = CurvedAnimation(
       parent: widget.routeAnimation,
-      curve: const Interval(0.2, 1.0, curve: MotionCurves.lightSpring),
-      reverseCurve: const Interval(0.5, 1.0, curve: MotionCurves.slow),
+      curve: MotionCurves.menuScaleIn,
+      reverseCurve: MotionCurves.menuScaleOut,
     );
   }
 
