@@ -1,17 +1,6 @@
 import 'package:flutter/material.dart' show Offset, immutable;
 
 @immutable
-abstract final class MotionTranslationX {
-  static const double none = 0;
-  static const double subtle = 8;
-}
-
-@immutable
-abstract final class MotionTranslationY {
-  static const double none = 0;
-}
-
-@immutable
 // Absolute values
 final class MotionTranslation {
   final double dx;

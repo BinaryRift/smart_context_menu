@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart'
 
 import '../../core/ui/motion/tokens/motion_scales.dart';
 import '../../core/ui/motion/tokens/motion_translation_factor.dart';
-import '../../core/ui/motion/tokens/motion_traslation.dart';
+import '../../core/ui/motion/tokens/motion_translation.dart';
 
 /// Stretches the menu towards the pointer while it is dragged.
 final class SmartContextMenuStretchController extends ChangeNotifier {

@@ -5,7 +5,7 @@ import '../../core/ui/gestures/gesture_thresholds.dart';
 import '../../core/ui/motion/tokens/motion_curves.dart';
 import '../../core/ui/motion/tokens/motion_durations.dart';
 import '../../core/ui/motion/tokens/motion_opacity.dart';
-import '../../core/ui/motion/tokens/motion_traslation.dart';
+import '../../core/ui/motion/tokens/motion_translation.dart';
 import '../../domain/smart_context_menu_config.dart';
 import '../../domain/smart_context_menu_item.dart';
 import '../components/smart_menu_reactive_physics.dart';

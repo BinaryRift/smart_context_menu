@@ -10,6 +10,5 @@ final class MotionTranslationFactor {
   const MotionTranslationFactor._(this.dx, this.dy, this.dz);
 
   static const none = MotionTranslationFactor._(0, 0, 0);
-  static const half = MotionTranslationFactor._(0.5, 0.5, 0.5);
   static const full = MotionTranslationFactor._(1.0, 1.0, 1.0);
 }

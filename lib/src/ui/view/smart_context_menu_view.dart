@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/ui/motion/tokens/motion_curves.dart';
 import '../../core/ui/motion/tokens/motion_durations.dart';
-import '../../core/ui/motion/tokens/motion_traslation.dart';
+import '../../core/ui/motion/tokens/motion_translation.dart';
 import '../../controllers/smart_context_menu_overlay_controller.dart';
 import '../../domain/smart_context_menu_navigator.dart';
 import '../state/smart_context_menu_hover_controller.dart';
