@@ -1,20 +1,31 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show ThemeMode;
 import 'package:flutter/scheduler.dart' show timeDilation;
 import 'package:smart_context_menu/smart_context_menu.dart';
 
-import 'demo_items.dart';
+import '../../../demo_items.dart';
+import 'widgets/demo_card.dart';
+import 'widgets/tap_empty_area.dart';
 
 /// Menus for checking submenus and swiping back.
-class SubmenuDemoPage extends StatefulWidget {
-  const SubmenuDemoPage({super.key});
+final class SubmenuDemoPage extends StatefulWidget {
+  final ThemeMode themeMode;
+  final ValueChanged<ThemeMode> onThemeModeChanged;
+
+  const SubmenuDemoPage({
+    super.key,
+    required this.themeMode,
+    required this.onThemeModeChanged,
+  });
 
   @override
   State<SubmenuDemoPage> createState() => _SubmenuDemoPageState();
 }
 
-class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
+final class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
   final _loader = DemoLoader();
-  final _menuController = SmartContextMenuController();
+  final _buttonMenuController = SmartContextMenuController();
+  final _tapAreaMenuController = SmartContextMenuController();
   bool _swipeBack = true;
   bool _haptics = true;
   bool _slowAnimations = false;
@@ -26,7 +37,8 @@ class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
 
   @override
   void dispose() {
-    _menuController.dispose();
+    _buttonMenuController.dispose();
+    _tapAreaMenuController.dispose();
     timeDilation = 1;
     super.dispose();
   }
@@ -49,9 +61,23 @@ class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
                     items: allSubmenuTypes(_loader),
                   ),
                   _buildManualMenu(
+                    controller: _buttonMenuController,
                     title: 'Opens from the button',
                     subtitle: 'All submenu types, no long press',
                     items: allSubmenuTypes(_loader),
+                    trailing: CupertinoButton(
+                      onPressed: _buttonMenuController.open,
+                      child: const Icon(CupertinoIcons.ellipsis_circle),
+                    ),
+                  ),
+                  _buildManualMenu(
+                    controller: _tapAreaMenuController,
+                    title: 'Opens from the empty area',
+                    subtitle: 'All submenu types, no long press',
+                    items: allSubmenuTypes(_loader),
+                    leading: TapEmptyArea(
+                      onDoubleTap: _tapAreaMenuController.open,
+                    ),
                   ),
                   _buildMenu(
                     title: 'Nested levels',
@@ -86,6 +112,20 @@ class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
     return CupertinoListSection.insetGrouped(
       header: const Text('Settings'),
       children: [
+        CupertinoListTile(
+          title: const Text('Theme'),
+          trailing: CupertinoSlidingSegmentedControl<ThemeMode>(
+            groupValue: widget.themeMode,
+            onValueChanged: (mode) {
+              if (mode != null) widget.onThemeModeChanged(mode);
+            },
+            children: const {
+              ThemeMode.system: Text('System'),
+              ThemeMode.light: Text('Light'),
+              ThemeMode.dark: Text('Dark'),
+            },
+          ),
+        ),
         _buildSwitch(
           title: 'Swipe back',
           value: _swipeBack,
@@ -124,30 +164,36 @@ class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
     );
   }
 
+  /// A menu that opens only from code, with [leading] and [trailing]
+  /// next to the card to open it.
   Widget _buildManualMenu({
+    required SmartContextMenuController controller,
     required String title,
     required String subtitle,
     required List<SmartContextMenuItem> items,
+    Widget? leading,
+    Widget? trailing,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      child: Row(
-        children: [
-          Expanded(
-            child: SmartContextMenu(
-              controller: _menuController,
-              config: _config.copyWith(
-                activationMode: SmartContextMenuActivationMode.manual,
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ?leading,
+            Expanded(
+              child: SmartContextMenu(
+                controller: controller,
+                config: _config.copyWith(
+                  activationMode: SmartContextMenuActivationMode.manual,
+                ),
+                items: items,
+                child: DemoCard(title: title, subtitle: subtitle),
               ),
-              items: items,
-              child: _DemoCard(title: title, subtitle: subtitle),
             ),
-          ),
-          CupertinoButton(
-            onPressed: _menuController.open,
-            child: const Icon(CupertinoIcons.ellipsis_circle),
-          ),
-        ],
+            ?trailing,
+          ],
+        ),
       ),
     );
   }
@@ -162,48 +208,7 @@ class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
       child: SmartContextMenu(
         config: _config,
         items: items,
-        child: _DemoCard(title: title, subtitle: subtitle),
-      ),
-    );
-  }
-}
-
-class _DemoCard extends StatelessWidget {
-  final String title;
-  final String subtitle;
-
-  const _DemoCard({required this.title, required this.subtitle});
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = CupertinoTheme.of(context).textTheme;
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: CupertinoDynamicColor.resolve(
-          CupertinoColors.secondarySystemGroupedBackground,
-          context,
-        ),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: textTheme.textStyle),
-          const SizedBox(height: 4),
-          Text(
-            subtitle,
-            style: textTheme.textStyle.copyWith(
-              fontSize: 13,
-              color: CupertinoDynamicColor.resolve(
-                CupertinoColors.secondaryLabel,
-                context,
-              ),
-            ),
-          ),
-        ],
+        child: DemoCard(title: title, subtitle: subtitle),
       ),
     );
   }

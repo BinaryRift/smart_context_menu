@@ -1,17 +1,35 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show ThemeMode;
 
-import 'submenu_demo_page.dart';
+import 'pages/main/ui/submenu_demo_page.dart';
 
 void main() => runApp(const ExampleApp());
 
-class ExampleApp extends StatelessWidget {
+final class ExampleApp extends StatefulWidget {
   const ExampleApp({super.key});
 
   @override
+  State<ExampleApp> createState() => _ExampleAppState();
+}
+
+final class _ExampleAppState extends State<ExampleApp> {
+  ThemeMode _themeMode = ThemeMode.system;
+
+  Brightness? get _brightness => switch (_themeMode) {
+    ThemeMode.system => null,
+    ThemeMode.light => Brightness.light,
+    ThemeMode.dark => Brightness.dark,
+  };
+
+  @override
   Widget build(BuildContext context) {
-    return const CupertinoApp(
+    return CupertinoApp(
       title: 'smart_context_menu',
-      home: SubmenuDemoPage(),
+      theme: CupertinoThemeData(brightness: _brightness),
+      home: SubmenuDemoPage(
+        themeMode: _themeMode,
+        onThemeModeChanged: (mode) => setState(() => _themeMode = mode),
+      ),
     );
   }
 }

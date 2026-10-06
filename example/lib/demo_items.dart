@@ -32,7 +32,12 @@ List<SmartContextMenuItem> allSubmenuTypes(DemoLoader loader) => [
     children: [
       _action('Documents'),
       _action('Archive'),
-      _action('Trash', icon: CupertinoIcons.delete, isDestructive: true),
+      _action(
+        'Trash',
+        icon: CupertinoIcons.delete,
+        isDestructive: true,
+        hasDivider: true,
+      ),
     ],
   ),
   _recentFiles(loader),
@@ -42,14 +47,29 @@ List<SmartContextMenuItem> allSubmenuTypes(DemoLoader loader) => [
 
 /// Three levels: root, Share, Messages.
 List<SmartContextMenuItem> nestedLevels() => [
-  _action('Copy', icon: CupertinoIcons.doc_on_doc),
+  _action(
+    'Copy',
+    icon: CupertinoIcons.doc_on_doc,
+    hasDivider: true,
+    dividerPosition: SmartContextMenuDividerPosition.bottom,
+  ),
   _share(),
-  _action('Delete', icon: CupertinoIcons.delete, isDestructive: true),
+  _action(
+    'Delete',
+    icon: CupertinoIcons.delete,
+    isDestructive: true,
+    hasDivider: true,
+  ),
 ];
 
 /// A short root with a long scrollable submenu.
 List<SmartContextMenuItem> shortRootLongSubmenu() => [
-  _action('Open', icon: CupertinoIcons.arrow_up_right_square),
+  _action(
+    'Open',
+    icon: CupertinoIcons.arrow_up_right_square,
+    hasDivider: true,
+    dividerPosition: SmartContextMenuDividerPosition.bottom,
+  ),
   SmartContextMenuItem.submenu(
     title: 'Tags',
     leading: const Icon(CupertinoIcons.tag),
@@ -135,12 +155,17 @@ SmartContextMenuItem _action(
   IconData? icon,
   bool isDestructive = false,
   SmartContextMenuPagingMetadata? pagingMetadata,
+  bool hasDivider = false,
+  SmartContextMenuDividerPosition dividerPosition =
+      SmartContextMenuDividerPosition.top,
 }) {
   return SmartContextMenuItem.simple(
     title: title,
     leading: icon == null ? null : Icon(icon),
     isDestructive: isDestructive,
     pagingMetadata: pagingMetadata,
+    hasDivider: hasDivider,
+    dividerPosition: dividerPosition,
     onTap: () => debugPrint('Tapped: $title'),
   );
 }
