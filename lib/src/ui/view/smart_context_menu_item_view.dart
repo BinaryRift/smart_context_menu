@@ -64,7 +64,6 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
   SmartContextMenuItem? _resolvedItem;
   bool _isLoading = false;
   Object? _error;
-  ValueNotifier<bool>? _scrollingNotifier;
   bool get _isDisabled => _item.isDisabled || _isLoading || !_hasInteractions;
   bool get _hasInteractions =>
       _item.onTap != null ||
@@ -137,20 +136,12 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _scrollingNotifier?.removeListener(_onScrollChanged);
-    final scrollable = Scrollable.maybeOf(context);
-    if (scrollable != null && scrollable.position.hasContentDimensions) {
-      _scrollingNotifier = scrollable.position.isScrollingNotifier;
-      _scrollingNotifier?.addListener(_onScrollChanged);
-    }
-
     widget.hoverController?.removeListener(_handleGlobalPointer);
     widget.hoverController?.addListener(_handleGlobalPointer);
   }
 
   @override
   void dispose() {
-    _scrollingNotifier?.removeListener(_onScrollChanged);
     widget.hoverController?.removeListener(_handleGlobalPointer);
     super.dispose();
   }
@@ -206,6 +197,13 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
   }
 
   Widget _body(SmartContextMenuItem item) {
+    return IconTheme.merge(
+      data: IconThemeData(color: _textColor),
+      child: _buildRow(item),
+    );
+  }
+
+  Widget _buildRow(SmartContextMenuItem item) {
     return Row(
       children: [
         if (item.leading != null) ...[
@@ -329,20 +327,13 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
     }
   }
 
-  void _onScrollChanged() {
-    if (_scrollingNotifier?.value == true && _isHighlight) {
-      setState(() => _isHighlight = false);
-    }
-  }
-
   void _handleGlobalPointer() {
     final activeKey = widget.hoverController?.value;
     final bool isReleased = widget.hoverController?.isPointerReleased ?? false;
-    final bool isScrolling = _scrollingNotifier?.value ?? false;
     final myKey = widget.key;
 
     final bool isMeHovered = activeKey == myKey;
-    final bool shouldHighlight = isMeHovered && !isScrolling && !_isDisabled;
+    final bool shouldHighlight = isMeHovered && !_isDisabled;
 
     if (shouldHighlight != _isHighlight) {
       setState(() => _isHighlight = shouldHighlight);

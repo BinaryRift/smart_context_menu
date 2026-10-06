@@ -6,7 +6,8 @@ import '../state/smart_context_menu_hover_controller.dart';
 /// Tracks the pointer over [child] and reports the item under it
 /// to [hoverController].
 ///
-/// While the enclosing scrollable scrolls, no item is hovered.
+/// Once a scrollable inside [child] scrolls, the gesture no longer hovers
+/// or selects an item until the pointer is lifted.
 final class SmartContextMenuPointerTracker extends StatefulWidget {
   final SmartContextMenuHoverController hoverController;
 
@@ -33,40 +34,32 @@ final class SmartContextMenuPointerTracker extends StatefulWidget {
 
 final class _SmartContextMenuPointerTrackerState
     extends State<SmartContextMenuPointerTracker> {
-  ValueNotifier<bool>? _scrollingNotifier;
   Offset? _startPosition;
+  bool _didScroll = false;
 
   SmartContextMenuHoverController get _hoverController =>
       widget.hoverController;
 
-  bool get _isScrolling => _scrollingNotifier?.value ?? false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _scrollingNotifier?.removeListener(_onScrollChanged);
-    final scrollable = Scrollable.maybeOf(context);
-    if (scrollable != null) {
-      _scrollingNotifier = scrollable.position.isScrollingNotifier;
-      _scrollingNotifier?.addListener(_onScrollChanged);
-    }
-  }
-
-  @override
-  void dispose() {
-    _scrollingNotifier?.removeListener(_onScrollChanged);
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Listener(
-      onPointerDown: _onPointerEvent,
-      onPointerMove: _onPointerEvent,
-      onPointerUp: _onPointerEvent,
-      onPointerCancel: _onPointerEvent,
-      child: widget.child,
+    return NotificationListener<ScrollNotification>(
+      onNotification: _onScrollNotification,
+      child: Listener(
+        onPointerDown: _onPointerEvent,
+        onPointerMove: _onPointerEvent,
+        onPointerUp: _onPointerEvent,
+        onPointerCancel: _onPointerEvent,
+        child: widget.child,
+      ),
     );
+  }
+
+  bool _onScrollNotification(ScrollNotification notification) {
+    if (notification is ScrollStartNotification && _startPosition != null) {
+      _didScroll = true;
+      if (_hoverController.value != null) _hoverController.update(null);
+    }
+    return false;
   }
 
   void _onPointerEvent(PointerEvent event) {
@@ -81,6 +74,7 @@ final class _SmartContextMenuPointerTrackerState
 
   void _handlePointerDown(PointerDownEvent event) {
     _startPosition = event.position;
+    _didScroll = false;
     _updateHoveredItem(event.position);
   }
 
@@ -92,7 +86,7 @@ final class _SmartContextMenuPointerTrackerState
   }
 
   void _handlePointerReset() {
-    if (_hoverController.value != null && !_isScrolling) {
+    if (_hoverController.value != null && !_didScroll) {
       _hoverController.setReleased();
     }
 
@@ -104,7 +98,7 @@ final class _SmartContextMenuPointerTrackerState
   }
 
   void _updateHoveredItem(Offset globalPosition) {
-    if (_isScrolling) {
+    if (_didScroll) {
       if (_hoverController.value != null) _hoverController.update(null);
       return;
     }
@@ -112,12 +106,6 @@ final class _SmartContextMenuPointerTrackerState
     final key = context.findRenderObject()?.findMenuItemKeyAt(globalPosition);
     if (_hoverController.value != key) {
       _hoverController.update(key);
-    }
-  }
-
-  void _onScrollChanged() {
-    if (_scrollingNotifier?.value == true) {
-      _hoverController.update(null);
     }
   }
 }

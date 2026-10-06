@@ -58,6 +58,71 @@ void main() {
     expect(taps, 0);
   });
 
+  group('scrolling the items', () {
+    final taps = <String>[];
+    final items = [
+      for (var i = 1; i <= 40; i++)
+        SmartContextMenuItem.simple(
+          title: 'Item $i',
+          closeOnTap: false,
+          onTap: () => taps.add('Item $i'),
+        ),
+    ];
+
+    setUp(taps.clear);
+
+    Future<void> scrollAndRelease(WidgetTester tester) async {
+      final gesture = await tester.startGesture(
+        tester.getCenter(find.text('Item 5')),
+      );
+      await tester.pump();
+      for (var i = 0; i < 10; i++) {
+        await gesture.moveBy(const Offset(0, -15));
+        await tester.pump(const Duration(milliseconds: 16));
+      }
+      await tester.pump(const Duration(milliseconds: 200));
+      await gesture.up();
+      await tester.settleMenu();
+    }
+
+    testWidgets('releasing after a scroll triggers nothing', (tester) async {
+      await tester.pumpMenu(items: items);
+      await tester.openMenu();
+
+      await scrollAndRelease(tester);
+
+      expect(taps, isEmpty);
+    });
+
+    testWidgets('releasing after a scroll in a submenu triggers nothing', (
+      tester,
+    ) async {
+      await tester.pumpMenu(
+        items: [SmartContextMenuItem.submenu(title: 'More', children: items)],
+      );
+      await tester.openMenu();
+      await tester.tap(find.text('More'));
+      await tester.settleMenu();
+
+      await scrollAndRelease(tester);
+
+      expect(taps, isEmpty);
+    });
+
+    testWidgets('the next tap after a scroll triggers the item', (
+      tester,
+    ) async {
+      await tester.pumpMenu(items: items);
+      await tester.openMenu();
+      await scrollAndRelease(tester);
+
+      await tester.tap(find.text('Item 10'));
+      await tester.settleMenu();
+
+      expect(taps, ['Item 10']);
+    });
+  });
+
   testWidgets('an interactive child of an item handles the tap itself', (
     tester,
   ) async {
