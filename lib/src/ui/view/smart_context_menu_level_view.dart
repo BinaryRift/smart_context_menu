@@ -118,13 +118,17 @@ final class SmartContextMenuLevelView extends StatelessWidget {
 
     return AnimatedSwitcher(
       duration: isTransitionState ? MotionDurations.fast : Duration.zero,
-      transitionBuilder: (child, animation) {
-        return isTransitionState
-            ? TrickyTransition(animation: animation, child: child)
-            : child;
-      },
+      transitionBuilder: _transitionBuilder,
       child: child,
     );
+  }
+
+  // A static method stays equal between builds. AnimatedSwitcher rebuilds
+  // the transitions of all its children when its transitionBuilder changes,
+  // so a leaving paging trigger would be mounted again and load one more
+  // page.
+  static Widget _transitionBuilder(Widget child, Animation<double> animation) {
+    return TrickyTransition(animation: animation, child: child);
   }
 
   Widget _buildMenuItem(

@@ -102,6 +102,51 @@ void main() {
     expect(find.byType(CupertinoActivityIndicator), findsNothing);
   });
 
+  testWidgets('loads the next page on scroll after leaving and reopening', (
+    tester,
+  ) async {
+    final pages = <int>[];
+
+    await tester.pumpMenu(
+      items: [
+        SmartContextMenuItem.pagingSubmenu(
+          title: 'More',
+          initialMetadata: const SmartContextMenuPagingMetadata(),
+          asyncPagingChildren: (metadata) async {
+            pages.add(metadata.page);
+            final first = (metadata.page - 1) * metadata.limit;
+            return [
+              for (var i = 1; i <= metadata.limit; i++)
+                SmartContextMenuItem.simple(
+                  title: 'Item ${first + i}',
+                  pagingMetadata: i == metadata.limit && metadata.page < 3
+                      ? metadata.copyWith(page: metadata.page + 1)
+                      : null,
+                ),
+            ];
+          },
+        ),
+      ],
+    );
+    await tester.openMenu();
+
+    await tester.tap(find.text('More'));
+    await tester.settleMenu(frames: 10);
+    expect(pages, [1]);
+
+    await tester.tap(find.text(_labels.back).last);
+    await tester.settleMenu();
+    await tester.tap(find.text('More'));
+    await tester.settleMenu(frames: 10);
+    expect(pages, [1]);
+
+    await tester.drag(find.text('Item 5'), const Offset(0, -600));
+    await tester.settleMenu(frames: 10);
+
+    expect(pages, [1, 2]);
+    expect(find.text('Item 21', skipOffstage: false), findsOneWidget);
+  });
+
   testWidgets('shows the retry item when a page fails and retries it', (
     tester,
   ) async {
