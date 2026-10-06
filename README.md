@@ -225,6 +225,7 @@ const menuStyle = SmartContextMenuStyle(
   destructiveColor: Color(0xFFFF453A),
   disabledItemColor: Color(0x1F000000),
   dividerColor: Color(0x999E9E9E),
+  backButtonColor: Color(0xFF0A84FF),
   submenuIcon: Icons.arrow_forward_ios,
   backIcon: Icons.arrow_back_ios_new,
 );
@@ -234,6 +235,8 @@ The color of `textStyle` is used for enabled items that are not destructive.
 Disabled and destructive items use `secondaryTextColor` and `destructiveColor`.
 An item `titleStyle` replaces `textStyle` for that item.
 Icons in `leading` and `trailing` take the title color unless they set their own.
+The back item of a submenu uses `textStyle` in bold; `backButtonColor` sets the color
+of its title and icon.
 
 Colors may be `CupertinoDynamicColor`s: they follow the light and dark theme.
 A plain `Color` is used as is in both themes. The default values are available

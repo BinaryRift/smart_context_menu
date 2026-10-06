@@ -15,6 +15,7 @@ void main() {
       backgroundBlur: SmartContextMenuBlur(2),
       backButtonBlur: SmartContextMenuBlur(3),
       backButtonBorderRadius: BorderRadius.all(Radius.circular(2)),
+      backButtonColor: Color(0xFF00000A),
       textStyle: TextStyle(fontSize: 11),
       secondaryTextColor: Color(0xFF000005),
       destructiveColor: Color(0xFF000006),
@@ -37,6 +38,7 @@ void main() {
       'backgroundBlur': (s) => s.backgroundBlur,
       'backButtonBlur': (s) => s.backButtonBlur,
       'backButtonBorderRadius': (s) => s.backButtonBorderRadius,
+      'backButtonColor': (s) => s.backButtonColor,
       'textStyle': (s) => s.textStyle,
       'secondaryTextColor': (s) => s.secondaryTextColor,
       'destructiveColor': (s) => s.destructiveColor,
@@ -72,6 +74,10 @@ void main() {
       'backButtonBorderRadius': (
         radius,
         () => original.copyWith(backButtonBorderRadius: radius),
+      ),
+      'backButtonColor': (
+        color,
+        () => original.copyWith(backButtonColor: color),
       ),
       'textStyle': (textStyle, () => original.copyWith(textStyle: textStyle)),
       'secondaryTextColor': (

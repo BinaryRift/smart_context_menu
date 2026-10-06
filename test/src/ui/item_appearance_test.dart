@@ -185,6 +185,37 @@ void main() {
       expect(back.fontWeight, FontWeight.w600);
       expect(back.color, isSameColorAs(customStyle.textStyle.color!));
     });
+
+    testWidgets('applies the back item color', (tester) async {
+      const backColor = Color(0xFF0000FF);
+      await tester.pumpMenu(
+        config: customConfig.copyWith(
+          style: customStyle.copyWith(
+            backButtonColor: backColor,
+            defaultIconColor: const Color(0xFF000006),
+          ),
+        ),
+        items: [
+          SmartContextMenuItem.submenu(
+            title: 'More',
+            children: [SmartContextMenuItem.simple(title: 'Child')],
+          ),
+        ],
+      );
+      await tester.openMenu();
+      await tester.tap(find.text('More'));
+      await tester.settleMenu();
+
+      final back = titleStyleOf(tester, customConfig.labels.back);
+      expect(back.fontFamily, 'Custom');
+      expect(back.fontWeight, FontWeight.w600);
+      expect(back.color, isSameColorAs(backColor));
+
+      final icon = tester.widget<Icon>(
+        find.byIcon(SmartContextMenuDefaults.backIcon).first,
+      );
+      expect(icon.color, isSameColorAs(backColor));
+    });
   });
 
   group('icons', () {

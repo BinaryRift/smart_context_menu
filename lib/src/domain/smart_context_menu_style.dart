@@ -81,6 +81,12 @@ final class SmartContextMenuStyle {
   /// Defaults to [SmartContextMenuDefaults.backButtonBorderRadius].
   final BorderRadiusGeometry backButtonBorderRadius;
 
+  /// The title and icon color of the back item in a submenu.
+  ///
+  /// If null, the title uses the color of [textStyle] and the icon uses
+  /// [defaultIconColor].
+  final Color? backButtonColor;
+
   // Items
 
   /// The base style of item titles.
@@ -125,7 +131,8 @@ final class SmartContextMenuStyle {
 
   /// The color of the submenu chevron and the back icon.
   ///
-  /// If null, they take the title color of their item.
+  /// [backButtonColor] takes precedence for the back icon. If null, the
+  /// icons take the title color of their item.
   final Color? defaultIconColor;
 
   /// The chevron of an item that opens a submenu.
@@ -158,6 +165,7 @@ final class SmartContextMenuStyle {
     this.backButtonBlur = SmartContextMenuBlur.strong,
     this.backButtonBorderRadius =
         SmartContextMenuDefaults.backButtonBorderRadius,
+    this.backButtonColor,
     this.textStyle = SmartContextMenuDefaults.textStyle,
     this.secondaryTextColor = SmartContextMenuDefaults.secondaryTextColor,
     this.destructiveColor = SmartContextMenuDefaults.destructiveColor,
@@ -184,6 +192,7 @@ final class SmartContextMenuStyle {
     SmartContextMenuBlur? backgroundBlur,
     SmartContextMenuBlur? backButtonBlur,
     BorderRadiusGeometry? backButtonBorderRadius,
+    Color? backButtonColor,
     TextStyle? textStyle,
     Color? secondaryTextColor,
     Color? destructiveColor,
@@ -206,6 +215,7 @@ final class SmartContextMenuStyle {
       backButtonBlur: backButtonBlur ?? this.backButtonBlur,
       backButtonBorderRadius:
           backButtonBorderRadius ?? this.backButtonBorderRadius,
+      backButtonColor: backButtonColor ?? this.backButtonColor,
       textStyle: textStyle ?? this.textStyle,
       secondaryTextColor: secondaryTextColor ?? this.secondaryTextColor,
       destructiveColor: destructiveColor ?? this.destructiveColor,
