@@ -30,18 +30,20 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
   }
 
   final List<SmartMenuLevel> _menuStack = [];
-  bool _isLoading = false;
   bool _isForward = true;
   Future<List<SmartContextMenuItem>>? _activeLoadTask;
 
   List<SmartMenuLevel> get menuStack => _menuStack;
   SmartMenuLevel get currentLevel => _menuStack.last;
-  bool get isLoading => _isLoading;
+
+  /// The level below [currentLevel], or null on the root level.
+  SmartMenuLevel? get previousLevel =>
+      _menuStack.length > 1 ? _menuStack[_menuStack.length - 2] : null;
   bool get isForward => _isForward;
   int get stackLength => _menuStack.length;
   SmartContextMenuCache get cache => _cache;
 
-  void _pushSubmenuLevel({
+  SmartMenuLevel _pushSubmenuLevel({
     required String parentId,
     required List<SmartContextMenuItem> items,
     SmartContextMenuPageLoader? pagingMethod,
@@ -50,55 +52,31 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
     bool loading = false,
   }) {
     _isForward = true;
-    _isLoading = loading;
-    _menuStack.add(SmartMenuLevel(
+    final level = SmartMenuLevel(
       items: items,
       asyncLoader: asyncLoader,
       pagingMethod: pagingMethod,
       nextMetadata: initialMetadata,
       parentId: parentId,
-    ));
+      isLoading: loading,
+    );
+    _menuStack.add(level);
     notifyListeners();
     if (enableHaptics) HapticFeedback.selectionClick();
-  }
-
-  void popLevel() {
-    if (_menuStack.length <= 1) return;
-    _isForward = false;
-    _activeLoadTask = null;
-    _menuStack.removeLast();
-    notifyListeners();
+    return level;
   }
 
   void popSubmenu() {
     if (_menuStack.length <= 1) return;
     _isForward = false;
-    _isLoading = false;
     _activeLoadTask = null;
     _menuStack.removeLast();
     notifyListeners();
     if (enableHaptics) HapticFeedback.selectionClick();
   }
 
-  int calculateTotalItemCount() {
-    final level = currentLevel;
-    final bool hasBack = _menuStack.length > 1;
-    final int itemsCount = level.items.length;
-
-    int count = hasBack ? 1 : 0;
-    if (itemsCount == 0) {
-      if (_isLoading) return count + 1;
-      if (level.hasError) return count + 1;
-    }
-    count += itemsCount;
-    if (level.hasPaging || level.hasError) {
-      count += 1;
-    }
-    return count;
-  }
-
   void handleItemTap(SmartContextMenuItem item) async {
-    if (item.isDisabled || _isLoading) return;
+    if (item.isDisabled || currentLevel.isLoading) return;
 
     if (item.children != null) {
       final id = item.id;
@@ -133,16 +111,16 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
     final task = item.asyncChildren?.call();
     if (task == null) return;
 
-    _pushSubmenuLevel(
+    final level = _pushSubmenuLevel(
       items: [],
       loading: true,
       parentId: item.id,
       asyncLoader: item.asyncChildren,
     );
 
-    await _runAsyncLoad(task, onData: (results) {
+    await _runAsyncLoad(task, level, onData: (results) {
       _cache.submenus[item.id] = results;
-      _menuStack.last.items.addAll(results);
+      level.items.addAll(results);
     });
   }
 
@@ -154,7 +132,7 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
     if (loader == null || metadata == null) return;
     final task = loader(metadata);
 
-    _pushSubmenuLevel(
+    final level = _pushSubmenuLevel(
       items: [],
       loading: true,
       parentId: item.id,
@@ -162,18 +140,18 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
       initialMetadata: metadata,
     );
 
-    await _runAsyncLoad(task, onData: (results) {
+    await _runAsyncLoad(task, level, onData: (results) {
       final nextMeta = results.isNotEmpty ? results.last.pagingMetadata : null;
       _cache.paging[item.id] = (List.from(results), nextMeta);
 
-      final level = _menuStack.last;
       level.items.addAll(results);
       level.nextMetadata = nextMeta;
     });
   }
 
   Future<void> _runAsyncLoad(
-    Future<List<SmartContextMenuItem>> task, {
+    Future<List<SmartContextMenuItem>> task,
+    SmartMenuLevel level, {
     required void Function(List<SmartContextMenuItem> data) onData,
   }) async {
     _activeLoadTask = task;
@@ -182,45 +160,45 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
       final results = await task;
 
       if (hasListeners && _activeLoadTask == task) {
-        _isLoading = false;
+        level.isLoading = false;
         onData(results);
         notifyListeners();
       }
     } catch (e) {
-      _handleLoadError(task);
+      _handleLoadError(task, level);
     }
   }
 
-  void _handleLoadError(Future task) {
+  void _handleLoadError(Future task, SmartMenuLevel level) {
     if (hasListeners && _activeLoadTask == task) {
-      _isLoading = false;
+      level.isLoading = false;
       _activeLoadTask = null;
-      _menuStack.last.hasError = true;
+      level.hasError = true;
       notifyListeners();
     }
   }
 
-  Future<void> handlePagination() async {
-    final currentLevel = _menuStack.last;
-    final pagingMethod = currentLevel.pagingMethod;
-    final metadata = currentLevel.nextMetadata;
-    if (currentLevel.isPaginating ||
+  /// Loads the next page of [level].
+  Future<void> handlePagination(SmartMenuLevel level) async {
+    final pagingMethod = level.pagingMethod;
+    final metadata = level.nextMetadata;
+    if (level.isPaginating ||
         pagingMethod == null ||
         metadata == null ||
         !hasListeners) {
       return;
     }
 
-    currentLevel.isPaginating = true;
+    level.isPaginating = true;
     notifyListeners();
-    final List<SmartContextMenuItem> targetList = currentLevel.items;
+    final List<SmartContextMenuItem> targetList = level.items;
 
     try {
       final newItems = await pagingMethod(metadata);
 
-      _processPaginationResult(currentLevel, targetList, newItems);
+      _processPaginationResult(level, targetList, newItems);
     } catch (e) {
-      _handlePaginationError(currentLevel);
+      _handlePaginationError(level);
     }
   }
 
@@ -284,16 +262,17 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
     return false;
   }
 
-  void onRetryLoad(bool hasPagination) {
-    final currentLevel = _menuStack.last;
-    final String? parentId = currentLevel.parentId;
+  /// Retries the failed load of [level]: the next page of a paginated
+  /// level or the items of an async submenu.
+  void onRetryLoad(SmartMenuLevel level) {
+    final bool hasPagination = level.hasPaging;
 
-    currentLevel.hasError = false;
+    level.hasError = false;
     notifyListeners();
     if (hasPagination) {
-      handlePagination();
-    } else if (parentId != null) {
-      _retryLevelLoad(currentLevel);
+      handlePagination(level);
+    } else if (level.hasBack) {
+      _retryLevelLoad(level);
     }
   }
 
@@ -304,10 +283,10 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
     final task = level.asyncLoader?.call();
     if (task == null) return;
 
-    _isLoading = true;
+    level.isLoading = true;
     notifyListeners();
 
-    await _runAsyncLoad(task, onData: (results) {
+    await _runAsyncLoad(task, level, onData: (results) {
       if (level.parentId != null) {
         _cache.submenus[level.parentId!] = results;
       }

@@ -122,6 +122,7 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
                     isForward: _controller.isForward,
                     child: SmartContextMenuLevelView(
                       key: ValueKey(_controller.stackLength),
+                      level: _controller.currentLevel,
                       controller: _controller,
                       config: _config,
                       hoverController: _hoverController,

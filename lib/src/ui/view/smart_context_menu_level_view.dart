@@ -13,15 +13,17 @@ import '../widgets/smart_context_menu_pagination_trigger.dart';
 import '../widgets/smart_context_menu_retry_item.dart';
 import 'smart_context_menu_item_view.dart';
 
-/// The content of the current menu level: its items, the back item
-/// of a submenu and the loading, retry and paging rows.
+/// The content of a menu [level]: its items, the back item of a submenu
+/// and the loading, retry and paging rows.
 final class SmartContextMenuLevelView extends StatelessWidget {
+  final SmartMenuLevel level;
   final SmartContextMenuOverlayController controller;
   final SmartContextMenuConfig config;
   final SmartContextMenuHoverController hoverController;
 
   const SmartContextMenuLevelView({
     super.key,
+    required this.level,
     required this.controller,
     required this.config,
     required this.hoverController,
@@ -29,13 +31,11 @@ final class SmartContextMenuLevelView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final level = controller.currentLevel;
-    final bool hasBack = controller.stackLength > 1;
+    final bool hasBack = level.hasBack;
     final bool hasPaging = level.hasPaging;
     final bool hasError = level.hasError;
     final int itemsCount = level.items.length;
     final int headerOffset = hasBack ? 1 : 0;
-    final int totalCount = controller.calculateTotalItemCount();
 
     return Stack(
       children: [
@@ -43,9 +43,8 @@ final class SmartContextMenuLevelView extends StatelessWidget {
           shrinkWrap: true,
           padding: EdgeInsets.zero,
           physics: const BouncingScrollPhysics(),
-          itemCount: totalCount,
+          itemCount: level.rowCount,
           itemBuilder: (context, index) => _routeItem(
-            level: level,
             index: index,
             hasBack: hasBack,
             headerOffset: headerOffset,
@@ -70,7 +69,6 @@ final class SmartContextMenuLevelView extends StatelessWidget {
   }
 
   Widget _routeItem({
-    required SmartMenuLevel level,
     required int index,
     required bool hasBack,
     required int headerOffset,
@@ -91,7 +89,7 @@ final class SmartContextMenuLevelView extends StatelessWidget {
     final Widget child;
     final bool isTransitionState;
 
-    if (controller.isLoading && itemsCount == 0) {
+    if (level.isLoading && itemsCount == 0) {
       child = SmartContextMenuLoader(
         key: ServiceItemKey.loader,
         verticalPadding: config.style.loaderVerticalPadding,
@@ -101,18 +99,18 @@ final class SmartContextMenuLevelView extends StatelessWidget {
       child = SmartContextMenuRetryItem(
         config: config,
         hoverController: hoverController,
-        onRetry: () => controller.onRetryLoad(hasPaging),
+        onRetry: () => controller.onRetryLoad(level),
       );
       isTransitionState = true;
     } else if (!hasError && hasPaging && relativeIndex == itemsCount) {
       child = SmartContextMenuPaginationTrigger(
         key: ServiceItemKey.pagingTrigger(itemsCount),
-        onVisible: controller.handlePagination,
+        onVisible: () => controller.handlePagination(level),
         loaderVerticalPadding: config.style.loaderVerticalPadding,
       );
       isTransitionState = true;
     } else {
-      child = _buildMenuItem(level, relativeIndex, itemsCount);
+      child = _buildMenuItem(relativeIndex, itemsCount);
       isTransitionState = false;
     }
 
@@ -131,11 +129,7 @@ final class SmartContextMenuLevelView extends StatelessWidget {
     return TrickyTransition(animation: animation, child: child);
   }
 
-  Widget _buildMenuItem(
-    SmartMenuLevel level,
-    int relativeIndex,
-    int itemsCount,
-  ) {
+  Widget _buildMenuItem(int relativeIndex, int itemsCount) {
     if (relativeIndex < 0 || relativeIndex >= itemsCount) {
       return const SizedBox.shrink();
     }
