@@ -1,5 +1,4 @@
 import 'dart:async' show FutureOr;
-import 'dart:math' as math;
 import 'dart:ui' as ui show Image, ImageFilter;
 import 'package:flutter/cupertino.dart' show CupertinoDynamicColor;
 import 'package:flutter/gestures.dart' show HitTestResult;
@@ -14,6 +13,8 @@ import '../../domain/smart_context_menu_config.dart';
 import '../../domain/smart_context_menu_header_details.dart';
 import '../../domain/smart_context_menu_item.dart';
 import '../components/smart_menu_reactive_physics.dart';
+import '../layout/smart_context_menu_horizontal_layout.dart';
+import '../layout/smart_context_menu_vertical_layout.dart';
 import '../widgets/sliver_extent_listener.dart';
 import 'smart_context_menu_view.dart';
 
@@ -57,13 +58,8 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
   late final CurvedAnimation _backgroundCurve;
   late final CurvedAnimation _menuAnimation;
 
-  Alignment _menuAlignment = Alignment.topCenter;
-  double? _leftPadding;
-  double? _rightPadding;
-  double _appliedTopOffset = double.maxFinite;
-  double _headerExtent = 0.0;
-  double _heightThreshold = double.infinity;
-  double _lastContentHeight = 0.0;
+  late SmartContextMenuHorizontalLayout _horizontalLayout;
+  late final SmartContextMenuVerticalLayout _verticalLayout;
   Offset? _pointerDownPos;
   bool _isScrolling = false;
   Offset _startPreviewPosition = MotionTranslation.none.toOffset;
@@ -75,13 +71,23 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
   void initState() {
     super.initState();
     _scrollController = ScrollController();
+    _verticalLayout = SmartContextMenuVerticalLayout(
+      anchorTop: widget.anchorRect.top,
+      previewHeight: widget.anchorRect.height,
+      menuGap: _config.menuGap,
+      moveBackDown: _config.moveBackDown,
+    );
     _setupAnimations();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _refreshLayout();
+    _horizontalLayout = SmartContextMenuHorizontalLayout(
+      anchorRect: widget.anchorRect,
+      screenWidth: MediaQuery.of(context).size.width,
+      screenPadding: _config.screenPadding,
+    );
   }
 
   @override
@@ -124,7 +130,7 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
         media.padding.bottom + _config.screenPadding.bottom;
     final double previewHeight = widget.anchorRect.height;
 
-    final heightThreshold = _heightThreshold = _calculateMenuHeightThreshold(
+    _verticalLayout.setBounds(
       screenHeight: screenHeight,
       topSafe: topSafe,
       bottomSafe: bottomSafe,
@@ -140,19 +146,12 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
         AnimatedBuilder(
           animation: _currentMenuHeight,
           builder: (context, child) {
-            _updateTopOffset(
-              screenHeight: screenHeight,
-              bottomSafe: bottomSafe,
-              topSafe: topSafe,
-              heightThreshold: heightThreshold,
-            );
-
-            _scrollToBottomIfNeeded(heightThreshold: heightThreshold);
+            if (_verticalLayout.update(_currentMenuHeight.value)) {
+              _scrollToBottom();
+            }
 
             return SliverPadding(
-              padding: EdgeInsets.only(
-                top: _appliedTopOffset - _headerExtent,
-              ),
+              padding: EdgeInsets.only(top: _verticalLayout.topPadding),
             );
           },
         ),
@@ -206,7 +205,7 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
 
   Widget _buildHeader() {
     final header = SmartContextMenuHeaderDetails(
-      alignment: _menuAlignment,
+      alignment: _horizontalLayout.alignment,
       close: _close,
     );
 
@@ -215,10 +214,7 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
       sliver: SliverFadeTransition(
         opacity: widget.routeAnimation,
         sliver: SliverPadding(
-          padding: EdgeInsets.only(
-            left: _leftPadding ?? 0,
-            right: _rightPadding ?? 0,
-          ),
+          padding: _horizontalLayout.padding,
           sliver: SliverMainAxisGroup(
             key: _headerKey,
             slivers: widget.headerSliversBuilder!(context, header),
@@ -252,12 +248,9 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
         onPanEnd: _onPreviewPanEnd,
         onPanCancel: _onPreviewPanCancel,
         child: Padding(
-          padding: EdgeInsets.only(
-            left: _leftPadding ?? 0,
-            right: _rightPadding ?? 0,
-          ),
+          padding: _horizontalLayout.padding,
           child: Align(
-            alignment: _menuAlignment,
+            alignment: _horizontalLayout.alignment,
             child: SizedBox(
               width: widget.anchorRect.width,
               height: widget.anchorRect.height,
@@ -277,17 +270,14 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
 
   Widget _buildMenu() {
     return Align(
-      alignment: _menuAlignment,
+      alignment: _horizontalLayout.alignment,
       child: ScaleTransition(
         alignment: Alignment.center,
         scale: _menuAnimation,
         child: FadeTransition(
           opacity: widget.routeAnimation,
           child: Padding(
-            padding: EdgeInsets.only(
-              left: _leftPadding ?? 0,
-              right: _rightPadding ?? 0,
-            ),
+            padding: _horizontalLayout.padding,
             child: GestureDetector(
               onPanStart: (_) => (),
               child: SmartContextMenuView(
@@ -321,34 +311,6 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
       curve: MotionCurves.menuScaleIn,
       reverseCurve: MotionCurves.menuScaleOut,
     );
-  }
-
-  void _refreshLayout() {
-    _calculateHorizontalPosition();
-  }
-
-  void _calculateHorizontalPosition() {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double centerX = widget.anchorRect.center.dx;
-    final double screenCenter = screenWidth / 2;
-
-    final double leftPadding = widget.config.screenPadding.left;
-    final double rightPadding = widget.config.screenPadding.right;
-
-    if ((centerX - screenCenter).abs() < GestureThresholds.centerThreshold) {
-      _menuAlignment = Alignment.topCenter;
-      _leftPadding = null;
-      _rightPadding = null;
-    } else if (centerX < screenCenter) {
-      _menuAlignment = Alignment.topLeft;
-      _leftPadding = widget.anchorRect.left.clamp(leftPadding, screenWidth);
-      _rightPadding = null;
-    } else {
-      _menuAlignment = Alignment.topRight;
-      _leftPadding = null;
-      _rightPadding = (screenWidth - widget.anchorRect.right)
-          .clamp(rightPadding, screenWidth);
-    }
   }
 
   bool _isPointInside(Offset globalPos, GlobalKey key) {
@@ -413,83 +375,22 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
     return false;
   }
 
-  /// Moves the preview up when the menu grows and does not fit below it.
-  ///
-  /// With [SmartContextMenuConfig.moveBackDown], the preview also moves back
-  /// down when the menu shrinks, but not below its place on the screen, and
-  /// only while the preview and the menu fit on the screen without
-  /// scrolling. While they scroll, it only moves up: moving down would shift
-  /// the scroll position under the user.
-  ///
-  /// The header slivers always fit above the preview: if there is no room
-  /// for them, the preview moves down.
-  void _updateTopOffset({
-    required double screenHeight,
-    required double bottomSafe,
-    required double topSafe,
-    required double heightThreshold,
-  }) {
-    final double previewHeight = widget.anchorRect.height;
-    final double menuHeight = _currentMenuHeight.value;
-    double targetTop = widget.anchorRect.top;
-    final double totalH = previewHeight + _config.menuGap + menuHeight;
-    final double spaceBelow = screenHeight - targetTop - bottomSafe;
-
-    if (totalH > spaceBelow) {
-      targetTop -= (totalH - spaceBelow);
-    }
-
-    final double minTop = topSafe + _headerExtent;
-    final double finalTop = math.max(targetTop, minTop);
-
-    final bool canMoveDown =
-        _config.moveBackDown && menuHeight <= heightThreshold;
-
-    if (finalTop < _appliedTopOffset || canMoveDown) {
-      _appliedTopOffset = finalTop;
-    }
-    _appliedTopOffset = math.max(_appliedTopOffset, minTop);
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        final max = _scrollController.position.maxScrollExtent;
+        _scrollController.jumpTo(max);
+      }
+    });
   }
 
-  double _calculateMenuHeightThreshold({
-    required double screenHeight,
-    required double topSafe,
-    required double bottomSafe,
-  }) {
-    // topSafe and bottomSafe already include the screen padding.
-    final double availableTotalHeight = screenHeight - topSafe - bottomSafe;
-
-    final double menuHeightThreshold = availableTotalHeight -
-        _headerExtent -
-        widget.anchorRect.height -
-        _config.menuGap;
-    return menuHeightThreshold;
-  }
-
-  void _scrollToBottomIfNeeded({
-    required double heightThreshold,
-  }) {
-    final menuHeight = _currentMenuHeight.value;
-    final isOverflowing = menuHeight > heightThreshold;
-    final contentHeight = menuHeight + _headerExtent;
-
-    if (contentHeight > _lastContentHeight && isOverflowing) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_scrollController.hasClients) {
-          final max = _scrollController.position.maxScrollExtent;
-          _scrollController.jumpTo(max);
-        }
-      });
-    }
-    _lastContentHeight = contentHeight;
-  }
-
-  bool _isOverflowing() => _currentMenuHeight.value > _heightThreshold;
+  bool _isOverflowing() =>
+      _verticalLayout.isOverflowing(_currentMenuHeight.value);
 
   void _onHeaderExtentChanged(double extent) {
     final newExtent = extent.roundToDouble();
-    if (newExtent != _headerExtent) {
-      setState(() => _headerExtent = newExtent);
+    if (newExtent != _verticalLayout.headerExtent) {
+      setState(() => _verticalLayout.headerExtent = newExtent);
     }
   }
 
