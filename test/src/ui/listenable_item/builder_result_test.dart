@@ -12,7 +12,7 @@ void main() {
   setUp(() => notifier = ItemNotifier());
   tearDown(() => notifier.dispose());
 
-  group('the builder must return a simple item or null', () {
+  group('the builder must return a simple or a loading item', () {
     final invalidItems = <String, SmartContextMenuItem Function()>{
       'separator': SmartContextMenuItem.separator,
       'submenu': () => SmartContextMenuItem.submenu(children: []),
@@ -21,7 +21,7 @@ void main() {
       ),
       'listenable item': () => SmartContextMenuItem.listenable(
         listenable: notifier,
-        builder: () => null,
+        builder: SmartContextMenuItem.simple,
       ),
     };
 

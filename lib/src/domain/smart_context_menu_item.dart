@@ -25,9 +25,8 @@ typedef SmartContextMenuItemLoader = Future<SmartContextMenuItem> Function();
 /// Builds the item of [SmartContextMenuItem.listenable] from the current
 /// state of the app.
 ///
-/// Returns null while the item is loading.
-typedef SmartContextMenuListenableItemBuilder =
-    SmartContextMenuItem? Function();
+/// Returns a [SmartContextMenuItem.loading] while the item is loading.
+typedef SmartContextMenuListenableItemBuilder = SmartContextMenuItem Function();
 
 /// Builds the content of an item from its current state.
 typedef SmartContextMenuItemBuilder =
@@ -176,8 +175,7 @@ final class SmartContextMenuItem {
   /// Set by [SmartContextMenuItem.listenable].
   final Listenable? listenable;
 
-  /// Builds the item shown in place of this one, or returns null while
-  /// it is loading.
+  /// Builds the item shown in place of this one.
   ///
   /// Set by [SmartContextMenuItem.listenable].
   final SmartContextMenuListenableItemBuilder? listenableBuilder;
@@ -208,13 +206,13 @@ final class SmartContextMenuItem {
   /// buttons, handle their own taps: the item is not triggered over them.
   final SmartContextMenuItemBuilder? customBuilder;
 
-  /// Builds the content of the placeholder while [asyncItem] is loading
-  /// or [listenableBuilder] returns null.
+  /// Builds the content of the placeholder while [asyncItem] is loading,
+  /// or of a loading item.
   ///
   /// The item [padding] is still applied. If null, the placeholder shows
   /// [title] (or [SmartContextMenuLabels.loading]), [leading] and an activity
   /// indicator.
-  /// Set by [SmartContextMenuItem.async] and [SmartContextMenuItem.listenable].
+  /// Set by [SmartContextMenuItem.async] and [SmartContextMenuItem.loading].
   final SmartContextMenuItemBuilder? loadingBuilder;
 
   /// Builds the content of the placeholder after [asyncItem] has failed.
@@ -559,20 +557,17 @@ final class SmartContextMenuItem {
   /// [listenable]. To rebuild the item from a [Stream], wrap the stream in
   /// a [ChangeNotifier] that calls `notifyListeners` on each event.
   ///
-  /// [builder] returns the item to show, a [SmartContextMenuItem.simple].
-  /// Its [onTap] and [closeOnTap] are used, so it can act on the current
-  /// state. While [builder] returns null, the item does not respond to taps
-  /// and shows [loadingTitle] (or [SmartContextMenuLabels.loading]) with
-  /// [leading] and an activity indicator, as [SmartContextMenuItem.async]
-  /// does. Use [loadingBuilder] to replace this content.
-  ///
-  /// [padding] applies while loading; the built item uses its own.
+  /// [builder] returns the item to show: a [SmartContextMenuItem.simple],
+  /// whose [onTap] and [closeOnTap] are used, so it can act on the current
+  /// state, or a [SmartContextMenuItem.loading] while the item is loading.
   ///
   /// ```dart
   /// SmartContextMenuItem.listenable(
   ///   listenable: favorites,
   ///   builder: () {
-  ///     if (favorites.isLoading) return null;
+  ///     if (favorites.isLoading) {
+  ///       return SmartContextMenuItem.loading(title: 'Checking');
+  ///     }
   ///     final isFavorite = favorites.contains(post.id);
   ///     return SmartContextMenuItem.simple(
   ///       title: isFavorite ? 'Remove from Favorites' : 'Add to Favorites',
@@ -589,26 +584,12 @@ final class SmartContextMenuItem {
     required Listenable listenable,
     required SmartContextMenuListenableItemBuilder builder,
     String? id,
-    EdgeInsets? padding,
-    Widget? leading,
-    String? loadingTitle,
-    TextStyle? titleStyle,
-    SmartContextMenuItemBuilder? loadingBuilder,
-    double? childrenGap,
-  }) {
-    return SmartContextMenuItem._(
-      id: id ?? _generateId(),
-      title: loadingTitle,
-      listenable: listenable,
-      listenableBuilder: builder,
-      closeOnTap: false,
-      padding: padding,
-      leading: leading,
-      titleStyle: titleStyle,
-      loadingBuilder: loadingBuilder,
-      childrenGap: childrenGap,
-    );
-  }
+  }) => SmartContextMenuItem._(
+    id: id ?? _generateId(),
+    listenable: listenable,
+    listenableBuilder: builder,
+    closeOnTap: false,
+  );
 
   /// Creates an item that shows that the item of
   /// a [SmartContextMenuItem.listenable] is loading.

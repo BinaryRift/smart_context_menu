@@ -52,7 +52,7 @@ void main() {
       ),
       SmartContextMenuItem.listenable(
         listenable: listenable,
-        builder: () => null,
+        builder: SmartContextMenuItem.simple,
       ),
       SmartContextMenuItem.separator(),
     ];

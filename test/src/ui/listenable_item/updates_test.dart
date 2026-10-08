@@ -38,7 +38,7 @@ void main() {
         SmartContextMenuItem.listenable(
           listenable: notifier,
           builder: () => notifier.isLoading
-              ? null
+              ? SmartContextMenuItem.loading()
               : SmartContextMenuItem.simple(
                   title: 'Loaded',
                   padding: const EdgeInsets.all(40),

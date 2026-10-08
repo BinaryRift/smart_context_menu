@@ -21,9 +21,8 @@ void main() {
         items: [
           SmartContextMenuItem.listenable(
             listenable: notifier,
-            loadingTitle: 'Loading',
             builder: () => notifier.isOn
-                ? null
+                ? SmartContextMenuItem.loading(title: 'Loading')
                 : SmartContextMenuItem.simple(
                     title: 'Edit',
                     closeOnTap: false,

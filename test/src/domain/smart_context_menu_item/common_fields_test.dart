@@ -19,7 +19,7 @@ void main() {
         ).id,
         SmartContextMenuItem.listenable(
           listenable: ChangeNotifier(),
-          builder: () => null,
+          builder: SmartContextMenuItem.simple,
         ).id,
         SmartContextMenuItem.loading().id,
         SmartContextMenuItem.separator().id,
@@ -48,7 +48,7 @@ void main() {
         SmartContextMenuItem.listenable(
           id: 'a',
           listenable: ChangeNotifier(),
-          builder: () => null,
+          builder: SmartContextMenuItem.simple,
         ),
         SmartContextMenuItem.loading(id: 'a'),
         SmartContextMenuItem.separator(id: 'a'),
@@ -78,11 +78,6 @@ void main() {
         SmartContextMenuItem.async(
           padding: padding,
           asyncItem: () async => SmartContextMenuItem.simple(),
-        ),
-        SmartContextMenuItem.listenable(
-          padding: padding,
-          listenable: ChangeNotifier(),
-          builder: () => null,
         ),
         SmartContextMenuItem.loading(padding: padding),
       ];

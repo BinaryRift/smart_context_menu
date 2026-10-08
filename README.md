@@ -284,16 +284,15 @@ SmartContextMenuItem.async(
 
 Use it when the state of an item lives in your app and can change while the menu is open:
 a toggle that keeps the menu open, a counter, or an action that is already running.
-The builder runs again each time `listenable` notifies and returns the item to show,
-or `null` while it is loading. While loading, the item shows `loadingTitle` with an activity
-indicator, as an async item does, and ignores taps.
+The builder runs again each time `listenable` notifies and returns the item to show.
+While the item is loading, return `SmartContextMenuItem.loading`: it shows its title with
+an activity indicator, as an async item does, and ignores taps.
 
 ```dart
 SmartContextMenuItem.listenable(
   listenable: favorites,
-  loadingTitle: 'Checking',
   builder: () {
-    if (favorites.isLoading) return null;
+    if (favorites.isLoading) return SmartContextMenuItem.loading(title: 'Checking');
     final isFavorite = favorites.contains(post.id);
     return SmartContextMenuItem.simple(
       title: isFavorite ? 'Remove from Favorites' : 'Add to Favorites',
@@ -306,8 +305,9 @@ SmartContextMenuItem.listenable(
 ```
 
 Unlike an async item, the state belongs to your app: the item is not loaded once but built
-again on every notification. The builder returns a `SmartContextMenuItem.simple`, and its
-`onTap` and `closeOnTap` are used. The menu does not dispose `listenable`.
+again on every notification. The builder returns a `SmartContextMenuItem.simple`, whose
+`onTap` and `closeOnTap` are used, or a `SmartContextMenuItem.loading`. The menu does not
+dispose `listenable`.
 
 Any `Listenable` works: a `ChangeNotifier`, a `ValueNotifier`, several of them combined
 with `Listenable.merge`, or a controller of a state management package that implements

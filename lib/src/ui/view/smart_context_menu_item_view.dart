@@ -363,15 +363,14 @@ final class _SmartContextMenuItemViewState
   void _buildListenableItem() {
     final item = widget.item.listenableBuilder!();
     assert(
-      item == null ||
-          !(item.isSeparator ||
-              item.isInternalInteracted ||
-              item.listenableBuilder != null),
+      !(item.isSeparator ||
+          item.isInternalInteracted ||
+          item.listenableBuilder != null),
       'The builder of SmartContextMenuItem.listenable must return '
-      'a SmartContextMenuItem.simple or null.',
+      'a SmartContextMenuItem.simple or a SmartContextMenuItem.loading.',
     );
     _resolvedItem = item;
-    _isLoading = item == null || item.isLoading;
+    _isLoading = item.isLoading;
     _isHighlight = widget.hoverController?.value == widget.key && !_isDisabled;
   }
 
