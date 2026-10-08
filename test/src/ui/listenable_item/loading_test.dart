@@ -86,15 +86,7 @@ void main() {
       );
       await tester.openMenu();
 
-      final container = tester.widget<AnimatedContainer>(
-        find
-            .ancestor(
-              of: find.text('Syncing'),
-              matching: find.byType(AnimatedContainer),
-            )
-            .first,
-      );
-      expect(container.padding, padding);
+      expect(tester.itemPaddingOf('Syncing'), padding);
     });
 
     testWidgets('changes its title while loading', (tester) async {
@@ -123,7 +115,7 @@ void main() {
       await tester.pumpMenu(
         items: [
           SmartContextMenuItem.async(
-            loadingTitle: 'Async',
+            loading: SmartContextMenuItem.loading(title: 'Async'),
             asyncItem: () => completer.future,
           ),
           SmartContextMenuItem.listenable(

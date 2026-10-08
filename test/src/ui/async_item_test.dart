@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
 
+import '../../helpers/appearance_tester.dart';
 import '../../helpers/menu_tester.dart';
 
 void main() {
@@ -15,7 +16,7 @@ void main() {
     await tester.pumpMenu(
       items: [
         SmartContextMenuItem.async(
-          loadingTitle: 'Loading',
+          loading: SmartContextMenuItem.loading(title: 'Loading'),
           asyncItem: () => completer.future,
         ),
       ],
@@ -54,9 +55,11 @@ void main() {
     await tester.pumpMenu(
       items: [
         SmartContextMenuItem.async(
-          loadingTitle: 'Loading',
+          loading: SmartContextMenuItem.loading(
+            title: 'Loading',
+            loadingBuilder: (context, state) => const Text('Custom loading'),
+          ),
           asyncItem: () => completer.future,
-          loadingBuilder: (context, state) => const Text('Custom loading'),
         ),
       ],
     );
@@ -121,7 +124,7 @@ void main() {
     await tester.pumpMenu(
       items: [
         SmartContextMenuItem.async(
-          loadingTitle: 'Loading',
+          loading: SmartContextMenuItem.loading(title: 'Loading'),
           timeout: const Duration(seconds: 2),
           asyncItem: () => completer.future,
         ),
@@ -137,6 +140,76 @@ void main() {
     completer.complete(loadedItem);
     await tester.settleMenu();
     expect(find.text('Loaded'), findsNothing);
+  });
+
+  testWidgets('uses the padding of the loading item while loading', (
+    tester,
+  ) async {
+    const padding = EdgeInsets.all(24);
+    final completer = Completer<SmartContextMenuItem>();
+
+    await tester.pumpMenu(
+      items: [
+        SmartContextMenuItem.async(
+          loading: SmartContextMenuItem.loading(
+            title: 'Loading',
+            padding: padding,
+          ),
+          asyncItem: () => completer.future,
+        ),
+      ],
+    );
+    await tester.openMenu();
+
+    expect(tester.itemPaddingOf('Loading'), padding);
+
+    completer.complete(loadedItem);
+    await tester.settleMenu();
+  });
+
+  testWidgets('keeps the padding of the loading item after a failure', (
+    tester,
+  ) async {
+    const padding = EdgeInsets.all(24);
+
+    await tester.pumpMenu(
+      items: [
+        SmartContextMenuItem.async(
+          loading: SmartContextMenuItem.loading(padding: padding),
+          asyncItem: () => Future.error(Exception('Failed')),
+        ),
+      ],
+    );
+    await tester.openMenu();
+
+    expect(tester.itemPaddingOf(const SmartContextMenuLabels().retry), padding);
+  });
+
+  testWidgets('shows the loading item again on retry', (tester) async {
+    final completer = Completer<SmartContextMenuItem>();
+    var calls = 0;
+
+    await tester.pumpMenu(
+      items: [
+        SmartContextMenuItem.async(
+          loading: SmartContextMenuItem.loading(title: 'Loading'),
+          asyncItem: () {
+            calls++;
+            if (calls == 1) return Future.error(Exception('Failed'));
+            return completer.future;
+          },
+        ),
+      ],
+    );
+    await tester.openMenu();
+
+    await tester.tap(find.text(const SmartContextMenuLabels().retry));
+    await tester.settleMenu();
+    expect(find.text('Loading'), findsOneWidget);
+
+    completer.complete(loadedItem);
+    await tester.settleMenu();
+    expect(find.text('Loaded'), findsOneWidget);
   });
 
   testWidgets('keeps the loaded item after returning from a submenu', (

@@ -258,13 +258,14 @@ SmartContextMenuItem.pagingSubmenu(
 
 #### Async item
 
-The placeholder loads its item as soon as it appears. If loading fails or takes longer
-than `timeout` (10 seconds by default), it turns into a retry item. Loading and error
-views can be replaced; if a builder is not set, the default view is used.
+The placeholder loads its item as soon as it appears. While loading, it shows `loading`,
+a `SmartContextMenuItem.loading` with the loading label by default. If loading fails or takes
+longer than `timeout` (10 seconds by default), it turns into a retry item. The error view
+can be replaced with `errorBuilder`; if it is not set, the default view is used.
 
 ```dart
 SmartContextMenuItem.async(
-  loadingTitle: 'Checking access',
+  loading: SmartContextMenuItem.loading(title: 'Checking access'),
   asyncItem: () async {
     final canEdit = await permissions.canEdit();
     return SmartContextMenuItem.simple(

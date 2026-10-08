@@ -52,6 +52,16 @@ extension AppearanceTester on WidgetTester {
     return (container.decoration as BoxDecoration?)?.color;
   }
 
+  /// The padding of the item with [title].
+  EdgeInsetsGeometry? itemPaddingOf(String title) => widget<AnimatedContainer>(
+    find
+        .ancestor(
+          of: find.text(title),
+          matching: find.byType(AnimatedContainer),
+        )
+        .first,
+  ).padding;
+
   /// Puts a finger on [target] and moves it slightly, so the item
   /// under the finger is highlighted.
   Future<TestGesture> pressAt(Finder target) async {

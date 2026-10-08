@@ -75,10 +75,6 @@ void main() {
           asyncPagingChildren: (_) async => [],
           initialMetadata: const SmartContextMenuPagingMetadata(),
         ),
-        SmartContextMenuItem.async(
-          padding: padding,
-          asyncItem: () async => SmartContextMenuItem.simple(),
-        ),
         SmartContextMenuItem.loading(padding: padding),
       ];
 

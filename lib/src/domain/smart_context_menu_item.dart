@@ -46,8 +46,8 @@ typedef SmartContextMenuItemBuilder =
 ///   the item loaded by [asyncItem].
 /// * [SmartContextMenuItem.listenable] builds the item with
 ///   [listenableBuilder] and rebuilds it when [listenable] notifies.
-/// * [SmartContextMenuItem.loading] shows that the item of
-///   a [SmartContextMenuItem.listenable] is loading.
+/// * [SmartContextMenuItem.loading] shows that an async or a listenable
+///   item is loading.
 /// * [SmartContextMenuItem.separator] separates groups of items.
 ///
 /// A submenu replaces the current menu and shows a back item at the top.
@@ -170,6 +170,11 @@ final class SmartContextMenuItem {
   /// Set by [SmartContextMenuItem.async].
   final SmartContextMenuItemLoader? asyncItem;
 
+  /// The item shown while [asyncItem] is loading.
+  ///
+  /// Set by [SmartContextMenuItem.async].
+  final SmartContextMenuItem? loadingItem;
+
   /// Notifies when the item of [listenableBuilder] should be built again.
   ///
   /// Set by [SmartContextMenuItem.listenable].
@@ -206,19 +211,18 @@ final class SmartContextMenuItem {
   /// buttons, handle their own taps: the item is not triggered over them.
   final SmartContextMenuItemBuilder? customBuilder;
 
-  /// Builds the content of the placeholder while [asyncItem] is loading,
-  /// or of a loading item.
+  /// Builds the content of a loading item.
   ///
-  /// The item [padding] is still applied. If null, the placeholder shows
-  /// [title] (or [SmartContextMenuLabels.loading]), [leading] and an activity
+  /// The item [padding] is still applied. If null, the item shows [title]
+  /// (or [SmartContextMenuLabels.loading]), [leading] and an activity
   /// indicator.
-  /// Set by [SmartContextMenuItem.async] and [SmartContextMenuItem.loading].
+  /// Set by [SmartContextMenuItem.loading].
   final SmartContextMenuItemBuilder? loadingBuilder;
 
   /// Builds the content of the placeholder after [asyncItem] has failed.
   ///
-  /// Tapping the placeholder retries loading. The item [padding] and press
-  /// highlight are still applied. If null, the placeholder
+  /// Tapping the placeholder retries loading. The padding of [loadingItem]
+  /// and the press highlight are still applied. If null, the placeholder
   /// shows [SmartContextMenuLabels.retry] with error and retry icons.
   /// Set by [SmartContextMenuItem.async].
   final SmartContextMenuItemBuilder? errorBuilder;
@@ -252,6 +256,7 @@ final class SmartContextMenuItem {
     this.asyncChildren,
     this.asyncPagingChildren,
     this.asyncItem,
+    this.loadingItem,
     this.listenable,
     this.listenableBuilder,
     this.loadingTimeout,
@@ -496,21 +501,20 @@ final class SmartContextMenuItem {
   /// [asyncItem].
   ///
   /// [asyncItem] is called when the placeholder first appears. Until it
-  /// completes, the placeholder shows [loadingTitle] (or
-  /// [SmartContextMenuLabels.loading]) with [leading] and an activity
-  /// indicator. If loading fails or takes longer than [timeout], the
-  /// placeholder turns into a retry item. The loaded item is cached by [id]
-  /// until the menu closes.
+  /// completes, the placeholder shows [loading], a
+  /// [SmartContextMenuItem.loading]; by default its title is
+  /// [SmartContextMenuLabels.loading]. If loading fails or takes longer than
+  /// [timeout], the placeholder turns into a retry item. The loaded item is
+  /// cached by [id] until the menu closes.
   ///
   /// [timeout] defaults to [SmartContextMenuDefaults.loadingTimeout].
   ///
-  /// Use [loadingBuilder] and [errorBuilder] to replace the default loading
-  /// and error content. [padding] applies to the placeholder only; the loaded
-  /// item uses its own.
+  /// Use [errorBuilder] to replace the default error content. The retry item
+  /// keeps the padding of [loading]; the loaded item uses its own.
   ///
   /// ```dart
   /// SmartContextMenuItem.async(
-  ///   loadingTitle: 'Checking access',
+  ///   loading: SmartContextMenuItem.loading(title: 'Checking access'),
   ///   asyncItem: () async {
   ///     await Future<void>.delayed(const Duration(seconds: 1));
   ///     return SmartContextMenuItem.simple(
@@ -525,28 +529,16 @@ final class SmartContextMenuItem {
     required SmartContextMenuItemLoader asyncItem,
     String? id,
     Duration timeout = SmartContextMenuDefaults.loadingTimeout,
-    EdgeInsets? padding,
-    Widget? leading,
-    String? loadingTitle,
-    TextStyle? titleStyle,
-    SmartContextMenuItemBuilder? loadingBuilder,
+    SmartContextMenuItem? loading,
     SmartContextMenuItemBuilder? errorBuilder,
-    double? childrenGap,
-  }) {
-    return SmartContextMenuItem._(
-      id: id ?? _generateId(),
-      title: loadingTitle,
-      asyncItem: asyncItem,
-      loadingTimeout: timeout,
-      closeOnTap: false,
-      padding: padding,
-      leading: leading,
-      titleStyle: titleStyle,
-      loadingBuilder: loadingBuilder,
-      errorBuilder: errorBuilder,
-      childrenGap: childrenGap,
-    );
-  }
+  }) => SmartContextMenuItem._(
+    id: id ?? _generateId(),
+    asyncItem: asyncItem,
+    loadingItem: loading ?? SmartContextMenuItem.loading(),
+    loadingTimeout: timeout,
+    closeOnTap: false,
+    errorBuilder: errorBuilder,
+  );
 
   /// Creates an item that is built by [builder] and built again each time
   /// [listenable] notifies, also while the menu is open.
@@ -591,11 +583,11 @@ final class SmartContextMenuItem {
     closeOnTap: false,
   );
 
-  /// Creates an item that shows that the item of
-  /// a [SmartContextMenuItem.listenable] is loading.
+  /// Creates an item that shows that an async or a listenable item is
+  /// loading.
   ///
-  /// Return it from the builder of [SmartContextMenuItem.listenable] when
-  /// the loading states differ, for example by their titles. The item shows
+  /// Pass it as `loading` to [SmartContextMenuItem.async], or return it from
+  /// the builder of [SmartContextMenuItem.listenable]. The item shows
   /// [title] (or [SmartContextMenuLabels.loading]) with [leading] and
   /// an activity indicator, and does not respond to taps. Use
   /// [loadingBuilder] to replace this content.

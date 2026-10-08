@@ -298,7 +298,7 @@ final class _SmartContextMenuItemViewState
   }
 
   Widget _buildErrorBody(SmartContextMenuItemState state) {
-    final errorBuilder = _item.errorBuilder;
+    final errorBuilder = widget.item.errorBuilder;
     if (errorBuilder != null) {
       return KeyedSubtree(
         key: ItemContentKey.error,
@@ -332,6 +332,7 @@ final class _SmartContextMenuItemViewState
 
   Future<void> _loadAsyncData() async {
     setState(() {
+      _resolvedItem = widget.item.loadingItem;
       _isLoading = true;
       _error = null;
     });
