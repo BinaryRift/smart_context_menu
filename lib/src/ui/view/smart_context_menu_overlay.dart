@@ -1,4 +1,5 @@
 import 'dart:async' show FutureOr;
+import 'dart:math' as math;
 import 'dart:ui' as ui show Image, ImageFilter;
 import 'package:flutter/cupertino.dart' show CupertinoDynamicColor;
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ import '../../domain/smart_context_menu_config.dart';
 import '../../domain/smart_context_menu_header_details.dart';
 import '../../domain/smart_context_menu_item.dart';
 import '../components/smart_menu_reactive_physics.dart';
+import '../widgets/sliver_extent_listener.dart';
 import 'smart_context_menu_view.dart';
 
 part '../components/preview_header_delegate.dart';
@@ -57,7 +59,9 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
   double? _leftPadding;
   double? _rightPadding;
   double _appliedTopOffset = double.maxFinite;
-  double _lastMenuHeight = 0.0;
+  double _headerExtent = 0.0;
+  double _heightThreshold = double.infinity;
+  double _lastContentHeight = 0.0;
   Offset? _pointerDownPos;
   bool _isScrolling = false;
   Offset _startPreviewPosition = MotionTranslation.none.toOffset;
@@ -118,7 +122,7 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
         media.padding.bottom + _config.screenPadding.bottom;
     final double previewHeight = widget.anchorRect.height;
 
-    final heightThreshold = _calculateMenuHeightThreshold(
+    final heightThreshold = _heightThreshold = _calculateMenuHeightThreshold(
       screenHeight: screenHeight,
       topSafe: topSafe,
       bottomSafe: bottomSafe,
@@ -127,8 +131,7 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
     return CustomScrollView(
       controller: _scrollController,
       physics: SmartMenuReactivePhysics(
-        heightNotifier: _currentMenuHeight,
-        heightThreshold: heightThreshold,
+        isOverflowing: _isOverflowing,
         parent: const BouncingScrollPhysics(),
       ),
       slivers: [
@@ -145,7 +148,9 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
             _scrollToBottomIfNeeded(heightThreshold: heightThreshold);
 
             return SliverPadding(
-              padding: EdgeInsets.only(top: _appliedTopOffset),
+              padding: EdgeInsets.only(
+                top: _appliedTopOffset - _headerExtent,
+              ),
             );
           },
         ),
@@ -203,15 +208,18 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
       close: _close,
     );
 
-    return SliverFadeTransition(
-      opacity: widget.routeAnimation,
-      sliver: SliverPadding(
-        padding: EdgeInsets.only(
-          left: _leftPadding ?? 0,
-          right: _rightPadding ?? 0,
-        ),
-        sliver: SliverMainAxisGroup(
-          slivers: widget.headerSliversBuilder!(context, header),
+    return SliverExtentListener(
+      onExtentChanged: _onHeaderExtentChanged,
+      sliver: SliverFadeTransition(
+        opacity: widget.routeAnimation,
+        sliver: SliverPadding(
+          padding: EdgeInsets.only(
+            left: _leftPadding ?? 0,
+            right: _rightPadding ?? 0,
+          ),
+          sliver: SliverMainAxisGroup(
+            slivers: widget.headerSliversBuilder!(context, header),
+          ),
         ),
       ),
     );
@@ -391,6 +399,9 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
   /// only while the preview and the menu fit on the screen without
   /// scrolling. While they scroll, it only moves up: moving down would shift
   /// the scroll position under the user.
+  ///
+  /// The header slivers always fit above the preview: if there is no room
+  /// for them, the preview moves down.
   void _updateTopOffset({
     required double screenHeight,
     required double bottomSafe,
@@ -407,7 +418,8 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
       targetTop -= (totalH - spaceBelow);
     }
 
-    final double finalTop = targetTop.clamp(topSafe, screenHeight);
+    final double minTop = topSafe + _headerExtent;
+    final double finalTop = math.max(targetTop, minTop);
 
     final bool canMoveDown =
         _config.moveBackDown && menuHeight <= heightThreshold;
@@ -415,6 +427,7 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
     if (finalTop < _appliedTopOffset || canMoveDown) {
       _appliedTopOffset = finalTop;
     }
+    _appliedTopOffset = math.max(_appliedTopOffset, minTop);
   }
 
   double _calculateMenuHeightThreshold({
@@ -425,8 +438,10 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
     // topSafe and bottomSafe already include the screen padding.
     final double availableTotalHeight = screenHeight - topSafe - bottomSafe;
 
-    final double menuHeightThreshold =
-        availableTotalHeight - widget.anchorRect.height - _config.menuGap;
+    final double menuHeightThreshold = availableTotalHeight -
+        _headerExtent -
+        widget.anchorRect.height -
+        _config.menuGap;
     return menuHeightThreshold;
   }
 
@@ -435,8 +450,9 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
   }) {
     final menuHeight = _currentMenuHeight.value;
     final isOverflowing = menuHeight > heightThreshold;
+    final contentHeight = menuHeight + _headerExtent;
 
-    if (menuHeight > _lastMenuHeight && isOverflowing) {
+    if (contentHeight > _lastContentHeight && isOverflowing) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (_scrollController.hasClients) {
           final max = _scrollController.position.maxScrollExtent;
@@ -444,7 +460,16 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
         }
       });
     }
-    _lastMenuHeight = menuHeight;
+    _lastContentHeight = contentHeight;
+  }
+
+  bool _isOverflowing() => _currentMenuHeight.value > _heightThreshold;
+
+  void _onHeaderExtentChanged(double extent) {
+    final newExtent = extent.roundToDouble();
+    if (newExtent != _headerExtent) {
+      setState(() => _headerExtent = newExtent);
+    }
   }
 
   /// Closes the menu and calls [SmartContextMenuOverlay.onPreviewTap]

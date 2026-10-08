@@ -107,7 +107,10 @@ SmartContextMenu(
 The menu opens right below the pressed widget, and the widget stays exactly where it was.
 It moves up only when the widget and the menu together do not fit below it, and only as far
 as needed. Horizontally, the menu lines up with the widget's left or right edge, or centers
-under it, depending on where the widget is on the screen.
+under it, depending on where the widget is on the screen. [Header slivers](#header-slivers)
+are shown right above the widget; if there is no room for them, the widget and the menu
+move down. If they do not fit on the screen together, the widget and the menu take priority:
+the slivers scroll out at the top.
 
 - **Shorter menus.** When the menu gets shorter, for example after returning from a submenu,
   it stays where it is, so it stays under the finger: the parent menu starts where the back

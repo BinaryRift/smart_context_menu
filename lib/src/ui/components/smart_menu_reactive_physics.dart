@@ -1,29 +1,26 @@
 import 'package:flutter/widgets.dart';
 
+/// Scrolls only while [isOverflowing] returns true.
+///
+/// [isOverflowing] is a callback rather than a value: [Scrollable] keeps
+/// physics of the same type when it rebuilds, so a new value would be
+/// ignored.
 final class SmartMenuReactivePhysics extends BouncingScrollPhysics {
-  final ValueNotifier<double> heightNotifier;
-  final double heightThreshold;
+  final ValueGetter<bool> isOverflowing;
 
-  bool get _isOverflowing => heightNotifier.value > heightThreshold;
-
-  const SmartMenuReactivePhysics({
-    required this.heightNotifier,
-    required this.heightThreshold,
-    super.parent,
-  });
+  const SmartMenuReactivePhysics({required this.isOverflowing, super.parent});
 
   @override
   SmartMenuReactivePhysics applyTo(ScrollPhysics? ancestor) {
     return SmartMenuReactivePhysics(
-      heightNotifier: heightNotifier,
-      heightThreshold: heightThreshold,
+      isOverflowing: isOverflowing,
       parent: buildParent(ancestor),
     );
   }
 
   @override
   double applyPhysicsToUserOffset(ScrollMetrics position, double offset) {
-    if (!_isOverflowing) return 0.0;
+    if (!isOverflowing()) return 0.0;
     return super.applyPhysicsToUserOffset(position, offset);
   }
 
@@ -32,7 +29,7 @@ final class SmartMenuReactivePhysics extends BouncingScrollPhysics {
     ScrollMetrics position,
     double velocity,
   ) {
-    if (!_isOverflowing) return null;
+    if (!isOverflowing()) return null;
     return super.createBallisticSimulation(position, velocity);
   }
 
@@ -41,13 +38,8 @@ final class SmartMenuReactivePhysics extends BouncingScrollPhysics {
       identical(this, other) ||
       super == other &&
           other is SmartMenuReactivePhysics &&
-          heightNotifier == other.heightNotifier &&
-          heightThreshold == other.heightThreshold;
+          isOverflowing == other.isOverflowing;
 
   @override
-  int get hashCode => Object.hash(
-        super.hashCode,
-        heightNotifier,
-        heightThreshold,
-      );
+  int get hashCode => Object.hash(super.hashCode, isOverflowing);
 }
