@@ -205,5 +205,43 @@ void main() {
       expect(longPresses, 1);
       expect(find.text('Copy'), findsNothing);
     });
+
+    testWidgets('manual opens and closes from the controller', (tester) async {
+      final controller = SmartContextMenuController();
+      addTearDown(controller.dispose);
+      await tester.pumpWidget(
+        buildApp(
+          mode: SmartContextMenuActivationMode.manual,
+          controller: controller,
+        ),
+      );
+
+      controller.open();
+      await tester.settleMenu();
+      expect(find.text('Copy'), findsOneWidget);
+      expect(controller.isOpen, isTrue);
+
+      controller.close();
+      await tester.settleMenu();
+      expect(find.text('Copy'), findsNothing);
+      expect(controller.isOpen, isFalse);
+    });
+
+    testWidgets('does not open without items', (tester) async {
+      final controller = SmartContextMenuController();
+      addTearDown(controller.dispose);
+      await tester.pumpMenu(items: [], controller: controller);
+
+      await tester.openMenu();
+      expect(controller.isOpen, isFalse);
+
+      controller.open();
+      await tester.settleMenu();
+      expect(controller.isOpen, isFalse);
+      expect(
+        tester.state<NavigatorState>(find.byType(Navigator)).canPop(),
+        isFalse,
+      );
+    });
   });
 }
