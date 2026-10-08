@@ -12,9 +12,11 @@ drag-to-select and rich submenus.
   very tall widgets can be scrolled, and long menus scroll inside themselves.
 - **Drag-to-select**: slide a finger across the items and release on the one you want.
 - **Submenus**: static, loaded asynchronously or paginated, with a back item and swipe back.
+- **Lazy lists**: items are built only when they scroll into view, so long menus stay fast.
 - **Async items** that show a loading state and a retry item on failure, with optional custom views.
 - **Light and dark themes** out of the box.
-- **Customizable**: size, colors, text, icons, blur, decoration, labels and custom item content.
+- **Customizable**: size, colors, text, icons, blur, decoration, labels, dividers
+  and custom item content.
 - **Programmatic control**: open and close the menu from code with `SmartContextMenuController`,
   or turn off the long press and open the menu only from code.
 
@@ -69,7 +71,7 @@ under it, depending on where the widget is on the screen.
   they can be scrolled together, so every part of the widget and the menu stays reachable.
 - **Long menus.** The menu is never taller than a part of the screen set by
   `SmartContextMenuConfig.menuHeightFactor` (60% by default); items that do not fit scroll
-  inside the menu.
+  inside the menu and are built only when they scroll into view.
 
 `screenPadding` and `menuGap` in `SmartContextMenuConfig` set the distance to the screen
 edges and between the widget and the menu.
@@ -263,6 +265,23 @@ SmartContextMenu(
   controller: controller,
   items: items,
   child: child,
+)
+```
+
+#### Dividers
+
+Items have no divider by default. Set `hasDivider: true` to show one below the item,
+or above it with `dividerPosition`. The default divider takes `dividerColor` from the style;
+`customDivider` replaces it with your own widget.
+
+```dart
+SmartContextMenuItem.simple(
+  title: 'Delete',
+  isDestructive: true,
+  hasDivider: true,
+  dividerPosition: SmartContextMenuDividerPosition.top,
+  customDivider: const SizedBox(height: 8),
+  onTap: () => delete(),
 )
 ```
 
