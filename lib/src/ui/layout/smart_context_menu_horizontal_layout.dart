@@ -29,6 +29,8 @@ final class SmartContextMenuHorizontalLayout {
     this.menuPadding,
   );
 
+  /// [screenPadding] is the distance to keep from the screen edges,
+  /// including the system paddings.
   factory SmartContextMenuHorizontalLayout({
     required Rect anchorRect,
     required double screenWidth,

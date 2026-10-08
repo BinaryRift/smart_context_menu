@@ -164,8 +164,9 @@ the slivers scroll out at the top.
   `SmartContextMenuConfig.menuHeightFactor` (60% by default); items that do not fit scroll
   inside the menu and are built only when they scroll into view.
 
-`screenPadding` and `menuGap` in `SmartContextMenuConfig` set the distance to the screen
-edges and between the widget and the menu.
+`screenPadding` in `SmartContextMenuConfig` sets the distance to the screen edges, on top
+of the safe area such as the status bar or the notch in landscape. `menuGap` sets the distance
+between the widget and the menu.
 
 ### Item types
 

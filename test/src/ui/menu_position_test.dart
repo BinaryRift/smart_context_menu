@@ -118,9 +118,11 @@ void main() {
       WidgetTester tester, {
       required double left,
       double screenWidth = 390,
+      FakeViewPadding padding = FakeViewPadding.zero,
     }) async {
       tester.view.physicalSize = Size(screenWidth, 800);
       tester.view.devicePixelRatio = 1;
+      tester.view.padding = padding;
       addTearDown(tester.view.reset);
 
       await tester.pumpWidget(
@@ -182,6 +184,24 @@ void main() {
 
       expect(menu.left, padding);
       expect(menu.right, 280 - padding);
+    });
+
+    const notch = FakeViewPadding(left: 47, right: 47);
+
+    testWidgets('keeps the screen padding outside the left safe area', (
+      tester,
+    ) async {
+      final menu = await openMenuAt(tester, left: 0, padding: notch);
+
+      expect(menu.left, 47 + padding);
+    });
+
+    testWidgets('keeps the screen padding outside the right safe area', (
+      tester,
+    ) async {
+      final menu = await openMenuAt(tester, left: 370, padding: notch);
+
+      expect(menu.right, 390 - 47 - padding);
     });
   });
 }

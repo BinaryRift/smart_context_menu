@@ -68,7 +68,8 @@ final class SmartContextMenuConfig {
 
   /// The minimum distance between the menu and the screen edges.
   ///
-  /// Vertically, it is added to the safe area.
+  /// It is added to the safe area, for example below the status bar and
+  /// next to the notch in landscape.
   /// Defaults to [SmartContextMenuDefaults.screenPadding].
   final EdgeInsets screenPadding;
 

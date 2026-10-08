@@ -84,10 +84,15 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    final media = MediaQuery.of(context);
+    final screenPadding = _config.screenPadding;
     _horizontalLayout = SmartContextMenuHorizontalLayout(
       anchorRect: widget.anchorRect,
-      screenWidth: MediaQuery.of(context).size.width,
-      screenPadding: _config.screenPadding,
+      screenWidth: media.size.width,
+      screenPadding: screenPadding.copyWith(
+        left: screenPadding.left + media.padding.left,
+        right: screenPadding.right + media.padding.right,
+      ),
       menuWidth: _config.menuWidth,
     );
   }
