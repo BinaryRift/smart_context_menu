@@ -38,12 +38,16 @@ final class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
   _Header _header = _Header.none;
   bool _pinHeader = false;
 
-  SmartContextMenuConfig get _config => SmartContextMenuConfig(
-    enableSwipeBack: _swipeBack,
-    enableHaptics: _haptics,
-    moveBackDown: _moveBackDown,
-    style: SmartContextMenuStyle(dividersBetweenItems: _dividersBetweenItems),
-  );
+  /// The config of the app theme with the settings of this page.
+  SmartContextMenuConfig _menuConfig(BuildContext context) {
+    final theme = SmartContextMenuTheme.of(context);
+    return theme.copyWith(
+      enableSwipeBack: _swipeBack,
+      enableHaptics: _haptics,
+      moveBackDown: _moveBackDown,
+      style: theme.style.copyWith(dividersBetweenItems: _dividersBetweenItems),
+    );
+  }
 
   @override
   void dispose() {
@@ -55,6 +59,13 @@ final class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
 
   @override
   Widget build(BuildContext context) {
+    return SmartContextMenuTheme(
+      config: _menuConfig(context),
+      child: _buildPage(),
+    );
+  }
+
+  Widget _buildPage() {
     return CupertinoPageScaffold(
       backgroundColor: CupertinoColors.systemGroupedBackground,
       navigationBar: const CupertinoNavigationBar(
@@ -229,14 +240,17 @@ final class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
           children: [
             ?leading,
             Expanded(
-              child: SmartContextMenu(
-                controller: controller,
-                config: _config.copyWith(
-                  activationMode: SmartContextMenuActivationMode.manual,
+              // The theme of the page is below the context of the state.
+              child: Builder(
+                builder: (context) => SmartContextMenu(
+                  controller: controller,
+                  config: SmartContextMenuTheme.of(context).copyWith(
+                    activationMode: SmartContextMenuActivationMode.manual,
+                  ),
+                  items: items,
+                  headerSliversBuilder: _headerBuilder(title),
+                  child: DemoCard(title: title, subtitle: subtitle),
                 ),
-                items: items,
-                headerSliversBuilder: _headerBuilder(title),
-                child: DemoCard(title: title, subtitle: subtitle),
               ),
             ),
             ?trailing,
@@ -255,7 +269,6 @@ final class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       child: SmartContextMenu(
-        config: _config,
         items: items,
         onPreviewTap: () => debugPrint('Preview tapped: $title'),
         headerSliversBuilder: _headerBuilder(title),
