@@ -146,7 +146,9 @@ headerSliversBuilder: (context, header) => [
 The menu opens right below the pressed widget, and the widget stays exactly where it was.
 It moves up only when the widget and the menu together do not fit below it, and only as far
 as needed. Horizontally, the menu lines up with the widget's left or right edge, or centers
-under it, depending on where the widget is on the screen. [Header slivers](#header-slivers)
+under it, depending on where the widget is on the screen. If there is no room for the menu
+at the widget's edge, it moves towards the middle of the screen; on a screen narrower than
+the menu, it gets narrower. [Header slivers](#header-slivers)
 are shown right above the widget; if there is no room for them, the widget and the menu
 move down. If they do not fit on the screen together, the widget and the menu take priority:
 the slivers scroll out at the top.
@@ -371,6 +373,22 @@ MaterialApp(
 SmartContextMenu(
   items: items,
   child: child,
+);
+```
+
+A theme in the `builder` can also pick the config by the screen size, for example
+a shorter menu on tablets:
+
+```dart
+MaterialApp(
+  builder: (context, child) {
+    final isTablet = MediaQuery.sizeOf(context).shortestSide >= 600;
+    return SmartContextMenuTheme(
+      config: menuConfig.copyWith(menuHeightFactor: isTablet ? 0.45 : 0.6),
+      child: child!,
+    );
+  },
+  home: const HomePage(),
 );
 ```
 
