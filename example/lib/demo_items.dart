@@ -87,6 +87,11 @@ List<SmartContextMenuItem> longRootShortSubmenu() => [
       _action('Red', tintColor: _deep(CupertinoColors.systemRed)),
       _action('Green', tintColor: _deep(CupertinoColors.systemGreen)),
       _action('Blue', tintColor: _deep(CupertinoColors.systemBlue)),
+      _action(
+        'Orange',
+        tintColor: _deep(CupertinoColors.systemOrange),
+        isDisabled: true,
+      ),
     ],
   ),
   _action('Rename', icon: CupertinoIcons.pencil),
@@ -99,7 +104,14 @@ List<SmartContextMenuItem> longRootShortSubmenu() => [
   ),
   _action('Copy link', icon: CupertinoIcons.link),
   _action('Info', icon: CupertinoIcons.info),
+  _action('Archive', icon: CupertinoIcons.archivebox, isDisabled: true),
   _action('Delete', icon: CupertinoIcons.delete, isDestructive: true),
+  _action(
+    'Delete forever',
+    icon: CupertinoIcons.trash_slash,
+    isDestructive: true,
+    isDisabled: true,
+  ),
 ];
 
 SmartContextMenuItem _recentFiles(DemoLoader loader) {
@@ -170,6 +182,7 @@ SmartContextMenuItem _action(
   String title, {
   IconData? icon,
   bool isDestructive = false,
+  bool isDisabled = false,
   Color? tintColor,
   SmartContextMenuPagingMetadata? pagingMetadata,
   bool hasDivider = false,
@@ -180,6 +193,7 @@ SmartContextMenuItem _action(
     title: title,
     leading: icon == null ? null : Icon(icon),
     isDestructive: isDestructive,
+    isDisabled: isDisabled,
     tintColor: tintColor,
     pagingMetadata: pagingMetadata,
     hasDivider: hasDivider,
