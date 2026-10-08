@@ -90,6 +90,11 @@ final class SmartContextMenu extends StatefulWidget {
   /// with the menu and close the menu, use the
   /// [SmartContextMenuHeaderDetails] passed to the builder.
   ///
+  /// The slivers are direct children of the scroll view of the menu, so
+  /// a [PinnedHeaderSliver] stays at the top while a tall preview and the
+  /// menu scroll under it. It pins under the status bar, so add the top
+  /// padding yourself.
+  ///
   /// If null, nothing is shown above the preview.
   final SmartContextMenuHeaderBuilder? headerSliversBuilder;
 

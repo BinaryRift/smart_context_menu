@@ -49,7 +49,8 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
   late final ScrollController _scrollController;
   final GlobalKey _menuKey = GlobalKey();
   final GlobalKey _previewKey = GlobalKey();
-  final GlobalKey _headerKey = GlobalKey();
+  final List<GlobalKey> _headerKeys = [];
+  final List<double> _headerExtents = [];
   final ValueNotifier<double> _currentMenuHeight = ValueNotifier(0.0);
   final ValueNotifier<Offset> _previewMotion = ValueNotifier(Offset.zero);
 
@@ -160,17 +161,7 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
           },
         ),
 
-        if (widget.headerSliversBuilder case final builder?)
-          SmartContextMenuHeader(
-            builder: builder,
-            layout: _horizontalLayout,
-            animation: widget.routeAnimation,
-            fade: widget.fadeHeaderSlivers,
-            motion: _previewMotion,
-            close: _close,
-            onExtentChanged: _onHeaderExtentChanged,
-            groupKey: _headerKey,
-          ),
+        ..._buildHeader(),
 
         SliverPersistentHeader(
           pinned: false,
@@ -195,6 +186,29 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
         SliverPadding(padding: EdgeInsets.only(bottom: bottomSafe)),
       ],
     );
+  }
+
+  List<Widget> _buildHeader() {
+    final builder = widget.headerSliversBuilder;
+    if (builder == null) return const [];
+
+    final slivers = SmartContextMenuHeader(
+      builder: builder,
+      layout: _horizontalLayout,
+      animation: widget.routeAnimation,
+      fade: widget.fadeHeaderSlivers,
+      motion: _previewMotion,
+      close: _close,
+      onExtentChanged: _onHeaderExtentChanged,
+      keyOf: _headerKeyOf,
+    ).build(context);
+
+    // Forget the heights of the slivers the builder no longer returns.
+    if (_headerExtents.length > slivers.length) {
+      _headerExtents.length = slivers.length;
+      _verticalLayout.headerExtent = _totalHeaderExtent();
+    }
+    return slivers;
   }
 
   Widget _buildMenu() {
@@ -230,11 +244,10 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
 
     final menu = find(_menuKey);
     final preview = find(_previewKey);
-    final header = find(_headerKey);
+    final header = [for (final key in _headerKeys) ?find(key)];
     return (menu is RenderBox && menu.containsGlobal(position)) ||
         (preview is RenderBox && preview.containsGlobal(position)) ||
-        (header != null &&
-            header.isHitAt(position, viewId: View.of(context).viewId));
+        header.anyHitAt(position, viewId: View.of(context).viewId);
   }
 
   void _handlePointerDown(PointerDownEvent event) {
@@ -283,11 +296,28 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
   bool _isOverflowing() =>
       _verticalLayout.isOverflowing(_currentMenuHeight.value);
 
-  void _onHeaderExtentChanged(double extent) {
-    final newExtent = extent.roundToDouble();
-    if (newExtent != _verticalLayout.headerExtent) {
-      setState(() => _verticalLayout.headerExtent = newExtent);
+  GlobalKey _headerKeyOf(int index) {
+    while (_headerKeys.length <= index) {
+      _headerKeys.add(GlobalKey());
     }
+    return _headerKeys[index];
+  }
+
+  void _onHeaderExtentChanged(int index, double extent) {
+    while (_headerExtents.length <= index) {
+      _headerExtents.add(0);
+    }
+    _headerExtents[index] = extent;
+
+    final total = _totalHeaderExtent();
+    if (total != _verticalLayout.headerExtent) {
+      setState(() => _verticalLayout.headerExtent = total);
+    }
+  }
+
+  double _totalHeaderExtent() {
+    return _headerExtents.fold(0.0, (sum, extent) => sum + extent)
+        .roundToDouble();
   }
 
   /// Closes the menu and calls [SmartContextMenuOverlay.onPreviewTap]

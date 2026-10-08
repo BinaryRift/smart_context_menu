@@ -393,4 +393,116 @@ void main() {
       );
     });
   });
+
+  group('several slivers', () {
+    /// A menu for a widget of [targetHeight] with the slivers from
+    /// [slivers] above it.
+    Widget menuWith({
+      required List<Widget> Function() slivers,
+      double targetHeight = 40,
+      VoidCallback? onPreviewTap,
+    }) {
+      return CupertinoApp(
+        home: Center(
+          child: SmartContextMenu(
+            items: _items,
+            onPreviewTap: onPreviewTap,
+            headerSliversBuilder: (context, header) => slivers(),
+            child: SizedBox(
+              width: 100,
+              height: targetHeight,
+              child: const Text(menuTargetText),
+            ),
+          ),
+        ),
+      );
+    }
+
+    Widget box(String key, double height) {
+      return SliverToBoxAdapter(
+        child: SizedBox(key: ValueKey(key), height: height),
+      );
+    }
+
+    testWidgets('keeps the preview in place below all of them', (tester) async {
+      await tester.pumpWidget(
+        menuWith(slivers: () => [box('a', 20), box('b', 30)]),
+      );
+      final targetTop = tester.getTopLeft(find.text(menuTargetText)).dy;
+      await tester.openMenu();
+
+      expect(tester.getTopLeft(_preview).dy, moreOrLessEquals(targetTop));
+      expect(
+        tester.getBottomLeft(find.byKey(const ValueKey('b'))).dy,
+        moreOrLessEquals(targetTop),
+      );
+      expect(
+        tester.getTopLeft(find.byKey(const ValueKey('a'))).dy,
+        moreOrLessEquals(targetTop - 50),
+      );
+    });
+
+    testWidgets('recounts the height when the builder returns fewer', (
+      tester,
+    ) async {
+      var count = 2;
+      await tester.pumpWidget(
+        menuWith(slivers: () => [box('a', 20), if (count > 1) box('b', 30)]),
+      );
+      final targetTop = tester.getTopLeft(find.text(menuTargetText)).dy;
+      await tester.openMenu();
+
+      count = 1;
+      // A new screen size rebuilds the open menu.
+      tester.view.physicalSize = tester.view.physicalSize + const Offset(0, 1);
+      addTearDown(tester.view.resetPhysicalSize);
+      await tester.settleMenu();
+
+      expect(find.byKey(const ValueKey('b')), findsNothing);
+      expect(
+        tester.getBottomLeft(find.byKey(const ValueKey('a'))).dy,
+        moreOrLessEquals(tester.getTopLeft(_preview).dy),
+      );
+      expect(tester.getTopLeft(_preview).dy, moreOrLessEquals(targetTop));
+    });
+
+    testWidgets('a pinned sliver stays at the top over the preview', (
+      tester,
+    ) async {
+      var barTaps = 0;
+      var previewTaps = 0;
+      await tester.pumpWidget(
+        menuWith(
+          // With the 30-tall bar and the 10 gap, the 540-tall widget and the
+          // menu scroll by 72.
+          targetHeight: 540,
+          onPreviewTap: () => previewTaps++,
+          slivers: () => [
+            PinnedHeaderSliver(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => barTaps++,
+                child: const SizedBox(key: ValueKey('bar'), height: 30),
+              ),
+            ),
+            box('gap', 10),
+          ],
+        ),
+      );
+      await _openMenu(tester);
+
+      final position = _scrollPosition(tester);
+      expect(position.pixels, position.maxScrollExtent);
+      final bar = find.byKey(const ValueKey('bar'));
+      expect(tester.getTopLeft(bar).dy, 0);
+      expect(tester.getTopLeft(_preview).dy, lessThan(0));
+
+      await tester.tap(bar);
+      await tester.settleMenu();
+
+      expect(barTaps, 1);
+      expect(previewTaps, 0);
+      expect(find.text('Copy'), findsOneWidget);
+    });
+  });
 }

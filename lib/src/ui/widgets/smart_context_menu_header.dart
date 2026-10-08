@@ -7,25 +7,29 @@ import 'sliver_extent_listener.dart';
 import 'sliver_paint_offset.dart';
 import 'smart_context_menu_motion.dart';
 
-/// The slivers built by [builder] above the preview.
+/// Builds the slivers from [builder] for the scroll view above the preview.
 ///
-/// They have the horizontal padding of the preview, move with it by
-/// [motion], fade with [animation] if [fade] is true and report their
+/// Each sliver gets the horizontal padding of the preview, moves with it by
+/// [motion], fades with [animation] if [fade] is true and reports its
 /// height to [onExtentChanged].
-final class SmartContextMenuHeader extends StatelessWidget {
+///
+/// The slivers are not grouped: a [PinnedHeaderSliver] stays pinned only
+/// as a direct child of the scroll view.
+final class SmartContextMenuHeader {
   final SmartContextMenuHeaderBuilder builder;
   final SmartContextMenuHorizontalLayout layout;
   final Animation<double> animation;
   final bool fade;
   final ValueListenable<Offset> motion;
   final Future<void> Function() close;
-  final ValueChanged<double> onExtentChanged;
 
-  /// The key of the group of the built slivers.
-  final GlobalKey groupKey;
+  /// Called with the index of a sliver and its new height.
+  final void Function(int index, double extent) onExtentChanged;
+
+  /// Returns the key of the sliver at an index.
+  final GlobalKey Function(int index) keyOf;
 
   const SmartContextMenuHeader({
-    super.key,
     required this.builder,
     required this.layout,
     required this.animation,
@@ -33,35 +37,39 @@ final class SmartContextMenuHeader extends StatelessWidget {
     required this.motion,
     required this.close,
     required this.onExtentChanged,
-    required this.groupKey,
+    required this.keyOf,
   });
 
-  @override
-  Widget build(BuildContext context) {
+  List<Widget> build(BuildContext context) {
     final header = SmartContextMenuHeaderDetails(
       alignment: layout.alignment,
       animation: animation,
       close: close,
     );
+    final slivers = builder(context, header);
 
-    final Widget slivers = SliverPadding(
+    return [
+      for (var i = 0; i < slivers.length; i++) _wrap(i, slivers[i]),
+    ];
+  }
+
+  Widget _wrap(int index, Widget sliver) {
+    final Widget padded = SliverPadding(
       padding: layout.padding,
-      sliver: SliverMainAxisGroup(
-        key: groupKey,
-        slivers: builder(context, header),
-      ),
+      sliver: sliver,
     );
 
     return SliverExtentListener(
-      onExtentChanged: onExtentChanged,
+      key: keyOf(index),
+      onExtentChanged: (extent) => onExtentChanged(index, extent),
       sliver: SmartContextMenuMotion(
         motion: motion,
         builder: (context, offset, child) {
           return SliverPaintOffset(offset: offset, sliver: child);
         },
         child: fade
-            ? SliverFadeTransition(opacity: animation, sliver: slivers)
-            : slivers,
+            ? SliverFadeTransition(opacity: animation, sliver: padded)
+            : padded,
       ),
     );
   }

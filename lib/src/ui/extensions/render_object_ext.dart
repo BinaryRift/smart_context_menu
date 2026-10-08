@@ -65,16 +65,19 @@ extension SmartContextMenuItemHitTest on RenderObject {
   }
 }
 
-extension SmartContextMenuContentHitTest on RenderObject {
-  /// Whether a hit test at [globalPosition] in the view [viewId] hits this
-  /// render object.
+extension SmartContextMenuContentHitTest on Iterable<RenderObject> {
+  /// Whether a hit test at [globalPosition] in the view [viewId] hits any
+  /// of these render objects.
   ///
-  /// Empty space inside it does not count: a render object is in the hit
+  /// Empty space inside them does not count: a render object is in the hit
   /// test path only if it or one of its children is hit.
-  bool isHitAt(Offset globalPosition, {required int viewId}) {
+  bool anyHitAt(Offset globalPosition, {required int viewId}) {
+    if (isEmpty) return false;
+
+    final targets = toSet();
     final result = HitTestResult();
     RendererBinding.instance.hitTestInView(result, globalPosition, viewId);
-    return result.path.any((entry) => entry.target == this);
+    return result.path.any((entry) => targets.contains(entry.target));
   }
 }
 
