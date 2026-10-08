@@ -7,7 +7,8 @@ drag-to-select and rich submenus.
 
 ## Features
 
-- **Long press to open** with a lifted preview of the pressed widget.
+- **Long press to open** with a lifted preview of the pressed widget; tap the preview
+  to run the widget's main action.
 - **Smart positioning**: the pressed widget stays in place whenever there is room for the menu;
   very tall widgets can be scrolled, and long menus scroll inside themselves.
 - **Drag-to-select**: slide a finger across the items and release on the one you want.
@@ -54,6 +55,18 @@ SmartContextMenu(
 ```
 
 Only the long press is taken from the child: its taps, drags and other gestures keep working.
+
+The preview above the open menu is a snapshot of the child, so its own buttons do not
+work there. To run the main action of the child when the preview is tapped, for example
+to open a message, pass `onPreviewTap`. The menu starts closing first, as with an item:
+
+```dart
+SmartContextMenu(
+  onPreviewTap: () => openMessage(message),
+  items: items,
+  child: MessageBubble(message),
+)
+```
 
 ### Positioning
 

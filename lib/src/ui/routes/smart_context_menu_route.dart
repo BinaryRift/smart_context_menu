@@ -1,3 +1,4 @@
+import 'dart:async' show FutureOr;
 import 'dart:ui' as ui show Image;
 import 'package:flutter/material.dart' show Colors;
 import 'package:flutter/widgets.dart'
@@ -14,6 +15,7 @@ final class SmartContextMenuRoute extends PageRoute<void> {
   final String heroTag;
   final List<SmartContextMenuItem> items;
   final SmartContextMenuConfig config;
+  final FutureOr<void> Function()? onPreviewTap;
 
   @override
   final String? barrierLabel;
@@ -24,6 +26,7 @@ final class SmartContextMenuRoute extends PageRoute<void> {
     required this.heroTag,
     required this.items,
     required this.config,
+    this.onPreviewTap,
     this.barrierLabel,
   });
 
@@ -55,6 +58,7 @@ final class SmartContextMenuRoute extends PageRoute<void> {
       items: items,
       config: config,
       snapshot: snapshot,
+      onPreviewTap: onPreviewTap,
     );
   }
 }

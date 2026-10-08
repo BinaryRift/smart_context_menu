@@ -1,3 +1,4 @@
+import 'dart:async' show FutureOr;
 import 'dart:ui' as ui;
 
 import 'package:flutter/cupertino.dart' show CupertinoLocalizations;
@@ -69,6 +70,13 @@ final class SmartContextMenu extends StatefulWidget {
   /// [SmartContextMenuActivationMode.manual].
   final SmartContextMenuController? controller;
 
+  /// Called when the preview above the open menu is tapped.
+  ///
+  /// The menu starts closing before it is called, as with an item that
+  /// closes on tap. Use it for the main action of [child], for example to
+  /// open a message. If null, tapping the preview does nothing.
+  final FutureOr<void> Function()? onPreviewTap;
+
   /// Creates a context menu for [child].
   const SmartContextMenu({
     super.key,
@@ -76,6 +84,7 @@ final class SmartContextMenu extends StatefulWidget {
     required this.items,
     this.config = const SmartContextMenuConfig(),
     this.controller,
+    this.onPreviewTap,
   });
 
   @override
@@ -354,6 +363,7 @@ final class _SmartContextMenuState extends State<SmartContextMenu>
       heroTag: _heroTag,
       items: widget.items,
       config: widget.config,
+      onPreviewTap: widget.onPreviewTap,
       barrierLabel: barrierLabel,
     );
 

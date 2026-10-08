@@ -224,6 +224,7 @@ final class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
       child: SmartContextMenu(
         config: _config,
         items: items,
+        onPreviewTap: () => debugPrint('Preview tapped: $title'),
         child: DemoCard(title: title, subtitle: subtitle),
       ),
     );

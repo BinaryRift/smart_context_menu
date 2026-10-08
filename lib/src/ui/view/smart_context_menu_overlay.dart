@@ -1,6 +1,8 @@
+import 'dart:async' show FutureOr;
 import 'dart:ui' as ui show Image, ImageFilter;
 import 'package:flutter/cupertino.dart' show CupertinoDynamicColor;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show HapticFeedback;
 import '../../core/ui/gestures/gesture_thresholds.dart';
 import '../../core/ui/motion/tokens/motion_curves.dart';
 import '../../core/ui/motion/tokens/motion_durations.dart';
@@ -20,6 +22,7 @@ final class SmartContextMenuOverlay extends StatefulWidget {
   final String heroTag;
   final List<SmartContextMenuItem> items;
   final SmartContextMenuConfig config;
+  final FutureOr<void> Function()? onPreviewTap;
 
   const SmartContextMenuOverlay({
     super.key,
@@ -29,6 +32,7 @@ final class SmartContextMenuOverlay extends StatefulWidget {
     required this.heroTag,
     required this.items,
     required this.config,
+    this.onPreviewTap,
   });
 
   @override
@@ -54,6 +58,7 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
   Offset? _pointerDownPos;
   bool _isScrolling = false;
   Offset _startPreviewPosition = MotionTranslation.none.toOffset;
+  bool _isPreviewTapped = false;
 
   SmartContextMenuConfig get _config => widget.config;
 
@@ -205,6 +210,7 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
         );
       },
       child: GestureDetector(
+        onTap: widget.onPreviewTap == null ? null : _onPreviewTap,
         onPanStart: _onPreviewPanStart,
         onPanUpdate: _onPreviewPanUpdate,
         onPanEnd: _onPreviewPanEnd,
@@ -414,6 +420,22 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
       });
     }
     _lastMenuHeight = menuHeight;
+  }
+
+  /// Closes the menu and calls [SmartContextMenuOverlay.onPreviewTap]
+  /// halfway through the closing, as an item that closes on tap does.
+  Future<void> _onPreviewTap() async {
+    if (_isPreviewTapped) return;
+    _isPreviewTapped = true;
+    if (_config.enableHaptics) HapticFeedback.lightImpact();
+
+    final route = ModalRoute.of(context);
+    final navigator = Navigator.of(context);
+    if (route != null && navigator.canPop()) {
+      navigator.pop();
+      await Future<void>.delayed(route.transitionDuration * 0.5);
+    }
+    await widget.onPreviewTap?.call();
   }
 
   void _onPreviewPanStart(DragStartDetails details) {

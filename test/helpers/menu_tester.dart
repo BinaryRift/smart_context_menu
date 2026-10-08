@@ -13,6 +13,7 @@ extension MenuTester on WidgetTester {
     SmartContextMenuConfig config = const SmartContextMenuConfig(),
     SmartContextMenuController? controller,
     Brightness? brightness,
+    VoidCallback? onPreviewTap,
   }) {
     return pumpWidget(
       CupertinoApp(
@@ -22,6 +23,7 @@ extension MenuTester on WidgetTester {
             items: items,
             config: config,
             controller: controller,
+            onPreviewTap: onPreviewTap,
             child: const Text(menuTargetText),
           ),
         ),
