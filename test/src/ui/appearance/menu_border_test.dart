@@ -7,8 +7,8 @@ import '../../../helpers/menu_tester.dart';
 
 void main() {
   List<Decoration> foregroundsOf(WidgetTester tester) => [
-    for (final container in tester.widgetList<AnimatedContainer>(
-      find.byType(AnimatedContainer),
+    for (final container in tester.widgetList<Container>(
+      find.byType(Container),
     ))
       ?container.foregroundDecoration,
   ];

@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
+import 'package:smart_context_menu/src/ui/widgets/smart_context_menu_blur_box.dart';
+import 'package:smart_context_menu/src/ui/widgets/smart_context_menu_shadow_box.dart';
 
 import '../../helpers/menu_tester.dart';
 
@@ -78,5 +80,44 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(previewOffset(), Offset.zero);
+  });
+
+  testWidgets('the blur and the shadow follow the stretched menu', (
+    tester,
+  ) async {
+    await tester.pumpMenu(
+      config: const SmartContextMenuConfig(
+        style: SmartContextMenuStyle(menuBlur: SmartContextMenuBlur.small),
+      ),
+      items: [
+        SmartContextMenuItem.simple(
+          title: 'Item',
+          closeOnTap: false,
+          onTap: () {},
+        ),
+      ],
+    );
+    await tester.openMenu();
+
+    final blur = find.byType(SmartContextMenuBlurBox);
+    final shadow = find.byType(SmartContextMenuShadowBox);
+    final blurCenter = tester.getCenter(blur);
+    final shadowCenter = tester.getCenter(shadow);
+
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.text('Item')),
+    );
+    await tester.pump();
+    await gesture.moveBy(const Offset(40, 0));
+    await tester.pumpAndSettle();
+
+    expect(tester.getCenter(blur).dx, greaterThan(blurCenter.dx));
+    expect(tester.getCenter(shadow).dx, greaterThan(shadowCenter.dx));
+
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    expect(tester.getCenter(blur), blurCenter);
+    expect(tester.getCenter(shadow), shadowCenter);
   });
 }

@@ -97,47 +97,50 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
 
+    // The stretch moves the shadow and the blur together with the menu.
     return WidgetSizeListener(
       onSizeChanged: _onSizeChanged,
-      child: SmartContextMenuShadowBox(
-        borderRadius: _config.style.borderRadius,
-        shadows: _config.style.menuShadows,
-        child: SmartContextMenuBlurBox(
-          blur: _config.style.menuBlur,
+      child: ListenableBuilder(
+        listenable: _stretchController,
+        builder: (context, child) => AnimatedContainer(
+          duration: MotionDurations.fast,
+          curve: MotionCurves.quartOut,
+          transformAlignment: Alignment.center,
+          transform: _stretchController.transform,
+          child: child,
+        ),
+        child: SmartContextMenuShadowBox(
           borderRadius: _config.style.borderRadius,
-          child: ListenableBuilder(
-            listenable: _stretchController,
-            builder: (context, child) => AnimatedContainer(
-              duration: MotionDurations.fast,
-              curve: MotionCurves.quartOut,
-              transformAlignment: Alignment.center,
-              transform: _stretchController.transform,
+          shadows: _config.style.menuShadows,
+          child: SmartContextMenuBlurBox(
+            blur: _config.style.menuBlur,
+            borderRadius: _config.style.borderRadius,
+            child: Container(
               width: _config.menuWidth,
               decoration: _config.style.menuDecoration ?? _defaultDecoration,
               foregroundDecoration: _config.style.menuDecoration == null
                   ? _defaultBorder
                   : null,
               clipBehavior: Clip.antiAlias,
-              child: child,
-            ),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxHeight: screenHeight * _config.menuHeightFactor,
-              ),
-              child: SmartContextMenuPointerTracker(
-                hoverController: _hoverController,
-                isSwiping: _isSwiping,
-                onDrag: _setMenuEffect,
-                onRelease: _resetMenuEffect,
-                child: SmartContextMenuLevelSwitcher(
-                  isForward: _controller.isForward,
-                  enableSwipeBack: _config.enableSwipeBack,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: screenHeight * _config.menuHeightFactor,
+                ),
+                child: SmartContextMenuPointerTracker(
+                  hoverController: _hoverController,
                   isSwiping: _isSwiping,
-                  onSwipeBack: _controller.popSubmenu,
-                  previous: _buildPreviousLevel(),
-                  child: _buildLevel(
-                    _controller.currentLevel,
-                    depth: _controller.stackLength,
+                  onDrag: _setMenuEffect,
+                  onRelease: _resetMenuEffect,
+                  child: SmartContextMenuLevelSwitcher(
+                    isForward: _controller.isForward,
+                    enableSwipeBack: _config.enableSwipeBack,
+                    isSwiping: _isSwiping,
+                    onSwipeBack: _controller.popSubmenu,
+                    previous: _buildPreviousLevel(),
+                    child: _buildLevel(
+                      _controller.currentLevel,
+                      depth: _controller.stackLength,
+                    ),
                   ),
                 ),
               ),
