@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart'
-    show CupertinoActivityIndicator, CupertinoDynamicColor;
+    show CupertinoActivityIndicator, CupertinoDynamicColor, CupertinoTheme;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show HapticFeedback;
 
@@ -12,6 +12,7 @@ import '../../domain/smart_context_menu_item.dart';
 import '../../domain/smart_context_menu_item_state.dart';
 import '../../domain/smart_context_menu_style.dart';
 import '../keys/item_content_key.dart';
+import '../keys/service_item_key.dart';
 import '../state/smart_context_menu_hover_controller.dart';
 import '../widgets/smart_context_menu_divider.dart';
 
@@ -79,6 +80,16 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
   Color get _baseTextColor =>
       _style.textStyle.color ?? SmartContextMenuDefaults.textColor;
 
+  // A dark highlight stands out more in the light theme, so it is lighter
+  // there. The back item has its own menu color fill, lighter than the menu,
+  // so its highlight is stronger to differ from the menu background.
+  double get _highlightOpacity {
+    final brightness =
+        CupertinoTheme.maybeBrightnessOf(context) ?? Brightness.light;
+    if (brightness == Brightness.dark) return 0.1;
+    return widget.key == ServiceItemKey.back ? 0.16 : 0.06;
+  }
+
   Color? get _tintColor =>
       _item.tintColor ?? (_item.isDestructive ? _style.destructiveColor : null);
 
@@ -96,7 +107,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
       return _resolve(_style.disabledItemColor);
     }
     return _isHighlight
-        ? _resolve(_baseTextColor).withValues(alpha: 0.1)
+        ? _resolve(_baseTextColor).withValues(alpha: _highlightOpacity)
         : Colors.transparent;
   }
 

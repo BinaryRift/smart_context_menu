@@ -78,6 +78,61 @@ void main() {
     );
   });
 
+  group('press highlight', () {
+    final textColor = SmartContextMenuDefaults.textColor;
+
+    testWidgets('is lighter in the light theme', (tester) async {
+      await tester.pumpMenu(
+        items: appearanceItems(),
+        brightness: Brightness.light,
+      );
+      await tester.openMenu();
+      final gesture = await tester.pressAt(find.text('Enabled'));
+
+      expect(
+        tester.backgroundOf('Enabled'),
+        isSameColorAs(textColor.color.withValues(alpha: 0.06)),
+      );
+      await tester.releaseOutside(gesture);
+    });
+
+    testWidgets('is stronger in the dark theme', (tester) async {
+      await tester.pumpMenu(
+        items: appearanceItems(),
+        brightness: Brightness.dark,
+      );
+      await tester.openMenu();
+      final gesture = await tester.pressAt(find.text('Enabled'));
+
+      expect(
+        tester.backgroundOf('Enabled'),
+        isSameColorAs(textColor.darkColor.withValues(alpha: 0.1)),
+      );
+      await tester.releaseOutside(gesture);
+    });
+
+    testWidgets('is stronger on the back item in the light theme', (
+      tester,
+    ) async {
+      await tester.pumpMenu(
+        items: submenuItems(),
+        brightness: Brightness.light,
+      );
+      await tester.openSubmenu();
+      final gesture = await tester.pressAt(find.text('Child'));
+      // The placeholder of the back item comes first.
+      final back = find.text(const SmartContextMenuLabels().back).last;
+      await gesture.moveTo(tester.getCenter(back));
+      await tester.pump();
+
+      expect(
+        tester.backgroundAt(back),
+        isSameColorAs(textColor.color.withValues(alpha: 0.16)),
+      );
+      await tester.releaseOutside(gesture);
+    });
+  });
+
   group('tint color', () {
     const tintColor = Color(0xFF00AA00);
 

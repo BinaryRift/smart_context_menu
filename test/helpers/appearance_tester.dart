@@ -42,16 +42,32 @@ extension AppearanceTester on WidgetTester {
       widget<Text>(find.text(title).first).style!;
 
   /// The background color of the item with [title].
-  Color? backgroundOf(String title) {
+  Color? backgroundOf(String title) => backgroundAt(find.text(title));
+
+  /// The background color of the item that contains [finder].
+  Color? backgroundAt(Finder finder) {
     final container = widget<AnimatedContainer>(
-      find
-          .ancestor(
-            of: find.text(title),
-            matching: find.byType(AnimatedContainer),
-          )
-          .first,
+      find.ancestor(of: finder, matching: find.byType(AnimatedContainer)).first,
     );
     return (container.decoration as BoxDecoration?)?.color;
+  }
+
+  /// Puts a finger on [target] and moves it slightly, so the item
+  /// under the finger is highlighted.
+  Future<TestGesture> pressAt(Finder target) async {
+    final gesture = await startGesture(getCenter(target));
+    await pump();
+    await gesture.moveBy(const Offset(2, 0));
+    await pump();
+    return gesture;
+  }
+
+  /// Lifts the finger outside the menu, so no item is tapped.
+  Future<void> releaseOutside(TestGesture gesture) async {
+    await gesture.moveTo(const Offset(1, 1));
+    await pump();
+    await gesture.up();
+    await settleMenu();
   }
 
   Color? iconColorOf(IconData icon) =>
