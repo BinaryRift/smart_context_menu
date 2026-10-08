@@ -79,15 +79,18 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
   Color get _baseTextColor =>
       _style.textStyle.color ?? SmartContextMenuDefaults.textColor;
 
+  Color? get _tintColor =>
+      _item.tintColor ?? (_item.isDestructive ? _style.destructiveColor : null);
+
   Color get _overlayColor {
-    if (_item.isDestructive) {
+    final tintColor = _tintColor;
+    if (tintColor != null) {
       final alpha = _item.isDisabled
           ? 0.08
           : _isHighlight
               ? 0.24
               : 0.12;
-      return _resolve(_style.destructiveColor)
-          .withValues(alpha: alpha);
+      return _resolve(tintColor).withValues(alpha: alpha);
     }
     if (_item.isDisabled) {
       return _resolve(_style.disabledItemColor);
@@ -98,8 +101,9 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
   }
 
   Color get _textColor {
-    if (_item.isDestructive) {
-      return _resolve(_style.destructiveColor).withValues(
+    final tintColor = _tintColor;
+    if (tintColor != null) {
+      return _resolve(tintColor).withValues(
         alpha: _item.isDisabled
             ? MotionOpacity.medium.value
             : MotionOpacity.visible.value,

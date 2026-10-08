@@ -20,7 +20,8 @@ final class SmartContextMenuItemState {
 
   /// The title color for the current state, resolved for the current theme.
   ///
-  /// Depends on [isDisabled], [isDestructive], the color of
+  /// Depends on [isDisabled], [isDestructive],
+  /// [SmartContextMenuItem.tintColor], the color of
   /// [SmartContextMenuItem.titleStyle] and [SmartContextMenuStyle].
   final Color textColor;
 

@@ -249,6 +249,19 @@ Icons in `leading` and `trailing` take the title color unless they set their own
 The back item of a submenu uses `textStyle` in bold; `backButtonColor` sets the color
 of its title and icon.
 
+To give one item its own color, set its `tintColor`. The item is tinted like a destructive
+one: the title and icons take the color, and the background a translucent shade of it.
+`tintColor` takes precedence over `destructiveColor` and the `titleStyle` color.
+
+```dart
+SmartContextMenuItem.simple(
+  title: 'Approve',
+  leading: const Icon(CupertinoIcons.checkmark),
+  tintColor: CupertinoColors.systemGreen,
+  onTap: () => approve(),
+)
+```
+
 Colors may be `CupertinoDynamicColor`s: they follow the light and dark theme.
 A plain `Color` is used as is in both themes. The default values are available
 in `SmartContextMenuDefaults`.

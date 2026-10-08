@@ -1,6 +1,6 @@
 import 'dart:async' show FutureOr;
 import 'package:flutter/widgets.dart'
-    show Widget, BuildContext, EdgeInsets, TextStyle;
+    show Widget, BuildContext, Color, EdgeInsets, TextStyle;
 import 'package:meta/meta.dart' show internal;
 
 import '../core/ui/styles/smart_context_menu_defaults.dart';
@@ -87,7 +87,7 @@ final class SmartContextMenuItem {
   /// The style of [title].
   ///
   /// Defaults to [SmartContextMenuStyle.textStyle]. Its color is used
-  /// only while the item is enabled and not destructive.
+  /// only while the item is enabled, not destructive and has no [tintColor].
   final TextStyle? titleStyle;
 
   /// A widget shown before [title], usually an [Icon].
@@ -113,8 +113,17 @@ final class SmartContextMenuItem {
 
   /// Whether the item performs a destructive action.
   ///
-  /// Destructive items are shown in [SmartContextMenuStyle.destructiveColor].
+  /// Destructive items are tinted with [SmartContextMenuStyle.destructiveColor]
+  /// unless [tintColor] is set.
   final bool isDestructive;
+
+  /// The color the item is tinted with, like a destructive item.
+  ///
+  /// The title and icons take this color, and the background takes
+  /// a translucent shade of it. Takes precedence over
+  /// [SmartContextMenuStyle.destructiveColor] and the color of [titleStyle].
+  /// May be a [CupertinoDynamicColor] to follow the theme.
+  final Color? tintColor;
 
   /// Whether the item is disabled.
   ///
@@ -223,6 +232,7 @@ final class SmartContextMenuItem {
     this.leading,
     this.trailing,
     this.isDestructive = false,
+    this.tintColor,
     this.isDisabled = false,
     this.hasDivider = false,
     this.customDivider,
@@ -262,6 +272,7 @@ final class SmartContextMenuItem {
     Widget? leading,
     Widget? trailing,
     bool isDestructive = false,
+    Color? tintColor,
     bool isDisabled = false,
     bool hasDivider = false,
     bool closeOnTap = true,
@@ -279,6 +290,7 @@ final class SmartContextMenuItem {
     leading: leading,
     trailing: trailing,
     isDestructive: isDestructive,
+    tintColor: tintColor,
     isDisabled: isDisabled,
     hasDivider: hasDivider,
     closeOnTap: closeOnTap,
@@ -300,6 +312,7 @@ final class SmartContextMenuItem {
     Widget? leading,
     Widget? trailing,
     bool isDestructive = false,
+    Color? tintColor,
     bool isDisabled = false,
     bool hasDivider = false,
     Widget? customDivider,
@@ -314,6 +327,7 @@ final class SmartContextMenuItem {
     leading: leading,
     trailing: trailing,
     isDestructive: isDestructive,
+    tintColor: tintColor,
     isDisabled: isDisabled,
     hasDivider: hasDivider,
     customDivider: customDivider,
@@ -352,6 +366,7 @@ final class SmartContextMenuItem {
     Widget? leading,
     Widget? trailing,
     bool isDestructive = false,
+    Color? tintColor,
     bool isDisabled = false,
     bool hasDivider = false,
     Widget? customDivider,
@@ -366,6 +381,7 @@ final class SmartContextMenuItem {
     leading: leading,
     trailing: trailing,
     isDestructive: isDestructive,
+    tintColor: tintColor,
     isDisabled: isDisabled,
     hasDivider: hasDivider,
     customDivider: customDivider,
@@ -418,6 +434,7 @@ final class SmartContextMenuItem {
     Widget? leading,
     Widget? trailing,
     bool isDestructive = false,
+    Color? tintColor,
     bool isDisabled = false,
     bool hasDivider = false,
     Widget? customDivider,
@@ -434,6 +451,7 @@ final class SmartContextMenuItem {
     leading: leading,
     trailing: trailing,
     isDestructive: isDestructive,
+    tintColor: tintColor,
     isDisabled: isDisabled,
     hasDivider: hasDivider,
     customDivider: customDivider,

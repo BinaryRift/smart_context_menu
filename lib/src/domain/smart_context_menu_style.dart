@@ -93,7 +93,8 @@ final class SmartContextMenuStyle {
   ///
   /// Used for items without [SmartContextMenuItem.titleStyle] and for the
   /// back, retry and loading items. Its color is used only while an item is
-  /// enabled and not destructive, and also tints the press highlight. If the
+  /// enabled, not destructive and has no [SmartContextMenuItem.tintColor],
+  /// and also tints the press highlight. If the
   /// style has no color, [SmartContextMenuDefaults.textColor] is used.
   /// Defaults to [SmartContextMenuDefaults.textStyle].
   final TextStyle textStyle;
@@ -105,6 +106,7 @@ final class SmartContextMenuStyle {
 
   /// The title and press highlight color of a destructive item.
   ///
+  /// [SmartContextMenuItem.tintColor] takes precedence over it.
   /// Defaults to [SmartContextMenuDefaults.destructiveColor].
   final Color destructiveColor;
 
