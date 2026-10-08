@@ -37,7 +37,9 @@ abstract final class SmartContextMenuDefaults {
 
   // Loading
 
-  /// How long [SmartContextMenuItem.async] waits for its item.
+  /// How long [SmartContextMenuItem.async] waits for its item,
+  /// [SmartContextMenuItem.asyncSubmenu] for its items and
+  /// [SmartContextMenuItem.pagingSubmenu] for each page.
   static const Duration loadingTimeout = Duration(seconds: 10);
 
   // Radii
@@ -179,11 +181,7 @@ abstract final class SmartContextMenuDefaults {
       spreadRadius: -5,
     ),
     // Thin shadow for crisp edges.
-    BoxShadow(
-      color: Color(0x1F000000),
-      blurRadius: 10,
-      offset: Offset(0, 5),
-    ),
+    BoxShadow(color: Color(0x1F000000), blurRadius: 10, offset: Offset(0, 5)),
   ];
 
   // Text

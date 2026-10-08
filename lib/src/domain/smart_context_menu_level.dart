@@ -6,6 +6,9 @@ final class SmartMenuLevel {
   final SmartContextMenuSubmenuLoader? asyncLoader;
   final String? parentId;
   final SmartContextMenuPageLoader? pagingMethod;
+
+  /// How long a load of the items or of a page may take, if limited.
+  final Duration? loadingTimeout;
   SmartContextMenuPagingMetadata? nextMetadata;
   bool isLoading;
   bool isPaginating;
@@ -16,6 +19,7 @@ final class SmartMenuLevel {
     this.asyncLoader,
     this.parentId,
     this.pagingMethod,
+    this.loadingTimeout,
     this.nextMetadata,
     this.isLoading = false,
     this.isPaginating = false,

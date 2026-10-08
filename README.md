@@ -203,7 +203,8 @@ To turn the swipe off, set `enableSwipeBack: false` in `SmartContextMenuConfig`.
 #### Async submenu
 
 The items are loaded when the submenu opens and cached until the menu closes.
-If loading fails, the submenu shows a retry item.
+If loading fails or takes longer than `timeout` (10 seconds by default), the submenu
+shows a retry item.
 
 ```dart
 SmartContextMenuItem.asyncSubmenu(
@@ -225,7 +226,8 @@ SmartContextMenuItem.asyncSubmenu(
 
 The first page is loaded with `initialMetadata`. The last item of each page carries
 the metadata of the next page in `pagingMetadata`; the next page is loaded when the
-user scrolls to the end. Leave it `null` on the last page.
+user scrolls to the end. Leave it `null` on the last page. If a page fails to load or
+takes longer than `timeout` (10 seconds by default), the submenu shows a retry item.
 
 ```dart
 SmartContextMenuItem.pagingSubmenu(
@@ -251,8 +253,9 @@ SmartContextMenuItem.pagingSubmenu(
 
 #### Async item
 
-The placeholder loads its item as soon as it appears. Loading and error views can be
-replaced; if a builder is not set, the default view is used.
+The placeholder loads its item as soon as it appears. If loading fails or takes longer
+than `timeout` (10 seconds by default), it turns into a retry item. Loading and error
+views can be replaced; if a builder is not set, the default view is used.
 
 ```dart
 SmartContextMenuItem.async(

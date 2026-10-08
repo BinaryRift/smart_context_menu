@@ -129,13 +129,11 @@ final class SmartContextMenuItem {
   /// Set by [SmartContextMenuItem.separator].
   final bool isSeparator;
 
-
   /// Whether the menu closes when the item is tapped.
   ///
   /// The menu starts closing before [onTap] is called.
   /// Ignored for items that open a submenu. Defaults to true.
   final bool closeOnTap;
-
 
   /// Called when the item is tapped.
   ///
@@ -157,9 +155,11 @@ final class SmartContextMenuItem {
   /// Set by [SmartContextMenuItem.async].
   final SmartContextMenuItemLoader? asyncItem;
 
-  /// How long [asyncItem] may take before loading fails.
+  /// How long loading may take before it fails: the item of [asyncItem],
+  /// the items of [asyncChildren] or each page of [asyncPagingChildren].
   ///
-  /// Set by [SmartContextMenuItem.async].
+  /// Set by [SmartContextMenuItem.async], [SmartContextMenuItem.asyncSubmenu]
+  /// and [SmartContextMenuItem.pagingSubmenu].
   final Duration? loadingTimeout;
 
   /// Loads one page of the submenu opened by this item.
@@ -311,8 +311,11 @@ final class SmartContextMenuItem {
   /// [asyncChildren].
   ///
   /// [asyncChildren] is called when the item is tapped. Until it completes,
-  /// the submenu shows an activity indicator; if it fails, a retry item.
-  /// The loaded items are cached by [id] until the menu closes.
+  /// the submenu shows an activity indicator; if it fails or takes longer
+  /// than [timeout], a retry item. The loaded items are cached by [id] until
+  /// the menu closes.
+  ///
+  /// [timeout] defaults to [SmartContextMenuDefaults.loadingTimeout].
   ///
   /// ```dart
   /// SmartContextMenuItem.asyncSubmenu(
@@ -329,6 +332,7 @@ final class SmartContextMenuItem {
   /// ```
   factory SmartContextMenuItem.asyncSubmenu({
     required SmartContextMenuSubmenuLoader asyncChildren,
+    Duration timeout = SmartContextMenuDefaults.loadingTimeout,
     String? id,
     String? title,
     TextStyle? titleStyle,
@@ -350,6 +354,7 @@ final class SmartContextMenuItem {
     tintColor: tintColor,
     isDisabled: isDisabled,
     asyncChildren: asyncChildren,
+    loadingTimeout: timeout,
     customBuilder: customBuilder,
     padding: padding,
     childrenGap: childrenGap,
@@ -363,8 +368,11 @@ final class SmartContextMenuItem {
   /// scrolls to the end of the submenu. A page that is empty or whose last
   /// item has no metadata is the last one.
   ///
-  /// If a page fails to load, the submenu shows a retry item.
-  /// The loaded pages are cached by [id] until the menu closes.
+  /// If a page fails to load or takes longer than [timeout], the submenu
+  /// shows a retry item. The loaded pages are cached by [id] until the menu
+  /// closes.
+  ///
+  /// [timeout] defaults to [SmartContextMenuDefaults.loadingTimeout].
   ///
   /// ```dart
   /// SmartContextMenuItem.pagingSubmenu(
@@ -391,6 +399,7 @@ final class SmartContextMenuItem {
   factory SmartContextMenuItem.pagingSubmenu({
     required SmartContextMenuPageLoader asyncPagingChildren,
     required SmartContextMenuPagingMetadata initialMetadata,
+    Duration timeout = SmartContextMenuDefaults.loadingTimeout,
     String? id,
     String? title,
     TextStyle? titleStyle,
@@ -407,6 +416,7 @@ final class SmartContextMenuItem {
     title: title,
     asyncPagingChildren: asyncPagingChildren,
     pagingMetadata: initialMetadata,
+    loadingTimeout: timeout,
     titleStyle: titleStyle,
     leading: leading,
     trailing: trailing,
@@ -423,7 +433,7 @@ final class SmartContextMenuItem {
   /// A separator has no actions and no press highlight, and drag-to-select
   /// passes over it. By default it is a band of
   /// [SmartContextMenuStyle.separatorHeight] in
-  /// [SmartContextMenuStyle.separatorColor]; 
+  /// [SmartContextMenuStyle.separatorColor];
   /// [child] replaces the band, for example with a section title.
   ///
   /// A separator at the start or the end of a menu level is not shown, and

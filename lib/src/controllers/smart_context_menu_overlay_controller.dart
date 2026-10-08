@@ -49,6 +49,7 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
     SmartContextMenuPageLoader? pagingMethod,
     SmartContextMenuSubmenuLoader? asyncLoader,
     SmartContextMenuPagingMetadata? initialMetadata,
+    Duration? loadingTimeout,
     bool loading = false,
   }) {
     _isForward = true;
@@ -56,6 +57,7 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
       items: items,
       asyncLoader: asyncLoader,
       pagingMethod: pagingMethod,
+      loadingTimeout: loadingTimeout,
       nextMetadata: initialMetadata,
       parentId: parentId,
       isLoading: loading,
@@ -108,7 +110,7 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
 
   Future<void> _handleAsyncSubmenu(SmartContextMenuItem item) async {
     if (_tryRestoreSubmenuFromCache(item)) return;
-    final task = item.asyncChildren?.call();
+    final task = item.asyncChildren?.call()._limit(item.loadingTimeout);
     if (task == null) return;
 
     final level = _pushSubmenuLevel(
@@ -116,12 +118,17 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
       loading: true,
       parentId: item.id,
       asyncLoader: item.asyncChildren,
+      loadingTimeout: item.loadingTimeout,
     );
 
-    await _runAsyncLoad(task, level, onData: (results) {
-      _cache.submenus[item.id] = results;
-      level.items.addAll(results);
-    });
+    await _runAsyncLoad(
+      task,
+      level,
+      onData: (results) {
+        _cache.submenus[item.id] = results;
+        level.items.addAll(results);
+      },
+    );
   }
 
   Future<void> _handleAsyncPagingStart(SmartContextMenuItem item) async {
@@ -130,7 +137,7 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
     final loader = item.asyncPagingChildren;
     final metadata = item.pagingMetadata;
     if (loader == null || metadata == null) return;
-    final task = loader(metadata);
+    final task = loader(metadata)._limit(item.loadingTimeout);
 
     final level = _pushSubmenuLevel(
       items: [],
@@ -138,15 +145,22 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
       parentId: item.id,
       pagingMethod: loader,
       initialMetadata: metadata,
+      loadingTimeout: item.loadingTimeout,
     );
 
-    await _runAsyncLoad(task, level, onData: (results) {
-      final nextMeta = results.isNotEmpty ? results.last.pagingMetadata : null;
-      _cache.paging[item.id] = (List.from(results), nextMeta);
+    await _runAsyncLoad(
+      task,
+      level,
+      onData: (results) {
+        final nextMeta = results.isNotEmpty
+            ? results.last.pagingMetadata
+            : null;
+        _cache.paging[item.id] = (List.from(results), nextMeta);
 
-      level.items.addAll(results);
-      level.nextMetadata = nextMeta;
-    });
+        level.items.addAll(results);
+        level.nextMetadata = nextMeta;
+      },
+    );
   }
 
   Future<void> _runAsyncLoad(
@@ -194,7 +208,8 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
     final List<SmartContextMenuItem> targetList = level.items;
 
     try {
-      final newItems = await pagingMethod(metadata);
+      final timeout = level.loadingTimeout;
+      final newItems = await pagingMethod(metadata)._limit(timeout);
 
       _processPaginationResult(level, targetList, newItems);
     } catch (e) {
@@ -208,8 +223,9 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
     List<SmartContextMenuItem> newItems,
   ) {
     if (hasListeners && level.items == targetList) {
-      final nextMeta =
-          newItems.isNotEmpty ? newItems.last.pagingMetadata : null;
+      final nextMeta = newItems.isNotEmpty
+          ? newItems.last.pagingMetadata
+          : null;
       level.items.addAll(newItems);
       level.nextMetadata = nextMeta;
       level.isPaginating = false;
@@ -227,8 +243,9 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
     if (parentId != null) {
       final currentCached = _cache.paging[parentId] ?? ([], null);
       final updatedList = [...currentCached.$1, ...newItems];
-      final nextMeta =
-          newItems.isNotEmpty ? newItems.last.pagingMetadata : null;
+      final nextMeta = newItems.isNotEmpty
+          ? newItems.last.pagingMetadata
+          : null;
       _cache.paging[parentId] = (updatedList, nextMeta);
     }
   }
@@ -254,6 +271,7 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
         items: List.from(items),
         pagingMethod: item.asyncPagingChildren,
         initialMetadata: meta,
+        loadingTimeout: item.loadingTimeout,
         parentId: id,
       );
       return true;
@@ -280,17 +298,28 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
     if (!hasListeners) return;
 
     // Paging levels retry through [handlePagination].
-    final task = level.asyncLoader?.call();
+    final task = level.asyncLoader?.call()._limit(level.loadingTimeout);
     if (task == null) return;
 
     level.isLoading = true;
     notifyListeners();
 
-    await _runAsyncLoad(task, level, onData: (results) {
-      if (level.parentId != null) {
-        _cache.submenus[level.parentId!] = results;
-      }
-      level.items.addAll(results);
-    });
+    await _runAsyncLoad(
+      task,
+      level,
+      onData: (results) {
+        if (level.parentId != null) {
+          _cache.submenus[level.parentId!] = results;
+        }
+        level.items.addAll(results);
+      },
+    );
   }
+}
+
+extension<T> on Future<T> {
+  /// Fails with a `TimeoutException` if the future takes longer
+  /// than [timeout].
+  Future<T> _limit(Duration? timeout) =>
+      timeout == null ? this : this.timeout(timeout);
 }
