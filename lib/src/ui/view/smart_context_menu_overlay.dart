@@ -7,7 +7,7 @@ import '../../core/ui/motion/tokens/motion_curves.dart';
 import '../../domain/smart_context_menu_config.dart';
 import '../../domain/smart_context_menu_header_details.dart';
 import '../../domain/smart_context_menu_item.dart';
-import '../components/preview_sliver_delegate.dart';
+import '../components/fixed_extent_header_delegate.dart';
 import '../components/smart_menu_reactive_physics.dart';
 import '../extensions/render_object_ext.dart';
 import '../layout/smart_context_menu_horizontal_layout.dart';
@@ -134,6 +134,9 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
     final double topSafe = media.padding.top + _config.screenPadding.top;
     final double bottomSafe =
         media.padding.bottom + _config.screenPadding.bottom;
+    // Pinned header slivers pin below this space, not under the status bar.
+    final double statusBarHeight =
+        widget.headerSliversBuilder == null ? 0 : media.padding.top;
 
     _verticalLayout.setBounds(
       screenHeight: screenHeight,
@@ -148,6 +151,15 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
         parent: const BouncingScrollPhysics(),
       ),
       slivers: [
+        if (statusBarHeight > 0)
+          SliverPersistentHeader(
+            pinned: true,
+            delegate: FixedExtentHeaderDelegate(
+              height: statusBarHeight,
+              child: const SizedBox.shrink(),
+            ),
+          ),
+
         AnimatedBuilder(
           animation: _currentMenuHeight,
           builder: (context, child) {
@@ -156,7 +168,9 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
             }
 
             return SliverPadding(
-              padding: EdgeInsets.only(top: _verticalLayout.topPadding),
+              padding: EdgeInsets.only(
+                top: _verticalLayout.topPadding - statusBarHeight,
+              ),
             );
           },
         ),
@@ -165,7 +179,7 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
 
         SliverPersistentHeader(
           pinned: false,
-          delegate: PreviewSliverDelegate(
+          delegate: FixedExtentHeaderDelegate(
             height: widget.anchorRect.height,
             child: SmartContextMenuPreview(
               snapshot: widget.snapshot,

@@ -124,25 +124,19 @@ The fade stays on top of your animation; set `fadeHeaderSlivers: false` to anima
 the slivers only your way.
 
 The slivers are direct children of the scroll view of the menu, so a `PinnedHeaderSliver`
-stays at the top while a tall widget and the menu scroll under it. It covers them there,
-so keep it small. It pins to the top edge of the screen, under the status bar, so add
-the top padding yourself:
+stays at the top, right below the status bar, while a tall widget and the menu scroll
+under it. It covers them there, so keep it small:
 
 ```dart
 headerSliversBuilder: (context, header) => [
   PinnedHeaderSliver(
-    child: Padding(
-      padding: EdgeInsets.only(top: MediaQuery.paddingOf(context).top),
-      child: Align(
-        alignment: header.alignment,
-        child: ReactionsBar(onSelected: react),
-      ),
+    child: Align(
+      alignment: header.alignment,
+      child: ReactionsBar(onSelected: react),
     ),
   ),
 ],
 ```
-
-The padding is there while the sliver is not pinned too, as space above it.
 
 ### Positioning
 

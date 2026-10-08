@@ -289,13 +289,7 @@ final class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
 
       return [
         if (_pinHeader)
-          // Pins under the status bar, so the padding keeps it below.
-          PinnedHeaderSliver(
-            child: Padding(
-              padding: EdgeInsets.only(top: MediaQuery.paddingOf(context).top),
-              child: reactions,
-            ),
-          )
+          PinnedHeaderSliver(child: reactions)
         else
           SliverToBoxAdapter(child: reactions),
         if (_header == _Header.tall)

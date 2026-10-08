@@ -1,11 +1,11 @@
 import 'package:flutter/widgets.dart';
 
-/// Lays out the preview as a sliver of a fixed [height].
-final class PreviewSliverDelegate extends SliverPersistentHeaderDelegate {
+/// Lays out [child] as a persistent header of a fixed [height].
+final class FixedExtentHeaderDelegate extends SliverPersistentHeaderDelegate {
   final double height;
   final Widget child;
 
-  PreviewSliverDelegate({required this.height, required this.child});
+  FixedExtentHeaderDelegate({required this.height, required this.child});
 
   @override
   double get minExtent => height;
@@ -23,7 +23,7 @@ final class PreviewSliverDelegate extends SliverPersistentHeaderDelegate {
   }
 
   @override
-  bool shouldRebuild(PreviewSliverDelegate oldDelegate) {
+  bool shouldRebuild(FixedExtentHeaderDelegate oldDelegate) {
     return oldDelegate.height != height || oldDelegate.child != child;
   }
 }
