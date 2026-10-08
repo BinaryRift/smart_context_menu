@@ -218,9 +218,12 @@ const menuConfig = SmartContextMenuConfig(
     menuBlur: SmartContextMenuBlur.small,
     backgroundBlur: SmartContextMenuBlur(10),
     borderRadius: BorderRadius.all(Radius.circular(20)),
+    menuShadows: [BoxShadow(color: Color(0x33000000), blurRadius: 20)],
   ),
 );
 ```
+
+`menuShadows` replaces the default shadows under the menu; pass an empty list to remove them.
 
 `SmartContextMenuStyle` also sets the text, colors, icons and spacing of items, so the menu
 can match the app theme:

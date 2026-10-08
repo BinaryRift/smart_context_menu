@@ -101,6 +101,7 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
       onSizeChanged: _onSizeChanged,
       child: SmartContextMenuShadowBox(
         borderRadius: _config.style.borderRadius,
+        shadows: _config.style.menuShadows,
         child: SmartContextMenuBlurBox(
           blur: _config.style.menuBlur,
           borderRadius: _config.style.borderRadius,

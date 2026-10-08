@@ -11,6 +11,7 @@ void main() {
       borderRadius: BorderRadius.all(Radius.circular(1)),
       menuDecoration: BoxDecoration(color: Color(0xFF000003)),
       menuBlur: SmartContextMenuBlur(1),
+      menuShadows: [BoxShadow(blurRadius: 1)],
       backgroundColor: Color(0xFF000004),
       backgroundBlur: SmartContextMenuBlur(2),
       backButtonBlur: SmartContextMenuBlur(3),
@@ -36,6 +37,7 @@ void main() {
       'borderRadius': (s) => s.borderRadius,
       'menuDecoration': (s) => s.menuDecoration,
       'menuBlur': (s) => s.menuBlur,
+      'menuShadows': (s) => s.menuShadows,
       'backgroundColor': (s) => s.backgroundColor,
       'backgroundBlur': (s) => s.backgroundBlur,
       'backButtonBlur': (s) => s.backButtonBlur,
@@ -69,6 +71,10 @@ void main() {
         () => original.copyWith(menuDecoration: decoration),
       ),
       'menuBlur': (blur, () => original.copyWith(menuBlur: blur)),
+      'menuShadows': (
+        const <BoxShadow>[],
+        () => original.copyWith(menuShadows: const []),
+      ),
       'backgroundColor': (
         color,
         () => original.copyWith(backgroundColor: color),

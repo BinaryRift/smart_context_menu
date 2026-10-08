@@ -5,8 +5,8 @@ import 'package:flutter/cupertino.dart';
 ///
 /// Most of them are defaults of [SmartContextMenuConfig],
 /// [SmartContextMenuStyle] and [SmartContextMenuItem] fields. The rest, such
-/// as [menuShadows], [errorIcon] and the opacities, are fixed. All are
-/// public, so custom content, for example from [SmartContextMenuItem.customBuilder], can match
+/// as [errorIcon] and the opacities, are fixed. All are public, so custom
+/// content, for example from [SmartContextMenuItem.customBuilder], can match
 /// the default look.
 ///
 /// Colors are [CupertinoDynamicColor]s with light and dark variants.
@@ -152,7 +152,8 @@ abstract final class SmartContextMenuDefaults {
 
   // Shadows
 
-  /// The shadow under the menu.
+  /// The shadow under the menu, the default of
+  /// [SmartContextMenuStyle.menuShadows].
   static const List<BoxShadow> menuShadows = [
     // Main soft shadow.
     BoxShadow(

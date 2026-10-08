@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart'
     show
         BorderRadiusGeometry,
+        BoxShadow,
         Color,
         Decoration,
         EdgeInsets,
@@ -44,7 +45,7 @@ final class SmartContextMenuStyle {
 
   /// The corner radius of the menu.
   ///
-  /// Applied to the default decoration, the shadow and [menuBlur].
+  /// Applied to the default decoration, [menuShadows] and [menuBlur].
   /// Defaults to [SmartContextMenuDefaults.borderRadius].
   final BorderRadiusGeometry borderRadius;
 
@@ -60,6 +61,12 @@ final class SmartContextMenuStyle {
   /// If null, which is the default, the content behind the menu is not
   /// blurred.
   final SmartContextMenuBlur? menuBlur;
+
+  /// The shadows under the menu.
+  ///
+  /// Drawn with a custom [menuDecoration] too. Pass an empty list to remove
+  /// them. Defaults to [SmartContextMenuDefaults.menuShadows].
+  final List<BoxShadow> menuShadows;
 
   // Background
 
@@ -182,6 +189,7 @@ final class SmartContextMenuStyle {
     this.borderRadius = SmartContextMenuDefaults.borderRadius,
     this.menuDecoration,
     this.menuBlur,
+    this.menuShadows = SmartContextMenuDefaults.menuShadows,
     this.backgroundColor = SmartContextMenuDefaults.backgroundColor,
     this.backgroundBlur = SmartContextMenuBlur.medium,
     this.backButtonBlur = SmartContextMenuBlur.strong,
@@ -212,6 +220,7 @@ final class SmartContextMenuStyle {
     BorderRadiusGeometry? borderRadius,
     Decoration? menuDecoration,
     SmartContextMenuBlur? menuBlur,
+    List<BoxShadow>? menuShadows,
     Color? backgroundColor,
     SmartContextMenuBlur? backgroundBlur,
     SmartContextMenuBlur? backButtonBlur,
@@ -236,6 +245,7 @@ final class SmartContextMenuStyle {
       borderRadius: borderRadius ?? this.borderRadius,
       menuDecoration: menuDecoration ?? this.menuDecoration,
       menuBlur: menuBlur ?? this.menuBlur,
+      menuShadows: menuShadows ?? this.menuShadows,
       backgroundColor: backgroundColor ?? this.backgroundColor,
       backgroundBlur: backgroundBlur ?? this.backgroundBlur,
       backButtonBlur: backButtonBlur ?? this.backButtonBlur,
