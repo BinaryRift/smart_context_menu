@@ -11,8 +11,8 @@ topics:
   - cupertino
 
 environment:
-  sdk: ^3.12.2
-  flutter: ">=1.17.0"
+  sdk: ^3.8.0
+  flutter: ">=3.32.0"
 
 dependencies:
   flutter:
@@ -23,3 +23,5 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  # The version is pinned by flutter_test.
+  leak_tracker_flutter_testing: any

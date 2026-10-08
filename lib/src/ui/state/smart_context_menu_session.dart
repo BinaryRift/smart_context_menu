@@ -1,5 +1,5 @@
 import 'dart:ui' as ui;
-import 'package:flutter/widgets.dart' show NavigatorState;
+import 'package:flutter/widgets.dart' show NavigatorState, RawImage;
 import '../routes/smart_context_menu_route.dart';
 
 enum _SmartContextMenuLifecycleState { idle, opening, open, closing }
@@ -39,7 +39,10 @@ final class SmartContextMenuSession {
     _sessionFuture = future;
   }
 
+  /// Takes ownership of [snapshot]: it is disposed when the session ends.
+  /// [RawImage] keeps its own clone, so the preview stays valid.
   void setSnapshot(ui.Image snapshot) {
+    _snapshot?.dispose();
     _snapshot = snapshot;
   }
 
@@ -97,6 +100,7 @@ final class SmartContextMenuSession {
     _activeRoute = null;
     _activeNavigator = null;
     _activeSessionId = null;
+    _snapshot?.dispose();
     _snapshot = null;
     _sessionFuture = null;
     _lifecycleState = _SmartContextMenuLifecycleState.idle;

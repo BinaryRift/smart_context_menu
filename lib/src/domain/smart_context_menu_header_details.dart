@@ -64,8 +64,8 @@ final class SmartContextMenuHeaderDetails {
   const SmartContextMenuHeaderDetails({
     required this.alignment,
     required this.animation,
-    required this._close,
-  });
+    required Future<void> Function() close,
+  }) : _close = close;
 
   /// Closes the menu.
   ///

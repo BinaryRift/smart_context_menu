@@ -25,6 +25,8 @@ drag-to-select and rich submenus.
 
 ## Getting started
 
+Requires Flutter 3.32 or later (Dart 3.8).
+
 ```sh
 flutter pub add smart_context_menu
 ```

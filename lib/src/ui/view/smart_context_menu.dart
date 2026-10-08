@@ -176,6 +176,9 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
 
   @override
   Widget build(BuildContext context) {
+    // Validated in build, where the framework reports an error
+    // and keeps the element tree consistent.
+    _debugValidateConfiguration();
     return SmartContextMenuPressDetector(
       enabled: _hasInternalActivation && _items.isNotEmpty,
       isMenuActive: _session.hasActiveSession,
@@ -194,7 +197,6 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
 
   void _resolveConfig() {
     _config = widget.config ?? SmartContextMenuTheme.of(context);
-    _debugValidateConfiguration();
   }
 
   void _bindController() {
@@ -241,6 +243,7 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
     final image = await _captureSnapshot();
     if (!_session.canContinueOpening(sessionId, mounted: mounted) ||
         image == null) {
+      image?.dispose();
       _finishSession(sessionId);
       return;
     }

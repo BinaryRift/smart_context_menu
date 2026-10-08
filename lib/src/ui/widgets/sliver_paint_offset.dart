@@ -33,7 +33,7 @@ final class SliverPaintOffset extends SingleChildRenderObjectWidget {
 final class RenderSliverPaintOffset extends RenderProxySliver {
   Offset _offset;
 
-  RenderSliverPaintOffset({required this._offset});
+  RenderSliverPaintOffset({required Offset offset}) : _offset = offset;
 
   Offset get offset => _offset;
 
@@ -50,7 +50,7 @@ final class RenderSliverPaintOffset extends RenderProxySliver {
 
   @override
   void applyPaintTransform(RenderObject child, Matrix4 transform) {
-    transform.translateByDouble(_offset.dx, _offset.dy, 0, 1);
+    transform.multiply(Matrix4.translationValues(_offset.dx, _offset.dy, 0));
   }
 
   @override
