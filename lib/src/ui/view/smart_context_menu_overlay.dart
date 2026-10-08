@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show HapticFeedback;
 import '../../core/ui/gestures/gesture_thresholds.dart';
 import '../../core/ui/motion/tokens/motion_curves.dart';
+import '../../core/ui/motion/tokens/motion_timing.dart';
 import '../../domain/smart_context_menu_config.dart';
 import '../../domain/smart_context_menu_header_details.dart';
 import '../../domain/smart_context_menu_item.dart';
@@ -364,7 +365,9 @@ final class _SmartContextMenuOverlayState
       if (route == null || !route.isCurrent) return;
 
       Navigator.of(context).pop();
-      await Future<void>.delayed(route.transitionDuration * 0.5);
+      await Future<void>.delayed(
+        route.transitionDuration * MotionTiming.closingAction,
+      );
     }();
   }
 }

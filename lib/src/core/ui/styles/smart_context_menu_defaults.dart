@@ -14,6 +14,12 @@ import 'package:flutter/cupertino.dart';
 abstract final class SmartContextMenuDefaults {
   // Layout
 
+  /// The default of [SmartContextMenuConfig.menuWidth].
+  static const double menuWidth = 280;
+
+  /// The default of [SmartContextMenuConfig.menuHeightFactor].
+  static const double menuHeightFactor = 0.6;
+
   /// The default of [SmartContextMenuConfig.screenPadding].
   static const EdgeInsets screenPadding = EdgeInsets.all(16);
 
@@ -32,6 +38,9 @@ abstract final class SmartContextMenuDefaults {
   /// The default of [SmartContextMenuStyle.loaderVerticalPadding].
   static const double loaderVerticalPadding = 12;
 
+  /// The radius of the activity indicator of a loading submenu or page.
+  static const double loaderIndicatorRadius = 12;
+
   /// The default of [SmartContextMenuStyle.defaultIconSize].
   static const double iconSize = 20;
 
@@ -41,6 +50,9 @@ abstract final class SmartContextMenuDefaults {
   /// [SmartContextMenuItem.asyncSubmenu] for its items and
   /// [SmartContextMenuItem.pagingSubmenu] for each page.
   static const Duration loadingTimeout = Duration(seconds: 10);
+
+  /// The default of [SmartContextMenuPagingMetadata.limit].
+  static const int pageLimit = 20;
 
   // Radii
 

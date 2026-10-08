@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import '../../controllers/smart_context_menu_overlay_controller.dart';
 import '../../core/ui/motion/tokens/motion_durations.dart';
 import '../../core/ui/motion/transitions/tricky_transition.dart';
+import '../../core/ui/styles/smart_context_menu_defaults.dart';
 import '../../domain/smart_context_menu_config.dart';
 import '../../domain/smart_context_menu_item.dart';
 import '../../domain/smart_context_menu_level.dart';
@@ -57,7 +58,7 @@ final class SmartContextMenuLevelView extends StatelessWidget {
         ),
         if (hasBack)
           Positioned(
-            top: -0.5,
+            top: -SmartContextMenuDefaults.dividerThickness,
             left: 0,
             right: 0,
             child: SmartContextMenuBackItem(
@@ -162,7 +163,11 @@ final class SmartContextMenuLevelView extends StatelessWidget {
       padding: EdgeInsets.symmetric(
         vertical: config.style.loaderVerticalPadding,
       ),
-      child: const Center(child: CupertinoActivityIndicator(radius: 12)),
+      child: const Center(
+        child: CupertinoActivityIndicator(
+          radius: SmartContextMenuDefaults.loaderIndicatorRadius,
+        ),
+      ),
     );
   }
 

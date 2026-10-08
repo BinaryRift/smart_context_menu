@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart' show immutable;
 
+import '../core/ui/styles/smart_context_menu_defaults.dart';
+
 /// Describes a page of a [SmartContextMenuItem.pagingSubmenu].
 ///
 /// The menu does not interpret the fields: it passes the metadata to the
@@ -21,7 +23,7 @@ final class SmartContextMenuPagingMetadata {
 
   /// The maximum number of items on a page.
   ///
-  /// Defaults to 20.
+  /// Defaults to [SmartContextMenuDefaults.pageLimit].
   final int limit;
 
   /// The cursor of the page to load, for cursor-based APIs.
@@ -35,7 +37,7 @@ final class SmartContextMenuPagingMetadata {
   /// Creates paging metadata.
   const SmartContextMenuPagingMetadata({
     this.page = 1,
-    this.limit = 20,
+    this.limit = SmartContextMenuDefaults.pageLimit,
     this.nextCursor,
     this.extra = const {},
   });

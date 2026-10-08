@@ -58,12 +58,13 @@ final class SmartContextMenuConfig {
   /// The width of the menu.
   ///
   /// On a screen narrower than the width with [screenPadding], the menu
-  /// gets narrower. Defaults to 280.
+  /// gets narrower. Defaults to [SmartContextMenuDefaults.menuWidth].
   final double menuWidth;
 
   /// The maximum height of the menu as a fraction of the screen height.
   ///
-  /// Items that do not fit are scrolled. Defaults to 0.6.
+  /// Items that do not fit are scrolled.
+  /// Defaults to [SmartContextMenuDefaults.menuHeightFactor].
   final double menuHeightFactor;
 
   /// The minimum distance between the menu and the screen edges.
@@ -100,8 +101,8 @@ final class SmartContextMenuConfig {
     this.enableSwipeBack = true,
     this.barrierDismissible = true,
     this.activationMode = SmartContextMenuActivationMode.longPress,
-    this.menuWidth = 280,
-    this.menuHeightFactor = 0.6,
+    this.menuWidth = SmartContextMenuDefaults.menuWidth,
+    this.menuHeightFactor = SmartContextMenuDefaults.menuHeightFactor,
     this.screenPadding = SmartContextMenuDefaults.screenPadding,
     this.menuGap = SmartContextMenuDefaults.menuGap,
     this.moveBackDown = false,

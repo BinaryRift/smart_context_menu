@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/ui/motion/tokens/motion_curves.dart';
 import '../../core/ui/motion/tokens/motion_durations.dart';
+import '../../core/ui/motion/tokens/motion_timing.dart';
 import '../../core/ui/motion/tokens/motion_translation.dart';
 import '../../controllers/smart_context_menu_overlay_controller.dart';
 import '../../domain/smart_context_menu_level.dart';
@@ -87,7 +88,7 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
     if (!mounted || route == null) return;
 
     if (Navigator.of(context).canPop()) {
-      final delay = route.transitionDuration * 0.5;
+      final delay = route.transitionDuration * MotionTiming.closingAction;
       Navigator.of(context).pop();
       await Future.delayed(delay);
     }
