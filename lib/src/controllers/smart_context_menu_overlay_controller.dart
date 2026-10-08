@@ -50,6 +50,7 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
     SmartContextMenuSubmenuLoader? asyncLoader,
     SmartContextMenuPagingMetadata? initialMetadata,
     Duration? loadingTimeout,
+    SmartContextMenuItem? loadingItem,
     bool loading = false,
   }) {
     _isForward = true;
@@ -58,6 +59,7 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
       asyncLoader: asyncLoader,
       pagingMethod: pagingMethod,
       loadingTimeout: loadingTimeout,
+      loadingItem: loadingItem,
       nextMetadata: initialMetadata,
       parentId: parentId,
       isLoading: loading,
@@ -119,6 +121,7 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
       parentId: item.id,
       asyncLoader: item.asyncChildren,
       loadingTimeout: item.loadingTimeout,
+      loadingItem: item.loadingItem,
     );
 
     await _runAsyncLoad(
@@ -146,6 +149,7 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
       pagingMethod: loader,
       initialMetadata: metadata,
       loadingTimeout: item.loadingTimeout,
+      loadingItem: item.loadingItem,
     );
 
     await _runAsyncLoad(
@@ -272,6 +276,7 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
         pagingMethod: item.asyncPagingChildren,
         initialMetadata: meta,
         loadingTimeout: item.loadingTimeout,
+        loadingItem: item.loadingItem,
         parentId: id,
       );
       return true;

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart' show CupertinoActivityIndicator;
 import 'package:flutter/widgets.dart';
 
 import '../../controllers/smart_context_menu_overlay_controller.dart';
@@ -10,7 +11,6 @@ import '../keys/service_item_key.dart';
 import '../state/smart_context_menu_hover_controller.dart';
 import '../widgets/smart_context_menu_back_item.dart';
 import '../widgets/smart_context_menu_divider.dart';
-import '../widgets/smart_context_menu_loader.dart';
 import '../widgets/smart_context_menu_pagination_trigger.dart';
 import '../widgets/smart_context_menu_retry_item.dart';
 import 'smart_context_menu_item_view.dart';
@@ -92,10 +92,7 @@ final class SmartContextMenuLevelView extends StatelessWidget {
     final bool isTransitionState;
 
     if (level.isLoading && itemsCount == 0) {
-      child = SmartContextMenuLoader(
-        key: ServiceItemKey.loader,
-        verticalPadding: config.style.loaderVerticalPadding,
-      );
+      child = _buildLoadingRow();
       isTransitionState = true;
     } else if (hasError && relativeIndex == itemsCount) {
       child = SmartContextMenuRetryItem(
@@ -108,7 +105,7 @@ final class SmartContextMenuLevelView extends StatelessWidget {
       child = SmartContextMenuPaginationTrigger(
         key: ServiceItemKey.pagingTrigger(itemsCount),
         onVisible: () => controller.handlePagination(level),
-        loaderVerticalPadding: config.style.loaderVerticalPadding,
+        child: _buildPageLoadingRow(),
       );
       isTransitionState = true;
     } else {
@@ -129,6 +126,45 @@ final class SmartContextMenuLevelView extends StatelessWidget {
   // page.
   static Widget _transitionBuilder(Widget child, Animation<double> animation) {
     return TrickyTransition(animation: animation, child: child);
+  }
+
+  Widget _buildLoadingRow() {
+    return SmartContextMenuItemView(
+      key: ServiceItemKey.loader,
+      item: level.loadingItem ?? _defaultLoadingItem(),
+      config: config,
+      hoverController: hoverController,
+    );
+  }
+
+  // A loading item of the app is a row of the list, so it is divided from
+  // the items above as they are from each other.
+  Widget _buildPageLoadingRow() {
+    final row = _buildLoadingRow();
+    final items = level.items;
+    if (level.loadingItem == null ||
+        !config.style.dividersBetweenItems ||
+        items.isEmpty ||
+        items.last.isSeparator) {
+      return row;
+    }
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SmartContextMenuDivider(style: config.style),
+        row,
+      ],
+    );
+  }
+
+  SmartContextMenuItem _defaultLoadingItem() {
+    return SmartContextMenuItem.loading(
+      padding: EdgeInsets.symmetric(
+        vertical: config.style.loaderVerticalPadding,
+      ),
+      loadingBuilder: (context, state) =>
+          const Center(child: CupertinoActivityIndicator(radius: 12)),
+    );
   }
 
   Widget _buildMenuItem(int relativeIndex, int itemsCount) {

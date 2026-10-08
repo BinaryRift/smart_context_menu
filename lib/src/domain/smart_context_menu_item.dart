@@ -73,6 +73,8 @@ typedef SmartContextMenuItemBuilder =
 final class SmartContextMenuItem {
   static int _nextId = 0;
   static String _generateId() => "smart_context_menu_item_${_nextId++}";
+  static const String _loadingMustBeLoadingItem =
+      'loading must be a SmartContextMenuItem.loading.';
 
   /// Identifies the item within the menu.
   ///
@@ -170,9 +172,13 @@ final class SmartContextMenuItem {
   /// Set by [SmartContextMenuItem.async].
   final SmartContextMenuItemLoader? asyncItem;
 
-  /// The item shown while [asyncItem] is loading.
+  /// The item shown while [asyncItem], the items of [asyncChildren] or
+  /// a page of [asyncPagingChildren] are loading.
   ///
-  /// Set by [SmartContextMenuItem.async].
+  /// Set by [SmartContextMenuItem.async], [SmartContextMenuItem.asyncSubmenu]
+  /// and [SmartContextMenuItem.pagingSubmenu]. If null in a submenu, it shows
+  /// an activity indicator in the middle, see
+  /// [SmartContextMenuStyle.loaderVerticalPadding].
   final SmartContextMenuItem? loadingItem;
 
   /// Notifies when the item of [listenableBuilder] should be built again.
@@ -345,9 +351,10 @@ final class SmartContextMenuItem {
   /// [asyncChildren].
   ///
   /// [asyncChildren] is called when the item is tapped. Until it completes,
-  /// the submenu shows an activity indicator; if it fails or takes longer
-  /// than [timeout], a retry item. The loaded items are cached by [id] until
-  /// the menu closes.
+  /// the submenu shows [loading], a [SmartContextMenuItem.loading], or by
+  /// default an activity indicator in the middle; if it fails or takes
+  /// longer than [timeout], a retry item. The loaded items are cached by [id]
+  /// until the menu closes.
   ///
   /// [timeout] defaults to [SmartContextMenuDefaults.loadingTimeout].
   ///
@@ -367,6 +374,7 @@ final class SmartContextMenuItem {
   factory SmartContextMenuItem.asyncSubmenu({
     required SmartContextMenuSubmenuLoader asyncChildren,
     Duration timeout = SmartContextMenuDefaults.loadingTimeout,
+    SmartContextMenuItem? loading,
     String? id,
     String? title,
     TextStyle? titleStyle,
@@ -378,21 +386,25 @@ final class SmartContextMenuItem {
     SmartContextMenuItemBuilder? customBuilder,
     EdgeInsets? padding,
     double? childrenGap,
-  }) => SmartContextMenuItem._(
-    id: id ?? _generateId(),
-    title: title,
-    titleStyle: titleStyle,
-    leading: leading,
-    trailing: trailing,
-    isDestructive: isDestructive,
-    tintColor: tintColor,
-    isDisabled: isDisabled,
-    asyncChildren: asyncChildren,
-    loadingTimeout: timeout,
-    customBuilder: customBuilder,
-    padding: padding,
-    childrenGap: childrenGap,
-  );
+  }) {
+    assert(loading == null || loading.isLoading, _loadingMustBeLoadingItem);
+    return SmartContextMenuItem._(
+      id: id ?? _generateId(),
+      title: title,
+      titleStyle: titleStyle,
+      leading: leading,
+      trailing: trailing,
+      isDestructive: isDestructive,
+      tintColor: tintColor,
+      isDisabled: isDisabled,
+      asyncChildren: asyncChildren,
+      loadingTimeout: timeout,
+      customBuilder: customBuilder,
+      padding: padding,
+      childrenGap: childrenGap,
+      loadingItem: loading,
+    );
+  }
 
   /// Creates an item that opens a submenu with items loaded page by page.
   ///
@@ -400,7 +412,9 @@ final class SmartContextMenuItem {
   /// is tapped. The [SmartContextMenuItem.pagingMetadata] of the last item
   /// of each page describes the next page, which is loaded when the user
   /// scrolls to the end of the submenu. A page that is empty or whose last
-  /// item has no metadata is the last one.
+  /// item has no metadata is the last one. While a page loads, the submenu
+  /// shows [loading], a [SmartContextMenuItem.loading], or by default
+  /// an activity indicator in the middle, after the loaded items.
   ///
   /// If a page fails to load or takes longer than [timeout], the submenu
   /// shows a retry item. The loaded pages are cached by [id] until the menu
@@ -434,6 +448,7 @@ final class SmartContextMenuItem {
     required SmartContextMenuPageLoader asyncPagingChildren,
     required SmartContextMenuPagingMetadata initialMetadata,
     Duration timeout = SmartContextMenuDefaults.loadingTimeout,
+    SmartContextMenuItem? loading,
     String? id,
     String? title,
     TextStyle? titleStyle,
@@ -445,22 +460,26 @@ final class SmartContextMenuItem {
     SmartContextMenuItemBuilder? customBuilder,
     EdgeInsets? padding,
     double? childrenGap,
-  }) => SmartContextMenuItem._(
-    id: id ?? _generateId(),
-    title: title,
-    asyncPagingChildren: asyncPagingChildren,
-    pagingMetadata: initialMetadata,
-    loadingTimeout: timeout,
-    titleStyle: titleStyle,
-    leading: leading,
-    trailing: trailing,
-    isDestructive: isDestructive,
-    tintColor: tintColor,
-    isDisabled: isDisabled,
-    customBuilder: customBuilder,
-    padding: padding,
-    childrenGap: childrenGap,
-  );
+  }) {
+    assert(loading == null || loading.isLoading, _loadingMustBeLoadingItem);
+    return SmartContextMenuItem._(
+      id: id ?? _generateId(),
+      title: title,
+      asyncPagingChildren: asyncPagingChildren,
+      pagingMetadata: initialMetadata,
+      loadingTimeout: timeout,
+      titleStyle: titleStyle,
+      leading: leading,
+      trailing: trailing,
+      isDestructive: isDestructive,
+      tintColor: tintColor,
+      isDisabled: isDisabled,
+      customBuilder: customBuilder,
+      padding: padding,
+      childrenGap: childrenGap,
+      loadingItem: loading,
+    );
+  }
 
   /// Creates a separator between groups of items.
   ///
@@ -532,11 +551,7 @@ final class SmartContextMenuItem {
     SmartContextMenuItem? loading,
     SmartContextMenuItemBuilder? errorBuilder,
   }) {
-    assert(
-      loading == null || loading.isLoading,
-      'The loading of SmartContextMenuItem.async must be '
-      'a SmartContextMenuItem.loading.',
-    );
+    assert(loading == null || loading.isLoading, _loadingMustBeLoadingItem);
     return SmartContextMenuItem._(
       id: id ?? _generateId(),
       asyncItem: asyncItem,

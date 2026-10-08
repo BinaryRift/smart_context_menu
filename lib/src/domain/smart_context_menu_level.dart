@@ -9,6 +9,9 @@ final class SmartMenuLevel {
 
   /// How long a load of the items or of a page may take, if limited.
   final Duration? loadingTimeout;
+
+  /// The item shown while the items or a page load, if not the default one.
+  final SmartContextMenuItem? loadingItem;
   SmartContextMenuPagingMetadata? nextMetadata;
   bool isLoading;
   bool isPaginating;
@@ -20,6 +23,7 @@ final class SmartMenuLevel {
     this.parentId,
     this.pagingMethod,
     this.loadingTimeout,
+    this.loadingItem,
     this.nextMetadata,
     this.isLoading = false,
     this.isPaginating = false,

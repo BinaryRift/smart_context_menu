@@ -40,6 +40,54 @@ void main() {
     expect(find.text('Loaded'), findsOneWidget);
   });
 
+  testWidgets('shows the loading item while the items load', (tester) async {
+    final completer = Completer<List<SmartContextMenuItem>>();
+
+    await tester.pumpMenu(
+      items: [
+        SmartContextMenuItem.asyncSubmenu(
+          title: 'More',
+          loading: SmartContextMenuItem.loading(title: 'Loading files'),
+          asyncChildren: () => completer.future,
+        ),
+      ],
+    );
+    await tester.openMenu();
+    await tester.tap(find.text('More'));
+    await tester.settleMenu();
+
+    expect(find.text('Loading files'), findsOneWidget);
+    expect(find.byType(CupertinoActivityIndicator), findsOneWidget);
+
+    completer.complete(_items(['Loaded']));
+    await tester.settleMenu();
+
+    expect(find.text('Loading files'), findsNothing);
+    expect(find.text('Loaded'), findsOneWidget);
+  });
+
+  testWidgets('shows the default loader without a title', (tester) async {
+    final completer = Completer<List<SmartContextMenuItem>>();
+
+    await tester.pumpMenu(
+      items: [
+        SmartContextMenuItem.asyncSubmenu(
+          title: 'More',
+          asyncChildren: () => completer.future,
+        ),
+      ],
+    );
+    await tester.openMenu();
+    await tester.tap(find.text('More'));
+    await tester.settleMenu();
+
+    expect(find.byType(CupertinoActivityIndicator), findsOneWidget);
+    expect(find.text(_labels.loading), findsNothing);
+
+    completer.complete([]);
+    await tester.settleMenu();
+  });
+
   testWidgets('animates the menu height when the items are loaded', (
     tester,
   ) async {
@@ -136,6 +184,89 @@ void main() {
     expect(pages, [1, 2]);
     expect(find.text('Page 2 B'), findsOneWidget);
     expect(find.byType(CupertinoActivityIndicator), findsNothing);
+  });
+
+  testWidgets('shows the loading item for the first and the next pages', (
+    tester,
+  ) async {
+    final nextPage = Completer<List<SmartContextMenuItem>>();
+    final firstPage = Completer<List<SmartContextMenuItem>>();
+
+    await tester.pumpMenu(
+      items: [
+        SmartContextMenuItem.pagingSubmenu(
+          title: 'More',
+          loading: SmartContextMenuItem.loading(title: 'Loading contacts'),
+          initialMetadata: const SmartContextMenuPagingMetadata(limit: 2),
+          asyncPagingChildren: (metadata) =>
+              metadata.page == 1 ? firstPage.future : nextPage.future,
+        ),
+      ],
+    );
+    await tester.openMenu();
+    await tester.tap(find.text('More'));
+    await tester.settleMenu();
+    expect(find.text('Loading contacts'), findsOneWidget);
+
+    firstPage.complete([
+      SmartContextMenuItem.simple(title: 'A'),
+      SmartContextMenuItem.simple(
+        title: 'B',
+        pagingMetadata: const SmartContextMenuPagingMetadata(page: 2, limit: 2),
+      ),
+    ]);
+    await tester.settleMenu();
+
+    expect(find.text('B'), findsOneWidget);
+    expect(find.text('Loading contacts'), findsOneWidget);
+    expect(
+      tester.getTopLeft(find.text('Loading contacts')).dy,
+      greaterThan(tester.getTopLeft(find.text('B')).dy),
+    );
+
+    nextPage.complete([]);
+    await tester.settleMenu();
+    expect(find.text('Loading contacts'), findsNothing);
+  });
+
+  testWidgets('keeps the loading item after leaving and reopening', (
+    tester,
+  ) async {
+    final nextPage = Completer<List<SmartContextMenuItem>>();
+
+    await tester.pumpMenu(
+      items: [
+        SmartContextMenuItem.pagingSubmenu(
+          title: 'More',
+          loading: SmartContextMenuItem.loading(title: 'Loading contacts'),
+          initialMetadata: const SmartContextMenuPagingMetadata(limit: 2),
+          asyncPagingChildren: (metadata) async {
+            if (metadata.page > 1) return nextPage.future;
+            return [
+              SmartContextMenuItem.simple(title: 'A'),
+              SmartContextMenuItem.simple(
+                title: 'B',
+                pagingMetadata: metadata.copyWith(page: 2),
+              ),
+            ];
+          },
+        ),
+      ],
+    );
+    await tester.openMenu();
+    await tester.tap(find.text('More'));
+    await tester.settleMenu();
+    await tester.tap(find.text(_labels.back).last);
+    await tester.settleMenu();
+
+    await tester.tap(find.text('More'));
+    await tester.settleMenu();
+
+    expect(find.text('B'), findsOneWidget);
+    expect(find.text('Loading contacts'), findsOneWidget);
+
+    nextPage.complete([]);
+    await tester.settleMenu();
   });
 
   testWidgets('loads the next page on scroll after leaving and reopening', (

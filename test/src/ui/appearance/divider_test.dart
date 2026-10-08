@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show Divider;
 import 'package:flutter_test/flutter_test.dart';
@@ -85,6 +87,65 @@ void main() {
     await tester.openMenu();
 
     expect(dividers, findsOneWidget);
+  });
+
+  group('before the loading row of the next page', () {
+    Future<Completer<List<SmartContextMenuItem>>> openPagingSubmenu(
+      WidgetTester tester, {
+      SmartContextMenuItem? loading,
+    }) async {
+      final nextPage = Completer<List<SmartContextMenuItem>>();
+      await tester.pumpMenu(
+        config: const SmartContextMenuConfig(style: style),
+        items: [
+          SmartContextMenuItem.pagingSubmenu(
+            title: 'More',
+            loading: loading,
+            initialMetadata: const SmartContextMenuPagingMetadata(limit: 2),
+            asyncPagingChildren: (metadata) async {
+              if (metadata.page > 1) return nextPage.future;
+              return [
+                SmartContextMenuItem.simple(title: 'A'),
+                SmartContextMenuItem.simple(
+                  title: 'B',
+                  pagingMetadata: metadata.copyWith(page: 2),
+                ),
+              ];
+            },
+          ),
+        ],
+      );
+      await tester.openMenu();
+      await tester.tap(find.text('More'));
+      await tester.settleMenu();
+      return nextPage;
+    }
+
+    // The back item and its placeholder have their own dividers.
+    const backDividers = 2;
+
+    testWidgets('a divider is drawn before a loading item', (tester) async {
+      final nextPage = await openPagingSubmenu(
+        tester,
+        loading: SmartContextMenuItem.loading(title: 'Loading'),
+      );
+
+      expect(dividers, findsNWidgets(backDividers + 2));
+
+      nextPage.complete([]);
+      await tester.settleMenu();
+    });
+
+    testWidgets('no divider is drawn before the default loader', (
+      tester,
+    ) async {
+      final nextPage = await openPagingSubmenu(tester);
+
+      expect(dividers, findsNWidgets(backDividers + 1));
+
+      nextPage.complete([]);
+      await tester.settleMenu();
+    });
   });
 
   testWidgets('the back item has a divider with the style', (tester) async {

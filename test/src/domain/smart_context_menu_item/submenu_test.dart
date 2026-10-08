@@ -65,4 +65,47 @@ void main() {
     expect(async.loadingTimeout, SmartContextMenuDefaults.loadingTimeout);
     expect(paging.loadingTimeout, SmartContextMenuDefaults.loadingTimeout);
   });
+
+  test('loading submenus keep their loading item', () {
+    final loading = SmartContextMenuItem.loading(title: 'Loading');
+    final async = SmartContextMenuItem.asyncSubmenu(
+      asyncChildren: () async => [],
+      loading: loading,
+    );
+    final paging = SmartContextMenuItem.pagingSubmenu(
+      asyncPagingChildren: (_) async => [],
+      initialMetadata: const SmartContextMenuPagingMetadata(),
+      loading: loading,
+    );
+
+    expect(async.loadingItem, same(loading));
+    expect(paging.loadingItem, same(loading));
+    expect(SmartContextMenuItem.submenu(children: []).loadingItem, isNull);
+    expect(
+      SmartContextMenuItem.asyncSubmenu(
+        asyncChildren: () async => [],
+      ).loadingItem,
+      isNull,
+    );
+  });
+
+  test('loading submenus assert when loading is not a loading item', () {
+    final notLoading = SmartContextMenuItem.simple(title: 'Loading');
+
+    expect(
+      () => SmartContextMenuItem.asyncSubmenu(
+        asyncChildren: () async => [],
+        loading: notLoading,
+      ),
+      throwsAssertionError,
+    );
+    expect(
+      () => SmartContextMenuItem.pagingSubmenu(
+        asyncPagingChildren: (_) async => [],
+        initialMetadata: const SmartContextMenuPagingMetadata(),
+        loading: notLoading,
+      ),
+      throwsAssertionError,
+    );
+  });
 }

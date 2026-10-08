@@ -1,18 +1,16 @@
 import 'package:flutter/widgets.dart';
 
-import 'smart_context_menu_loader.dart';
-
-/// The loader row at the end of a paginated submenu.
+/// The loading row at the end of a paginated submenu.
 ///
 /// Calls [onVisible] once it is built.
 final class SmartContextMenuPaginationTrigger extends StatefulWidget {
   final VoidCallback onVisible;
-  final double loaderVerticalPadding;
+  final Widget child;
 
   const SmartContextMenuPaginationTrigger({
     super.key,
     required this.onVisible,
-    required this.loaderVerticalPadding,
+    required this.child,
   });
 
   @override
@@ -31,6 +29,5 @@ final class _SmartContextMenuPaginationTriggerState
   }
 
   @override
-  Widget build(BuildContext context) =>
-      SmartContextMenuLoader(verticalPadding: widget.loaderVerticalPadding);
+  Widget build(BuildContext context) => widget.child;
 }
