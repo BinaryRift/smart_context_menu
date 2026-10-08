@@ -83,12 +83,20 @@ List<SmartContextMenuItem> longRootShortSubmenu() => [
   SmartContextMenuItem.submenu(
     title: 'Color',
     leading: const Icon(CupertinoIcons.paintbrush),
-    children: [_action('Red'), _action('Blue')],
+    children: [
+      _action('Red', tintColor: _deep(CupertinoColors.systemRed)),
+      _action('Green', tintColor: _deep(CupertinoColors.systemGreen)),
+      _action('Blue', tintColor: _deep(CupertinoColors.systemBlue)),
+    ],
   ),
   _action('Rename', icon: CupertinoIcons.pencil),
   _action('Duplicate', icon: CupertinoIcons.plus_square_on_square),
   _action('Pin', icon: CupertinoIcons.pin),
-  _action('Favorite', icon: CupertinoIcons.heart),
+  _action(
+    'Favorite',
+    icon: CupertinoIcons.heart,
+    tintColor: CupertinoColors.systemPurple,
+  ),
   _action('Copy link', icon: CupertinoIcons.link),
   _action('Info', icon: CupertinoIcons.info),
   _action('Delete', icon: CupertinoIcons.delete, isDestructive: true),
@@ -150,10 +158,19 @@ SmartContextMenuItem _share() {
   );
 }
 
+/// A system color with its darker high contrast variant in the light theme.
+CupertinoDynamicColor _deep(CupertinoDynamicColor color) {
+  return CupertinoDynamicColor.withBrightness(
+    color: color.highContrastColor,
+    darkColor: color.darkColor,
+  );
+}
+
 SmartContextMenuItem _action(
   String title, {
   IconData? icon,
   bool isDestructive = false,
+  Color? tintColor,
   SmartContextMenuPagingMetadata? pagingMetadata,
   bool hasDivider = false,
   SmartContextMenuDividerPosition dividerPosition =
@@ -163,6 +180,7 @@ SmartContextMenuItem _action(
     title: title,
     leading: icon == null ? null : Icon(icon),
     isDestructive: isDestructive,
+    tintColor: tintColor,
     pagingMetadata: pagingMetadata,
     hasDivider: hasDivider,
     dividerPosition: dividerPosition,
