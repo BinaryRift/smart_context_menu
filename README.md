@@ -11,7 +11,7 @@ drag-to-select and rich submenus.
 - **Smart positioning**: the pressed widget stays in place whenever there is room for the menu;
   very tall widgets can be scrolled, and long menus scroll inside themselves.
 - **Drag-to-select**: slide a finger across the items and release on the one you want.
-- **Submenus**: static, loaded asynchronously or paginated, with a back item.
+- **Submenus**: static, loaded asynchronously or paginated, with a back item and swipe back.
 - **Async items** that show a loading state and a retry item on failure, with optional custom views.
 - **Light and dark themes** out of the box.
 - **Customizable**: size, colors, text, icons, blur, decoration, labels and custom item content.
@@ -83,7 +83,7 @@ Create items with the factory that matches what the item does:
 
 #### Submenu
 
-<!-- GIF: submenu and back item -->
+<!-- GIF: submenu, back item and swipe back -->
 
 ```dart
 SmartContextMenuItem.submenu(
@@ -95,6 +95,10 @@ SmartContextMenuItem.submenu(
   ],
 )
 ```
+
+Tap the back item at the top of the submenu or swipe right to return to the parent menu.
+The submenu follows the finger and slides back in place if the swipe is short.
+To turn the swipe off, set `enableSwipeBack: false` in `SmartContextMenuConfig`.
 
 #### Async submenu
 

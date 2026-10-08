@@ -49,6 +49,8 @@ enum SmartContextMenuDividerPosition {
 ///   the item loaded by [asyncItem].
 ///
 /// A submenu replaces the current menu and shows a back item at the top.
+/// Tapping the back item or swiping right returns to the parent menu,
+/// see [SmartContextMenuConfig.enableSwipeBack].
 ///
 /// ```dart
 /// SmartContextMenuItem.submenu(

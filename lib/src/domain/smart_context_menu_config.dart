@@ -35,9 +35,10 @@ final class SmartContextMenuConfig {
   /// Defaults to true.
   final bool enableHaptics;
 
-  /// Whether swiping back returns from a submenu.
+  /// Whether swiping right on a submenu returns to the parent level.
   ///
-  /// Not implemented yet and has no effect. Defaults to true.
+  /// The submenu follows the finger and slides back in place if the swipe
+  /// is short and slow. The back item works either way. Defaults to true.
   final bool enableSwipeBack;
 
   /// Whether tapping outside the menu and its preview closes the menu.
