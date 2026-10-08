@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/widgets.dart';
 
 import '../extensions/render_object_ext.dart';
@@ -6,10 +7,14 @@ import '../state/smart_context_menu_hover_controller.dart';
 /// Tracks the pointer over [child] and reports the item under it
 /// to [hoverController].
 ///
-/// Once a scrollable inside [child] scrolls, the gesture no longer hovers
-/// or selects an item until the pointer is lifted.
+/// Once a scrollable inside [child] scrolls or a level is swiped back
+/// (see [isSwiping]), the gesture no longer hovers or selects an item
+/// until the pointer is lifted.
 final class SmartContextMenuPointerTracker extends StatefulWidget {
   final SmartContextMenuHoverController hoverController;
+
+  /// Whether a menu level is being swiped back.
+  final ValueListenable<bool> isSwiping;
 
   /// Called on pointer move with the offset from the pointer-down position.
   final ValueChanged<Offset> onDrag;
@@ -22,6 +27,7 @@ final class SmartContextMenuPointerTracker extends StatefulWidget {
   const SmartContextMenuPointerTracker({
     super.key,
     required this.hoverController,
+    required this.isSwiping,
     required this.onDrag,
     required this.onRelease,
     required this.child,
@@ -35,10 +41,31 @@ final class SmartContextMenuPointerTracker extends StatefulWidget {
 final class _SmartContextMenuPointerTrackerState
     extends State<SmartContextMenuPointerTracker> {
   Offset? _startPosition;
-  bool _didScroll = false;
+  bool _isSelectionBlocked = false;
 
   SmartContextMenuHoverController get _hoverController =>
       widget.hoverController;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.isSwiping.addListener(_onSwipeChanged);
+  }
+
+  @override
+  void didUpdateWidget(SmartContextMenuPointerTracker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isSwiping != oldWidget.isSwiping) {
+      oldWidget.isSwiping.removeListener(_onSwipeChanged);
+      widget.isSwiping.addListener(_onSwipeChanged);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.isSwiping.removeListener(_onSwipeChanged);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,11 +82,18 @@ final class _SmartContextMenuPointerTrackerState
   }
 
   bool _onScrollNotification(ScrollNotification notification) {
-    if (notification is ScrollStartNotification && _startPosition != null) {
-      _didScroll = true;
-      if (_hoverController.value != null) _hoverController.update(null);
-    }
+    if (notification is ScrollStartNotification) _blockSelection();
     return false;
+  }
+
+  void _onSwipeChanged() {
+    if (widget.isSwiping.value) _blockSelection();
+  }
+
+  void _blockSelection() {
+    if (_startPosition == null) return;
+    _isSelectionBlocked = true;
+    if (_hoverController.value != null) _hoverController.update(null);
   }
 
   void _onPointerEvent(PointerEvent event) {
@@ -74,7 +108,7 @@ final class _SmartContextMenuPointerTrackerState
 
   void _handlePointerDown(PointerDownEvent event) {
     _startPosition = event.position;
-    _didScroll = false;
+    _isSelectionBlocked = false;
     _updateHoveredItem(event.position);
   }
 
@@ -86,7 +120,7 @@ final class _SmartContextMenuPointerTrackerState
   }
 
   void _handlePointerReset() {
-    if (_hoverController.value != null && !_didScroll) {
+    if (_hoverController.value != null && !_isSelectionBlocked) {
       _hoverController.setReleased();
     }
 
@@ -98,7 +132,7 @@ final class _SmartContextMenuPointerTrackerState
   }
 
   void _updateHoveredItem(Offset globalPosition) {
-    if (_didScroll) {
+    if (_isSelectionBlocked) {
       if (_hoverController.value != null) _hoverController.update(null);
       return;
     }

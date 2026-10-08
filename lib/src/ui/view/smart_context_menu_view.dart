@@ -5,6 +5,7 @@ import '../../core/ui/motion/tokens/motion_curves.dart';
 import '../../core/ui/motion/tokens/motion_durations.dart';
 import '../../core/ui/motion/tokens/motion_translation.dart';
 import '../../controllers/smart_context_menu_overlay_controller.dart';
+import '../../domain/smart_context_menu_level.dart';
 import '../../domain/smart_context_menu_navigator.dart';
 import '../state/smart_context_menu_hover_controller.dart';
 import '../state/smart_context_menu_stretch_controller.dart';
@@ -40,6 +41,7 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
   late final SmartContextMenuOverlayController _controller;
   late final SmartContextMenuHoverController _hoverController;
   late final SmartContextMenuStretchController _stretchController;
+  final ValueNotifier<bool> _isSwiping = ValueNotifier(false);
 
   SmartContextMenuConfig get _config => widget.config;
 
@@ -69,6 +71,7 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
     _controller.dispose();
     _hoverController.dispose();
     _stretchController.dispose();
+    _isSwiping.dispose();
     super.dispose();
   }
 
@@ -116,16 +119,18 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
                 ),
                 child: SmartContextMenuPointerTracker(
                   hoverController: _hoverController,
+                  isSwiping: _isSwiping,
                   onDrag: _setMenuEffect,
                   onRelease: _resetMenuEffect,
                   child: SmartContextMenuLevelSwitcher(
                     isForward: _controller.isForward,
-                    child: SmartContextMenuLevelView(
-                      key: ValueKey(_controller.stackLength),
-                      level: _controller.currentLevel,
-                      controller: _controller,
-                      config: _config,
-                      hoverController: _hoverController,
+                    enableSwipeBack: _config.enableSwipeBack,
+                    isSwiping: _isSwiping,
+                    onSwipeBack: _controller.popSubmenu,
+                    previous: _buildPreviousLevel(),
+                    child: _buildLevel(
+                      _controller.currentLevel,
+                      depth: _controller.stackLength,
                     ),
                   ),
                 ),
@@ -134,6 +139,24 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
           ),
         ),
       ),
+    );
+  }
+
+  Widget? _buildPreviousLevel() {
+    final level = _controller.previousLevel;
+    if (level == null) return null;
+    return _buildLevel(level, depth: _controller.stackLength - 1);
+  }
+
+  // The key is the depth, so a level keeps its key when it becomes current
+  // after a swipe back.
+  Widget _buildLevel(SmartMenuLevel level, {required int depth}) {
+    return SmartContextMenuLevelView(
+      key: ValueKey(depth),
+      level: level,
+      controller: _controller,
+      config: _config,
+      hoverController: _hoverController,
     );
   }
 
