@@ -1,5 +1,11 @@
 import 'package:flutter/widgets.dart'
-    show BorderRadiusGeometry, Color, Decoration, IconData, TextStyle;
+    show
+        BorderRadiusGeometry,
+        Color,
+        Decoration,
+        EdgeInsets,
+        IconData,
+        TextStyle;
 
 import '../core/ui/styles/smart_context_menu_defaults.dart';
 import 'smart_context_menu_blur.dart';
@@ -89,6 +95,20 @@ final class SmartContextMenuStyle {
 
   // Items
 
+  /// The padding around the content of items without their own
+  /// [SmartContextMenuItem.padding].
+  ///
+  /// Also used by the back and retry items.
+  /// Defaults to [SmartContextMenuDefaults.itemPadding].
+  final EdgeInsets itemPadding;
+
+  /// The gap between the parts of items without their own
+  /// [SmartContextMenuItem.childrenGap].
+  ///
+  /// Also used by the back and retry items.
+  /// Defaults to [SmartContextMenuDefaults.itemChildrenGap].
+  final double itemChildrenGap;
+
   /// The base style of item titles.
   ///
   /// Used for items without [SmartContextMenuItem.titleStyle] and for the
@@ -168,6 +188,8 @@ final class SmartContextMenuStyle {
     this.backButtonBorderRadius =
         SmartContextMenuDefaults.backButtonBorderRadius,
     this.backButtonColor,
+    this.itemPadding = SmartContextMenuDefaults.itemPadding,
+    this.itemChildrenGap = SmartContextMenuDefaults.itemChildrenGap,
     this.textStyle = SmartContextMenuDefaults.textStyle,
     this.secondaryTextColor = SmartContextMenuDefaults.secondaryTextColor,
     this.destructiveColor = SmartContextMenuDefaults.destructiveColor,
@@ -195,6 +217,8 @@ final class SmartContextMenuStyle {
     SmartContextMenuBlur? backButtonBlur,
     BorderRadiusGeometry? backButtonBorderRadius,
     Color? backButtonColor,
+    EdgeInsets? itemPadding,
+    double? itemChildrenGap,
     TextStyle? textStyle,
     Color? secondaryTextColor,
     Color? destructiveColor,
@@ -218,6 +242,8 @@ final class SmartContextMenuStyle {
       backButtonBorderRadius:
           backButtonBorderRadius ?? this.backButtonBorderRadius,
       backButtonColor: backButtonColor ?? this.backButtonColor,
+      itemPadding: itemPadding ?? this.itemPadding,
+      itemChildrenGap: itemChildrenGap ?? this.itemChildrenGap,
       textStyle: textStyle ?? this.textStyle,
       secondaryTextColor: secondaryTextColor ?? this.secondaryTextColor,
       destructiveColor: destructiveColor ?? this.destructiveColor,

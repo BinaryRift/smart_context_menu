@@ -191,7 +191,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
           AnimatedContainer(
             duration: MotionDurations.instant,
             color: _overlayColor,
-            padding: _item.padding,
+            padding: _item.padding ?? _style.itemPadding,
             child: AnimatedSwitcher(
               duration: MotionDurations.fast,
               transitionBuilder: (child, animation) =>
@@ -228,12 +228,10 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
   }
 
   Widget _buildRow(SmartContextMenuItem item) {
+    final gap = SizedBox(width: item.childrenGap ?? _style.itemChildrenGap);
     return Row(
       children: [
-        if (item.leading != null) ...[
-          item.leading!,
-          SizedBox(width: _item.childrenGap),
-        ],
+        if (item.leading != null) ...[item.leading!, gap],
         Expanded(
           child: Text(
             item.title ?? "",
@@ -244,12 +242,9 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
             overflow: TextOverflow.ellipsis,
           ),
         ),
-        if (item.trailing != null) ...[
-          SizedBox(width: item.childrenGap),
-          item.trailing!,
-        ],
+        if (item.trailing != null) ...[gap, item.trailing!],
         if (item.showTransitionIcon) ...[
-          SizedBox(width: item.childrenGap),
+          gap,
           Icon(
             _style.submenuIcon,
             size: _style.defaultIconSize,

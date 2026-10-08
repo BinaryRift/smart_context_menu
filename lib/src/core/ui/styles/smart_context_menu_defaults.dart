@@ -20,10 +20,10 @@ abstract final class SmartContextMenuDefaults {
   /// The default of [SmartContextMenuConfig.menuGap].
   static const double menuGap = 12;
 
-  /// The default of [SmartContextMenuItem.childrenGap].
-  static const double childrenGap = 12;
+  /// The default of [SmartContextMenuStyle.itemChildrenGap].
+  static const double itemChildrenGap = 12;
 
-  /// The default of [SmartContextMenuItem.padding].
+  /// The default of [SmartContextMenuStyle.itemPadding].
   static const EdgeInsets itemPadding = EdgeInsets.symmetric(
     horizontal: 16,
     vertical: 12,

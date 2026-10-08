@@ -222,7 +222,7 @@ const menuConfig = SmartContextMenuConfig(
 );
 ```
 
-`SmartContextMenuStyle` also sets the text, colors and icons of items, so the menu
+`SmartContextMenuStyle` also sets the text, colors, icons and spacing of items, so the menu
 can match the app theme:
 
 ```dart
@@ -238,6 +238,8 @@ const menuStyle = SmartContextMenuStyle(
   backButtonColor: Color(0xFF0A84FF),
   submenuIcon: Icons.arrow_forward_ios,
   backIcon: Icons.arrow_back_ios_new,
+  itemPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+  itemChildrenGap: 10,
 );
 ```
 
@@ -248,6 +250,8 @@ An item `titleStyle` replaces `textStyle` for that item.
 Icons in `leading` and `trailing` take the title color unless they set their own.
 The back item of a submenu uses `textStyle` in bold; `backButtonColor` sets the color
 of its title and icon.
+`itemPadding` and `itemChildrenGap` set the padding of items and the gap between
+their icons and title; an item `padding` or `childrenGap` overrides them.
 
 To give one item its own color, set its `tintColor`. The item is tinted like a destructive
 one: the title and icons take the color, and the background a translucent shade of it.

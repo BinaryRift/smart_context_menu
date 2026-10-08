@@ -103,13 +103,13 @@ final class SmartContextMenuItem {
 
   /// The padding around the item content.
   ///
-  /// Defaults to [SmartContextMenuDefaults.itemPadding].
-  final EdgeInsets padding;
+  /// If null, [SmartContextMenuStyle.itemPadding] is used.
+  final EdgeInsets? padding;
 
   /// The gap between [leading], [title], [trailing] and the submenu chevron.
   ///
-  /// Defaults to [SmartContextMenuDefaults.childrenGap].
-  final double childrenGap;
+  /// If null, [SmartContextMenuStyle.itemChildrenGap] is used.
+  final double? childrenGap;
 
   /// Whether the item performs a destructive action.
   ///
@@ -247,8 +247,8 @@ final class SmartContextMenuItem {
     this.customBuilder,
     this.loadingBuilder,
     this.errorBuilder,
-    EdgeInsets? padding,
-    this.childrenGap = SmartContextMenuDefaults.childrenGap,
+    this.padding,
+    this.childrenGap,
     this.closeOnTap = true,
     this.dividerPosition = SmartContextMenuDividerPosition.bottom,
   }) : assert(
@@ -258,9 +258,7 @@ final class SmartContextMenuItem {
              1,
          'Menu item can have only one of children, asyncChildren '
          'or asyncPagingChildren.',
-       ),
-
-       padding = padding ?? SmartContextMenuDefaults.itemPadding;
+       );
 
   /// Creates an item that runs [onTap] when tapped.
   ///
@@ -281,7 +279,7 @@ final class SmartContextMenuItem {
     SmartContextMenuItemBuilder? customBuilder,
     FutureOr<void> Function()? onTap,
     EdgeInsets? padding,
-    double childrenGap = SmartContextMenuDefaults.childrenGap,
+    double? childrenGap,
     SmartContextMenuPagingMetadata? pagingMetadata,
     SmartContextMenuDividerPosition? dividerPosition,
   }) => SmartContextMenuItem._(
@@ -319,7 +317,7 @@ final class SmartContextMenuItem {
     Widget? customDivider,
     SmartContextMenuItemBuilder? customBuilder,
     EdgeInsets? padding,
-    double childrenGap = SmartContextMenuDefaults.childrenGap,
+    double? childrenGap,
     SmartContextMenuDividerPosition? dividerPosition,
   }) => SmartContextMenuItem._(
     id: id ?? _generateId(),
@@ -373,7 +371,7 @@ final class SmartContextMenuItem {
     Widget? customDivider,
     SmartContextMenuItemBuilder? customBuilder,
     EdgeInsets? padding,
-    double childrenGap = SmartContextMenuDefaults.childrenGap,
+    double? childrenGap,
     SmartContextMenuDividerPosition? dividerPosition,
   }) => SmartContextMenuItem._(
     id: id ?? _generateId(),
@@ -441,7 +439,7 @@ final class SmartContextMenuItem {
     Widget? customDivider,
     SmartContextMenuItemBuilder? customBuilder,
     EdgeInsets? padding,
-    double childrenGap = SmartContextMenuDefaults.childrenGap,
+    double? childrenGap,
     SmartContextMenuDividerPosition? dividerPosition,
   }) => SmartContextMenuItem._(
     id: id ?? _generateId(),
@@ -503,7 +501,7 @@ final class SmartContextMenuItem {
     TextStyle? titleStyle,
     SmartContextMenuItemBuilder? loadingBuilder,
     SmartContextMenuItemBuilder? errorBuilder,
-    double childrenGap = SmartContextMenuDefaults.childrenGap,
+    double? childrenGap,
     SmartContextMenuDividerPosition? dividerPosition,
   }) {
     return SmartContextMenuItem._(
