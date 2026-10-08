@@ -156,6 +156,21 @@ final class _SmartContextMenuItemViewState
         _loadAsyncData();
       }
     }
+
+    if (widget.item.listenableBuilder != null) {
+      widget.item.listenable?.addListener(_onListenableChanged);
+      _buildListenableItem();
+    }
+  }
+
+  @override
+  void didUpdateWidget(SmartContextMenuItemView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.item.listenable != oldWidget.item.listenable) {
+      oldWidget.item.listenable?.removeListener(_onListenableChanged);
+      widget.item.listenable?.addListener(_onListenableChanged);
+    }
+    if (widget.item.listenableBuilder != null) _buildListenableItem();
   }
 
   @override
@@ -168,6 +183,7 @@ final class _SmartContextMenuItemViewState
   @override
   void dispose() {
     widget.hoverController?.removeListener(_handleGlobalPointer);
+    widget.item.listenable?.removeListener(_onListenableChanged);
     super.dispose();
   }
 
@@ -340,6 +356,14 @@ final class _SmartContextMenuItemViewState
         });
       }
     }
+  }
+
+  void _onListenableChanged() => setState(_buildListenableItem);
+
+  void _buildListenableItem() {
+    final item = widget.item.listenableBuilder!();
+    _resolvedItem = item;
+    _isLoading = item == null;
   }
 
   void _handleGlobalPointer() {
