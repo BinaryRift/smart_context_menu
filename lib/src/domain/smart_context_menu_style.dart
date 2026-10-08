@@ -100,6 +100,12 @@ final class SmartContextMenuStyle {
   /// [defaultIconColor].
   final Color? backButtonColor;
 
+  /// The style of the back item title, merged over [textStyle].
+  ///
+  /// [backButtonColor] takes precedence over its color.
+  /// Defaults to [SmartContextMenuDefaults.backButtonTextStyle].
+  final TextStyle backButtonTextStyle;
+
   // Items
 
   /// The padding around the content of items without their own
@@ -119,12 +125,19 @@ final class SmartContextMenuStyle {
   /// The base style of item titles.
   ///
   /// Used for items without [SmartContextMenuItem.titleStyle] and for the
-  /// back, retry and loading items. Its color is used only while an item is
+  /// retry and loading items. The back item merges [backButtonTextStyle]
+  /// over it. Its color is used only while an item is
   /// enabled, not destructive and has no [SmartContextMenuItem.tintColor],
   /// and also tints the press highlight unless [highlightColor] is set.
   /// If the style has no color, [SmartContextMenuDefaults.textColor] is used.
   /// Defaults to [SmartContextMenuDefaults.textStyle].
   final TextStyle textStyle;
+
+  /// The maximum number of lines of an item title.
+  ///
+  /// Longer titles are truncated with an ellipsis.
+  /// Defaults to [SmartContextMenuDefaults.titleMaxLines].
+  final int titleMaxLines;
 
   /// The title and submenu chevron color of a disabled item.
   ///
@@ -229,9 +242,11 @@ final class SmartContextMenuStyle {
     this.backButtonBorderRadius =
         SmartContextMenuDefaults.backButtonBorderRadius,
     this.backButtonColor,
+    this.backButtonTextStyle = SmartContextMenuDefaults.backButtonTextStyle,
     this.itemPadding = SmartContextMenuDefaults.itemPadding,
     this.itemChildrenGap = SmartContextMenuDefaults.itemChildrenGap,
     this.textStyle = SmartContextMenuDefaults.textStyle,
+    this.titleMaxLines = SmartContextMenuDefaults.titleMaxLines,
     this.secondaryTextColor = SmartContextMenuDefaults.secondaryTextColor,
     this.destructiveColor = SmartContextMenuDefaults.destructiveColor,
     this.disabledItemColor,
@@ -265,9 +280,11 @@ final class SmartContextMenuStyle {
     SmartContextMenuBlur? backButtonBlur,
     BorderRadiusGeometry? backButtonBorderRadius,
     Color? backButtonColor,
+    TextStyle? backButtonTextStyle,
     EdgeInsets? itemPadding,
     double? itemChildrenGap,
     TextStyle? textStyle,
+    int? titleMaxLines,
     Color? secondaryTextColor,
     Color? destructiveColor,
     Color? disabledItemColor,
@@ -297,9 +314,11 @@ final class SmartContextMenuStyle {
       backButtonBorderRadius:
           backButtonBorderRadius ?? this.backButtonBorderRadius,
       backButtonColor: backButtonColor ?? this.backButtonColor,
+      backButtonTextStyle: backButtonTextStyle ?? this.backButtonTextStyle,
       itemPadding: itemPadding ?? this.itemPadding,
       itemChildrenGap: itemChildrenGap ?? this.itemChildrenGap,
       textStyle: textStyle ?? this.textStyle,
+      titleMaxLines: titleMaxLines ?? this.titleMaxLines,
       secondaryTextColor: secondaryTextColor ?? this.secondaryTextColor,
       destructiveColor: destructiveColor ?? this.destructiveColor,
       disabledItemColor: disabledItemColor ?? this.disabledItemColor,

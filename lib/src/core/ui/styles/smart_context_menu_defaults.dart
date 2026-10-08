@@ -196,6 +196,14 @@ abstract final class SmartContextMenuDefaults {
     fontWeight: FontWeight.w400,
   );
 
+  /// The default of [SmartContextMenuStyle.backButtonTextStyle]: bold.
+  static const TextStyle backButtonTextStyle = TextStyle(
+    fontWeight: FontWeight.w600,
+  );
+
+  /// The default of [SmartContextMenuStyle.titleMaxLines].
+  static const int titleMaxLines = 2;
+
   // Icons
 
   /// The default of [SmartContextMenuStyle.submenuIcon].

@@ -251,7 +251,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
             style: (item.titleStyle ?? _style.textStyle).copyWith(
               color: _textColor,
             ),
-            maxLines: 2,
+            maxLines: _style.titleMaxLines,
             overflow: TextOverflow.ellipsis,
           ),
         ),

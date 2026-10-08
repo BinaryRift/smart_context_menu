@@ -63,4 +63,25 @@ void main() {
     expect(style.fontFamily, isNull);
     expect(style.color, isSameColorAs(const Color(0xFF0000FF)));
   });
+
+  testWidgets('limits the title lines', (tester) async {
+    await tester.pumpMenu(items: appearanceItems());
+    await tester.openMenu();
+    expect(
+      tester.widget<Text>(find.text('Enabled')).maxLines,
+      SmartContextMenuDefaults.titleMaxLines,
+    );
+  });
+
+  testWidgets('applies the title max lines', (tester) async {
+    await tester.pumpMenu(
+      items: appearanceItems(),
+      config: const SmartContextMenuConfig(
+        style: SmartContextMenuStyle(titleMaxLines: 1),
+      ),
+    );
+    await tester.openMenu();
+
+    expect(tester.widget<Text>(find.text('Enabled')).maxLines, 1);
+  });
 }

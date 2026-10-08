@@ -82,7 +82,8 @@ final class SmartContextMenuItem {
 
   /// The text of the item.
   ///
-  /// Shown in up to two lines and truncated with an ellipsis.
+  /// Shown in up to [SmartContextMenuStyle.titleMaxLines] lines and truncated
+  /// with an ellipsis.
   final String? title;
 
   /// The style of [title].

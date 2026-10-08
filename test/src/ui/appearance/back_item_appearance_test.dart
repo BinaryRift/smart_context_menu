@@ -17,6 +17,49 @@ void main() {
     expect(back.color, isSameColorAs(customStyle.textStyle.color!));
   });
 
+  testWidgets('merges the back button text style', (tester) async {
+    await tester.pumpMenu(
+      config: customConfig.copyWith(
+        style: customStyle.copyWith(
+          backButtonTextStyle: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w300,
+            color: Color(0xFF0000FF),
+          ),
+        ),
+      ),
+      items: submenuItems(),
+    );
+    await tester.openSubmenu();
+
+    final back = tester.titleStyleOf(customConfig.labels.back);
+    expect(back.fontFamily, 'Custom');
+    expect(back.fontSize, 20);
+    expect(back.fontWeight, FontWeight.w300);
+    expect(back.color, isSameColorAs(const Color(0xFF0000FF)));
+  });
+
+  testWidgets('back button color takes precedence over the text style', (
+    tester,
+  ) async {
+    const backColor = Color(0xFF00FF00);
+    await tester.pumpMenu(
+      config: customConfig.copyWith(
+        style: customStyle.copyWith(
+          backButtonColor: backColor,
+          backButtonTextStyle: const TextStyle(color: Color(0xFF0000FF)),
+        ),
+      ),
+      items: submenuItems(),
+    );
+    await tester.openSubmenu();
+
+    expect(
+      tester.titleStyleOf(customConfig.labels.back).color,
+      isSameColorAs(backColor),
+    );
+  });
+
   testWidgets('applies the back item color', (tester) async {
     const backColor = Color(0xFF0000FF);
     await tester.pumpMenu(

@@ -275,8 +275,9 @@ Disabled items have no background unless `disabledItemColor` is set.
 A pressed item is highlighted with a translucent `textStyle` color; `highlightColor`
 replaces it. Tinted and destructive items keep their own pressed tint.
 Icons in `leading` and `trailing` take the title color unless they set their own.
-The back item of a submenu uses `textStyle` in bold; `backButtonColor` sets the color
-of its title and icon.
+The back item of a submenu merges `backButtonTextStyle` (bold by default) over
+`textStyle`; `backButtonColor` sets the color of its title and icon.
+Titles take up to `titleMaxLines` lines (2 by default) and are truncated with an ellipsis.
 `itemPadding` and `itemChildrenGap` set the padding of items and the gap between
 their icons and title.
 
