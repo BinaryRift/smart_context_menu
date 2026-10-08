@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Flutter ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # The lowest version allowed by pubspec.yaml.
+          - name: 3.32.0
+            version: 3.32.0
+            latest: false
+          - name: stable
+            version: ""
+            latest: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ matrix.version }}
+          cache: true
+
+      - run: flutter --version
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # The formatter output depends on its version, so only the latest checks it.
+      - name: Check formatting
+        if: matrix.latest
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test the package
+        run: flutter test ${{ matrix.latest && '--coverage' || '' }}
+
+      - name: Test the example
+        working-directory: example
+        run: flutter test
+
+      - name: Upload coverage
+        if: matrix.latest
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/lcov.info
