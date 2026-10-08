@@ -84,12 +84,21 @@ final class SmartContextMenu extends StatefulWidget {
   /// Builds slivers shown above the preview while the menu is open.
   ///
   /// Use it for content tied to [child], for example a reactions bar above
-  /// a message. The slivers fade in and out with the menu. To line them up
-  /// with the preview and to close the menu, use the
+  /// a message. The slivers move with the preview when it is dragged or
+  /// the menu is stretched, and fade in and out with the menu, see
+  /// [fadeHeaderSlivers]. To line them up with the preview, animate them
+  /// with the menu and close the menu, use the
   /// [SmartContextMenuHeaderDetails] passed to the builder.
   ///
   /// If null, nothing is shown above the preview.
   final SmartContextMenuHeaderBuilder? headerSliversBuilder;
+
+  /// Whether the slivers from [headerSliversBuilder] fade in and out with
+  /// the menu.
+  ///
+  /// Set it to false to animate them only with
+  /// [SmartContextMenuHeaderDetails.animation]. Defaults to true.
+  final bool fadeHeaderSlivers;
 
   /// Creates a context menu for [child].
   const SmartContextMenu({
@@ -100,6 +109,7 @@ final class SmartContextMenu extends StatefulWidget {
     this.controller,
     this.onPreviewTap,
     this.headerSliversBuilder,
+    this.fadeHeaderSlivers = true,
   });
 
   @override
@@ -380,6 +390,7 @@ final class _SmartContextMenuState extends State<SmartContextMenu>
       config: widget.config,
       onPreviewTap: widget.onPreviewTap,
       headerSliversBuilder: widget.headerSliversBuilder,
+      fadeHeaderSlivers: widget.fadeHeaderSlivers,
       barrierLabel: barrierLabel,
     );
 

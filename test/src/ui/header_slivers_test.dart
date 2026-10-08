@@ -22,6 +22,7 @@ Widget _menu({
   VoidCallback? onHeaderTap,
   SmartContextMenuConfig config = const SmartContextMenuConfig(),
   List<SmartContextMenuItem>? items,
+  bool fadeHeaderSlivers = true,
 }) {
   return CupertinoApp(
     home: Padding(
@@ -31,6 +32,7 @@ Widget _menu({
         child: SmartContextMenu(
           items: items ?? _items,
           config: config,
+          fadeHeaderSlivers: fadeHeaderSlivers,
           headerSliversBuilder: headerHeight == null
               ? null
               : (context, header) {
@@ -286,6 +288,109 @@ void main() {
 
       expect(copies, 0);
       expect(find.text('Copy'), findsOneWidget);
+    });
+  });
+
+  group('motion', () {
+    /// How far the header and the preview have moved from [header] and
+    /// [preview].
+    (Offset, Offset) moved(WidgetTester tester, Offset header, Offset preview) {
+      return (
+        tester.getTopLeft(_header) - header,
+        tester.getTopLeft(_preview) - preview,
+      );
+    }
+
+    testWidgets('the slivers move with the dragged preview', (tester) async {
+      await tester.pumpWidget(_menu());
+      await _openMenu(tester);
+      final header = tester.getTopLeft(_header);
+      final preview = tester.getTopLeft(_preview);
+
+      final gesture = await tester.startGesture(tester.getCenter(_preview));
+      for (var i = 0; i < 6; i++) {
+        await gesture.moveBy(const Offset(0, 10));
+        await tester.pump(const Duration(milliseconds: 16));
+      }
+      await tester.pumpAndSettle();
+      final (headerShift, previewShift) = moved(tester, header, preview);
+      expect(previewShift.dy, greaterThan(0));
+      expect(headerShift, previewShift);
+
+      await gesture.up();
+      await tester.pumpAndSettle();
+      expect(moved(tester, header, preview), (Offset.zero, Offset.zero));
+    });
+
+    testWidgets('the slivers move with the stretched menu', (tester) async {
+      await tester.pumpWidget(
+        _menu(
+          items: [
+            SmartContextMenuItem.simple(
+              title: 'Copy',
+              closeOnTap: false,
+              onTap: () {},
+            ),
+          ],
+        ),
+      );
+      await _openMenu(tester);
+      final header = tester.getTopLeft(_header);
+      final preview = tester.getTopLeft(_preview);
+
+      final gesture = await tester.startGesture(
+        tester.getCenter(find.text('Copy')),
+      );
+      await tester.pump();
+      await gesture.moveBy(const Offset(40, 0));
+      await tester.pumpAndSettle();
+      final (headerShift, previewShift) = moved(tester, header, preview);
+      expect(previewShift.dx, greaterThan(0));
+      expect(headerShift, previewShift);
+
+      await gesture.up();
+      await tester.pumpAndSettle();
+    });
+  });
+
+  group('animation', () {
+    testWidgets('runs to 1 as the menu opens and back to 0 as it closes', (
+      tester,
+    ) async {
+      late SmartContextMenuHeaderDetails header;
+      await tester.pumpWidget(_menu(onHeader: (value) => header = value));
+      await tester.openMenu();
+      final animation = header.animation;
+      expect(animation.value, 1);
+
+      header.close();
+      await tester.pump();
+      expect(animation.status, AnimationStatus.reverse);
+
+      await tester.settleMenu();
+      expect(animation.value, 0);
+    });
+
+    testWidgets('the slivers fade with the menu by default', (tester) async {
+      await tester.pumpWidget(_menu());
+      await tester.openMenu();
+
+      expect(
+        find.ancestor(of: _header, matching: find.byType(SliverFadeTransition)),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('the slivers do not fade with fadeHeaderSlivers off', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_menu(fadeHeaderSlivers: false));
+      await tester.openMenu();
+
+      expect(
+        find.ancestor(of: _header, matching: find.byType(SliverFadeTransition)),
+        findsNothing,
+      );
     });
   });
 }

@@ -18,6 +18,7 @@ final class SmartContextMenuRoute extends PageRoute<void> {
   final SmartContextMenuConfig config;
   final FutureOr<void> Function()? onPreviewTap;
   final SmartContextMenuHeaderBuilder? headerSliversBuilder;
+  final bool fadeHeaderSlivers;
 
   @override
   final String? barrierLabel;
@@ -30,6 +31,7 @@ final class SmartContextMenuRoute extends PageRoute<void> {
     required this.config,
     this.onPreviewTap,
     this.headerSliversBuilder,
+    this.fadeHeaderSlivers = true,
     this.barrierLabel,
   });
 
@@ -63,6 +65,7 @@ final class SmartContextMenuRoute extends PageRoute<void> {
       snapshot: snapshot,
       onPreviewTap: onPreviewTap,
       headerSliversBuilder: headerSliversBuilder,
+      fadeHeaderSlivers: fadeHeaderSlivers,
     );
   }
 }

@@ -1,4 +1,5 @@
-import 'package:flutter/widgets.dart' show Alignment, BuildContext, Widget;
+import 'package:flutter/widgets.dart'
+    show Alignment, Animation, BuildContext, Widget;
 import 'package:meta/meta.dart' show internal;
 
 /// Builds the slivers shown above the preview of an open
@@ -37,11 +38,32 @@ final class SmartContextMenuHeaderDetails {
   /// `Align(alignment: alignment)` puts a widget at the edge of the preview.
   final Alignment alignment;
 
+  /// Runs from 0 to 1 as the menu opens and back to 0 as it closes.
+  ///
+  /// Use it to animate the slivers with the menu, for example to scale
+  /// a reactions bar from the edge of the preview:
+  ///
+  /// ```dart
+  /// ScaleTransition(
+  ///   scale: header.animation.drive(CurveTween(curve: Curves.easeOutBack)),
+  ///   alignment: Alignment(header.alignment.x, 1),
+  ///   child: ReactionsBar(onSelected: react),
+  /// )
+  /// ```
+  ///
+  /// Prefer `drive` to [CurvedAnimation]: the builder runs on every rebuild,
+  /// and a [CurvedAnimation] created there is never disposed.
+  ///
+  /// The slivers also fade with the menu unless
+  /// [SmartContextMenu.fadeHeaderSlivers] is false.
+  final Animation<double> animation;
+
   final Future<void> Function() _close;
 
   @internal
   const SmartContextMenuHeaderDetails({
     required this.alignment,
+    required this.animation,
     required this._close,
   });
 

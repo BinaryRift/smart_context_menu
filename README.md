@@ -72,12 +72,14 @@ SmartContextMenu(
 ### Header slivers
 
 To show your own content above the widget while the menu is open, pass `headerSliversBuilder`.
-It returns a list of slivers, which fade in and out with the menu. The builder gets
-`SmartContextMenuHeaderDetails`:
+It returns a list of slivers, which fade in and out with the menu and move with the widget
+when it is dragged or the menu is stretched. The builder gets `SmartContextMenuHeaderDetails`:
 
 - `alignment` tells how the widget and the menu are aligned horizontally. The slivers have
   the same horizontal padding as the widget, so `Align(alignment: header.alignment)` puts
   your content at the edge of the widget.
+- `animation` runs from 0 to 1 as the menu opens and back as it closes, to animate
+  your content with the menu.
 - `close()` closes the menu. It completes halfway through the closing, as an item does,
   so the result of the action is seen as the menu closes.
 
@@ -104,6 +106,22 @@ SmartContextMenu(
   child: MessageBubble(message),
 )
 ```
+
+For example, to scale the bar in from the edge of the widget, wrap it with a transition
+driven by `header.animation`. Use `drive` rather than `CurvedAnimation`: the builder runs
+on every rebuild, and a `CurvedAnimation` created there is never disposed.
+
+```dart
+ScaleTransition(
+  scale: header.animation.drive(CurveTween(curve: Curves.easeOutBack)),
+  // Grows from the bottom edge, next to the widget.
+  alignment: Alignment(header.alignment.x, 1),
+  child: ReactionsBar(onSelected: react),
+)
+```
+
+The fade stays on top of your animation; set `fadeHeaderSlivers: false` to animate
+the slivers only your way.
 
 ### Positioning
 

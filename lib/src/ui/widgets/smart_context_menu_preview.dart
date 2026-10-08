@@ -3,10 +3,9 @@ import 'dart:ui' as ui show Image;
 import 'package:flutter/widgets.dart';
 
 import '../../core/ui/gestures/gesture_thresholds.dart';
-import '../../core/ui/motion/tokens/motion_curves.dart';
-import '../../core/ui/motion/tokens/motion_durations.dart';
 import '../../core/ui/motion/tokens/motion_translation.dart';
 import '../layout/smart_context_menu_horizontal_layout.dart';
+import 'smart_context_menu_motion.dart';
 
 /// The snapshot of the widget above the open menu.
 ///
@@ -45,18 +44,10 @@ final class _SmartContextMenuPreviewState
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: widget.motion,
+    return SmartContextMenuMotion(
+      motion: widget.motion,
       builder: (context, offset, child) {
-        return TweenAnimationBuilder<Offset>(
-          duration: MotionDurations.fast,
-          curve: MotionCurves.entrance,
-          tween: Tween<Offset>(begin: offset, end: offset),
-          builder: (context, animatedOffset, child) {
-            return Transform.translate(offset: animatedOffset, child: child);
-          },
-          child: child,
-        );
+        return Transform.translate(offset: offset, child: child);
       },
       child: GestureDetector(
         onTap: widget.onTap,

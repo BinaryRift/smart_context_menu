@@ -258,8 +258,9 @@ final class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
     );
   }
 
-  /// Reactions above the preview; the tall header adds a 240-tall block
-  /// below them, so the header does not fit above most widgets.
+  /// Reactions above the preview that scale in from its edge; the tall
+  /// header adds a 240-tall block below them, so the header does not fit
+  /// above most widgets.
   SmartContextMenuHeaderBuilder? _headerBuilder(String title) {
     if (_header == _Header.none) return null;
 
@@ -267,11 +268,18 @@ final class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
       SliverToBoxAdapter(
         child: Align(
           alignment: header.alignment,
-          child: ReactionsBar(
-            onSelected: (reaction) async {
-              await header.close();
-              debugPrint('Reaction $reaction: $title');
-            },
+          child: ScaleTransition(
+            scale: header.animation.drive(
+              CurveTween(curve: Curves.easeOutBack),
+            ),
+            // Grows from the bottom edge, next to the preview.
+            alignment: Alignment(header.alignment.x, 1),
+            child: ReactionsBar(
+              onSelected: (reaction) async {
+                await header.close();
+                debugPrint('Reaction $reaction: $title');
+              },
+            ),
           ),
         ),
       ),

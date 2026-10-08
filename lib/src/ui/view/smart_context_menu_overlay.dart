@@ -26,6 +26,7 @@ final class SmartContextMenuOverlay extends StatefulWidget {
   final SmartContextMenuConfig config;
   final FutureOr<void> Function()? onPreviewTap;
   final SmartContextMenuHeaderBuilder? headerSliversBuilder;
+  final bool fadeHeaderSlivers;
 
   const SmartContextMenuOverlay({
     super.key,
@@ -37,6 +38,7 @@ final class SmartContextMenuOverlay extends StatefulWidget {
     required this.config,
     this.onPreviewTap,
     this.headerSliversBuilder,
+    this.fadeHeaderSlivers = true,
   });
 
   @override
@@ -163,6 +165,8 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
             builder: builder,
             layout: _horizontalLayout,
             animation: widget.routeAnimation,
+            fade: widget.fadeHeaderSlivers,
+            motion: _previewMotion,
             close: _close,
             onExtentChanged: _onHeaderExtentChanged,
             groupKey: _headerKey,
