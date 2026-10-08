@@ -47,7 +47,9 @@ final class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       backgroundColor: CupertinoColors.systemGroupedBackground,
-      navigationBar: const CupertinoNavigationBar(middle: Text('Smart Context Menu')),
+      navigationBar: const CupertinoNavigationBar(
+        middle: Text('Smart Context Menu'),
+      ),
       child: SafeArea(
         child: Column(
           children: [
