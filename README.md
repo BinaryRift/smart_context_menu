@@ -19,7 +19,7 @@ drag-to-select and rich submenus.
 - **Async items** that show a loading state and a retry item on failure, with optional custom views.
 - **Light and dark themes** out of the box.
 - **Customizable**: size, colors, text, icons, blur, decoration, labels, dividers
-  and custom item content.
+  and custom item content, set once for the whole app with a theme or for each menu.
 - **Programmatic control**: open and close the menu from code with `SmartContextMenuController`,
   or turn off the long press and open the menu only from code.
 
@@ -329,7 +329,7 @@ Dispose it when it is no longer needed.
 ### Customization
 
 All settings live in `SmartContextMenuConfig`, and the appearance in its `style`.
-Create the config once and reuse it to keep the menus in the app consistent.
+Every field has a default, so set only what you need.
 
 ```dart
 const menuConfig = SmartContextMenuConfig(
@@ -345,6 +345,94 @@ const menuConfig = SmartContextMenuConfig(
 ```
 
 `menuShadows` replaces the default shadows under the menu; pass an empty list to remove them.
+
+#### Theme and config
+
+A menu takes its config from the first of:
+
+1. its own `config`;
+2. the nearest `SmartContextMenuTheme` above it;
+3. the defaults, `const SmartContextMenuConfig()`.
+
+Both the theme and `config` are optional, so pick what fits your app.
+
+**The whole app.** Set the config once with a theme in the `builder` of the app.
+Menus need no `config` then:
+
+```dart
+MaterialApp(
+  builder: (context, child) => SmartContextMenuTheme(
+    config: menuConfig,
+    child: child!,
+  ),
+  home: const HomePage(),
+);
+
+SmartContextMenu(
+  items: items,
+  child: child,
+);
+```
+
+**A part of the app.** Wrap a screen, a list or any other subtree with its own theme.
+The nearest theme wins and replaces the outer one as a whole, so start from the outer one
+to keep its settings:
+
+```dart
+SmartContextMenuTheme(
+  config: SmartContextMenuTheme.of(context).copyWith(enableSwipeBack: false),
+  child: const ChatScreen(),
+)
+```
+
+**One menu.** Pass `config` to the menu. It replaces the theme for this menu as a whole:
+
+```dart
+SmartContextMenu(
+  config: const SmartContextMenuConfig(menuWidth: 220),
+  items: items,
+  child: child,
+)
+```
+
+To change a few settings and keep the rest of the theme, start from it with `copyWith`.
+`SmartContextMenuStyle` has it too:
+
+```dart
+final theme = SmartContextMenuTheme.of(context);
+
+SmartContextMenu(
+  config: theme.copyWith(
+    activationMode: SmartContextMenuActivationMode.manual,
+    style: theme.style.copyWith(menuBlur: SmartContextMenuBlur.small),
+  ),
+  controller: controller,
+  items: items,
+  child: child,
+)
+```
+
+**Without a theme.** Keep a shared config in a constant and pass it to the menus,
+with `copyWith` where a menu needs a change:
+
+```dart
+SmartContextMenu(
+  config: menuConfig,
+  items: items,
+  child: child,
+);
+
+SmartContextMenu(
+  config: menuConfig.copyWith(
+    activationMode: SmartContextMenuActivationMode.manual,
+  ),
+  controller: controller,
+  items: items,
+  child: child,
+);
+```
+
+#### Style
 
 `SmartContextMenuStyle` also sets the text, colors, icons and spacing of items, so the menu
 can match the app theme:
@@ -420,21 +508,6 @@ Colors may be `CupertinoDynamicColor`s: they follow the light and dark theme.
 A plain `Color` is used as is in both themes. The default values are available
 in `SmartContextMenuDefaults`.
 
-To change a few settings of a shared config for one menu, use `copyWith`.
-`SmartContextMenuStyle` has it too:
-
-```dart
-SmartContextMenu(
-  config: menuConfig.copyWith(
-    activationMode: SmartContextMenuActivationMode.manual,
-    style: menuConfig.style.copyWith(menuBlur: SmartContextMenuBlur.small),
-  ),
-  controller: controller,
-  items: items,
-  child: child,
-)
-```
-
 #### Dividers
 
 Dividers are thin lines between items, as in iOS. They are off by default; set
@@ -477,7 +550,8 @@ SmartContextMenuItem.simple(
 ### Localization
 
 The menu shows a few strings itself: the back item, the retry item and the loading
-placeholder. Override them with `SmartContextMenuLabels`:
+placeholder. Override them with `SmartContextMenuLabels`, for example in the config
+of a [theme](#theme-and-config) to localize all menus at once:
 
 ```dart
 SmartContextMenuConfig(

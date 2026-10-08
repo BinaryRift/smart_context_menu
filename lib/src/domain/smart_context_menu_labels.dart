@@ -1,6 +1,7 @@
 /// Strings shown by the menu itself.
 ///
-/// Override them to localize the menu:
+/// Override them to localize the menu, for example in the config of
+/// a [SmartContextMenuTheme] to localize all menus at once:
 ///
 /// ```dart
 /// const SmartContextMenuConfig(

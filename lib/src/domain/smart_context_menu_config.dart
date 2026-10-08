@@ -7,9 +7,12 @@ import 'smart_context_menu_style.dart';
 
 /// The behavior and appearance of a [SmartContextMenu].
 ///
-/// Every field has a default, so set only what you need. Create the config
-/// once, for example as a `const`, and reuse it to keep all menus in the app
-/// consistent. The appearance is set by [style].
+/// Every field has a default, so set only what you need. The appearance is
+/// set by [style].
+///
+/// To use one config for all menus in the app or in a part of the tree, set
+/// it with a [SmartContextMenuTheme]. Pass it to [SmartContextMenu.config]
+/// to set it for one menu: it replaces the theme then.
 ///
 /// ```dart
 /// const menuConfig = SmartContextMenuConfig(
@@ -18,9 +21,8 @@ import 'smart_context_menu_style.dart';
 ///   style: SmartContextMenuStyle(menuBlur: SmartContextMenuBlur.small),
 /// );
 ///
-/// SmartContextMenu(
+/// SmartContextMenuTheme(
 ///   config: menuConfig,
-///   items: items,
 ///   child: child,
 /// )
 /// ```
