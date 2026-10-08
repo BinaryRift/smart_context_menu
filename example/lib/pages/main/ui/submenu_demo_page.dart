@@ -36,6 +36,7 @@ final class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
   bool _slowAnimations = false;
   bool _dividersBetweenItems = false;
   _Header _header = _Header.none;
+  bool _pinHeader = false;
 
   SmartContextMenuConfig get _config => SmartContextMenuConfig(
     enableSwipeBack: _swipeBack,
@@ -151,11 +152,16 @@ final class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
               if (header != null) setState(() => _header = header);
             },
             children: const {
-              _Header.none: Text('None'),
-              _Header.short: Text('Short'),
+              _Header.none: Text('Off'),
+              _Header.short: Text('Bar'),
               _Header.tall: Text('Tall'),
             },
           ),
+        ),
+        _buildSwitch(
+          title: 'Pinned header',
+          value: _pinHeader,
+          onChanged: (value) => setState(() => _pinHeader = value),
         ),
         _buildSwitch(
           title: 'Swipe back',
@@ -260,47 +266,57 @@ final class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
 
   /// Reactions above the preview that scale in from its edge; the tall
   /// header adds a 240-tall block below them, so the header does not fit
-  /// above most widgets.
+  /// above most widgets. With [_pinHeader], the reactions stay at the top
+  /// while a tall widget and its menu scroll.
   SmartContextMenuHeaderBuilder? _headerBuilder(String title) {
     if (_header == _Header.none) return null;
 
-    return (context, header) => [
-      SliverToBoxAdapter(
-        child: Align(
-          alignment: header.alignment,
-          child: ScaleTransition(
-            scale: header.animation.drive(
-              CurveTween(curve: Curves.easeOutBack),
-            ),
-            // Grows from the bottom edge, next to the preview.
-            alignment: Alignment(header.alignment.x, 1),
-            child: ReactionsBar(
-              onSelected: (reaction) async {
-                await header.close();
-                debugPrint('Reaction $reaction: $title');
-              },
-            ),
+    return (context, header) {
+      final reactions = Align(
+        alignment: header.alignment,
+        child: ScaleTransition(
+          scale: header.animation.drive(CurveTween(curve: Curves.easeOutBack)),
+          // Grows from the bottom edge, next to the preview.
+          alignment: Alignment(header.alignment.x, 1),
+          child: ReactionsBar(
+            onSelected: (reaction) async {
+              await header.close();
+              debugPrint('Reaction $reaction: $title');
+            },
           ),
         ),
-      ),
-      if (_header == _Header.tall)
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Align(
-              alignment: header.alignment,
-              child: const SizedBox(
-                width: 240,
-                height: 240,
-                child: DemoCard(
-                  title: 'Tall header',
-                  subtitle: 'A sliver above the preview',
+      );
+
+      return [
+        if (_pinHeader)
+          // Pins under the status bar, so the padding keeps it below.
+          PinnedHeaderSliver(
+            child: Padding(
+              padding: EdgeInsets.only(top: MediaQuery.paddingOf(context).top),
+              child: reactions,
+            ),
+          )
+        else
+          SliverToBoxAdapter(child: reactions),
+        if (_header == _Header.tall)
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Align(
+                alignment: header.alignment,
+                child: const SizedBox(
+                  width: 240,
+                  height: 240,
+                  child: DemoCard(
+                    title: 'Tall header',
+                    subtitle: 'A sliver above the preview',
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      const SliverToBoxAdapter(child: SizedBox(height: 8)),
-    ];
+        const SliverToBoxAdapter(child: SizedBox(height: 8)),
+      ];
+    };
   }
 }
