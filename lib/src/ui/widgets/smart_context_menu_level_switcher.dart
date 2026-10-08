@@ -64,6 +64,11 @@ final class _SmartContextMenuLevelSwitcherState
 
   /// The parent level revealed by a swipe back.
   SmartContextMenuLevelEntry? _swipeParent;
+
+  /// While a swipe back moves the levels, [_revealed] is visible only
+  /// to the left of [_cover], as if [_cover] were opaque.
+  SmartContextMenuLevelEntry? _revealed;
+  SmartContextMenuLevelEntry? _cover;
   bool _isTracking = false;
   bool _isSettling = false;
   double _swipeProgress = 0;
@@ -161,8 +166,20 @@ final class _SmartContextMenuLevelSwitcherState
   }
 
   Widget _buildEntry(SmartContextMenuLevelEntry entry) {
-    return FadeSlideTransition(
+    final cover = entry == _revealed ? _cover : null;
+
+    // The clip stays in the tree with Clip.none, so the level is not
+    // mounted again when a swipe starts or ends.
+    return ClipRect(
       key: ObjectKey(entry),
+      clipBehavior: cover == null ? Clip.none : Clip.hardEdge,
+      clipper: cover == null ? null : _UncoveredClipper(cover.position),
+      child: _buildTransition(entry),
+    );
+  }
+
+  Widget _buildTransition(SmartContextMenuLevelEntry entry) {
+    return FadeSlideTransition(
       opacity: entry.fade,
       position: entry.position,
       child: AnimatedSize(
@@ -218,6 +235,8 @@ final class _SmartContextMenuLevelSwitcherState
 
     setState(() {
       _swipeParent = parent;
+      _revealed = parent;
+      _cover = _current;
       _swipeWidth = width;
       _swipeProgress = 0;
       _isTracking = true;
@@ -270,7 +289,7 @@ final class _SmartContextMenuLevelSwitcherState
       _current = parent;
       _swipeParent = null;
       parent.settle(show: true, duration: duration).whenCompleteOrCancel(() {
-        if (mounted) setState(() => _isSettling = false);
+        if (mounted) setState(_endSettling);
       });
       widget.onSwipeBack();
       return;
@@ -281,9 +300,32 @@ final class _SmartContextMenuLevelSwitcherState
       if (!mounted) return;
       setState(() {
         _swipeParent = null;
-        _isSettling = false;
+        _endSettling();
       });
       parent.controller.dispose();
     });
   }
+
+  void _endSettling() {
+    _isSettling = false;
+    _revealed = null;
+    _cover = null;
+  }
+}
+
+/// Clips to the part of the level stack left of a covering level that
+/// slides right by [cover], a fraction of its width.
+final class _UncoveredClipper extends CustomClipper<Rect> {
+  final Animation<Offset> cover;
+
+  _UncoveredClipper(this.cover) : super(reclip: cover);
+
+  @override
+  Rect getClip(Size size) {
+    final visible = cover.value.dx.clamp(0.0, 1.0);
+    return Rect.fromLTWH(0, 0, size.width * visible, size.height);
+  }
+
+  @override
+  bool shouldReclip(_UncoveredClipper oldClipper) => oldClipper.cover != cover;
 }

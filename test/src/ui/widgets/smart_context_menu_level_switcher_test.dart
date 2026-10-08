@@ -1,3 +1,4 @@
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu/src/core/ui/motion/tokens/motion_durations.dart';
@@ -242,6 +243,36 @@ void main() {
 
       await gesture.up();
       await tester.pumpAndSettle();
+    });
+
+    testWidgets('shows the parent only left of the swiped level', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_swipeable());
+      final gesture = await tester.startGesture(
+        tester.getCenter(find.text('Level 2')),
+      );
+      await gesture.moveBy(const Offset(30, 0));
+      await gesture.moveBy(const Offset(120, 0));
+      await tester.pump();
+
+      RenderClipRect clipOf(String level) => tester.renderObject(
+        find.ancestor(of: find.text(level), matching: find.byType(ClipRect)),
+      );
+      final parentClip = clipOf('Level 1');
+      final width = tester
+          .getSize(find.byType(SmartContextMenuLevelSwitcher))
+          .width;
+      expect(parentClip.clipBehavior, Clip.hardEdge);
+      expect(
+        parentClip.clipper!.getClip(parentClip.size).width,
+        moreOrLessEquals(tester.slideOf('Level 2') * width),
+      );
+      expect(clipOf('Level 2').clipBehavior, Clip.none);
+
+      await gesture.up();
+      await tester.pumpAndSettle();
+      expect(clipOf('Level 2').clipBehavior, Clip.none);
     });
 
     testWidgets('returns to the parent past half of the width', (
