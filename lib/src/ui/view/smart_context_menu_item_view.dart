@@ -362,8 +362,17 @@ final class _SmartContextMenuItemViewState
 
   void _buildListenableItem() {
     final item = widget.item.listenableBuilder!();
+    assert(
+      item == null ||
+          !(item.isSeparator ||
+              item.isInternalInteracted ||
+              item.listenableBuilder != null),
+      'The builder of SmartContextMenuItem.listenable must return '
+      'a SmartContextMenuItem.simple or null.',
+    );
     _resolvedItem = item;
     _isLoading = item == null;
+    _isHighlight = widget.hoverController?.value == widget.key && !_isDisabled;
   }
 
   void _handleGlobalPointer() {
