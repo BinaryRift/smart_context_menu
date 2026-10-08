@@ -3,8 +3,14 @@ import 'package:flutter/cupertino.dart';
 final class DemoCard extends StatelessWidget {
   final String title;
   final String subtitle;
+  final double? height;
 
-  const DemoCard({super.key, required this.title, required this.subtitle});
+  const DemoCard({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    this.height,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -12,6 +18,7 @@ final class DemoCard extends StatelessWidget {
 
     return Container(
       width: double.infinity,
+      height: height,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: CupertinoDynamicColor.resolve(

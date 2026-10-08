@@ -5,7 +5,11 @@ import 'package:smart_context_menu/smart_context_menu.dart';
 
 import '../../../demo_items.dart';
 import 'widgets/demo_card.dart';
+import 'widgets/reactions_bar.dart';
 import 'widgets/tap_empty_area.dart';
+
+/// Content shown above the preview.
+enum _Header { none, short, tall }
 
 /// Menus for checking submenus and swiping back.
 final class SubmenuDemoPage extends StatefulWidget {
@@ -31,6 +35,7 @@ final class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
   bool _moveBackDown = false;
   bool _slowAnimations = false;
   bool _dividersBetweenItems = false;
+  _Header _header = _Header.none;
 
   SmartContextMenuConfig get _config => SmartContextMenuConfig(
     enableSwipeBack: _swipeBack,
@@ -100,6 +105,12 @@ final class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
                     subtitle: 'The menu shrinks in the submenu',
                     items: longRootShortSubmenu(),
                   ),
+                  _buildMenu(
+                    title: 'Tall widget',
+                    subtitle: 'Short root, long submenu',
+                    items: shortRootLongSubmenu(),
+                    height: 420,
+                  ),
                 ],
               ),
             ),
@@ -129,6 +140,20 @@ final class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
               ThemeMode.system: Text('System'),
               ThemeMode.light: Text('Light'),
               ThemeMode.dark: Text('Dark'),
+            },
+          ),
+        ),
+        CupertinoListTile(
+          title: const Text('Header'),
+          trailing: CupertinoSlidingSegmentedControl<_Header>(
+            groupValue: _header,
+            onValueChanged: (header) {
+              if (header != null) setState(() => _header = header);
+            },
+            children: const {
+              _Header.none: Text('None'),
+              _Header.short: Text('Short'),
+              _Header.tall: Text('Tall'),
             },
           ),
         ),
@@ -204,6 +229,7 @@ final class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
                   activationMode: SmartContextMenuActivationMode.manual,
                 ),
                 items: items,
+                headerSliversBuilder: _headerBuilder(title),
                 child: DemoCard(title: title, subtitle: subtitle),
               ),
             ),
@@ -218,6 +244,7 @@ final class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
     required String title,
     required String subtitle,
     required List<SmartContextMenuItem> items,
+    double? height,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -225,8 +252,47 @@ final class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
         config: _config,
         items: items,
         onPreviewTap: () => debugPrint('Preview tapped: $title'),
-        child: DemoCard(title: title, subtitle: subtitle),
+        headerSliversBuilder: _headerBuilder(title),
+        child: DemoCard(title: title, subtitle: subtitle, height: height),
       ),
     );
+  }
+
+  /// Reactions above the preview; the tall header adds a 240-tall block
+  /// below them, so the header does not fit above most widgets.
+  SmartContextMenuHeaderBuilder? _headerBuilder(String title) {
+    if (_header == _Header.none) return null;
+
+    return (context, header) => [
+      SliverToBoxAdapter(
+        child: Align(
+          alignment: header.alignment,
+          child: ReactionsBar(
+            onSelected: (reaction) async {
+              await header.close();
+              debugPrint('Reaction $reaction: $title');
+            },
+          ),
+        ),
+      ),
+      if (_header == _Header.tall)
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Align(
+              alignment: header.alignment,
+              child: const SizedBox(
+                width: 240,
+                height: 240,
+                child: DemoCard(
+                  title: 'Tall header',
+                  subtitle: 'A sliver above the preview',
+                ),
+              ),
+            ),
+          ),
+        ),
+      const SliverToBoxAdapter(child: SizedBox(height: 8)),
+    ];
   }
 }
