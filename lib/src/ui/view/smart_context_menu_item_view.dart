@@ -62,8 +62,8 @@ final class _SmartContextMenuItemViewState
     extends State<SmartContextMenuItemView> {
   bool _isHighlight = false;
   SmartContextMenuItem? _resolvedItem;
-  bool _isLoading = false;
   Object? _error;
+  bool get _isLoading => _error == null && _item.isLoading;
   bool get _isDisabled => _item.isDisabled || _isLoading || !_hasInteractions;
   bool get _hasInteractions =>
       _item.onTap != null ||
@@ -145,13 +145,11 @@ final class _SmartContextMenuItemViewState
 
     if (widget.onRetry != null) {
       _error = "External error";
-      _isLoading = false;
     }
 
     if (widget.item.asyncItem != null) {
       if (widget.cachedItem != null) {
         _resolvedItem = widget.cachedItem;
-        _isLoading = false;
       } else {
         _loadAsyncData();
       }
@@ -333,7 +331,6 @@ final class _SmartContextMenuItemViewState
   Future<void> _loadAsyncData() async {
     setState(() {
       _resolvedItem = widget.item.loadingItem;
-      _isLoading = true;
       _error = null;
     });
 
@@ -346,14 +343,12 @@ final class _SmartContextMenuItemViewState
         widget.onLoaded?.call(result);
         setState(() {
           _resolvedItem = result;
-          _isLoading = false;
         });
       }
     } catch (e) {
       if (mounted) {
         setState(() {
           _error = e;
-          _isLoading = false;
         });
       }
     }
@@ -371,7 +366,6 @@ final class _SmartContextMenuItemViewState
       'a SmartContextMenuItem.simple or a SmartContextMenuItem.loading.',
     );
     _resolvedItem = item;
-    _isLoading = item.isLoading;
     _isHighlight = widget.hoverController?.value == widget.key && !_isDisabled;
   }
 

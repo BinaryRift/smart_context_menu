@@ -212,6 +212,22 @@ void main() {
     expect(find.text('Loaded'), findsOneWidget);
   });
 
+  testWidgets('shows a loading item returned by asyncItem', (tester) async {
+    await tester.pumpMenu(
+      items: [
+        SmartContextMenuItem.async(
+          loading: SmartContextMenuItem.loading(title: 'Checking'),
+          asyncItem: () async => SmartContextMenuItem.loading(title: 'Waiting'),
+        ),
+      ],
+    );
+    await tester.openMenu();
+
+    expect(find.text('Checking'), findsNothing);
+    expect(find.text('Waiting'), findsOneWidget);
+    expect(find.byType(CupertinoActivityIndicator), findsOneWidget);
+  });
+
   testWidgets('keeps the loaded item after returning from a submenu', (
     tester,
   ) async {

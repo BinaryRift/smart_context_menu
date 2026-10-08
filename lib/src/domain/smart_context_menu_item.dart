@@ -46,8 +46,8 @@ typedef SmartContextMenuItemBuilder =
 ///   the item loaded by [asyncItem].
 /// * [SmartContextMenuItem.listenable] builds the item with
 ///   [listenableBuilder] and rebuilds it when [listenable] notifies.
-/// * [SmartContextMenuItem.loading] shows that an async or a listenable
-///   item is loading.
+/// * [SmartContextMenuItem.loading] shows a loading state, usually of
+///   an async or a listenable item.
 /// * [SmartContextMenuItem.separator] separates groups of items.
 ///
 /// A submenu replaces the current menu and shows a back item at the top.
@@ -531,14 +531,21 @@ final class SmartContextMenuItem {
     Duration timeout = SmartContextMenuDefaults.loadingTimeout,
     SmartContextMenuItem? loading,
     SmartContextMenuItemBuilder? errorBuilder,
-  }) => SmartContextMenuItem._(
-    id: id ?? _generateId(),
-    asyncItem: asyncItem,
-    loadingItem: loading ?? SmartContextMenuItem.loading(),
-    loadingTimeout: timeout,
-    closeOnTap: false,
-    errorBuilder: errorBuilder,
-  );
+  }) {
+    assert(
+      loading == null || loading.isLoading,
+      'The loading of SmartContextMenuItem.async must be '
+      'a SmartContextMenuItem.loading.',
+    );
+    return SmartContextMenuItem._(
+      id: id ?? _generateId(),
+      asyncItem: asyncItem,
+      loadingItem: loading ?? SmartContextMenuItem.loading(),
+      loadingTimeout: timeout,
+      closeOnTap: false,
+      errorBuilder: errorBuilder,
+    );
+  }
 
   /// Creates an item that is built by [builder] and built again each time
   /// [listenable] notifies, also while the menu is open.
@@ -583,14 +590,16 @@ final class SmartContextMenuItem {
     closeOnTap: false,
   );
 
-  /// Creates an item that shows that an async or a listenable item is
-  /// loading.
+  /// Creates an item that shows a loading state.
   ///
   /// Pass it as `loading` to [SmartContextMenuItem.async], or return it from
-  /// the builder of [SmartContextMenuItem.listenable]. The item shows
-  /// [title] (or [SmartContextMenuLabels.loading]) with [leading] and
-  /// an activity indicator, and does not respond to taps. Use
-  /// [loadingBuilder] to replace this content.
+  /// the builder of [SmartContextMenuItem.listenable], so that it is
+  /// replaced once loading finishes. Anywhere else it stays as it is until
+  /// the menu closes.
+  ///
+  /// The item shows [title] (or [SmartContextMenuLabels.loading]) with
+  /// [leading] and an activity indicator, and does not respond to taps.
+  /// Use [loadingBuilder] to replace this content.
   ///
   /// ```dart
   /// SmartContextMenuItem.listenable(
