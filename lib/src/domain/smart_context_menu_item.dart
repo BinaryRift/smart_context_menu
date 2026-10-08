@@ -133,8 +133,11 @@ final class SmartContextMenuItem {
 
   /// Whether to show a divider next to the item.
   ///
-  /// The divider is placed according to [dividerPosition].
-  /// Use [customDivider] to replace the default one.
+  /// The divider is placed according to [dividerPosition]. Its look is set
+  /// by [SmartContextMenuStyle.dividerColor],
+  /// [SmartContextMenuStyle.dividerThickness],
+  /// [SmartContextMenuStyle.dividerIndent] and
+  /// [SmartContextMenuStyle.dividerEndIndent].
   final bool hasDivider;
 
   /// Whether the menu closes when the item is tapped.
@@ -142,11 +145,6 @@ final class SmartContextMenuItem {
   /// The menu starts closing before [onTap] is called.
   /// Ignored for items that open a submenu. Defaults to true.
   final bool closeOnTap;
-
-  /// A widget shown instead of the default divider.
-  ///
-  /// Shown only when [hasDivider] is true.
-  final Widget? customDivider;
 
   /// Where the divider is placed relative to the item.
   ///
@@ -236,7 +234,6 @@ final class SmartContextMenuItem {
     this.tintColor,
     this.isDisabled = false,
     this.hasDivider = false,
-    this.customDivider,
     this.onTap,
     this.children,
     this.asyncChildren,
@@ -275,7 +272,6 @@ final class SmartContextMenuItem {
     bool isDisabled = false,
     bool hasDivider = false,
     bool closeOnTap = true,
-    Widget? customDivider,
     SmartContextMenuItemBuilder? customBuilder,
     FutureOr<void> Function()? onTap,
     EdgeInsets? padding,
@@ -293,7 +289,6 @@ final class SmartContextMenuItem {
     isDisabled: isDisabled,
     hasDivider: hasDivider,
     closeOnTap: closeOnTap,
-    customDivider: customDivider,
     onTap: onTap,
     customBuilder: customBuilder,
     padding: padding,
@@ -314,7 +309,6 @@ final class SmartContextMenuItem {
     Color? tintColor,
     bool isDisabled = false,
     bool hasDivider = false,
-    Widget? customDivider,
     SmartContextMenuItemBuilder? customBuilder,
     EdgeInsets? padding,
     double? childrenGap,
@@ -329,7 +323,6 @@ final class SmartContextMenuItem {
     tintColor: tintColor,
     isDisabled: isDisabled,
     hasDivider: hasDivider,
-    customDivider: customDivider,
     children: children,
     customBuilder: customBuilder,
     padding: padding,
@@ -368,7 +361,6 @@ final class SmartContextMenuItem {
     Color? tintColor,
     bool isDisabled = false,
     bool hasDivider = false,
-    Widget? customDivider,
     SmartContextMenuItemBuilder? customBuilder,
     EdgeInsets? padding,
     double? childrenGap,
@@ -383,7 +375,6 @@ final class SmartContextMenuItem {
     tintColor: tintColor,
     isDisabled: isDisabled,
     hasDivider: hasDivider,
-    customDivider: customDivider,
     asyncChildren: asyncChildren,
     customBuilder: customBuilder,
     padding: padding,
@@ -436,7 +427,6 @@ final class SmartContextMenuItem {
     Color? tintColor,
     bool isDisabled = false,
     bool hasDivider = false,
-    Widget? customDivider,
     SmartContextMenuItemBuilder? customBuilder,
     EdgeInsets? padding,
     double? childrenGap,
@@ -453,7 +443,6 @@ final class SmartContextMenuItem {
     tintColor: tintColor,
     isDisabled: isDisabled,
     hasDivider: hasDivider,
-    customDivider: customDivider,
     customBuilder: customBuilder,
     padding: padding,
     childrenGap: childrenGap,
@@ -494,7 +483,6 @@ final class SmartContextMenuItem {
     String? id,
     Duration timeout = SmartContextMenuDefaults.loadingTimeout,
     bool hasDivider = false,
-    Widget? customDivider,
     EdgeInsets? padding,
     Widget? leading,
     String? loadingTitle,
@@ -511,7 +499,6 @@ final class SmartContextMenuItem {
       loadingTimeout: timeout,
       hasDivider: hasDivider,
       closeOnTap: false,
-      customDivider: customDivider,
       padding: padding,
       leading: leading,
       titleStyle: titleStyle,

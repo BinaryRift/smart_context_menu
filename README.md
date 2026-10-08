@@ -252,12 +252,33 @@ Disabled and destructive items use `secondaryTextColor` and `destructiveColor`.
 Disabled items have no background unless `disabledItemColor` is set.
 A pressed item is highlighted with a translucent `textStyle` color; `highlightColor`
 replaces it. Tinted and destructive items keep their own pressed tint.
-An item `titleStyle` replaces `textStyle` for that item.
 Icons in `leading` and `trailing` take the title color unless they set their own.
 The back item of a submenu uses `textStyle` in bold; `backButtonColor` sets the color
 of its title and icon.
 `itemPadding` and `itemChildrenGap` set the padding of items and the gap between
-their icons and title; an item `padding` or `childrenGap` overrides them.
+their icons and title.
+
+**Settings of an item take precedence over the style.** The style sets the look of
+all items, and an item changes it only for itself:
+
+```dart
+// The style: padding and text of all items.
+const style = SmartContextMenuStyle(
+  itemPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+  textStyle: TextStyle(fontSize: 17),
+);
+
+// This item uses its own padding and text style instead.
+SmartContextMenuItem.simple(
+  title: 'Open in new window',
+  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+  titleStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+  onTap: () => openInNewWindow(),
+)
+```
+
+The same goes for `childrenGap` over `itemChildrenGap`, and `tintColor` over
+`destructiveColor`.
 
 To give one item its own color, set its `tintColor`. The item is tinted like a destructive
 one: the title and icons take the color, and the background a translucent shade of it.
@@ -294,17 +315,22 @@ SmartContextMenu(
 
 #### Dividers
 
-Items have no divider by default. Set `hasDivider: true` to show one below the item,
-or above it with `dividerPosition`. The default divider takes `dividerColor` from the style;
-`customDivider` replaces it with your own widget.
+Items have no divider by default. Set `hasDivider: true` to show a line below the item,
+or above it with `dividerPosition`. The style sets the line for the whole menu:
+`dividerColor`, `dividerThickness`, and the space before and after it with
+`dividerIndent` and `dividerEndIndent`.
 
 ```dart
+const style = SmartContextMenuStyle(
+  dividerThickness: 1,
+  dividerIndent: 52,
+);
+
 SmartContextMenuItem.simple(
   title: 'Delete',
   isDestructive: true,
   hasDivider: true,
   dividerPosition: SmartContextMenuDividerPosition.top,
-  customDivider: const SizedBox(height: 8),
   onTap: () => delete(),
 )
 ```

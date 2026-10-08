@@ -150,11 +150,26 @@ final class SmartContextMenuStyle {
   /// [SmartContextMenuDefaults.darkHighlightOpacity] in the dark one.
   final Color? highlightColor;
 
-  /// The color of the divider between items.
+  /// The color of the divider of items with
+  /// [SmartContextMenuItem.hasDivider].
   ///
-  /// Does not affect [SmartContextMenuItem.customDivider].
   /// Defaults to [SmartContextMenuDefaults.dividerColor].
   final Color dividerColor;
+
+  /// The thickness of the divider, which is also the space it takes.
+  ///
+  /// Defaults to [SmartContextMenuDefaults.dividerThickness].
+  final double dividerThickness;
+
+  /// The empty space before the divider, on the left in left-to-right text.
+  ///
+  /// Defaults to 0.
+  final double dividerIndent;
+
+  /// The empty space after the divider, on the right in left-to-right text.
+  ///
+  /// Defaults to 0.
+  final double dividerEndIndent;
 
   // Icons
 
@@ -212,6 +227,9 @@ final class SmartContextMenuStyle {
     this.disabledItemColor,
     this.highlightColor,
     this.dividerColor = SmartContextMenuDefaults.dividerColor,
+    this.dividerThickness = SmartContextMenuDefaults.dividerThickness,
+    this.dividerIndent = 0,
+    this.dividerEndIndent = 0,
     this.defaultIconSize = SmartContextMenuDefaults.iconSize,
     this.defaultIconColor,
     this.submenuIcon = SmartContextMenuDefaults.submenuIcon,
@@ -243,6 +261,9 @@ final class SmartContextMenuStyle {
     Color? disabledItemColor,
     Color? highlightColor,
     Color? dividerColor,
+    double? dividerThickness,
+    double? dividerIndent,
+    double? dividerEndIndent,
     double? defaultIconSize,
     Color? defaultIconColor,
     IconData? submenuIcon,
@@ -270,6 +291,9 @@ final class SmartContextMenuStyle {
       disabledItemColor: disabledItemColor ?? this.disabledItemColor,
       highlightColor: highlightColor ?? this.highlightColor,
       dividerColor: dividerColor ?? this.dividerColor,
+      dividerThickness: dividerThickness ?? this.dividerThickness,
+      dividerIndent: dividerIndent ?? this.dividerIndent,
+      dividerEndIndent: dividerEndIndent ?? this.dividerEndIndent,
       defaultIconSize: defaultIconSize ?? this.defaultIconSize,
       defaultIconColor: defaultIconColor ?? this.defaultIconColor,
       submenuIcon: submenuIcon ?? this.submenuIcon,

@@ -188,8 +188,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
         mainAxisSize: MainAxisSize.min,
         children: [
           if (_item.hasDivider && _item.dividerPosition == SmartContextMenuDividerPosition.top)
-            _item.customDivider ??
-                SmartContextMenuDivider(color: _style.dividerColor),
+            SmartContextMenuDivider(style: _style),
           AnimatedContainer(
             duration: MotionDurations.instant,
             color: _overlayColor,
@@ -203,8 +202,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
           ),
           if (_item.hasDivider &&
               _item.dividerPosition == SmartContextMenuDividerPosition.bottom)
-            _item.customDivider ??
-                SmartContextMenuDivider(color: _style.dividerColor),
+            SmartContextMenuDivider(style: _style),
         ],
       ),
     );

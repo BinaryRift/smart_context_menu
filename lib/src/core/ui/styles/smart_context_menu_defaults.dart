@@ -110,6 +110,9 @@ abstract final class SmartContextMenuDefaults {
         darkColor: Color(0x99545458),
       );
 
+  /// The default of [SmartContextMenuStyle.dividerThickness].
+  static const double dividerThickness = 0.5;
+
   // Opacities
 
   /// The background opacity of a tinted item in the light theme, see
