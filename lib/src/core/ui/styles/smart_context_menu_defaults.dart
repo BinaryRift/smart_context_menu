@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 
-/// Default values of the menu: layout, radii, colors, shadows, text
-/// and icons.
+/// Default values of the menu: layout, radii, colors, opacities, shadows,
+/// text and icons.
 ///
 /// Most of them are defaults of [SmartContextMenuConfig],
 /// [SmartContextMenuStyle] and [SmartContextMenuItem] fields. The rest, such
-/// as [menuShadows] and [errorIcon], are fixed. All are public, so custom
-/// content, for example from [SmartContextMenuItem.customBuilder], can match
+/// as [menuShadows], [errorIcon] and the opacities, are fixed. All are
+/// public, so custom content, for example from [SmartContextMenuItem.customBuilder], can match
 /// the default look.
 ///
 /// Colors are [CupertinoDynamicColor]s with light and dark variants.
@@ -116,6 +116,52 @@ abstract final class SmartContextMenuDefaults {
         color: Color(0x999E9E9E),
         darkColor: Color(0x99545458),
       );
+
+  // Opacities
+
+  /// The background opacity of a tinted item in the light theme, see
+  /// [SmartContextMenuItem.tintColor] and [SmartContextMenuItem.isDestructive].
+  ///
+  /// A tint fades on a light menu, so the light theme opacities are twice
+  /// as high as the dark ones.
+  static const double tintOpacity = 0.24;
+
+  /// The background opacity of a tinted item in the dark theme.
+  static const double darkTintOpacity = 0.12;
+
+  /// The background opacity of a pressed tinted item in the light theme.
+  static const double tintPressedOpacity = 0.48;
+
+  /// The background opacity of a pressed tinted item in the dark theme.
+  static const double darkTintPressedOpacity = 0.24;
+
+  /// The background opacity of a disabled tinted item in the light theme.
+  static const double tintDisabledOpacity = 0.16;
+
+  /// The background opacity of a disabled tinted item in the dark theme.
+  static const double darkTintDisabledOpacity = 0.08;
+
+  /// The title and icon opacity of a disabled tinted item.
+  static const double tintDisabledTextOpacity = 0.5;
+
+  /// The opacity of the title color in the press highlight of an item
+  /// in the light theme.
+  ///
+  /// A dark highlight stands out more on a light menu, so it is lighter than
+  /// [darkHighlightOpacity].
+  static const double highlightOpacity = 0.06;
+
+  /// The opacity of the title color in the press highlight of an item,
+  /// including the back item, in the dark theme.
+  static const double darkHighlightOpacity = 0.1;
+
+  /// The opacity of the title color in the press highlight of the back item
+  /// in the light theme.
+  ///
+  /// The back item has its own [menuColor] fill and is lighter than the menu,
+  /// so its highlight is stronger than [highlightOpacity] to differ from
+  /// the menu background.
+  static const double backHighlightOpacity = 0.16;
 
   // Shadows
 

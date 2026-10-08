@@ -5,7 +5,6 @@ import 'package:flutter/services.dart' show HapticFeedback;
 
 import '../../core/ui/motion/tokens/motion_durations.dart';
 import '../../core/ui/styles/smart_context_menu_defaults.dart';
-import '../../core/ui/motion/tokens/motion_opacity.dart';
 import '../../core/ui/motion/transitions/tricky_transition.dart';
 import '../../domain/smart_context_menu_config.dart';
 import '../../domain/smart_context_menu_item.dart';
@@ -80,14 +79,32 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
   Color get _baseTextColor =>
       _style.textStyle.color ?? SmartContextMenuDefaults.textColor;
 
-  // A dark highlight stands out more in the light theme, so it is lighter
-  // there. The back item has its own menu color fill, lighter than the menu,
-  // so its highlight is stronger to differ from the menu background.
+  // The same brightness that CupertinoDynamicColor.resolve uses.
+  bool get _isDark =>
+      (CupertinoTheme.maybeBrightnessOf(context) ?? Brightness.light) ==
+      Brightness.dark;
+
+  double get _tintOpacity {
+    if (_item.isDisabled) {
+      return _isDark
+          ? SmartContextMenuDefaults.darkTintDisabledOpacity
+          : SmartContextMenuDefaults.tintDisabledOpacity;
+    }
+    if (_isHighlight) {
+      return _isDark
+          ? SmartContextMenuDefaults.darkTintPressedOpacity
+          : SmartContextMenuDefaults.tintPressedOpacity;
+    }
+    return _isDark
+        ? SmartContextMenuDefaults.darkTintOpacity
+        : SmartContextMenuDefaults.tintOpacity;
+  }
+
   double get _highlightOpacity {
-    final brightness =
-        CupertinoTheme.maybeBrightnessOf(context) ?? Brightness.light;
-    if (brightness == Brightness.dark) return 0.1;
-    return widget.key == ServiceItemKey.back ? 0.16 : 0.06;
+    if (_isDark) return SmartContextMenuDefaults.darkHighlightOpacity;
+    return widget.key == ServiceItemKey.back
+        ? SmartContextMenuDefaults.backHighlightOpacity
+        : SmartContextMenuDefaults.highlightOpacity;
   }
 
   Color? get _tintColor =>
@@ -96,12 +113,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
   Color get _overlayColor {
     final tintColor = _tintColor;
     if (tintColor != null) {
-      final alpha = _item.isDisabled
-          ? 0.08
-          : _isHighlight
-              ? 0.24
-              : 0.12;
-      return _resolve(tintColor).withValues(alpha: alpha);
+      return _resolve(tintColor).withValues(alpha: _tintOpacity);
     }
     if (_item.isDisabled) {
       return _resolve(_style.disabledItemColor);
@@ -116,8 +128,8 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
     if (tintColor != null) {
       return _resolve(tintColor).withValues(
         alpha: _item.isDisabled
-            ? MotionOpacity.medium.value
-            : MotionOpacity.visible.value,
+            ? SmartContextMenuDefaults.tintDisabledTextOpacity
+            : 1,
       );
     }
     if (_item.isDisabled) {

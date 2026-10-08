@@ -139,6 +139,7 @@ void main() {
     testWidgets('tints the title, icons and background', (tester) async {
       await tester.pumpMenu(
         config: customConfig,
+        brightness: Brightness.light,
         items: [
           SmartContextMenuItem.simple(
             title: 'Tinted',
@@ -157,12 +158,62 @@ void main() {
       expect(tester.iconColorOf(Icons.check), isSameColorAs(tintColor));
       expect(
         tester.backgroundOf('Tinted'),
-        isSameColorAs(tintColor.withValues(alpha: 0.12)),
+        isSameColorAs(tintColor.withValues(alpha: 0.24)),
       );
       expect(
         tester.backgroundOf('Destructive'),
-        isSameColorAs(customStyle.destructiveColor.withValues(alpha: 0.12)),
+        isSameColorAs(customStyle.destructiveColor.withValues(alpha: 0.24)),
       );
+    });
+
+    testWidgets('is stronger on a pressed item', (tester) async {
+      await tester.pumpMenu(
+        config: customConfig,
+        brightness: Brightness.light,
+        items: [
+          SmartContextMenuItem.simple(title: 'Tinted', tintColor: tintColor),
+        ],
+      );
+      await tester.openMenu();
+      final gesture = await tester.pressAt(find.text('Tinted'));
+
+      expect(
+        tester.backgroundOf('Tinted'),
+        isSameColorAs(tintColor.withValues(alpha: 0.48)),
+      );
+      await tester.releaseOutside(gesture);
+    });
+
+    testWidgets('is lighter in the dark theme', (tester) async {
+      await tester.pumpMenu(
+        config: customConfig,
+        brightness: Brightness.dark,
+        items: [
+          SmartContextMenuItem.simple(title: 'Tinted', tintColor: tintColor),
+          SmartContextMenuItem.simple(
+            title: 'Disabled',
+            tintColor: tintColor,
+            isDisabled: true,
+          ),
+        ],
+      );
+      await tester.openMenu();
+
+      expect(
+        tester.backgroundOf('Tinted'),
+        isSameColorAs(tintColor.withValues(alpha: 0.12)),
+      );
+      expect(
+        tester.backgroundOf('Disabled'),
+        isSameColorAs(tintColor.withValues(alpha: 0.08)),
+      );
+
+      final gesture = await tester.pressAt(find.text('Tinted'));
+      expect(
+        tester.backgroundOf('Tinted'),
+        isSameColorAs(tintColor.withValues(alpha: 0.24)),
+      );
+      await tester.releaseOutside(gesture);
     });
 
     testWidgets('takes precedence over destructive and title colors', (
@@ -170,6 +221,7 @@ void main() {
     ) async {
       await tester.pumpMenu(
         config: customConfig,
+        brightness: Brightness.light,
         items: [
           SmartContextMenuItem.simple(
             title: 'Tinted',
@@ -184,13 +236,14 @@ void main() {
       expect(tester.titleStyleOf('Tinted').color, isSameColorAs(tintColor));
       expect(
         tester.backgroundOf('Tinted'),
-        isSameColorAs(tintColor.withValues(alpha: 0.12)),
+        isSameColorAs(tintColor.withValues(alpha: 0.24)),
       );
     });
 
     testWidgets('dims a disabled item', (tester) async {
       await tester.pumpMenu(
         config: customConfig,
+        brightness: Brightness.light,
         items: [
           SmartContextMenuItem.simple(
             title: 'Tinted',
@@ -207,7 +260,7 @@ void main() {
       );
       expect(
         tester.backgroundOf('Tinted'),
-        isSameColorAs(tintColor.withValues(alpha: 0.08)),
+        isSameColorAs(tintColor.withValues(alpha: 0.16)),
       );
     });
 
