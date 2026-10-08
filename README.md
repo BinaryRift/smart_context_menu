@@ -184,6 +184,7 @@ Create items with the factory that matches what the item does:
 | `SmartContextMenuItem.pagingSubmenu` | Opens a submenu and loads its items page by page. |
 | `SmartContextMenuItem.async` | Shows a placeholder and replaces it with a loaded item. |
 | `SmartContextMenuItem.listenable` | Rebuilds from a `Listenable` while the menu is open. |
+| `SmartContextMenuItem.loading` | Shows a loading state of an async item, a submenu or a listenable item. |
 | `SmartContextMenuItem.separator` | Separates groups of items. |
 
 #### Submenu
@@ -208,6 +209,8 @@ To turn the swipe off, set `enableSwipeBack: false` in `SmartContextMenuConfig`.
 #### Async submenu
 
 The items are loaded when the submenu opens and cached until the menu closes.
+While loading, the submenu shows an activity indicator in the middle; pass a
+[loading item](#loading-item) as `loading` to show a row with a title instead.
 If loading fails or takes longer than `timeout` (10 seconds by default), the submenu
 shows a retry item.
 
@@ -215,6 +218,7 @@ shows a retry item.
 SmartContextMenuItem.asyncSubmenu(
   title: 'Recent files',
   leading: const Icon(CupertinoIcons.clock),
+  loading: SmartContextMenuItem.loading(title: 'Loading files'),
   asyncChildren: () async {
     final files = await repository.recentFiles();
     return [
@@ -231,8 +235,9 @@ SmartContextMenuItem.asyncSubmenu(
 
 The first page is loaded with `initialMetadata`. The last item of each page carries
 the metadata of the next page in `pagingMetadata`; the next page is loaded when the
-user scrolls to the end. Leave it `null` on the last page. If a page fails to load or
-takes longer than `timeout` (10 seconds by default), the submenu shows a retry item.
+user scrolls to the end. Leave it `null` on the last page. While a page loads, the submenu
+shows `loading` after the loaded items, as an async submenu does. If a page fails to load
+or takes longer than `timeout` (10 seconds by default), the submenu shows a retry item.
 
 ```dart
 SmartContextMenuItem.pagingSubmenu(
@@ -334,6 +339,24 @@ final class StreamListenable extends ChangeNotifier {
 ```
 
 Create the adapter next to the state it listens to and dispose it there as well.
+
+#### Loading item
+
+A loading item shows its `title` (the loading label by default) with `leading` and an activity
+indicator, and ignores taps. `loadingBuilder` replaces this content. The menu replaces the item
+once loading finishes when it is the `loading` of an async item or an async or paginated
+submenu, or when a listenable item returns it. Anywhere else it stays until the menu closes.
+
+```dart
+SmartContextMenuItem.listenable(
+  listenable: sync,
+  builder: () => switch (sync.state) {
+    SyncState.checking => SmartContextMenuItem.loading(title: 'Checking'),
+    SyncState.syncing => SmartContextMenuItem.loading(title: 'Syncing'),
+    SyncState.idle => SmartContextMenuItem.simple(title: 'Sync now', onTap: sync.start),
+  },
+)
+```
 
 #### Separator
 
@@ -631,9 +654,9 @@ SmartContextMenuItem.simple(
 
 ### Localization
 
-The menu shows a few strings itself: the back item, the retry item and the loading
-title of async and listenable items. Override them with `SmartContextMenuLabels`, for example in the config
-of a [theme](#theme-and-config) to localize all menus at once:
+The menu shows a few strings itself: the back item, the retry item and the title
+of a loading item without its own title. Override them with `SmartContextMenuLabels`,
+for example in the config of a [theme](#theme-and-config) to localize all menus at once:
 
 ```dart
 SmartContextMenuConfig(

@@ -24,10 +24,9 @@ final class SmartContextMenuLabels {
   /// to load. Defaults to `'Try again'`.
   final String retry;
 
-  /// The title of a [SmartContextMenuItem.async] or
-  /// [SmartContextMenuItem.listenable] item while it loads.
-  ///
-  /// Used when the item has no `loadingTitle`.
+  /// The title of a [SmartContextMenuItem.loading] item without its own
+  /// title, for example the default loading item of
+  /// a [SmartContextMenuItem.async] item.
   /// Defaults to `'Loading…'`.
   final String loading;
 
