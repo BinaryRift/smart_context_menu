@@ -12,7 +12,8 @@ drag-to-select and rich submenus.
 - **Smart positioning**: the pressed widget stays in place whenever there is room for the menu;
   very tall widgets can be scrolled, and long menus scroll inside themselves.
 - **Drag-to-select**: slide a finger across the items and release on the one you want.
-- **Custom slivers above the widget**, for example a reactions bar above a message.
+- **Custom slivers above the widget**, for example a reactions bar above a message,
+  animated with the menu and optionally pinned to the top.
 - **Submenus**: static, loaded asynchronously or paginated, with a back item and swipe back.
 - **Lazy lists**: items are built only when they scroll into view, so long menus stay fast.
 - **Async items** that show a loading state and a retry item on failure, with optional custom views.
@@ -70,6 +71,8 @@ SmartContextMenu(
 ```
 
 ### Header slivers
+
+<!-- GIF: reactions bar above a message -->
 
 To show your own content above the widget while the menu is open, pass `headerSliversBuilder`.
 It returns a list of slivers, which fade in and out with the menu and move with the widget
