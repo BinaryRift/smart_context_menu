@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/painting.dart';
 
 import '../../core/ui/gestures/gesture_thresholds.dart';
@@ -10,41 +12,67 @@ final class SmartContextMenuHorizontalLayout {
   /// [Alignment.topLeft], [Alignment.topCenter] or [Alignment.topRight].
   final Alignment alignment;
 
-  /// Puts the edge of the content at the edge of the widget, but not
-  /// closer to the screen edge than the screen padding.
+  /// Puts the edge of the preview and the header slivers at the edge of
+  /// the widget, but not closer to the screen edge than the screen padding.
   final EdgeInsets padding;
 
-  const SmartContextMenuHorizontalLayout._(this.alignment, this.padding);
+  /// Puts the edge of the menu at the edge of the widget, but moves it
+  /// towards the middle of the screen if the menu does not fit there.
+  ///
+  /// Keeps the screen padding on both sides, so on a screen narrower than
+  /// the menu with the padding, the menu gets narrower.
+  final EdgeInsets menuPadding;
+
+  const SmartContextMenuHorizontalLayout._(
+    this.alignment,
+    this.padding,
+    this.menuPadding,
+  );
 
   factory SmartContextMenuHorizontalLayout({
     required Rect anchorRect,
     required double screenWidth,
     required EdgeInsets screenPadding,
+    required double menuWidth,
   }) {
     final double centerX = anchorRect.center.dx;
     final double screenCenter = screenWidth / 2;
+    final double maxMenuInset = math.max(
+      screenWidth - screenPadding.horizontal - menuWidth,
+      0,
+    );
 
     if ((centerX - screenCenter).abs() < GestureThresholds.centerThreshold) {
-      return const SmartContextMenuHorizontalLayout._(
+      return SmartContextMenuHorizontalLayout._(
         Alignment.topCenter,
         EdgeInsets.zero,
+        EdgeInsets.only(left: screenPadding.left, right: screenPadding.right),
       );
     }
     if (centerX < screenCenter) {
+      final double left = anchorRect.left.clamp(
+        screenPadding.left,
+        screenWidth,
+      );
       return SmartContextMenuHorizontalLayout._(
         Alignment.topLeft,
+        EdgeInsets.only(left: left),
         EdgeInsets.only(
-          left: anchorRect.left.clamp(screenPadding.left, screenWidth),
+          left: math.min(left, screenPadding.left + maxMenuInset),
+          right: screenPadding.right,
         ),
       );
     }
+    final double right = (screenWidth - anchorRect.right).clamp(
+      screenPadding.right,
+      screenWidth,
+    );
     return SmartContextMenuHorizontalLayout._(
       Alignment.topRight,
+      EdgeInsets.only(right: right),
       EdgeInsets.only(
-        right: (screenWidth - anchorRect.right).clamp(
-          screenPadding.right,
-          screenWidth,
-        ),
+        left: screenPadding.left,
+        right: math.min(right, screenPadding.right + maxMenuInset),
       ),
     );
   }

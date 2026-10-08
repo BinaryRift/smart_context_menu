@@ -57,7 +57,8 @@ final class SmartContextMenuConfig {
 
   /// The width of the menu.
   ///
-  /// Defaults to 280.
+  /// On a screen narrower than the width with [screenPadding], the menu
+  /// gets narrower. Defaults to 280.
   final double menuWidth;
 
   /// The maximum height of the menu as a fraction of the screen height.

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
+import 'package:smart_context_menu/src/ui/view/smart_context_menu_view.dart';
 
 import '../../helpers/menu_tester.dart';
 
@@ -108,5 +109,79 @@ void main() {
     for (var i = 1; i < tops.length; i++) {
       expect(tops[i], greaterThanOrEqualTo(tops[i - 1]), reason: 'frame $i');
     }
+  });
+
+  group('horizontally', () {
+    /// Opens the menu of a 20-wide widget at [left] on a [screenWidth]-wide
+    /// screen and returns the menu bounds.
+    Future<Rect> openMenuAt(
+      WidgetTester tester, {
+      required double left,
+      double screenWidth = 390,
+    }) async {
+      tester.view.physicalSize = Size(screenWidth, 800);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(
+        CupertinoApp(
+          home: Stack(
+            children: [
+              Positioned(
+                left: left,
+                top: 100,
+                child: SmartContextMenu(
+                  items: [SmartContextMenuItem.simple(title: 'Copy')],
+                  child: const SizedBox(
+                    width: 20,
+                    height: 40,
+                    child: Text(menuTargetText),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+      await tester.openMenu();
+      return tester.getRect(find.byType(SmartContextMenuView));
+    }
+
+    const menuWidth = 280.0;
+    const padding = 16.0;
+
+    testWidgets('lines up with the widget edge when the menu fits', (
+      tester,
+    ) async {
+      final menu = await openMenuAt(tester, left: 40);
+
+      expect(menu.left, 40);
+      expect(menu.width, menuWidth);
+    });
+
+    testWidgets('moves to keep its width and the screen padding', (
+      tester,
+    ) async {
+      final menu = await openMenuAt(tester, left: 150);
+
+      expect(menu.width, menuWidth);
+      expect(menu.right, 390 - padding);
+    });
+
+    testWidgets('moves to keep its width on the right too', (tester) async {
+      final menu = await openMenuAt(tester, left: 220);
+
+      expect(menu.width, menuWidth);
+      expect(menu.left, padding);
+    });
+
+    testWidgets('gets narrower on a screen narrower than the menu', (
+      tester,
+    ) async {
+      final menu = await openMenuAt(tester, left: 40, screenWidth: 280);
+
+      expect(menu.left, padding);
+      expect(menu.right, 280 - padding);
+    });
   });
 }

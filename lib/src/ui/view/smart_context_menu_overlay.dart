@@ -88,6 +88,7 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
       anchorRect: widget.anchorRect,
       screenWidth: MediaQuery.of(context).size.width,
       screenPadding: _config.screenPadding,
+      menuWidth: _config.menuWidth,
     );
   }
 
@@ -234,7 +235,7 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
         child: FadeTransition(
           opacity: widget.routeAnimation,
           child: Padding(
-            padding: _horizontalLayout.padding,
+            padding: _horizontalLayout.menuPadding,
             child: GestureDetector(
               onPanStart: (_) => (),
               child: SmartContextMenuView(
