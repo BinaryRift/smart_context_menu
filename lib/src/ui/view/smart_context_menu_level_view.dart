@@ -4,10 +4,12 @@ import '../../controllers/smart_context_menu_overlay_controller.dart';
 import '../../core/ui/motion/tokens/motion_durations.dart';
 import '../../core/ui/motion/transitions/tricky_transition.dart';
 import '../../domain/smart_context_menu_config.dart';
+import '../../domain/smart_context_menu_item.dart';
 import '../../domain/smart_context_menu_level.dart';
 import '../keys/service_item_key.dart';
 import '../state/smart_context_menu_hover_controller.dart';
 import '../widgets/smart_context_menu_back_item.dart';
+import '../widgets/smart_context_menu_divider.dart';
 import '../widgets/smart_context_menu_loader.dart';
 import '../widgets/smart_context_menu_pagination_trigger.dart';
 import '../widgets/smart_context_menu_retry_item.dart';
@@ -135,6 +137,43 @@ final class SmartContextMenuLevelView extends StatelessWidget {
     }
 
     final item = level.items[relativeIndex];
+    if (item.isSeparator && !_showsSeparatorAt(relativeIndex)) {
+      return const SizedBox.shrink();
+    }
+
+    final itemView = _buildItemView(item);
+    if (!config.style.dividersBetweenItems) return itemView;
+
+    // The item stays the first child, so it keeps its state when the divider
+    // appears, for example after the next page loads.
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        itemView,
+        if (relativeIndex < itemsCount - 1 &&
+            _needsDividerBetween(item, level.items[relativeIndex + 1]))
+          SmartContextMenuDivider(style: config.style),
+      ],
+    );
+  }
+
+  static bool _needsDividerBetween(
+    SmartContextMenuItem item,
+    SmartContextMenuItem next,
+  ) => !item.isSeparator && !next.isSeparator;
+
+  // A separator is shown only between items: not at the start or the end
+  // of the level, and only the first one of several in a row. Items shown
+  // on condition can keep their separators without extra checks.
+  bool _showsSeparatorAt(int index) {
+    final items = level.items;
+    if (index > 0 && items[index - 1].isSeparator) return false;
+    final hasItemBefore = items.take(index).any((item) => !item.isSeparator);
+    final hasItemAfter = items.skip(index + 1).any((item) => !item.isSeparator);
+    return hasItemBefore && hasItemAfter;
+  }
+
+  Widget _buildItemView(SmartContextMenuItem item) {
     if (item.asyncItem != null) {
       final parentId = item.id;
       return SmartContextMenuItemView.async(

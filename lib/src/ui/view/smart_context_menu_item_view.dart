@@ -13,7 +13,6 @@ import '../../domain/smart_context_menu_style.dart';
 import '../keys/item_content_key.dart';
 import '../keys/service_item_key.dart';
 import '../state/smart_context_menu_hover_controller.dart';
-import '../widgets/smart_context_menu_divider.dart';
 
 final class SmartContextMenuItemView extends StatefulWidget {
   final SmartContextMenuItem item;
@@ -187,26 +186,16 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
     return MetaData(
       metaData: widget.key,
       behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (_item.hasDivider && _item.dividerPosition == SmartContextMenuDividerPosition.top)
-            SmartContextMenuDivider(style: _style),
-          AnimatedContainer(
-            duration: MotionDurations.instant,
-            color: _overlayColor,
-            padding: _item.padding ?? _style.itemPadding,
-            child: AnimatedSwitcher(
-              duration: MotionDurations.fast,
-              transitionBuilder: (child, animation) =>
-                  TrickyTransition(animation: animation, child: child),
-              child: _buildContent(itemState),
-            ),
-          ),
-          if (_item.hasDivider &&
-              _item.dividerPosition == SmartContextMenuDividerPosition.bottom)
-            SmartContextMenuDivider(style: _style),
-        ],
+      child: AnimatedContainer(
+        duration: MotionDurations.instant,
+        color: _overlayColor,
+        padding: _item.padding ?? _style.itemPadding,
+        child: AnimatedSwitcher(
+          duration: MotionDurations.fast,
+          transitionBuilder: (child, animation) =>
+              TrickyTransition(animation: animation, child: child),
+          child: _buildContent(itemState),
+        ),
       ),
     );
   }

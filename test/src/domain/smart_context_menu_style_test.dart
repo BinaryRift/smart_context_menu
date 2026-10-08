@@ -30,6 +30,7 @@ void main() {
       dividerThickness: 1,
       dividerIndent: 1,
       dividerEndIndent: 1,
+      dividersBetweenItems: true,
       separatorHeight: 1,
       separatorColor: Color(0xFF00000C),
       defaultIconSize: 11,
@@ -64,6 +65,7 @@ void main() {
       'dividerThickness': (s) => s.dividerThickness,
       'dividerIndent': (s) => s.dividerIndent,
       'dividerEndIndent': (s) => s.dividerEndIndent,
+      'dividersBetweenItems': (s) => s.dividersBetweenItems,
       'separatorHeight': (s) => s.separatorHeight,
       'separatorColor': (s) => s.separatorColor,
       'defaultIconSize': (s) => s.defaultIconSize,
@@ -136,6 +138,10 @@ void main() {
       'dividerThickness': (9.0, () => original.copyWith(dividerThickness: 9)),
       'dividerIndent': (9.0, () => original.copyWith(dividerIndent: 9)),
       'dividerEndIndent': (9.0, () => original.copyWith(dividerEndIndent: 9)),
+      'dividersBetweenItems': (
+        false,
+        () => original.copyWith(dividersBetweenItems: false),
+      ),
       'separatorHeight': (9.0, () => original.copyWith(separatorHeight: 9)),
       'separatorColor': (
         color,

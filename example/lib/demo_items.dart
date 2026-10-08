@@ -32,12 +32,8 @@ List<SmartContextMenuItem> allSubmenuTypes(DemoLoader loader) => [
     children: [
       _action('Documents'),
       _action('Archive'),
-      _action(
-        'Trash',
-        icon: CupertinoIcons.delete,
-        isDestructive: true,
-        hasDivider: true,
-      ),
+      SmartContextMenuItem.separator(),
+      _action('Trash', icon: CupertinoIcons.delete, isDestructive: true),
     ],
   ),
   _recentFiles(loader),
@@ -47,12 +43,8 @@ List<SmartContextMenuItem> allSubmenuTypes(DemoLoader loader) => [
 
 /// Three levels: root, Share, Messages.
 List<SmartContextMenuItem> nestedLevels() => [
-  _action(
-    'Copy',
-    icon: CupertinoIcons.doc_on_doc,
-    hasDivider: true,
-    dividerPosition: SmartContextMenuDividerPosition.bottom,
-  ),
+  _action('Copy', icon: CupertinoIcons.doc_on_doc),
+  SmartContextMenuItem.separator(),
   _share(),
   SmartContextMenuItem.separator(),
   _action('Delete', icon: CupertinoIcons.delete, isDestructive: true),
@@ -60,12 +52,8 @@ List<SmartContextMenuItem> nestedLevels() => [
 
 /// A short root with a long scrollable submenu.
 List<SmartContextMenuItem> shortRootLongSubmenu() => [
-  _action(
-    'Open',
-    icon: CupertinoIcons.arrow_up_right_square,
-    hasDivider: true,
-    dividerPosition: SmartContextMenuDividerPosition.bottom,
-  ),
+  _action('Open', icon: CupertinoIcons.arrow_up_right_square),
+  SmartContextMenuItem.separator(),
   SmartContextMenuItem.submenu(
     title: 'Tags',
     leading: const Icon(CupertinoIcons.tag),
@@ -182,9 +170,6 @@ SmartContextMenuItem _action(
   bool isDisabled = false,
   Color? tintColor,
   SmartContextMenuPagingMetadata? pagingMetadata,
-  bool hasDivider = false,
-  SmartContextMenuDividerPosition dividerPosition =
-      SmartContextMenuDividerPosition.top,
 }) {
   return SmartContextMenuItem.simple(
     title: title,
@@ -193,8 +178,6 @@ SmartContextMenuItem _action(
     isDisabled: isDisabled,
     tintColor: tintColor,
     pagingMetadata: pagingMetadata,
-    hasDivider: hasDivider,
-    dividerPosition: dividerPosition,
     onTap: () => debugPrint('Tapped: $title'),
   );
 }

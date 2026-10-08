@@ -26,15 +26,6 @@ typedef SmartContextMenuItemLoader = Future<SmartContextMenuItem> Function();
 typedef SmartContextMenuItemBuilder =
     Widget Function(BuildContext context, SmartContextMenuItemState state);
 
-/// Where the divider of a [SmartContextMenuItem] is placed.
-enum SmartContextMenuDividerPosition {
-  /// Above the item.
-  top,
-
-  /// Below the item.
-  bottom,
-}
-
 /// An entry of a [SmartContextMenu].
 ///
 /// Create items with the factory that matches what the item does:
@@ -138,14 +129,6 @@ final class SmartContextMenuItem {
   /// Set by [SmartContextMenuItem.separator].
   final bool isSeparator;
 
-  /// Whether to show a divider next to the item.
-  ///
-  /// The divider is placed according to [dividerPosition]. Its look is set
-  /// by [SmartContextMenuStyle.dividerColor],
-  /// [SmartContextMenuStyle.dividerThickness],
-  /// [SmartContextMenuStyle.dividerIndent] and
-  /// [SmartContextMenuStyle.dividerEndIndent].
-  final bool hasDivider;
 
   /// Whether the menu closes when the item is tapped.
   ///
@@ -153,10 +136,6 @@ final class SmartContextMenuItem {
   /// Ignored for items that open a submenu. Defaults to true.
   final bool closeOnTap;
 
-  /// Where the divider is placed relative to the item.
-  ///
-  /// Defaults to [SmartContextMenuDividerPosition.bottom].
-  final SmartContextMenuDividerPosition dividerPosition;
 
   /// Called when the item is tapped.
   ///
@@ -197,23 +176,23 @@ final class SmartContextMenuItem {
 
   /// Builds the item content instead of [leading], [title] and [trailing].
   ///
-  /// The item [padding], press highlight and divider are still applied,
-  /// and taps are handled as usual. Interactive widgets inside, such as
+  /// The item [padding] and press highlight are still applied, and taps
+  /// are handled as usual. Interactive widgets inside, such as
   /// buttons, handle their own taps: the item is not triggered over them.
   final SmartContextMenuItemBuilder? customBuilder;
 
   /// Builds the content of the placeholder while [asyncItem] is loading.
   ///
-  /// The item [padding] and divider are still applied. If null, the
-  /// placeholder shows [title] (or [SmartContextMenuLabels.loading]),
-  /// [leading] and an activity indicator.
+  /// The item [padding] is still applied. If null, the placeholder shows
+  /// [title] (or [SmartContextMenuLabels.loading]), [leading] and an activity
+  /// indicator.
   /// Set by [SmartContextMenuItem.async].
   final SmartContextMenuItemBuilder? loadingBuilder;
 
   /// Builds the content of the placeholder after [asyncItem] has failed.
   ///
-  /// Tapping the placeholder retries loading. The item [padding], press
-  /// highlight and divider are still applied. If null, the placeholder
+  /// Tapping the placeholder retries loading. The item [padding] and press
+  /// highlight are still applied. If null, the placeholder
   /// shows [SmartContextMenuLabels.retry] with error and retry icons.
   /// Set by [SmartContextMenuItem.async].
   final SmartContextMenuItemBuilder? errorBuilder;
@@ -241,7 +220,6 @@ final class SmartContextMenuItem {
     this.tintColor,
     this.isDisabled = false,
     this.isSeparator = false,
-    this.hasDivider = false,
     this.onTap,
     this.children,
     this.asyncChildren,
@@ -255,7 +233,6 @@ final class SmartContextMenuItem {
     this.padding,
     this.childrenGap,
     this.closeOnTap = true,
-    this.dividerPosition = SmartContextMenuDividerPosition.bottom,
   }) : assert(
          (children != null ? 1 : 0) +
                  (asyncChildren != null ? 1 : 0) +
@@ -278,14 +255,12 @@ final class SmartContextMenuItem {
     bool isDestructive = false,
     Color? tintColor,
     bool isDisabled = false,
-    bool hasDivider = false,
     bool closeOnTap = true,
     SmartContextMenuItemBuilder? customBuilder,
     FutureOr<void> Function()? onTap,
     EdgeInsets? padding,
     double? childrenGap,
     SmartContextMenuPagingMetadata? pagingMetadata,
-    SmartContextMenuDividerPosition? dividerPosition,
   }) => SmartContextMenuItem._(
     id: id ?? _generateId(),
     title: title,
@@ -295,14 +270,12 @@ final class SmartContextMenuItem {
     isDestructive: isDestructive,
     tintColor: tintColor,
     isDisabled: isDisabled,
-    hasDivider: hasDivider,
     closeOnTap: closeOnTap,
     onTap: onTap,
     customBuilder: customBuilder,
     padding: padding,
     childrenGap: childrenGap,
     pagingMetadata: pagingMetadata,
-    dividerPosition: dividerPosition ?? SmartContextMenuDividerPosition.bottom,
   );
 
   /// Creates an item that opens a submenu with [children].
@@ -316,11 +289,9 @@ final class SmartContextMenuItem {
     bool isDestructive = false,
     Color? tintColor,
     bool isDisabled = false,
-    bool hasDivider = false,
     SmartContextMenuItemBuilder? customBuilder,
     EdgeInsets? padding,
     double? childrenGap,
-    SmartContextMenuDividerPosition? dividerPosition,
   }) => SmartContextMenuItem._(
     id: id ?? _generateId(),
     title: title,
@@ -330,12 +301,10 @@ final class SmartContextMenuItem {
     isDestructive: isDestructive,
     tintColor: tintColor,
     isDisabled: isDisabled,
-    hasDivider: hasDivider,
     children: children,
     customBuilder: customBuilder,
     padding: padding,
     childrenGap: childrenGap,
-    dividerPosition: dividerPosition ?? SmartContextMenuDividerPosition.bottom,
   );
 
   /// Creates an item that opens a submenu with items loaded by
@@ -368,11 +337,9 @@ final class SmartContextMenuItem {
     bool isDestructive = false,
     Color? tintColor,
     bool isDisabled = false,
-    bool hasDivider = false,
     SmartContextMenuItemBuilder? customBuilder,
     EdgeInsets? padding,
     double? childrenGap,
-    SmartContextMenuDividerPosition? dividerPosition,
   }) => SmartContextMenuItem._(
     id: id ?? _generateId(),
     title: title,
@@ -382,12 +349,10 @@ final class SmartContextMenuItem {
     isDestructive: isDestructive,
     tintColor: tintColor,
     isDisabled: isDisabled,
-    hasDivider: hasDivider,
     asyncChildren: asyncChildren,
     customBuilder: customBuilder,
     padding: padding,
     childrenGap: childrenGap,
-    dividerPosition: dividerPosition ?? SmartContextMenuDividerPosition.bottom,
   );
 
   /// Creates an item that opens a submenu with items loaded page by page.
@@ -434,11 +399,9 @@ final class SmartContextMenuItem {
     bool isDestructive = false,
     Color? tintColor,
     bool isDisabled = false,
-    bool hasDivider = false,
     SmartContextMenuItemBuilder? customBuilder,
     EdgeInsets? padding,
     double? childrenGap,
-    SmartContextMenuDividerPosition? dividerPosition,
   }) => SmartContextMenuItem._(
     id: id ?? _generateId(),
     title: title,
@@ -450,11 +413,9 @@ final class SmartContextMenuItem {
     isDestructive: isDestructive,
     tintColor: tintColor,
     isDisabled: isDisabled,
-    hasDivider: hasDivider,
     customBuilder: customBuilder,
     padding: padding,
     childrenGap: childrenGap,
-    dividerPosition: dividerPosition ?? SmartContextMenuDividerPosition.bottom,
   );
 
   /// Creates a separator between groups of items.
@@ -465,6 +426,13 @@ final class SmartContextMenuItem {
   /// [SmartContextMenuStyle.separatorColor]; 
   /// [child] replaces the band, for example with a section title.
   ///
+  /// A separator at the start or the end of a menu level is not shown, and
+  /// of several separators in a row only the first one is. So items shown
+  /// on condition can keep their separators without extra checks. A separator
+  /// at the end of a loaded page appears when the next page loads; set
+  /// [pagingMetadata] on it if it is the last item of a page, see
+  /// [SmartContextMenuItem.pagingSubmenu].
+  ///
   /// ```dart
   /// [
   ///   SmartContextMenuItem.simple(title: 'Copy'),
@@ -473,13 +441,17 @@ final class SmartContextMenuItem {
   ///   SmartContextMenuItem.simple(title: 'Delete', isDestructive: true),
   /// ]
   /// ```
-  factory SmartContextMenuItem.separator({String? id, Widget? child}) =>
-      SmartContextMenuItem._(
-        id: id ?? _generateId(),
-        isSeparator: true,
-        closeOnTap: false,
-        customBuilder: child == null ? null : (context, state) => child,
-      );
+  factory SmartContextMenuItem.separator({
+    String? id,
+    Widget? child,
+    SmartContextMenuPagingMetadata? pagingMetadata,
+  }) => SmartContextMenuItem._(
+    id: id ?? _generateId(),
+    isSeparator: true,
+    closeOnTap: false,
+    customBuilder: child == null ? null : (context, state) => child,
+    pagingMetadata: pagingMetadata,
+  );
 
   /// Creates a placeholder that is replaced by the item loaded by
   /// [asyncItem].
@@ -494,8 +466,8 @@ final class SmartContextMenuItem {
   /// [timeout] defaults to [SmartContextMenuDefaults.loadingTimeout].
   ///
   /// Use [loadingBuilder] and [errorBuilder] to replace the default loading
-  /// and error content. The divider and [padding] apply to the placeholder
-  /// only; the loaded item uses its own.
+  /// and error content. [padding] applies to the placeholder only; the loaded
+  /// item uses its own.
   ///
   /// ```dart
   /// SmartContextMenuItem.async(
@@ -514,7 +486,6 @@ final class SmartContextMenuItem {
     required SmartContextMenuItemLoader asyncItem,
     String? id,
     Duration timeout = SmartContextMenuDefaults.loadingTimeout,
-    bool hasDivider = false,
     EdgeInsets? padding,
     Widget? leading,
     String? loadingTitle,
@@ -522,14 +493,12 @@ final class SmartContextMenuItem {
     SmartContextMenuItemBuilder? loadingBuilder,
     SmartContextMenuItemBuilder? errorBuilder,
     double? childrenGap,
-    SmartContextMenuDividerPosition? dividerPosition,
   }) {
     return SmartContextMenuItem._(
       id: id ?? _generateId(),
       title: loadingTitle,
       asyncItem: asyncItem,
       loadingTimeout: timeout,
-      hasDivider: hasDivider,
       closeOnTap: false,
       padding: padding,
       leading: leading,
@@ -537,7 +506,6 @@ final class SmartContextMenuItem {
       loadingBuilder: loadingBuilder,
       errorBuilder: errorBuilder,
       childrenGap: childrenGap,
-      dividerPosition: dividerPosition ?? SmartContextMenuDividerPosition.bottom,
     );
   }
 }

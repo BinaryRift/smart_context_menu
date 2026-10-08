@@ -186,20 +186,30 @@ A separator splits the items into groups. It has no actions and no press highlig
 and drag-to-select passes over it. By default it is a band set by `separatorHeight`
 and `separatorColor` in the style; `child` replaces it, for example with a section title.
 
+Separators at the start or the end of a menu are not shown, and several separators
+in a row show as one. So a menu whose items depend on the user or the content
+needs no extra checks:
+
 ```dart
 [
+  if (canReply)
+    SmartContextMenuItem.simple(title: 'Reply', onTap: () => reply()),
   SmartContextMenuItem.simple(title: 'Copy', onTap: () => copy()),
-  SmartContextMenuItem.simple(title: 'Share', onTap: () => share()),
+  if (isAdmin) SmartContextMenuItem.simple(title: 'Pin', onTap: () => pin()),
   SmartContextMenuItem.separator(),
-  SmartContextMenuItem.simple(
-    title: 'Delete',
-    isDestructive: true,
-    onTap: () => delete(),
-  ),
+  // Without Delete, the separator above is not shown.
+  if (canDelete)
+    SmartContextMenuItem.simple(
+      title: 'Delete',
+      isDestructive: true,
+      onTap: () => delete(),
+    ),
 ]
 ```
 
-Unlike a separator, a divider is a thin line that belongs to an item, see [Dividers](#dividers).
+For a thin line instead of a band, set a small `separatorHeight` and the
+`dividerColor` as `separatorColor`. To draw lines between all items, see
+[Dividers](#dividers).
 
 ### Opening from code
 
@@ -338,30 +348,26 @@ SmartContextMenu(
 
 #### Dividers
 
-Items have no divider by default. Set `hasDivider: true` to show a line below the item,
-or above it with `dividerPosition`. The style sets the line for the whole menu:
-`dividerColor`, `dividerThickness`, and the space before and after it with
-`dividerIndent` and `dividerEndIndent`.
+Dividers are thin lines between items, as in iOS. They are off by default; set
+`dividersBetweenItems: true` in the style to draw a line between every two items.
+No line is drawn next to a separator, so groups stay split by separators only.
+The style also sets the look of the lines: `dividerColor`, `dividerThickness`, and
+the space before and after them with `dividerIndent` and `dividerEndIndent`.
 
 ```dart
 const style = SmartContextMenuStyle(
+  dividersBetweenItems: true,
   dividerThickness: 1,
   dividerIndent: 52,
 );
-
-SmartContextMenuItem.simple(
-  title: 'Delete',
-  isDestructive: true,
-  hasDivider: true,
-  dividerPosition: SmartContextMenuDividerPosition.top,
-  onTap: () => delete(),
-)
 ```
+
+To split items into groups, use a [separator](#separator).
 
 #### Custom item content
 
-`customBuilder` replaces the content of an item. The item padding, press highlight
-and divider are kept, and taps work as usual. Interactive widgets inside, such as
+`customBuilder` replaces the content of an item. The item padding and press highlight
+are kept, and taps work as usual. Interactive widgets inside, such as
 buttons, handle their own taps: the item is not triggered over them. The builder
 receives the item state, including `foregroundColor`: the color of the title and icons
 for the current state and theme.

@@ -7,6 +7,7 @@ import '../keys/service_item_key.dart';
 import '../state/smart_context_menu_hover_controller.dart';
 import '../view/smart_context_menu_item_view.dart';
 import 'smart_context_menu_blur_box.dart';
+import 'smart_context_menu_divider.dart';
 
 /// The item that returns to the parent menu level.
 final class SmartContextMenuBackItem extends StatelessWidget {
@@ -59,14 +60,17 @@ final class SmartContextMenuBackItem extends StatelessWidget {
             context,
           ),
         ),
-        hasDivider: true,
       ),
+    );
+    final itemWithDivider = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [item, SmartContextMenuDivider(style: style)],
     );
 
     if (_isPlaceholder) {
       return Visibility.maintain(
         visible: false,
-        child: IgnorePointer(child: item),
+        child: IgnorePointer(child: itemWithDivider),
       );
     }
 
@@ -81,7 +85,7 @@ final class SmartContextMenuBackItem extends StatelessWidget {
             color: CupertinoDynamicColor.resolve(style.menuColor, context),
             borderRadius: style.backButtonBorderRadius,
           ),
-          child: item,
+          child: itemWithDivider,
         ),
       ),
     );

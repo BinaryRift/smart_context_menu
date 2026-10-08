@@ -8,11 +8,14 @@ import '../../../helpers/menu_tester.dart';
 
 void main() {
   Color dividerColorOf(WidgetTester tester) =>
-      tester.widget<Divider>(find.byType(Divider)).color!;
+      tester.widget<Divider>(find.byType(Divider).first).color!;
 
   testWidgets('uses the default colors', (tester) async {
     await tester.pumpMenu(
       items: appearanceItems(),
+      config: const SmartContextMenuConfig(
+        style: SmartContextMenuStyle(dividersBetweenItems: true),
+      ),
       brightness: Brightness.light,
     );
     await tester.openMenu();
@@ -40,7 +43,12 @@ void main() {
   });
 
   testWidgets('applies the style colors', (tester) async {
-    await tester.pumpMenu(items: appearanceItems(), config: customConfig);
+    await tester.pumpMenu(
+      items: appearanceItems(),
+      config: customConfig.copyWith(
+        style: customStyle.copyWith(dividersBetweenItems: true),
+      ),
+    );
     await tester.openMenu();
 
     expect(

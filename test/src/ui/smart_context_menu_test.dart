@@ -90,7 +90,13 @@ void main() {
     testWidgets('resolve the divider color in dark theme', (tester) async {
       await tester.pumpMenu(
         brightness: Brightness.dark,
-        items: [SmartContextMenuItem.simple(title: 'Copy', hasDivider: true)],
+        config: const SmartContextMenuConfig(
+          style: SmartContextMenuStyle(dividersBetweenItems: true),
+        ),
+        items: [
+          SmartContextMenuItem.simple(title: 'Copy'),
+          SmartContextMenuItem.simple(title: 'Share'),
+        ],
       );
       await tester.openMenu();
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
@@ -38,6 +40,7 @@ void main() {
       items: [
         SmartContextMenuItem.simple(title: 'Copy'),
         SmartContextMenuItem.separator(),
+        SmartContextMenuItem.simple(title: 'Delete'),
       ],
     );
     await tester.openMenu();
@@ -51,6 +54,7 @@ void main() {
       items: [
         SmartContextMenuItem.simple(title: 'Copy'),
         SmartContextMenuItem.separator(child: const Text('Danger zone')),
+        SmartContextMenuItem.simple(title: 'Delete'),
       ],
     );
     await tester.openMenu();
@@ -65,6 +69,7 @@ void main() {
       items: [
         SmartContextMenuItem.simple(title: 'Copy', onTap: () => taps++),
         SmartContextMenuItem.separator(child: const Text('Section')),
+        SmartContextMenuItem.simple(title: 'Delete'),
       ],
     );
     await tester.openMenu();
@@ -87,6 +92,7 @@ void main() {
       items: [
         SmartContextMenuItem.simple(title: 'Copy'),
         SmartContextMenuItem.separator(child: const Text('Section')),
+        SmartContextMenuItem.simple(title: 'Delete'),
       ],
     );
     await tester.openMenu();
@@ -95,5 +101,87 @@ void main() {
     await tester.settleMenu();
 
     expect(find.text('Copy'), findsOneWidget);
+  });
+
+  group('cleanup', () {
+    Finder sections() => find.textContaining('Section');
+
+    testWidgets('hides separators at the start and the end', (tester) async {
+      await tester.pumpMenu(
+        items: [
+          SmartContextMenuItem.separator(child: const Text('Section 1')),
+          SmartContextMenuItem.simple(title: 'Copy'),
+          SmartContextMenuItem.separator(child: const Text('Section 2')),
+        ],
+      );
+      await tester.openMenu();
+
+      expect(sections(), findsNothing);
+    });
+
+    testWidgets('shows one of several separators in a row', (tester) async {
+      await tester.pumpMenu(
+        items: [
+          SmartContextMenuItem.simple(title: 'Copy'),
+          SmartContextMenuItem.separator(child: const Text('Section 1')),
+          SmartContextMenuItem.separator(child: const Text('Section 2')),
+          SmartContextMenuItem.simple(title: 'Delete'),
+        ],
+      );
+      await tester.openMenu();
+
+      expect(find.text('Section 1'), findsOneWidget);
+      expect(find.text('Section 2'), findsNothing);
+    });
+
+    testWidgets('keeps items shown on condition free of checks', (
+      tester,
+    ) async {
+      const canDelete = false;
+      await tester.pumpMenu(
+        items: [
+          SmartContextMenuItem.simple(title: 'Copy'),
+          SmartContextMenuItem.separator(child: const Text('Section')),
+          // ignore: dead_code
+          if (canDelete) SmartContextMenuItem.simple(title: 'Delete'),
+        ],
+      );
+      await tester.openMenu();
+
+      expect(sections(), findsNothing);
+    });
+
+    testWidgets('shows a trailing separator once the next page loads', (
+      tester,
+    ) async {
+      final secondPage = Completer<List<SmartContextMenuItem>>();
+      await tester.pumpMenu(
+        items: [
+          SmartContextMenuItem.pagingSubmenu(
+            title: 'More',
+            initialMetadata: const SmartContextMenuPagingMetadata(limit: 2),
+            asyncPagingChildren: (metadata) async => metadata.page == 1
+                ? [
+                    SmartContextMenuItem.simple(title: 'First'),
+                    SmartContextMenuItem.separator(
+                      child: const Text('Section'),
+                      pagingMetadata: metadata.copyWith(page: 2),
+                    ),
+                  ]
+                : secondPage.future,
+          ),
+        ],
+      );
+      await tester.openMenu();
+      await tester.tap(find.text('More'));
+      await tester.settleMenu();
+      expect(sections(), findsNothing);
+
+      secondPage.complete([SmartContextMenuItem.simple(title: 'Second')]);
+      await tester.settleMenu();
+
+      expect(find.text('Second'), findsOneWidget);
+      expect(sections(), findsOneWidget);
+    });
   });
 }

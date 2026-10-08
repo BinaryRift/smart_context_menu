@@ -19,9 +19,9 @@ const customStyle = SmartContextMenuStyle(
 
 const customConfig = SmartContextMenuConfig(style: customStyle);
 
-/// Enabled (with a divider), disabled and destructive items.
+/// Enabled, disabled and destructive items.
 List<SmartContextMenuItem> appearanceItems() => [
-  SmartContextMenuItem.simple(title: 'Enabled', hasDivider: true),
+  SmartContextMenuItem.simple(title: 'Enabled'),
   SmartContextMenuItem.simple(title: 'Disabled', isDisabled: true),
   SmartContextMenuItem.simple(title: 'Destructive', isDestructive: true),
 ];

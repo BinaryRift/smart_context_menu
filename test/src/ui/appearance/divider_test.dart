@@ -8,23 +8,35 @@ import '../../../helpers/menu_tester.dart';
 
 void main() {
   const style = SmartContextMenuStyle(
+    dividersBetweenItems: true,
     dividerColor: Color(0xFF000001),
     dividerThickness: 2,
     dividerIndent: 8,
     dividerEndIndent: 4,
   );
+  final dividers = find.byType(Divider);
+  List<SmartContextMenuItem> items(List<String> titles) => [
+    for (final title in titles) SmartContextMenuItem.simple(title: title),
+  ];
 
-  testWidgets('uses the default divider', (tester) async {
+  testWidgets('are off by default', (tester) async {
+    await tester.pumpMenu(items: items(['A', 'B', 'C']));
+    await tester.openMenu();
+
+    expect(dividers, findsNothing);
+  });
+
+  testWidgets('use the default look', (tester) async {
     await tester.pumpMenu(
-      items: [
-        SmartContextMenuItem.simple(title: 'First', hasDivider: true),
-        SmartContextMenuItem.simple(title: 'Second'),
-      ],
+      config: const SmartContextMenuConfig(
+        style: SmartContextMenuStyle(dividersBetweenItems: true),
+      ),
+      items: items(['A', 'B']),
       brightness: Brightness.light,
     );
     await tester.openMenu();
 
-    final divider = tester.widget<Divider>(find.byType(Divider));
+    final divider = tester.widget<Divider>(dividers);
     expect(divider.thickness, SmartContextMenuDefaults.dividerThickness);
     expect(divider.height, SmartContextMenuDefaults.dividerThickness);
     expect(divider.indent, 0);
@@ -35,17 +47,14 @@ void main() {
     );
   });
 
-  testWidgets('applies the style', (tester) async {
+  testWidgets('apply the style', (tester) async {
     await tester.pumpMenu(
       config: const SmartContextMenuConfig(style: style),
-      items: [
-        SmartContextMenuItem.simple(title: 'First', hasDivider: true),
-        SmartContextMenuItem.simple(title: 'Second'),
-      ],
+      items: items(['A', 'B']),
     );
     await tester.openMenu();
 
-    final divider = tester.widget<Divider>(find.byType(Divider));
+    final divider = tester.widget<Divider>(dividers);
     expect(divider.thickness, 2);
     expect(divider.height, 2);
     expect(divider.indent, 8);
@@ -53,17 +62,44 @@ void main() {
     expect(divider.color, isSameColorAs(style.dividerColor));
   });
 
-  testWidgets('applies the style to the back item', (tester) async {
+  testWidgets('are drawn between every two items', (tester) async {
     await tester.pumpMenu(
       config: const SmartContextMenuConfig(style: style),
+      items: items(['A', 'B', 'C']),
+    );
+    await tester.openMenu();
+
+    expect(dividers, findsNWidgets(2));
+  });
+
+  testWidgets('are not drawn next to a separator', (tester) async {
+    await tester.pumpMenu(
+      config: const SmartContextMenuConfig(style: style),
+      items: [
+        SmartContextMenuItem.simple(title: 'A'),
+        SmartContextMenuItem.simple(title: 'B'),
+        SmartContextMenuItem.separator(),
+        SmartContextMenuItem.simple(title: 'C'),
+      ],
+    );
+    await tester.openMenu();
+
+    expect(dividers, findsOneWidget);
+  });
+
+  testWidgets('the back item has a divider with the style', (tester) async {
+    await tester.pumpMenu(
+      config: const SmartContextMenuConfig(
+        style: SmartContextMenuStyle(dividerThickness: 2, dividerIndent: 8),
+      ),
       items: submenuItems(),
     );
     await tester.openSubmenu();
 
-    // The back item and its invisible placeholder.
-    final dividers = tester.widgetList<Divider>(find.byType(Divider));
-    expect(dividers, hasLength(2));
-    for (final divider in dividers) {
+    // The back item and its invisible placeholder; one child has none.
+    final backDividers = tester.widgetList<Divider>(dividers);
+    expect(backDividers, hasLength(2));
+    for (final divider in backDividers) {
       expect(divider.thickness, 2);
       expect(divider.indent, 8);
     }

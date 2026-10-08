@@ -30,11 +30,13 @@ final class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
   bool _haptics = true;
   bool _moveBackDown = false;
   bool _slowAnimations = false;
+  bool _dividersBetweenItems = false;
 
   SmartContextMenuConfig get _config => SmartContextMenuConfig(
     enableSwipeBack: _swipeBack,
     enableHaptics: _haptics,
     moveBackDown: _moveBackDown,
+    style: SmartContextMenuStyle(dividersBetweenItems: _dividersBetweenItems),
   );
 
   @override
@@ -144,6 +146,11 @@ final class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
           title: 'Move back down',
           value: _moveBackDown,
           onChanged: (value) => setState(() => _moveBackDown = value),
+        ),
+        _buildSwitch(
+          title: 'Dividers between items',
+          value: _dividersBetweenItems,
+          onChanged: (value) => setState(() => _dividersBetweenItems = value),
         ),
         _buildSwitch(
           title: 'Slow animations',

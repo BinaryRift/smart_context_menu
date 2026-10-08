@@ -164,8 +164,7 @@ final class SmartContextMenuStyle {
   /// [SmartContextMenuDefaults.darkHighlightOpacity] in the dark one.
   final Color? highlightColor;
 
-  /// The color of the divider of items with
-  /// [SmartContextMenuItem.hasDivider].
+  /// The color of the dividers, see [dividersBetweenItems].
   ///
   /// Defaults to [SmartContextMenuDefaults.dividerColor].
   final Color dividerColor;
@@ -184,6 +183,12 @@ final class SmartContextMenuStyle {
   ///
   /// Defaults to 0.
   final double dividerEndIndent;
+
+  /// Whether to draw a divider between every two adjacent items, as in iOS.
+  ///
+  /// No divider is drawn next to a [SmartContextMenuItem.separator]. The back
+  /// item of a submenu always has a divider below it. Defaults to false.
+  final bool dividersBetweenItems;
 
   /// The height of a [SmartContextMenuItem.separator] without a child.
   ///
@@ -256,6 +261,7 @@ final class SmartContextMenuStyle {
     this.dividerThickness = SmartContextMenuDefaults.dividerThickness,
     this.dividerIndent = 0,
     this.dividerEndIndent = 0,
+    this.dividersBetweenItems = false,
     this.separatorHeight = SmartContextMenuDefaults.separatorHeight,
     this.separatorColor = SmartContextMenuDefaults.separatorColor,
     this.defaultIconSize = SmartContextMenuDefaults.iconSize,
@@ -294,6 +300,7 @@ final class SmartContextMenuStyle {
     double? dividerThickness,
     double? dividerIndent,
     double? dividerEndIndent,
+    bool? dividersBetweenItems,
     double? separatorHeight,
     Color? separatorColor,
     double? defaultIconSize,
@@ -328,6 +335,7 @@ final class SmartContextMenuStyle {
       dividerThickness: dividerThickness ?? this.dividerThickness,
       dividerIndent: dividerIndent ?? this.dividerIndent,
       dividerEndIndent: dividerEndIndent ?? this.dividerEndIndent,
+      dividersBetweenItems: dividersBetweenItems ?? this.dividersBetweenItems,
       separatorHeight: separatorHeight ?? this.separatorHeight,
       separatorColor: separatorColor ?? this.separatorColor,
       defaultIconSize: defaultIconSize ?? this.defaultIconSize,
