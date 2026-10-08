@@ -60,6 +60,11 @@ It moves up only when the widget and the menu together do not fit below it, and 
 as needed. Horizontally, the menu lines up with the widget's left or right edge, or centers
 under it, depending on where the widget is on the screen.
 
+- **Shorter menus.** When the menu gets shorter, for example after returning from a submenu,
+  it stays where it is, so it stays under the finger: the parent menu starts where the back
+  item was. Set `moveBackDown: true` in `SmartContextMenuConfig` to move the widget back down
+  instead; it never goes below its place.
+
 - **Tall widgets.** If the widget and the menu do not fit on the screen even after moving,
   they can be scrolled together, so every part of the widget and the menu stays reachable.
 - **Long menus.** The menu is never taller than a part of the screen set by

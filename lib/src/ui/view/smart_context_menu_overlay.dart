@@ -131,6 +131,7 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
               screenHeight: screenHeight,
               bottomSafe: bottomSafe,
               topSafe: topSafe,
+              heightThreshold: heightThreshold,
             );
 
             _scrollToBottomIfNeeded(heightThreshold: heightThreshold);
@@ -352,10 +353,18 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
     return false;
   }
 
+  /// Moves the preview up when the menu grows and does not fit below it.
+  ///
+  /// With [SmartContextMenuConfig.moveBackDown], the preview also moves back
+  /// down when the menu shrinks, but not below its place on the screen, and
+  /// only while the preview and the menu fit on the screen without
+  /// scrolling. While they scroll, it only moves up: moving down would shift
+  /// the scroll position under the user.
   void _updateTopOffset({
     required double screenHeight,
     required double bottomSafe,
     required double topSafe,
+    required double heightThreshold,
   }) {
     final double previewHeight = widget.anchorRect.height;
     final double menuHeight = _currentMenuHeight.value;
@@ -369,7 +378,10 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
 
     final double finalTop = targetTop.clamp(topSafe, screenHeight);
 
-    if (finalTop < _appliedTopOffset) {
+    final bool canMoveDown =
+        _config.moveBackDown && menuHeight <= heightThreshold;
+
+    if (finalTop < _appliedTopOffset || canMoveDown) {
       _appliedTopOffset = finalTop;
     }
   }
@@ -379,11 +391,8 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
     required double topSafe,
     required double bottomSafe,
   }) {
-    final double availableTotalHeight = screenHeight -
-        topSafe -
-        bottomSafe -
-        _config.screenPadding.top -
-        _config.screenPadding.bottom;
+    // topSafe and bottomSafe already include the screen padding.
+    final double availableTotalHeight = screenHeight - topSafe - bottomSafe;
 
     final double menuHeightThreshold =
         availableTotalHeight - widget.anchorRect.height - _config.menuGap;

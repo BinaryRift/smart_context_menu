@@ -74,6 +74,16 @@ final class SmartContextMenuConfig {
   /// Defaults to [SmartContextMenuDefaults.menuGap].
   final double menuGap;
 
+  /// Whether the widget and the menu move back down when the menu gets
+  /// shorter, for example after returning from a submenu.
+  ///
+  /// The widget moves up when the menu grows and does not fit below it.
+  /// With this flag, it also moves back down as the menu shrinks, but never
+  /// below its place and never while the widget and the menu scroll.
+  /// Defaults to `false`, so the menu stays under the finger: after tapping
+  /// the back item, the parent menu starts where the back item was.
+  final bool moveBackDown;
+
   /// The appearance of the menu.
   ///
   /// Defaults to `const SmartContextMenuStyle()`.
@@ -90,6 +100,7 @@ final class SmartContextMenuConfig {
     this.menuHeightFactor = 0.6,
     this.screenPadding = SmartContextMenuDefaults.screenPadding,
     this.menuGap = SmartContextMenuDefaults.menuGap,
+    this.moveBackDown = false,
     this.style = const SmartContextMenuStyle(),
   });
 
@@ -110,6 +121,7 @@ final class SmartContextMenuConfig {
     double? menuHeightFactor,
     EdgeInsets? screenPadding,
     double? menuGap,
+    bool? moveBackDown,
     SmartContextMenuStyle? style,
   }) {
     return SmartContextMenuConfig(
@@ -122,6 +134,7 @@ final class SmartContextMenuConfig {
       menuHeightFactor: menuHeightFactor ?? this.menuHeightFactor,
       screenPadding: screenPadding ?? this.screenPadding,
       menuGap: menuGap ?? this.menuGap,
+      moveBackDown: moveBackDown ?? this.moveBackDown,
       style: style ?? this.style,
     );
   }

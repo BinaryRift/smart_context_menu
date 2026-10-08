@@ -14,6 +14,7 @@ void main() {
       menuHeightFactor: 0.5,
       screenPadding: EdgeInsets.all(8),
       menuGap: 4,
+      moveBackDown: true,
       style: SmartContextMenuStyle(menuBlur: SmartContextMenuBlur.small),
     );
 
@@ -27,6 +28,7 @@ void main() {
       'menuHeightFactor': (c) => c.menuHeightFactor,
       'screenPadding': (c) => c.screenPadding,
       'menuGap': (c) => c.menuGap,
+      'moveBackDown': (c) => c.moveBackDown,
       'style': (c) => c.style,
     };
 
@@ -53,6 +55,7 @@ void main() {
         () => original.copyWith(screenPadding: const EdgeInsets.all(24)),
       ),
       'menuGap': (20.0, () => original.copyWith(menuGap: 20)),
+      'moveBackDown': (false, () => original.copyWith(moveBackDown: false)),
       'style': (style, () => original.copyWith(style: style)),
     };
 

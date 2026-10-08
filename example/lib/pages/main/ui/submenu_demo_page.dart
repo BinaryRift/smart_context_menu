@@ -28,11 +28,13 @@ final class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
   final _tapAreaMenuController = SmartContextMenuController();
   bool _swipeBack = true;
   bool _haptics = true;
+  bool _moveBackDown = false;
   bool _slowAnimations = false;
 
   SmartContextMenuConfig get _config => SmartContextMenuConfig(
     enableSwipeBack: _swipeBack,
     enableHaptics: _haptics,
+    moveBackDown: _moveBackDown,
   );
 
   @override
@@ -137,6 +139,11 @@ final class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
           title: 'Haptics',
           value: _haptics,
           onChanged: (value) => setState(() => _haptics = value),
+        ),
+        _buildSwitch(
+          title: 'Move back down',
+          value: _moveBackDown,
+          onChanged: (value) => setState(() => _moveBackDown = value),
         ),
         _buildSwitch(
           title: 'Slow animations',
