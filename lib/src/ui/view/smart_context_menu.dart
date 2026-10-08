@@ -18,6 +18,7 @@ import '../../domain/smart_context_menu_header_details.dart';
 import '../../domain/smart_context_menu_item.dart';
 import '../routes/smart_context_menu_route.dart';
 import '../state/smart_context_menu_session.dart';
+import '../theme/smart_context_menu_theme.dart';
 
 /// Shows an iOS-style context menu for [child] on long press.
 ///
@@ -29,6 +30,9 @@ import '../state/smart_context_menu_session.dart';
 /// To open the menu from code, pass a [controller]. To turn off the long
 /// press, set [SmartContextMenuConfig.activationMode] to
 /// [SmartContextMenuActivationMode.manual].
+///
+/// To set the config of all menus in the app or in a part of the tree, wrap
+/// it with a [SmartContextMenuTheme].
 ///
 /// To show your own content above the preview, for example a reactions
 /// bar, pass [headerSliversBuilder].
@@ -65,8 +69,12 @@ final class SmartContextMenu extends StatefulWidget {
 
   /// The behavior and appearance of the menu.
   ///
-  /// Defaults to `const SmartContextMenuConfig()`.
-  final SmartContextMenuConfig config;
+  /// Replaces the config of the nearest [SmartContextMenuTheme] as a whole.
+  /// To change a few of its settings, start from it with
+  /// `SmartContextMenuTheme.of(context).copyWith(...)`.
+  /// If null, the config of the theme is used, and without a theme
+  /// `const SmartContextMenuConfig()`.
+  final SmartContextMenuConfig? config;
 
   /// Opens and closes the menu from code.
   ///
@@ -109,7 +117,7 @@ final class SmartContextMenu extends StatefulWidget {
     super.key,
     required this.child,
     required this.items,
-    this.config = const SmartContextMenuConfig(),
+    this.config,
     this.controller,
     this.onPreviewTap,
     this.headerSliversBuilder,
@@ -133,16 +141,16 @@ final class _SmartContextMenuState extends State<SmartContextMenu>
   late final Animation<double> _scaleAnimation;
 
   late final SmartContextMenuSession _session;
+  late SmartContextMenuConfig _config;
   int? _activePointer;
 
   List<SmartContextMenuItem> get _items => widget.items;
   bool get _hasInternalActivation =>
-      widget.config.activationMode == SmartContextMenuActivationMode.longPress;
+      _config.activationMode == SmartContextMenuActivationMode.longPress;
 
   @override
   void initState() {
     super.initState();
-    _debugValidateConfiguration();
     _heroTag = "menu_hero_${identityHashCode(widget)}";
     _session = SmartContextMenuSession();
     _setupAnimations();
@@ -151,10 +159,15 @@ final class _SmartContextMenuState extends State<SmartContextMenu>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _resolveConfig();
+  }
+
+  @override
   void didUpdateWidget(covariant SmartContextMenu oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _debugValidateConfiguration();
-    _syncRecognizers();
+    _resolveConfig();
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller?.detach();
       _bindController();
@@ -278,7 +291,6 @@ final class _SmartContextMenuState extends State<SmartContextMenu>
     );
 
     _tapRecognizer = TapGestureRecognizer();
-    _syncRecognizers();
   }
 
   void _setupAnimations() {
@@ -295,6 +307,12 @@ final class _SmartContextMenuState extends State<SmartContextMenu>
       begin: MotionScale.none.value,
       end: MotionScale.pressed.value,
     ).animate(_scaleCurve);
+  }
+
+  void _resolveConfig() {
+    _config = widget.config ?? SmartContextMenuTheme.of(context);
+    _debugValidateConfiguration();
+    _syncRecognizers();
   }
 
   void _syncRecognizers() {
@@ -344,7 +362,7 @@ final class _SmartContextMenuState extends State<SmartContextMenu>
 
     await _scaleController.animateTo(0, duration: MotionDurations.fast);
 
-    if (widget.config.enableHaptics) {
+    if (_config.enableHaptics) {
       await HapticFeedback.lightImpact();
     }
 
@@ -391,7 +409,7 @@ final class _SmartContextMenuState extends State<SmartContextMenu>
       snapshot: _session.snapshot,
       heroTag: _heroTag,
       items: widget.items,
-      config: widget.config,
+      config: _config,
       onPreviewTap: widget.onPreviewTap,
       headerSliversBuilder: widget.headerSliversBuilder,
       fadeHeaderSlivers: widget.fadeHeaderSlivers,
@@ -492,7 +510,7 @@ final class _SmartContextMenuState extends State<SmartContextMenu>
 
   void _debugValidateConfiguration() {
     assert(
-      widget.config.activationMode != SmartContextMenuActivationMode.manual ||
+      _config.activationMode != SmartContextMenuActivationMode.manual ||
           widget.controller != null,
       "SmartContextMenu in manual mode requires a controller.",
     );
