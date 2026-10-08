@@ -112,4 +112,64 @@ void main() {
     expect(find.text('Custom error'), findsNothing);
     expect(find.text('Loaded'), findsOneWidget);
   });
+
+  testWidgets('shows the retry label when loading takes too long', (
+    tester,
+  ) async {
+    final completer = Completer<SmartContextMenuItem>();
+
+    await tester.pumpMenu(
+      items: [
+        SmartContextMenuItem.async(
+          loadingTitle: 'Loading',
+          timeout: const Duration(seconds: 2),
+          asyncItem: () => completer.future,
+        ),
+      ],
+    );
+    await tester.openMenu();
+    expect(find.text('Loading'), findsOneWidget);
+
+    await tester.pump(const Duration(seconds: 2));
+    await tester.settleMenu();
+    expect(find.text(const SmartContextMenuLabels().retry), findsOneWidget);
+
+    completer.complete(loadedItem);
+    await tester.settleMenu();
+    expect(find.text('Loaded'), findsNothing);
+  });
+
+  testWidgets('keeps the loaded item after returning from a submenu', (
+    tester,
+  ) async {
+    var calls = 0;
+
+    await tester.pumpMenu(
+      items: [
+        SmartContextMenuItem.async(
+          asyncItem: () async {
+            calls++;
+            return loadedItem;
+          },
+        ),
+        SmartContextMenuItem.submenu(
+          title: 'More',
+          children: [SmartContextMenuItem.simple(title: 'Child')],
+        ),
+      ],
+    );
+    await tester.openMenu();
+    expect(find.text('Loaded'), findsOneWidget);
+
+    await tester.tap(find.text('More'));
+    await tester.settleMenu();
+    expect(find.text('Loaded'), findsNothing);
+
+    await tester.tap(find.text(const SmartContextMenuLabels().back).last);
+    await tester.settleMenu();
+
+    expect(calls, 1);
+    expect(find.text('Loaded'), findsOneWidget);
+    expect(find.text(const SmartContextMenuLabels().loading), findsNothing);
+  });
 }
