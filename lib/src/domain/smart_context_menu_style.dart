@@ -171,6 +171,16 @@ final class SmartContextMenuStyle {
   /// Defaults to 0.
   final double dividerEndIndent;
 
+  /// The height of a [SmartContextMenuItem.separator] without a child.
+  ///
+  /// Defaults to [SmartContextMenuDefaults.separatorHeight].
+  final double separatorHeight;
+
+  /// The color of a [SmartContextMenuItem.separator] without a child.
+  ///
+  /// Defaults to [SmartContextMenuDefaults.separatorColor].
+  final Color separatorColor;
+
   // Icons
 
   /// The size of the icons drawn by the menu itself: the submenu chevron,
@@ -230,6 +240,8 @@ final class SmartContextMenuStyle {
     this.dividerThickness = SmartContextMenuDefaults.dividerThickness,
     this.dividerIndent = 0,
     this.dividerEndIndent = 0,
+    this.separatorHeight = SmartContextMenuDefaults.separatorHeight,
+    this.separatorColor = SmartContextMenuDefaults.separatorColor,
     this.defaultIconSize = SmartContextMenuDefaults.iconSize,
     this.defaultIconColor,
     this.submenuIcon = SmartContextMenuDefaults.submenuIcon,
@@ -264,6 +276,8 @@ final class SmartContextMenuStyle {
     double? dividerThickness,
     double? dividerIndent,
     double? dividerEndIndent,
+    double? separatorHeight,
+    Color? separatorColor,
     double? defaultIconSize,
     Color? defaultIconColor,
     IconData? submenuIcon,
@@ -294,6 +308,8 @@ final class SmartContextMenuStyle {
       dividerThickness: dividerThickness ?? this.dividerThickness,
       dividerIndent: dividerIndent ?? this.dividerIndent,
       dividerEndIndent: dividerEndIndent ?? this.dividerEndIndent,
+      separatorHeight: separatorHeight ?? this.separatorHeight,
+      separatorColor: separatorColor ?? this.separatorColor,
       defaultIconSize: defaultIconSize ?? this.defaultIconSize,
       defaultIconColor: defaultIconColor ?? this.defaultIconColor,
       submenuIcon: submenuIcon ?? this.submenuIcon,

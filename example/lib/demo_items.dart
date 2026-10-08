@@ -54,12 +54,8 @@ List<SmartContextMenuItem> nestedLevels() => [
     dividerPosition: SmartContextMenuDividerPosition.bottom,
   ),
   _share(),
-  _action(
-    'Delete',
-    icon: CupertinoIcons.delete,
-    isDestructive: true,
-    hasDivider: true,
-  ),
+  SmartContextMenuItem.separator(),
+  _action('Delete', icon: CupertinoIcons.delete, isDestructive: true),
 ];
 
 /// A short root with a long scrollable submenu.
@@ -105,6 +101,7 @@ List<SmartContextMenuItem> longRootShortSubmenu() => [
   _action('Copy link', icon: CupertinoIcons.link),
   _action('Info', icon: CupertinoIcons.info),
   _action('Archive', icon: CupertinoIcons.archivebox, isDisabled: true),
+  SmartContextMenuItem.separator(),
   _action('Delete', icon: CupertinoIcons.delete, isDestructive: true),
   _action(
     'Delete forever',

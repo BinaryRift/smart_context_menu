@@ -113,6 +113,18 @@ abstract final class SmartContextMenuDefaults {
   /// The default of [SmartContextMenuStyle.dividerThickness].
   static const double dividerThickness = 0.5;
 
+  /// The default of [SmartContextMenuStyle.separatorHeight].
+  static const double separatorHeight = 8;
+
+  /// The default of [SmartContextMenuStyle.separatorColor].
+  ///
+  /// The colors of [dividerColor] at 40% opacity.
+  static const CupertinoDynamicColor separatorColor =
+      CupertinoDynamicColor.withBrightness(
+        color: Color(0x669E9E9E),
+        darkColor: Color(0x66545458),
+      );
+
   // Opacities
 
   /// The background opacity of a tinted item in the light theme, see

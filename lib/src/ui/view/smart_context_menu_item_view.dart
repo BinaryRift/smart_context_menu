@@ -181,6 +181,9 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
       textColor: _textColor,
     );
 
+    // Without MetaData, drag-to-select does not find the separator.
+    if (_item.isSeparator) return _buildSeparator(itemState);
+
     return MetaData(
       metaData: widget.key,
       behavior: HitTestBehavior.opaque,
@@ -205,6 +208,16 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
             SmartContextMenuDivider(style: _style),
         ],
       ),
+    );
+  }
+
+  Widget _buildSeparator(SmartContextMenuItemState state) {
+    final customBuilder = _item.customBuilder;
+    if (customBuilder != null) return customBuilder(context, state);
+
+    return Container(
+      height: _style.separatorHeight,
+      color: _resolve(_style.separatorColor),
     );
   }
 

@@ -87,6 +87,7 @@ Create items with the factory that matches what the item does:
 | `SmartContextMenuItem.asyncSubmenu` | Opens a submenu and loads its items. |
 | `SmartContextMenuItem.pagingSubmenu` | Opens a submenu and loads its items page by page. |
 | `SmartContextMenuItem.async` | Shows a placeholder and replaces it with a loaded item. |
+| `SmartContextMenuItem.separator` | Separates groups of items. |
 
 #### Submenu
 
@@ -178,6 +179,27 @@ SmartContextMenuItem.async(
   ),
 )
 ```
+
+#### Separator
+
+A separator splits the items into groups. It has no actions and no press highlight,
+and drag-to-select passes over it. By default it is a band set by `separatorHeight`
+and `separatorColor` in the style; `child` replaces it, for example with a section title.
+
+```dart
+[
+  SmartContextMenuItem.simple(title: 'Copy', onTap: () => copy()),
+  SmartContextMenuItem.simple(title: 'Share', onTap: () => share()),
+  SmartContextMenuItem.separator(),
+  SmartContextMenuItem.simple(
+    title: 'Delete',
+    isDestructive: true,
+    onTap: () => delete(),
+  ),
+]
+```
+
+Unlike a separator, a divider is a thin line that belongs to an item, see [Dividers](#dividers).
 
 ### Opening from code
 

@@ -47,6 +47,7 @@ enum SmartContextMenuDividerPosition {
 ///   items page by page with [asyncPagingChildren].
 /// * [SmartContextMenuItem.async] shows a placeholder and replaces it with
 ///   the item loaded by [asyncItem].
+/// * [SmartContextMenuItem.separator] separates groups of items.
 ///
 /// A submenu replaces the current menu and shows a back item at the top.
 /// Tapping the back item or swiping right returns to the parent menu,
@@ -130,6 +131,11 @@ final class SmartContextMenuItem {
   ///
   /// Disabled items are dimmed and do not respond to taps.
   final bool isDisabled;
+
+  /// Whether the item separates groups of items.
+  ///
+  /// Set by [SmartContextMenuItem.separator].
+  final bool isSeparator;
 
   /// Whether to show a divider next to the item.
   ///
@@ -233,6 +239,7 @@ final class SmartContextMenuItem {
     this.isDestructive = false,
     this.tintColor,
     this.isDisabled = false,
+    this.isSeparator = false,
     this.hasDivider = false,
     this.onTap,
     this.children,
@@ -448,6 +455,30 @@ final class SmartContextMenuItem {
     childrenGap: childrenGap,
     dividerPosition: dividerPosition ?? SmartContextMenuDividerPosition.bottom,
   );
+
+  /// Creates a separator between groups of items.
+  ///
+  /// A separator has no actions and no press highlight, and drag-to-select
+  /// passes over it. By default it is a band of
+  /// [SmartContextMenuStyle.separatorHeight] in
+  /// [SmartContextMenuStyle.separatorColor]; 
+  /// [child] replaces the band, for example with a section title.
+  ///
+  /// ```dart
+  /// [
+  ///   SmartContextMenuItem.simple(title: 'Copy'),
+  ///   SmartContextMenuItem.simple(title: 'Share'),
+  ///   SmartContextMenuItem.separator(),
+  ///   SmartContextMenuItem.simple(title: 'Delete', isDestructive: true),
+  /// ]
+  /// ```
+  factory SmartContextMenuItem.separator({String? id, Widget? child}) =>
+      SmartContextMenuItem._(
+        id: id ?? _generateId(),
+        isSeparator: true,
+        closeOnTap: false,
+        customBuilder: child == null ? null : (context, state) => child,
+      );
 
   /// Creates a placeholder that is replaced by the item loaded by
   /// [asyncItem].
