@@ -1,6 +1,6 @@
 import 'dart:async' show FutureOr;
 import 'package:flutter/widgets.dart'
-    show Widget, BuildContext, Color, EdgeInsets, TextStyle;
+    show Widget, BuildContext, Color, EdgeInsets, Listenable, TextStyle;
 import 'package:meta/meta.dart' show internal;
 
 import '../core/ui/styles/smart_context_menu_defaults.dart';
@@ -22,6 +22,13 @@ typedef SmartContextMenuSubmenuLoader =
 /// Loads an item for [SmartContextMenuItem.async].
 typedef SmartContextMenuItemLoader = Future<SmartContextMenuItem> Function();
 
+/// Builds the item of [SmartContextMenuItem.listenable] from the current
+/// state of the app.
+///
+/// Returns null while the item is loading.
+typedef SmartContextMenuListenableItemBuilder =
+    SmartContextMenuItem? Function();
+
 /// Builds the content of an item from its current state.
 typedef SmartContextMenuItemBuilder =
     Widget Function(BuildContext context, SmartContextMenuItemState state);
@@ -38,6 +45,8 @@ typedef SmartContextMenuItemBuilder =
 ///   items page by page with [asyncPagingChildren].
 /// * [SmartContextMenuItem.async] shows a placeholder and replaces it with
 ///   the item loaded by [asyncItem].
+/// * [SmartContextMenuItem.listenable] builds the item with
+///   [listenableBuilder] and rebuilds it when [listenable] notifies.
 /// * [SmartContextMenuItem.separator] separates groups of items.
 ///
 /// A submenu replaces the current menu and shows a back item at the top.
@@ -155,6 +164,17 @@ final class SmartContextMenuItem {
   /// Set by [SmartContextMenuItem.async].
   final SmartContextMenuItemLoader? asyncItem;
 
+  /// Notifies when the item of [listenableBuilder] should be built again.
+  ///
+  /// Set by [SmartContextMenuItem.listenable].
+  final Listenable? listenable;
+
+  /// Builds the item shown in place of this one, or returns null while
+  /// it is loading.
+  ///
+  /// Set by [SmartContextMenuItem.listenable].
+  final SmartContextMenuListenableItemBuilder? listenableBuilder;
+
   /// How long loading may take before it fails: the item of [asyncItem],
   /// the items of [asyncChildren] or each page of [asyncPagingChildren].
   ///
@@ -181,12 +201,13 @@ final class SmartContextMenuItem {
   /// buttons, handle their own taps: the item is not triggered over them.
   final SmartContextMenuItemBuilder? customBuilder;
 
-  /// Builds the content of the placeholder while [asyncItem] is loading.
+  /// Builds the content of the placeholder while [asyncItem] is loading
+  /// or [listenableBuilder] returns null.
   ///
   /// The item [padding] is still applied. If null, the placeholder shows
   /// [title] (or [SmartContextMenuLabels.loading]), [leading] and an activity
   /// indicator.
-  /// Set by [SmartContextMenuItem.async].
+  /// Set by [SmartContextMenuItem.async] and [SmartContextMenuItem.listenable].
   final SmartContextMenuItemBuilder? loadingBuilder;
 
   /// Builds the content of the placeholder after [asyncItem] has failed.
@@ -225,6 +246,8 @@ final class SmartContextMenuItem {
     this.asyncChildren,
     this.asyncPagingChildren,
     this.asyncItem,
+    this.listenable,
+    this.listenableBuilder,
     this.loadingTimeout,
     this.pagingMetadata,
     this.customBuilder,
@@ -515,6 +538,65 @@ final class SmartContextMenuItem {
       titleStyle: titleStyle,
       loadingBuilder: loadingBuilder,
       errorBuilder: errorBuilder,
+      childrenGap: childrenGap,
+    );
+  }
+
+  /// Creates an item that is built by [builder] and built again each time
+  /// [listenable] notifies, also while the menu is open.
+  ///
+  /// Use it when the state of the item lives in the app, for example in
+  /// a [ChangeNotifier]: a toggle that stays in the open menu, a counter,
+  /// or an action that is already running. The menu does not dispose
+  /// [listenable].
+  ///
+  /// [builder] returns the item to show, a [SmartContextMenuItem.simple].
+  /// Its [onTap] and [closeOnTap] are used, so it can act on the current
+  /// state. While [builder] returns null, the item does not respond to taps
+  /// and shows [loadingTitle] (or [SmartContextMenuLabels.loading]) with
+  /// [leading] and an activity indicator, as [SmartContextMenuItem.async]
+  /// does. Use [loadingBuilder] to replace this content.
+  ///
+  /// [padding] applies while loading; the built item uses its own.
+  ///
+  /// ```dart
+  /// SmartContextMenuItem.listenable(
+  ///   listenable: favorites,
+  ///   builder: () {
+  ///     if (favorites.isLoading) return null;
+  ///     final isFavorite = favorites.contains(post.id);
+  ///     return SmartContextMenuItem.simple(
+  ///       title: isFavorite ? 'Remove from Favorites' : 'Add to Favorites',
+  ///       leading: Icon(
+  ///         isFavorite ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
+  ///       ),
+  ///       closeOnTap: false,
+  ///       onTap: () => favorites.toggle(post.id),
+  ///     );
+  ///   },
+  /// )
+  /// ```
+  factory SmartContextMenuItem.listenable({
+    required Listenable listenable,
+    required SmartContextMenuListenableItemBuilder builder,
+    String? id,
+    EdgeInsets? padding,
+    Widget? leading,
+    String? loadingTitle,
+    TextStyle? titleStyle,
+    SmartContextMenuItemBuilder? loadingBuilder,
+    double? childrenGap,
+  }) {
+    return SmartContextMenuItem._(
+      id: id ?? _generateId(),
+      title: loadingTitle,
+      listenable: listenable,
+      listenableBuilder: builder,
+      closeOnTap: false,
+      padding: padding,
+      leading: leading,
+      titleStyle: titleStyle,
+      loadingBuilder: loadingBuilder,
       childrenGap: childrenGap,
     );
   }

@@ -8,7 +8,8 @@
 ///
 /// * [SmartContextMenu] attaches a menu to a widget.
 /// * [SmartContextMenuItem] is an entry of the menu: an action, a submenu,
-///   an async or paginated submenu, or an item loaded on the fly.
+///   an async or paginated submenu, an item loaded on the fly, or an item
+///   rebuilt from the state of the app while the menu is open.
 /// * [SmartContextMenuConfig] sets the behavior and appearance of the menu.
 /// * [SmartContextMenuStyle] sets the appearance, as part of the config.
 /// * [SmartContextMenuTheme] sets the config for the menus below it.
