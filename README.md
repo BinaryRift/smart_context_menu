@@ -17,6 +17,8 @@ drag-to-select and rich submenus.
 - **Submenus**: static, loaded asynchronously or paginated, with a back item and swipe back.
 - **Lazy lists**: items are built only when they scroll into view, so long menus stay fast.
 - **Async items** that show a loading state and a retry item on failure, with optional custom views.
+- **Listenable items** that rebuild from the state of your app while the menu is open,
+  such as toggles, counters or actions that are already running.
 - **Light and dark themes** out of the box.
 - **Customizable**: size, colors, text, icons, blur, decoration, labels, dividers
   and custom item content, set once for the whole app with a theme or for each menu.
@@ -181,6 +183,7 @@ Create items with the factory that matches what the item does:
 | `SmartContextMenuItem.asyncSubmenu` | Opens a submenu and loads its items. |
 | `SmartContextMenuItem.pagingSubmenu` | Opens a submenu and loads its items page by page. |
 | `SmartContextMenuItem.async` | Shows a placeholder and replaces it with a loaded item. |
+| `SmartContextMenuItem.listenable` | Rebuilds from a `Listenable` while the menu is open. |
 | `SmartContextMenuItem.separator` | Separates groups of items. |
 
 #### Submenu
@@ -276,6 +279,60 @@ SmartContextMenuItem.async(
   ),
 )
 ```
+
+#### Listenable item
+
+Use it when the state of an item lives in your app and can change while the menu is open:
+a toggle that keeps the menu open, a counter, or an action that is already running.
+The builder runs again each time `listenable` notifies and returns the item to show,
+or `null` while it is loading. While loading, the item shows `loadingTitle` with an activity
+indicator, as an async item does, and ignores taps.
+
+```dart
+SmartContextMenuItem.listenable(
+  listenable: favorites,
+  loadingTitle: 'Checking',
+  builder: () {
+    if (favorites.isLoading) return null;
+    final isFavorite = favorites.contains(post.id);
+    return SmartContextMenuItem.simple(
+      title: isFavorite ? 'Remove from Favorites' : 'Add to Favorites',
+      leading: Icon(isFavorite ? CupertinoIcons.heart_fill : CupertinoIcons.heart),
+      closeOnTap: false,
+      onTap: () => favorites.toggle(post.id),
+    );
+  },
+)
+```
+
+Unlike an async item, the state belongs to your app: the item is not loaded once but built
+again on every notification. The builder returns a `SmartContextMenuItem.simple`, and its
+`onTap` and `closeOnTap` are used. The menu does not dispose `listenable`.
+
+Any `Listenable` works: a `ChangeNotifier`, a `ValueNotifier`, several of them combined
+with `Listenable.merge`, or a controller of a state management package that implements
+`Listenable`, such as `GetxController`, which notifies on `update()` called without ids.
+Widgets such as `Obx` or `BlocBuilder` do not help here: an item is data, not a widget,
+and its builder runs outside of them. To rebuild the item from a `Stream`, for example
+of a Bloc or of a GetX `Rx`, wrap the stream in a `ChangeNotifier`:
+
+```dart
+final class StreamListenable extends ChangeNotifier {
+  StreamListenable(Stream<Object?> stream) {
+    _subscription = stream.listen((_) => notifyListeners());
+  }
+
+  late final StreamSubscription<Object?> _subscription;
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+}
+```
+
+Create the adapter next to the state it listens to and dispose it there as well.
 
 #### Separator
 
@@ -574,7 +631,7 @@ SmartContextMenuItem.simple(
 ### Localization
 
 The menu shows a few strings itself: the back item, the retry item and the loading
-placeholder. Override them with `SmartContextMenuLabels`, for example in the config
+title of async and listenable items. Override them with `SmartContextMenuLabels`, for example in the config
 of a [theme](#theme-and-config) to localize all menus at once:
 
 ```dart

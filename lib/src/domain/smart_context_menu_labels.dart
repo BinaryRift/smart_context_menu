@@ -24,9 +24,10 @@ final class SmartContextMenuLabels {
   /// to load. Defaults to `'Try again'`.
   final String retry;
 
-  /// The title of a [SmartContextMenuItem.async] placeholder while it loads.
+  /// The title of a [SmartContextMenuItem.async] or
+  /// [SmartContextMenuItem.listenable] item while it loads.
   ///
-  /// Used when the placeholder has no `loadingTitle`.
+  /// Used when the item has no `loadingTitle`.
   /// Defaults to `'Loading…'`.
   final String loading;
 

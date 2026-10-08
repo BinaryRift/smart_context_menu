@@ -548,7 +548,8 @@ final class SmartContextMenuItem {
   /// Use it when the state of the item lives in the app, for example in
   /// a [ChangeNotifier]: a toggle that stays in the open menu, a counter,
   /// or an action that is already running. The menu does not dispose
-  /// [listenable].
+  /// [listenable]. To rebuild the item from a [Stream], wrap the stream in
+  /// a [ChangeNotifier] that calls `notifyListeners` on each event.
   ///
   /// [builder] returns the item to show, a [SmartContextMenuItem.simple].
   /// Its [onTap] and [closeOnTap] are used, so it can act on the current
