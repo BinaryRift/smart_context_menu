@@ -38,6 +38,16 @@ extension MenuTester on WidgetTester {
     await settleMenu();
   }
 
+  /// Puts a finger on [from], slides it to [to] and lifts it there.
+  Future<void> dragTo(Finder from, Finder to) async {
+    final gesture = await startGesture(getCenter(from));
+    await pump();
+    await gesture.moveTo(getCenter(to));
+    await pump();
+    await gesture.up();
+    await settleMenu();
+  }
+
   /// Advances frames while letting real async work complete.
   ///
   /// Opening captures a snapshot via toImage(), which only completes

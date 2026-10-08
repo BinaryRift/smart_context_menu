@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
 
+import '../../helpers/appearance_tester.dart';
 import '../../helpers/menu_tester.dart';
 
 void main() {
@@ -20,16 +21,53 @@ void main() {
     );
     await tester.openMenu();
 
-    final gesture = await tester.startGesture(
-      tester.getCenter(find.text('First')),
-    );
-    await tester.pump();
-    await gesture.moveTo(tester.getCenter(find.text('Second')));
-    await tester.pump();
-    await gesture.up();
-    await tester.settleMenu();
+    await tester.dragTo(find.text('First'), find.text('Second'));
 
     expect(taps, ['Second']);
+  });
+
+  testWidgets('highlights the item under the finger', (tester) async {
+    const transparent = Color(0x00000000);
+    await tester.pumpMenu(
+      items: [
+        for (final title in ['First', 'Second'])
+          SmartContextMenuItem.simple(title: title, closeOnTap: false),
+      ],
+    );
+    await tester.openMenu();
+
+    final gesture = await tester.pressAt(find.text('First'));
+    expect(tester.backgroundOf('First'), isNot(isSameColorAs(transparent)));
+    expect(tester.backgroundOf('Second'), isSameColorAs(transparent));
+
+    await gesture.moveTo(tester.getCenter(find.text('Second')));
+    await tester.pump();
+    expect(tester.backgroundOf('First'), isSameColorAs(transparent));
+    expect(tester.backgroundOf('Second'), isNot(isSameColorAs(transparent)));
+
+    await tester.releaseOutside(gesture);
+  });
+
+  testWidgets('releasing over a disabled item triggers nothing', (
+    tester,
+  ) async {
+    final taps = <String>[];
+    await tester.pumpMenu(
+      items: [
+        for (final (title, isDisabled) in [('First', false), ('Second', true)])
+          SmartContextMenuItem.simple(
+            title: title,
+            isDisabled: isDisabled,
+            closeOnTap: false,
+            onTap: () => taps.add(title),
+          ),
+      ],
+    );
+    await tester.openMenu();
+
+    await tester.dragTo(find.text('First'), find.text('Second'));
+
+    expect(taps, isEmpty);
   });
 
   testWidgets('canceling the pointer triggers nothing', (tester) async {
