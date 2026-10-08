@@ -110,10 +110,10 @@ final class SmartContextMenuStyle {
   /// Defaults to [SmartContextMenuDefaults.destructiveColor].
   final Color destructiveColor;
 
-  /// The background of a disabled item.
+  /// The background of a disabled item, including a tinted one.
   ///
-  /// Defaults to [SmartContextMenuDefaults.disabledItemColor].
-  final Color disabledItemColor;
+  /// If null, which is the default, disabled items have no background.
+  final Color? disabledItemColor;
 
   /// The color of the divider between items.
   ///
@@ -171,7 +171,7 @@ final class SmartContextMenuStyle {
     this.textStyle = SmartContextMenuDefaults.textStyle,
     this.secondaryTextColor = SmartContextMenuDefaults.secondaryTextColor,
     this.destructiveColor = SmartContextMenuDefaults.destructiveColor,
-    this.disabledItemColor = SmartContextMenuDefaults.disabledItemColor,
+    this.disabledItemColor,
     this.dividerColor = SmartContextMenuDefaults.dividerColor,
     this.defaultIconSize = SmartContextMenuDefaults.iconSize,
     this.defaultIconColor,

@@ -120,9 +120,10 @@ final class SmartContextMenuItem {
   /// The color the item is tinted with, like a destructive item.
   ///
   /// The title and icons take this color, and the background takes
-  /// a translucent shade of it. Takes precedence over
-  /// [SmartContextMenuStyle.destructiveColor] and the color of [titleStyle].
-  /// May be a [CupertinoDynamicColor] to follow the theme.
+  /// a translucent shade of it. A disabled item has only the dimmed title
+  /// and icons, see [SmartContextMenuStyle.disabledItemColor]. Takes
+  /// precedence over [SmartContextMenuStyle.destructiveColor] and the color
+  /// of [titleStyle]. May be a [CupertinoDynamicColor] to follow the theme.
   final Color? tintColor;
 
   /// Whether the item is disabled.

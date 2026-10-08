@@ -103,13 +103,6 @@ abstract final class SmartContextMenuDefaults {
         darkColor: Color(0x66000000),
       );
 
-  /// The default of [SmartContextMenuStyle.disabledItemColor].
-  static const CupertinoDynamicColor disabledItemColor =
-      CupertinoDynamicColor.withBrightness(
-        color: Color(0x1F000000),
-        darkColor: Color(0x1FFFFFFF),
-      );
-
   /// The default of [SmartContextMenuStyle.dividerColor].
   static const CupertinoDynamicColor dividerColor =
       CupertinoDynamicColor.withBrightness(
@@ -134,12 +127,6 @@ abstract final class SmartContextMenuDefaults {
 
   /// The background opacity of a pressed tinted item in the dark theme.
   static const double darkTintPressedOpacity = 0.24;
-
-  /// The background opacity of a disabled tinted item in the light theme.
-  static const double tintDisabledOpacity = 0.16;
-
-  /// The background opacity of a disabled tinted item in the dark theme.
-  static const double darkTintDisabledOpacity = 0.08;
 
   /// The title and icon opacity of a disabled tinted item.
   static const double tintDisabledTextOpacity = 0.5;

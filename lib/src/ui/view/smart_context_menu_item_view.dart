@@ -85,11 +85,6 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
       Brightness.dark;
 
   double get _tintOpacity {
-    if (_item.isDisabled) {
-      return _isDark
-          ? SmartContextMenuDefaults.darkTintDisabledOpacity
-          : SmartContextMenuDefaults.tintDisabledOpacity;
-    }
     if (_isHighlight) {
       return _isDark
           ? SmartContextMenuDefaults.darkTintPressedOpacity
@@ -111,12 +106,15 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
       _item.tintColor ?? (_item.isDestructive ? _style.destructiveColor : null);
 
   Color get _overlayColor {
+    if (_item.isDisabled) {
+      final disabledItemColor = _style.disabledItemColor;
+      return disabledItemColor == null
+          ? Colors.transparent
+          : _resolve(disabledItemColor);
+    }
     final tintColor = _tintColor;
     if (tintColor != null) {
       return _resolve(tintColor).withValues(alpha: _tintOpacity);
-    }
-    if (_item.isDisabled) {
-      return _resolve(_style.disabledItemColor);
     }
     return _isHighlight
         ? _resolve(_baseTextColor).withValues(alpha: _highlightOpacity)

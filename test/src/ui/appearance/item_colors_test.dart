@@ -31,7 +31,7 @@ void main() {
     );
     expect(
       tester.backgroundOf('Disabled'),
-      isSameColorAs(light(SmartContextMenuDefaults.disabledItemColor)),
+      isSameColorAs(const Color(0x00000000)),
     );
     expect(
       dividerColorOf(tester),
@@ -53,7 +53,7 @@ void main() {
     );
     expect(
       tester.backgroundOf('Disabled'),
-      isSameColorAs(customStyle.disabledItemColor),
+      isSameColorAs(customStyle.disabledItemColor!),
     );
     expect(dividerColorOf(tester), isSameColorAs(customStyle.dividerColor));
   });
@@ -190,11 +190,6 @@ void main() {
         brightness: Brightness.dark,
         items: [
           SmartContextMenuItem.simple(title: 'Tinted', tintColor: tintColor),
-          SmartContextMenuItem.simple(
-            title: 'Disabled',
-            tintColor: tintColor,
-            isDisabled: true,
-          ),
         ],
       );
       await tester.openMenu();
@@ -202,10 +197,6 @@ void main() {
       expect(
         tester.backgroundOf('Tinted'),
         isSameColorAs(tintColor.withValues(alpha: 0.12)),
-      );
-      expect(
-        tester.backgroundOf('Disabled'),
-        isSameColorAs(tintColor.withValues(alpha: 0.08)),
       );
 
       final gesture = await tester.pressAt(find.text('Tinted'));
@@ -240,9 +231,8 @@ void main() {
       );
     });
 
-    testWidgets('dims a disabled item', (tester) async {
+    testWidgets('dims a disabled item without a background', (tester) async {
       await tester.pumpMenu(
-        config: customConfig,
         brightness: Brightness.light,
         items: [
           SmartContextMenuItem.simple(
@@ -260,7 +250,37 @@ void main() {
       );
       expect(
         tester.backgroundOf('Tinted'),
-        isSameColorAs(tintColor.withValues(alpha: 0.16)),
+        isSameColorAs(const Color(0x00000000)),
+      );
+    });
+
+    testWidgets('uses the disabled item color on a disabled item', (
+      tester,
+    ) async {
+      await tester.pumpMenu(
+        config: customConfig,
+        items: [
+          SmartContextMenuItem.simple(
+            title: 'Tinted',
+            tintColor: tintColor,
+            isDisabled: true,
+          ),
+          SmartContextMenuItem.simple(
+            title: 'Destructive',
+            isDestructive: true,
+            isDisabled: true,
+          ),
+        ],
+      );
+      await tester.openMenu();
+
+      expect(
+        tester.backgroundOf('Tinted'),
+        isSameColorAs(customStyle.disabledItemColor!),
+      );
+      expect(
+        tester.backgroundOf('Destructive'),
+        isSameColorAs(customStyle.disabledItemColor!),
       );
     });
 
