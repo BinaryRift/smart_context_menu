@@ -9,6 +9,7 @@ import '../../core/ui/motion/tokens/motion_durations.dart';
 import '../../core/ui/motion/tokens/motion_opacity.dart';
 import '../../core/ui/motion/tokens/motion_translation.dart';
 import '../../domain/smart_context_menu_config.dart';
+import '../../domain/smart_context_menu_header_details.dart';
 import '../../domain/smart_context_menu_item.dart';
 import '../components/smart_menu_reactive_physics.dart';
 import 'smart_context_menu_view.dart';
@@ -23,6 +24,7 @@ final class SmartContextMenuOverlay extends StatefulWidget {
   final List<SmartContextMenuItem> items;
   final SmartContextMenuConfig config;
   final FutureOr<void> Function()? onPreviewTap;
+  final SmartContextMenuHeaderBuilder? headerSliversBuilder;
 
   const SmartContextMenuOverlay({
     super.key,
@@ -33,6 +35,7 @@ final class SmartContextMenuOverlay extends StatefulWidget {
     required this.items,
     required this.config,
     this.onPreviewTap,
+    this.headerSliversBuilder,
   });
 
   @override
@@ -58,7 +61,7 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
   Offset? _pointerDownPos;
   bool _isScrolling = false;
   Offset _startPreviewPosition = MotionTranslation.none.toOffset;
-  bool _isPreviewTapped = false;
+  Future<void>? _closing;
 
   SmartContextMenuConfig get _config => widget.config;
 
@@ -147,6 +150,8 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
           },
         ),
 
+        if (widget.headerSliversBuilder != null) _buildHeader(),
+
         SliverPersistentHeader(
           pinned: false,
           delegate: _PreviewHeaderDelegate(
@@ -188,6 +193,26 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
                 child: Container(color: backgroundColor),
               )
             : Container(color: backgroundColor),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    final header = SmartContextMenuHeaderDetails(
+      alignment: _menuAlignment,
+      close: _close,
+    );
+
+    return SliverFadeTransition(
+      opacity: widget.routeAnimation,
+      sliver: SliverPadding(
+        padding: EdgeInsets.only(
+          left: _leftPadding ?? 0,
+          right: _rightPadding ?? 0,
+        ),
+        sliver: SliverMainAxisGroup(
+          slivers: widget.headerSliversBuilder!(context, header),
+        ),
       ),
     );
   }
@@ -425,17 +450,25 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
   /// Closes the menu and calls [SmartContextMenuOverlay.onPreviewTap]
   /// halfway through the closing, as an item that closes on tap does.
   Future<void> _onPreviewTap() async {
-    if (_isPreviewTapped) return;
-    _isPreviewTapped = true;
+    if (_closing != null) return;
     if (_config.enableHaptics) HapticFeedback.lightImpact();
 
-    final route = ModalRoute.of(context);
-    final navigator = Navigator.of(context);
-    if (route != null && navigator.canPop()) {
-      navigator.pop();
-      await Future<void>.delayed(route.transitionDuration * 0.5);
-    }
+    await _close();
     await widget.onPreviewTap?.call();
+  }
+
+  /// Closes the menu once and completes halfway through the closing.
+  ///
+  /// Does nothing if the menu is already closing, so it never pops
+  /// the route below the menu.
+  Future<void> _close() {
+    return _closing ??= () async {
+      final route = ModalRoute.of(context);
+      if (route == null || !route.isCurrent) return;
+
+      Navigator.of(context).pop();
+      await Future<void>.delayed(route.transitionDuration * 0.5);
+    }();
   }
 
   void _onPreviewPanStart(DragStartDetails details) {

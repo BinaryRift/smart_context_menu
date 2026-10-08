@@ -20,6 +20,8 @@
 /// * [SmartContextMenuPagingMetadata] describes a page of a paginated
 ///   submenu.
 /// * [SmartContextMenuItemState] is passed to custom item builders.
+/// * [SmartContextMenuHeaderDetails] is passed to the builder of the
+///   slivers above the preview.
 /// * [SmartContextMenuDefaults] holds the default values of the menu.
 library;
 
@@ -28,6 +30,7 @@ export 'src/core/ui/styles/smart_context_menu_defaults.dart';
 export 'src/domain/smart_context_menu_activation_mode.dart';
 export 'src/domain/smart_context_menu_blur.dart';
 export 'src/domain/smart_context_menu_config.dart';
+export 'src/domain/smart_context_menu_header_details.dart';
 export 'src/domain/smart_context_menu_item.dart';
 export 'src/domain/smart_context_menu_item_state.dart';
 export 'src/domain/smart_context_menu_labels.dart';

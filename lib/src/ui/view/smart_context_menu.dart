@@ -14,6 +14,7 @@ import '../../core/ui/motion/tokens/motion_scales.dart';
 import '../../controllers/smart_context_menu_controller.dart';
 import '../../domain/smart_context_menu_activation_mode.dart';
 import '../../domain/smart_context_menu_config.dart';
+import '../../domain/smart_context_menu_header_details.dart';
 import '../../domain/smart_context_menu_item.dart';
 import '../routes/smart_context_menu_route.dart';
 import '../state/smart_context_menu_session.dart';
@@ -28,6 +29,9 @@ import '../state/smart_context_menu_session.dart';
 /// To open the menu from code, pass a [controller]. To turn off the long
 /// press, set [SmartContextMenuConfig.activationMode] to
 /// [SmartContextMenuActivationMode.manual].
+///
+/// To show your own content above the preview, for example a reactions
+/// bar, pass [headerSliversBuilder].
 ///
 /// ```dart
 /// SmartContextMenu(
@@ -77,6 +81,16 @@ final class SmartContextMenu extends StatefulWidget {
   /// open a message. If null, tapping the preview does nothing.
   final FutureOr<void> Function()? onPreviewTap;
 
+  /// Builds slivers shown above the preview while the menu is open.
+  ///
+  /// Use it for content tied to [child], for example a reactions bar above
+  /// a message. The slivers fade in and out with the menu. To line them up
+  /// with the preview and to close the menu, use the
+  /// [SmartContextMenuHeaderDetails] passed to the builder.
+  ///
+  /// If null, nothing is shown above the preview.
+  final SmartContextMenuHeaderBuilder? headerSliversBuilder;
+
   /// Creates a context menu for [child].
   const SmartContextMenu({
     super.key,
@@ -85,6 +99,7 @@ final class SmartContextMenu extends StatefulWidget {
     this.config = const SmartContextMenuConfig(),
     this.controller,
     this.onPreviewTap,
+    this.headerSliversBuilder,
   });
 
   @override
@@ -364,6 +379,7 @@ final class _SmartContextMenuState extends State<SmartContextMenu>
       items: widget.items,
       config: widget.config,
       onPreviewTap: widget.onPreviewTap,
+      headerSliversBuilder: widget.headerSliversBuilder,
       barrierLabel: barrierLabel,
     );
 

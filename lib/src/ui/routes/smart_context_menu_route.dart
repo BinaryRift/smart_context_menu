@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart'
 
 import '../../core/ui/motion/tokens/motion_durations.dart';
 import '../../domain/smart_context_menu_config.dart';
+import '../../domain/smart_context_menu_header_details.dart';
 import '../../domain/smart_context_menu_item.dart';
 import '../view/smart_context_menu_overlay.dart';
 
@@ -16,6 +17,7 @@ final class SmartContextMenuRoute extends PageRoute<void> {
   final List<SmartContextMenuItem> items;
   final SmartContextMenuConfig config;
   final FutureOr<void> Function()? onPreviewTap;
+  final SmartContextMenuHeaderBuilder? headerSliversBuilder;
 
   @override
   final String? barrierLabel;
@@ -27,6 +29,7 @@ final class SmartContextMenuRoute extends PageRoute<void> {
     required this.items,
     required this.config,
     this.onPreviewTap,
+    this.headerSliversBuilder,
     this.barrierLabel,
   });
 
@@ -59,6 +62,7 @@ final class SmartContextMenuRoute extends PageRoute<void> {
       config: config,
       snapshot: snapshot,
       onPreviewTap: onPreviewTap,
+      headerSliversBuilder: headerSliversBuilder,
     );
   }
 }

@@ -12,6 +12,7 @@ drag-to-select and rich submenus.
 - **Smart positioning**: the pressed widget stays in place whenever there is room for the menu;
   very tall widgets can be scrolled, and long menus scroll inside themselves.
 - **Drag-to-select**: slide a finger across the items and release on the one you want.
+- **Custom slivers above the widget**, for example a reactions bar above a message.
 - **Submenus**: static, loaded asynchronously or paginated, with a back item and swipe back.
 - **Lazy lists**: items are built only when they scroll into view, so long menus stay fast.
 - **Async items** that show a loading state and a retry item on failure, with optional custom views.
@@ -63,6 +64,39 @@ to open a message, pass `onPreviewTap`. The menu starts closing first, as with a
 ```dart
 SmartContextMenu(
   onPreviewTap: () => openMessage(message),
+  items: items,
+  child: MessageBubble(message),
+)
+```
+
+### Header slivers
+
+To show your own content above the widget while the menu is open, pass `headerSliversBuilder`.
+It returns a list of slivers, which fade in and out with the menu. The builder gets
+`SmartContextMenuHeaderDetails`:
+
+- `alignment` tells how the widget and the menu are aligned horizontally. The slivers have
+  the same horizontal padding as the widget, so `Align(alignment: header.alignment)` puts
+  your content at the edge of the widget.
+- `close()` closes the menu. It completes halfway through the closing, as an item does,
+  so the result of the action is seen as the menu closes.
+
+```dart
+SmartContextMenu(
+  headerSliversBuilder: (context, header) => [
+    SliverToBoxAdapter(
+      child: Align(
+        alignment: header.alignment,
+        child: ReactionsBar(
+          onSelected: (reaction) async {
+            await header.close();
+            react(message, reaction);
+          },
+        ),
+      ),
+    ),
+    const SliverToBoxAdapter(child: SizedBox(height: 8)),
+  ],
   items: items,
   child: MessageBubble(message),
 )
