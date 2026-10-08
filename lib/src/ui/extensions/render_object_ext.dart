@@ -64,3 +64,23 @@ extension SmartContextMenuItemHitTest on RenderObject {
     return null;
   }
 }
+
+extension SmartContextMenuContentHitTest on RenderObject {
+  /// Whether a hit test at [globalPosition] in the view [viewId] hits this
+  /// render object.
+  ///
+  /// Empty space inside it does not count: a render object is in the hit
+  /// test path only if it or one of its children is hit.
+  bool isHitAt(Offset globalPosition, {required int viewId}) {
+    final result = HitTestResult();
+    RendererBinding.instance.hitTestInView(result, globalPosition, viewId);
+    return result.path.any((entry) => entry.target == this);
+  }
+}
+
+extension SmartContextMenuBoxBounds on RenderBox {
+  /// Whether [globalPosition] is inside the paint bounds of this box.
+  bool containsGlobal(Offset globalPosition) {
+    return paintBounds.contains(globalToLocal(globalPosition));
+  }
+}

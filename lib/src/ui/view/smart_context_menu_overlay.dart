@@ -1,24 +1,21 @@
 import 'dart:async' show FutureOr;
-import 'dart:ui' as ui show Image, ImageFilter;
-import 'package:flutter/cupertino.dart' show CupertinoDynamicColor;
-import 'package:flutter/gestures.dart' show HitTestResult;
+import 'dart:ui' as ui show Image;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show HapticFeedback;
 import '../../core/ui/gestures/gesture_thresholds.dart';
 import '../../core/ui/motion/tokens/motion_curves.dart';
-import '../../core/ui/motion/tokens/motion_durations.dart';
-import '../../core/ui/motion/tokens/motion_opacity.dart';
-import '../../core/ui/motion/tokens/motion_translation.dart';
 import '../../domain/smart_context_menu_config.dart';
 import '../../domain/smart_context_menu_header_details.dart';
 import '../../domain/smart_context_menu_item.dart';
+import '../components/preview_sliver_delegate.dart';
 import '../components/smart_menu_reactive_physics.dart';
+import '../extensions/render_object_ext.dart';
 import '../layout/smart_context_menu_horizontal_layout.dart';
 import '../layout/smart_context_menu_vertical_layout.dart';
-import '../widgets/sliver_extent_listener.dart';
+import '../widgets/smart_context_menu_background.dart';
+import '../widgets/smart_context_menu_header.dart';
+import '../widgets/smart_context_menu_preview.dart';
 import 'smart_context_menu_view.dart';
-
-part '../components/preview_header_delegate.dart';
 
 final class SmartContextMenuOverlay extends StatefulWidget {
   final Animation<double> routeAnimation;
@@ -54,15 +51,12 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
   final ValueNotifier<double> _currentMenuHeight = ValueNotifier(0.0);
   final ValueNotifier<Offset> _previewMotion = ValueNotifier(Offset.zero);
 
-  late final Animation<double> _backgroundAnimation;
-  late final CurvedAnimation _backgroundCurve;
   late final CurvedAnimation _menuAnimation;
 
   late SmartContextMenuHorizontalLayout _horizontalLayout;
   late final SmartContextMenuVerticalLayout _verticalLayout;
   Offset? _pointerDownPos;
   bool _isScrolling = false;
-  Offset _startPreviewPosition = MotionTranslation.none.toOffset;
   Future<void>? _closing;
 
   SmartContextMenuConfig get _config => widget.config;
@@ -77,7 +71,11 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
       menuGap: _config.menuGap,
       moveBackDown: _config.moveBackDown,
     );
-    _setupAnimations();
+    _menuAnimation = CurvedAnimation(
+      parent: widget.routeAnimation,
+      curve: MotionCurves.menuScaleIn,
+      reverseCurve: MotionCurves.menuScaleOut,
+    );
   }
 
   @override
@@ -94,7 +92,6 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
   void dispose() {
     _currentMenuHeight.dispose();
     _previewMotion.dispose();
-    _backgroundCurve.dispose();
     _menuAnimation.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -109,7 +106,13 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
         onPointerUp: _handlePointerUp,
         child: Stack(
           children: [
-            _buildBackground(context),
+            Positioned.fill(
+              child: SmartContextMenuBackground(
+                animation: widget.routeAnimation,
+                color: _config.style.backgroundColor,
+                blur: _config.style.backgroundBlur,
+              ),
+            ),
             Positioned.fill(
               child: NotificationListener<ScrollNotification>(
                 onNotification: _handleScrollNotification,
@@ -128,7 +131,6 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
     final double topSafe = media.padding.top + _config.screenPadding.top;
     final double bottomSafe =
         media.padding.bottom + _config.screenPadding.bottom;
-    final double previewHeight = widget.anchorRect.height;
 
     _verticalLayout.setBounds(
       screenHeight: screenHeight,
@@ -156,13 +158,29 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
           },
         ),
 
-        if (widget.headerSliversBuilder != null) _buildHeader(),
+        if (widget.headerSliversBuilder case final builder?)
+          SmartContextMenuHeader(
+            builder: builder,
+            layout: _horizontalLayout,
+            animation: widget.routeAnimation,
+            close: _close,
+            onExtentChanged: _onHeaderExtentChanged,
+            groupKey: _headerKey,
+          ),
 
         SliverPersistentHeader(
           pinned: false,
-          delegate: _PreviewHeaderDelegate(
-            height: previewHeight,
-            child: _buildPreview(),
+          delegate: PreviewSliverDelegate(
+            height: widget.anchorRect.height,
+            child: SmartContextMenuPreview(
+              snapshot: widget.snapshot,
+              size: widget.anchorRect.size,
+              heroTag: widget.heroTag,
+              layout: _horizontalLayout,
+              motion: _previewMotion,
+              snapshotKey: _previewKey,
+              onTap: widget.onPreviewTap == null ? null : _onPreviewTap,
+            ),
           ),
         ),
 
@@ -172,99 +190,6 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
 
         SliverPadding(padding: EdgeInsets.only(bottom: bottomSafe)),
       ],
-    );
-  }
-
-  Widget _buildBackground(BuildContext context) {
-    final backgroundColor =
-        CupertinoDynamicColor.resolve(_config.style.backgroundColor, context);
-
-    return Positioned.fill(
-      child: FadeTransition(
-        opacity: _backgroundAnimation,
-        child: _config.style.backgroundBlur != null
-            ? AnimatedBuilder(
-                animation: _backgroundCurve,
-                builder: (context, child) {
-                  return BackdropFilter(
-                    filter: ui.ImageFilter.blur(
-                      sigmaX: _config.style.backgroundBlur!.sigmaX *
-                          _backgroundCurve.value,
-                      sigmaY: _config.style.backgroundBlur!.sigmaY *
-                          _backgroundCurve.value,
-                    ),
-                    child: child,
-                  );
-                },
-                child: Container(color: backgroundColor),
-              )
-            : Container(color: backgroundColor),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    final header = SmartContextMenuHeaderDetails(
-      alignment: _horizontalLayout.alignment,
-      close: _close,
-    );
-
-    return SliverExtentListener(
-      onExtentChanged: _onHeaderExtentChanged,
-      sliver: SliverFadeTransition(
-        opacity: widget.routeAnimation,
-        sliver: SliverPadding(
-          padding: _horizontalLayout.padding,
-          sliver: SliverMainAxisGroup(
-            key: _headerKey,
-            slivers: widget.headerSliversBuilder!(context, header),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPreview() {
-    return ValueListenableBuilder(
-      valueListenable: _previewMotion,
-      builder: (context, offset, child) {
-        return TweenAnimationBuilder<Offset>(
-          duration: MotionDurations.fast,
-          curve: MotionCurves.entrance,
-          tween: Tween<Offset>(begin: offset, end: offset),
-          builder: (context, animatedOffset, child) {
-            return Transform.translate(
-              offset: animatedOffset,
-              child: child,
-            );
-          },
-          child: child,
-        );
-      },
-      child: GestureDetector(
-        onTap: widget.onPreviewTap == null ? null : _onPreviewTap,
-        onPanStart: _onPreviewPanStart,
-        onPanUpdate: _onPreviewPanUpdate,
-        onPanEnd: _onPreviewPanEnd,
-        onPanCancel: _onPreviewPanCancel,
-        child: Padding(
-          padding: _horizontalLayout.padding,
-          child: Align(
-            alignment: _horizontalLayout.alignment,
-            child: SizedBox(
-              width: widget.anchorRect.width,
-              height: widget.anchorRect.height,
-              child: KeyedSubtree(
-                key: _previewKey,
-                child: Hero(
-                  tag: widget.heroTag,
-                  child: RawImage(image: widget.snapshot, fit: BoxFit.fill),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 
@@ -294,48 +219,18 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
     );
   }
 
-  void _setupAnimations() {
-    _backgroundCurve = CurvedAnimation(
-      parent: widget.routeAnimation,
-      curve: MotionCurves.quartOut,
-      reverseCurve: MotionCurves.quartIn,
-    );
+  /// Whether [position] is on the menu, the preview or a widget in the
+  /// header slivers, so a tap there does not close the menu.
+  bool _isOnContent(Offset position) {
+    RenderObject? find(GlobalKey key) => key.currentContext?.findRenderObject();
 
-    _backgroundAnimation = Tween<double>(
-      begin: MotionOpacity.hidden.value,
-      end: MotionOpacity.visible.value,
-    ).animate(_backgroundCurve);
-
-    _menuAnimation = CurvedAnimation(
-      parent: widget.routeAnimation,
-      curve: MotionCurves.menuScaleIn,
-      reverseCurve: MotionCurves.menuScaleOut,
-    );
-  }
-
-  bool _isPointInside(Offset globalPos, GlobalKey key) {
-    final renderBox = key.currentContext?.findRenderObject() as RenderBox?;
-    if (renderBox == null) return false;
-    final localPos = renderBox.globalToLocal(globalPos);
-    return renderBox.paintBounds.contains(localPos);
-  }
-
-  /// Whether [globalPos] hits a widget in the header slivers.
-  ///
-  /// Unlike [_isPointInside], empty space next to the widgets does not
-  /// count: a sliver is in the hit test path only if one of its children
-  /// is hit.
-  bool _isPointOnHeader(Offset globalPos) {
-    final header = _headerKey.currentContext?.findRenderObject();
-    if (header == null) return false;
-
-    final result = HitTestResult();
-    WidgetsBinding.instance.hitTestInView(
-      result,
-      globalPos,
-      View.of(context).viewId,
-    );
-    return result.path.any((entry) => entry.target == header);
+    final menu = find(_menuKey);
+    final preview = find(_previewKey);
+    final header = find(_headerKey);
+    return (menu is RenderBox && menu.containsGlobal(position)) ||
+        (preview is RenderBox && preview.containsGlobal(position)) ||
+        (header != null &&
+            header.isHitAt(position, viewId: View.of(context).viewId));
   }
 
   void _handlePointerDown(PointerDownEvent event) {
@@ -359,10 +254,7 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
     _pointerDownPos = null;
     if (distance > GestureThresholds.tapSlop) return;
 
-    final bool hitMenu = _isPointInside(event.position, _menuKey);
-    final bool hitPreview = _isPointInside(event.position, _previewKey);
-
-    if (!hitMenu && !hitPreview && !_isPointOnHeader(event.position)) {
+    if (!_isOnContent(event.position)) {
       Navigator.of(context).pop();
     }
   }
@@ -416,36 +308,5 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
       Navigator.of(context).pop();
       await Future<void>.delayed(route.transitionDuration * 0.5);
     }();
-  }
-
-  void _onPreviewPanStart(DragStartDetails details) {
-    _startPreviewPosition = details.localPosition;
-  }
-
-  void _onPreviewPanUpdate(DragUpdateDetails details) {
-    final Offset delta = details.localPosition - _startPreviewPosition;
-
-    final double maxTranslation = MotionTranslation.subtle.dx;
-
-    final double tx = (delta.dx * GestureThresholds.dragResistance).clamp(
-      -maxTranslation,
-      maxTranslation,
-    );
-    final double ty = (delta.dy * GestureThresholds.dragResistance).clamp(
-      -maxTranslation,
-      maxTranslation,
-    );
-
-    _previewMotion.value = Offset(tx, ty);
-  }
-
-  void _onPreviewPanEnd(DragEndDetails details) {
-    _previewMotion.value = MotionTranslation.none.toOffset;
-    _startPreviewPosition = MotionTranslation.none.toOffset;
-  }
-
-  void _onPreviewPanCancel() {
-    _previewMotion.value = MotionTranslation.none.toOffset;
-    _startPreviewPosition = MotionTranslation.none.toOffset;
   }
 }
