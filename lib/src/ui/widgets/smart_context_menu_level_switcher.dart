@@ -2,10 +2,12 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../core/ui/gestures/gesture_thresholds.dart';
+import '../../core/ui/motion/tokens/motion_curves.dart';
 import '../../core/ui/motion/tokens/motion_durations.dart';
 import '../../core/ui/motion/tokens/motion_slides.dart';
 import '../../core/ui/motion/transitions/fade_slide_transition.dart';
 import '../state/smart_context_menu_level_entry.dart';
+import 'smart_context_menu_level_stack.dart';
 
 /// Switches menu levels: a submenu slides in from the right and pushes
 /// the current level to the left; going back, the parent slides in from
@@ -14,6 +16,11 @@ import '../state/smart_context_menu_level_entry.dart';
 /// With [enableSwipeBack] and a [previous] level, swiping right drags
 /// the current level away and reveals [previous]. If the swipe goes far
 /// or fast enough, [onSwipeBack] is called once released.
+///
+/// The height follows the transitions: it moves from the height of one
+/// level to the other along with the levels. A change of height inside
+/// a level, such as items loaded in place of the loader, is animated
+/// by the level itself.
 ///
 /// Give each level its own key, so a new level is animated in.
 final class SmartContextMenuLevelSwitcher extends StatefulWidget {
@@ -118,6 +125,8 @@ final class _SmartContextMenuLevelSwitcherState
   @override
   Widget build(BuildContext context) {
     final swipeParent = _swipeParent;
+    final entries = [..._leaving, ?swipeParent, _current];
+    final levels = [for (final entry in entries) _buildEntry(entry)];
 
     // The gesture detector stays in the tree even when swiping is off,
     // so the levels are not mounted again when it turns on or off.
@@ -138,15 +147,14 @@ final class _SmartContextMenuLevelSwitcherState
       },
       child: IgnorePointer(
         ignoring: _isTracking || _isSettling,
-        child: Stack(
-          alignment: widget.isForward
-              ? Alignment.centerRight
-              : Alignment.centerLeft,
-          children: [
-            for (final entry in _leaving) _buildEntry(entry),
-            if (swipeParent != null) _buildEntry(swipeParent),
-            _buildEntry(_current),
-          ],
+        child: AnimatedBuilder(
+          animation: Listenable.merge([
+            for (final entry in entries) entry.controller,
+          ]),
+          builder: (context, _) => SmartContextMenuLevelStack(
+            presences: [for (final entry in entries) entry.presence],
+            children: levels,
+          ),
         ),
       ),
     );
@@ -157,7 +165,12 @@ final class _SmartContextMenuLevelSwitcherState
       key: ObjectKey(entry),
       opacity: entry.fade,
       position: entry.position,
-      child: entry.child,
+      child: AnimatedSize(
+        duration: MotionDurations.standard,
+        curve: MotionCurves.quartOut,
+        alignment: Alignment.topCenter,
+        child: entry.child,
+      ),
     );
   }
 

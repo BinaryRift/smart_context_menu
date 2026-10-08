@@ -4,6 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
 
+import 'package:smart_context_menu/src/core/ui/motion/tokens/motion_durations.dart';
+import 'package:smart_context_menu/src/ui/widgets/smart_context_menu_level_switcher.dart';
+
 import '../../helpers/menu_tester.dart';
 
 const _labels = SmartContextMenuLabels();
@@ -35,6 +38,40 @@ void main() {
 
     expect(find.byType(CupertinoActivityIndicator), findsNothing);
     expect(find.text('Loaded'), findsOneWidget);
+  });
+
+  testWidgets('animates the menu height when the items are loaded', (
+    tester,
+  ) async {
+    final completer = Completer<List<SmartContextMenuItem>>();
+
+    await tester.pumpMenu(
+      items: [
+        SmartContextMenuItem.asyncSubmenu(
+          title: 'More',
+          asyncChildren: () => completer.future,
+        ),
+      ],
+    );
+    await tester.openMenu();
+    await tester.tap(find.text('More'));
+    await tester.settleMenu();
+
+    double menuHeight() => tester
+        .getSize(find.byType(SmartContextMenuLevelSwitcher))
+        .height;
+    final loadingHeight = menuHeight();
+
+    completer.complete(_items(['A', 'B', 'C', 'D']));
+    await tester.pump();
+    await tester.pump(MotionDurations.standard * 0.3);
+    final animatedHeight = menuHeight();
+
+    await tester.settleMenu();
+    final loadedHeight = menuHeight();
+
+    expect(loadedHeight, greaterThan(loadingHeight));
+    expect(animatedHeight, inExclusiveRange(loadingHeight, loadedHeight));
   });
 
   testWidgets('shows the retry item on error and retries on tap', (

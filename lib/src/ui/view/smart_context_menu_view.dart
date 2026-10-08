@@ -110,28 +110,24 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
               clipBehavior: Clip.antiAlias,
               child: child,
             ),
-            child: AnimatedSize(
-              duration: MotionDurations.standard,
-              curve: MotionCurves.quartOut,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxHeight: screenHeight * _config.menuHeightFactor,
-                ),
-                child: SmartContextMenuPointerTracker(
-                  hoverController: _hoverController,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: screenHeight * _config.menuHeightFactor,
+              ),
+              child: SmartContextMenuPointerTracker(
+                hoverController: _hoverController,
+                isSwiping: _isSwiping,
+                onDrag: _setMenuEffect,
+                onRelease: _resetMenuEffect,
+                child: SmartContextMenuLevelSwitcher(
+                  isForward: _controller.isForward,
+                  enableSwipeBack: _config.enableSwipeBack,
                   isSwiping: _isSwiping,
-                  onDrag: _setMenuEffect,
-                  onRelease: _resetMenuEffect,
-                  child: SmartContextMenuLevelSwitcher(
-                    isForward: _controller.isForward,
-                    enableSwipeBack: _config.enableSwipeBack,
-                    isSwiping: _isSwiping,
-                    onSwipeBack: _controller.popSubmenu,
-                    previous: _buildPreviousLevel(),
-                    child: _buildLevel(
-                      _controller.currentLevel,
-                      depth: _controller.stackLength,
-                    ),
+                  onSwipeBack: _controller.popSubmenu,
+                  previous: _buildPreviousLevel(),
+                  child: _buildLevel(
+                    _controller.currentLevel,
+                    depth: _controller.stackLength,
                   ),
                 ),
               ),

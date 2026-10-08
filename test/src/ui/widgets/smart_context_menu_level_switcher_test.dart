@@ -33,7 +33,42 @@ Widget _swipeable({int depth = 2, bool enableSwipeBack = true}) {
 Widget _level(int depth) =>
     Text('Level $depth', key: ValueKey('Level $depth'));
 
+/// Levels of different heights: level n is 100 * n high.
+Widget _sizedSwitcher({
+  required int depth,
+  bool isForward = true,
+  double? height,
+}) {
+  return Directionality(
+    textDirection: TextDirection.ltr,
+    child: Align(
+      alignment: Alignment.topCenter,
+      child: SizedBox(
+        width: 300,
+        child: StatefulBuilder(
+          builder: (context, setState) => SmartContextMenuLevelSwitcher(
+            isForward: isForward,
+            enableSwipeBack: true,
+            onSwipeBack: () => setState(() => depth--),
+            previous: depth > 1 ? _sizedLevel(depth - 1) : null,
+            child: _sizedLevel(depth, height: height),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+Widget _sizedLevel(int depth, {double? height}) => SizedBox(
+  key: ValueKey('Level $depth'),
+  height: height ?? 100.0 * depth,
+  child: Text('Level $depth'),
+);
+
 extension on WidgetTester {
+  double get switcherHeight =>
+      getSize(find.byType(SmartContextMenuLevelSwitcher)).height;
+
   double slideOf(String level) {
     final slide = widget<SlideTransition>(
       find.ancestor(
@@ -199,7 +234,9 @@ void main() {
       await gesture.moveBy(const Offset(80, 0));
       await tester.pump();
 
-      final width = tester.getSize(find.byType(Stack)).width;
+      final width = tester
+          .getSize(find.byType(SmartContextMenuLevelSwitcher))
+          .width;
       expect(tester.slideOf('Level 2') - start, moreOrLessEquals(80 / width));
       expect(tester.slideOf('Level 1'), lessThan(0));
 
@@ -257,6 +294,58 @@ void main() {
       await tester.slowSwipe('Level 1', 500);
 
       expect(tester.slideOf('Level 1'), 0);
+    });
+  });
+
+  group('height', () {
+    testWidgets('moves between the levels with a transition', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_sizedSwitcher(depth: 1));
+      expect(tester.switcherHeight, 100);
+
+      await tester.pumpWidget(_sizedSwitcher(depth: 2));
+      await tester.pumpHalfway();
+      expect(tester.switcherHeight, inExclusiveRange(100, 200));
+
+      await tester.pumpAndSettle();
+      expect(tester.switcherHeight, 200);
+    });
+
+    testWidgets('follows the finger during a swipe back', (tester) async {
+      await tester.pumpWidget(_sizedSwitcher(depth: 2));
+      final gesture = await tester.startGesture(
+        tester.getCenter(find.text('Level 2')),
+      );
+      await gesture.moveBy(const Offset(30, 0));
+      await gesture.moveBy(const Offset(90, 0));
+      await tester.pump();
+
+      final progress = tester.slideOf('Level 2');
+      expect(progress, greaterThan(0));
+      expect(tester.switcherHeight, moreOrLessEquals(200 - 100 * progress));
+
+      await gesture.up();
+      await tester.pumpAndSettle();
+      expect(tester.switcherHeight, 200);
+    });
+
+    testWidgets('is the parent height after a swipe back', (tester) async {
+      await tester.pumpWidget(_sizedSwitcher(depth: 2));
+      await tester.slowSwipe('Level 2', 200);
+
+      expect(find.text('Level 2'), findsNothing);
+      expect(tester.switcherHeight, 100);
+    });
+
+    testWidgets('animates a change of height inside a level', (tester) async {
+      await tester.pumpWidget(_sizedSwitcher(depth: 1));
+      await tester.pumpWidget(_sizedSwitcher(depth: 1, height: 300));
+      await tester.pumpHalfway();
+      expect(tester.switcherHeight, inExclusiveRange(100, 300));
+
+      await tester.pumpAndSettle();
+      expect(tester.switcherHeight, 300);
     });
   });
 }
