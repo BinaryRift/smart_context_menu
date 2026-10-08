@@ -131,6 +131,54 @@ void main() {
       );
       await tester.releaseOutside(gesture);
     });
+
+    group('with highlight color', () {
+      const highlightColor = Color(0x33000001);
+      const config = SmartContextMenuConfig(
+        style: SmartContextMenuStyle(highlightColor: highlightColor),
+      );
+
+      testWidgets('uses it on an item', (tester) async {
+        await tester.pumpMenu(items: appearanceItems(), config: config);
+        await tester.openMenu();
+        final gesture = await tester.pressAt(find.text('Enabled'));
+
+        expect(tester.backgroundOf('Enabled'), isSameColorAs(highlightColor));
+        await tester.releaseOutside(gesture);
+      });
+
+      testWidgets('uses it on the back item', (tester) async {
+        await tester.pumpMenu(items: submenuItems(), config: config);
+        await tester.openSubmenu();
+        final gesture = await tester.pressAt(find.text('Child'));
+        final back = find.text(const SmartContextMenuLabels().back).last;
+        await gesture.moveTo(tester.getCenter(back));
+        await tester.pump();
+
+        expect(tester.backgroundAt(back), isSameColorAs(highlightColor));
+        await tester.releaseOutside(gesture);
+      });
+
+      testWidgets('keeps the tint of a destructive item', (tester) async {
+        await tester.pumpMenu(
+          items: appearanceItems(),
+          config: config,
+          brightness: Brightness.light,
+        );
+        await tester.openMenu();
+        final gesture = await tester.pressAt(find.text('Destructive'));
+
+        expect(
+          tester.backgroundOf('Destructive'),
+          isSameColorAs(
+            light(
+              SmartContextMenuDefaults.destructiveColor,
+            ).withValues(alpha: 0.48),
+          ),
+        );
+        await tester.releaseOutside(gesture);
+      });
+    });
   });
 
   group('tint color', () {

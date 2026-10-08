@@ -121,8 +121,8 @@ final class SmartContextMenuStyle {
   /// Used for items without [SmartContextMenuItem.titleStyle] and for the
   /// back, retry and loading items. Its color is used only while an item is
   /// enabled, not destructive and has no [SmartContextMenuItem.tintColor],
-  /// and also tints the press highlight. If the
-  /// style has no color, [SmartContextMenuDefaults.textColor] is used.
+  /// and also tints the press highlight unless [highlightColor] is set.
+  /// If the style has no color, [SmartContextMenuDefaults.textColor] is used.
   /// Defaults to [SmartContextMenuDefaults.textStyle].
   final TextStyle textStyle;
 
@@ -141,6 +141,14 @@ final class SmartContextMenuStyle {
   ///
   /// If null, which is the default, disabled items have no background.
   final Color? disabledItemColor;
+
+  /// The background of a pressed item, including the back item.
+  ///
+  /// Tinted and destructive items keep their own pressed tint. If null,
+  /// which is the default, the color of [textStyle] is used with
+  /// [SmartContextMenuDefaults.highlightOpacity] in the light theme and
+  /// [SmartContextMenuDefaults.darkHighlightOpacity] in the dark one.
+  final Color? highlightColor;
 
   /// The color of the divider between items.
   ///
@@ -202,6 +210,7 @@ final class SmartContextMenuStyle {
     this.secondaryTextColor = SmartContextMenuDefaults.secondaryTextColor,
     this.destructiveColor = SmartContextMenuDefaults.destructiveColor,
     this.disabledItemColor,
+    this.highlightColor,
     this.dividerColor = SmartContextMenuDefaults.dividerColor,
     this.defaultIconSize = SmartContextMenuDefaults.iconSize,
     this.defaultIconColor,
@@ -232,6 +241,7 @@ final class SmartContextMenuStyle {
     Color? secondaryTextColor,
     Color? destructiveColor,
     Color? disabledItemColor,
+    Color? highlightColor,
     Color? dividerColor,
     double? defaultIconSize,
     Color? defaultIconColor,
@@ -258,6 +268,7 @@ final class SmartContextMenuStyle {
       secondaryTextColor: secondaryTextColor ?? this.secondaryTextColor,
       destructiveColor: destructiveColor ?? this.destructiveColor,
       disabledItemColor: disabledItemColor ?? this.disabledItemColor,
+      highlightColor: highlightColor ?? this.highlightColor,
       dividerColor: dividerColor ?? this.dividerColor,
       defaultIconSize: defaultIconSize ?? this.defaultIconSize,
       defaultIconColor: defaultIconColor ?? this.defaultIconColor,

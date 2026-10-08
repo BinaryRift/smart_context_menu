@@ -23,6 +23,7 @@ void main() {
       secondaryTextColor: Color(0xFF000005),
       destructiveColor: Color(0xFF000006),
       disabledItemColor: Color(0xFF000007),
+      highlightColor: Color(0xFF00000B),
       dividerColor: Color(0xFF000008),
       defaultIconSize: 11,
       defaultIconColor: Color(0xFF000009),
@@ -49,6 +50,7 @@ void main() {
       'secondaryTextColor': (s) => s.secondaryTextColor,
       'destructiveColor': (s) => s.destructiveColor,
       'disabledItemColor': (s) => s.disabledItemColor,
+      'highlightColor': (s) => s.highlightColor,
       'dividerColor': (s) => s.dividerColor,
       'defaultIconSize': (s) => s.defaultIconSize,
       'defaultIconColor': (s) => s.defaultIconColor,
@@ -106,6 +108,10 @@ void main() {
       'disabledItemColor': (
         color,
         () => original.copyWith(disabledItemColor: color),
+      ),
+      'highlightColor': (
+        color,
+        () => original.copyWith(highlightColor: color),
       ),
       'dividerColor': (color, () => original.copyWith(dividerColor: color)),
       'defaultIconSize': (19.0, () => original.copyWith(defaultIconSize: 19)),

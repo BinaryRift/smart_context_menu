@@ -132,7 +132,8 @@ abstract final class SmartContextMenuDefaults {
   static const double tintDisabledTextOpacity = 0.5;
 
   /// The opacity of the title color in the press highlight of an item
-  /// in the light theme.
+  /// in the light theme, used when [SmartContextMenuStyle.highlightColor]
+  /// is null.
   ///
   /// A dark highlight stands out more on a light menu, so it is lighter than
   /// [darkHighlightOpacity].

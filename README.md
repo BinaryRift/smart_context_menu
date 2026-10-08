@@ -237,6 +237,7 @@ const menuStyle = SmartContextMenuStyle(
   ),
   secondaryTextColor: Color(0x99FFFFFF),
   destructiveColor: Color(0xFFFF453A),
+  highlightColor: Color(0x1FFFFFFF),
   dividerColor: Color(0x999E9E9E),
   backButtonColor: Color(0xFF0A84FF),
   submenuIcon: Icons.arrow_forward_ios,
@@ -249,6 +250,8 @@ const menuStyle = SmartContextMenuStyle(
 The color of `textStyle` is used for enabled items that are not destructive.
 Disabled and destructive items use `secondaryTextColor` and `destructiveColor`.
 Disabled items have no background unless `disabledItemColor` is set.
+A pressed item is highlighted with a translucent `textStyle` color; `highlightColor`
+replaces it. Tinted and destructive items keep their own pressed tint.
 An item `titleStyle` replaces `textStyle` for that item.
 Icons in `leading` and `trailing` take the title color unless they set their own.
 The back item of a submenu uses `textStyle` in bold; `backButtonColor` sets the color

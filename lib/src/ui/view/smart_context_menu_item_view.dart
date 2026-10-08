@@ -116,9 +116,11 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
     if (tintColor != null) {
       return _resolve(tintColor).withValues(alpha: _tintOpacity);
     }
-    return _isHighlight
-        ? _resolve(_baseTextColor).withValues(alpha: _highlightOpacity)
-        : Colors.transparent;
+    if (!_isHighlight) return Colors.transparent;
+    final highlightColor = _style.highlightColor;
+    return highlightColor != null
+        ? _resolve(highlightColor)
+        : _resolve(_baseTextColor).withValues(alpha: _highlightOpacity);
   }
 
   Color get _textColor {
