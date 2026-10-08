@@ -25,7 +25,7 @@ void main() {
     await tester.tap(find.text('More'));
     await tester.settleMenu();
 
-    return tester
+    final padding = tester
         .widget<Padding>(
           find
               .ancestor(
@@ -35,6 +35,11 @@ void main() {
               .first,
         )
         .padding;
+
+    // Completes the load so that its timeout timer does not stay pending.
+    completer.complete([]);
+    await tester.settleMenu();
+    return padding;
   }
 
   testWidgets('uses the default vertical padding', (tester) async {

@@ -3,6 +3,22 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
 
 void main() {
+  test('has the documented defaults', () {
+    const config = SmartContextMenuConfig();
+
+    expect(config.labels, same(const SmartContextMenuLabels()));
+    expect(config.enableHaptics, isTrue);
+    expect(config.enableSwipeBack, isTrue);
+    expect(config.barrierDismissible, isTrue);
+    expect(config.activationMode, SmartContextMenuActivationMode.longPress);
+    expect(config.menuWidth, 280);
+    expect(config.menuHeightFactor, 0.6);
+    expect(config.screenPadding, SmartContextMenuDefaults.screenPadding);
+    expect(config.menuGap, SmartContextMenuDefaults.menuGap);
+    expect(config.moveBackDown, isFalse);
+    expect(config.style, same(const SmartContextMenuStyle()));
+  });
+
   group('copyWith', () {
     const original = SmartContextMenuConfig(
       labels: SmartContextMenuLabels(back: 'Back 1'),

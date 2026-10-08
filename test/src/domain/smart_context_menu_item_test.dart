@@ -63,21 +63,23 @@ void main() {
     expect(item.isInternalInteracted, isTrue);
   });
 
-  test('asyncSubmenu keeps its loader', () {
+  test('asyncSubmenu keeps its loader and timeout', () {
     Future<List<SmartContextMenuItem>> loader() async => [];
     final item = SmartContextMenuItem.asyncSubmenu(
       title: 'More',
       asyncChildren: loader,
+      timeout: const Duration(seconds: 3),
     );
 
     expect(item.asyncChildren, loader);
+    expect(item.loadingTimeout, const Duration(seconds: 3));
     expect(item.children, isNull);
     expect(item.asyncPagingChildren, isNull);
     expect(item.showTransitionIcon, isTrue);
     expect(item.isInternalInteracted, isTrue);
   });
 
-  test('pagingSubmenu keeps its loader and the first page metadata', () {
+  test('pagingSubmenu keeps its loader, timeout and first page metadata', () {
     Future<List<SmartContextMenuItem>> loader(
       SmartContextMenuPagingMetadata metadata,
     ) async => [];
@@ -86,9 +88,11 @@ void main() {
       title: 'Pages',
       asyncPagingChildren: loader,
       initialMetadata: metadata,
+      timeout: const Duration(seconds: 3),
     );
 
     expect(item.asyncPagingChildren, loader);
+    expect(item.loadingTimeout, const Duration(seconds: 3));
     expect(item.pagingMetadata, metadata);
     expect(item.children, isNull);
     expect(item.asyncChildren, isNull);
@@ -134,6 +138,19 @@ void main() {
       expect(item.showTransitionIcon, isFalse);
       expect(item.isInternalInteracted, isTrue);
     });
+  });
+
+  test('async submenus use the default timeout', () {
+    final async = SmartContextMenuItem.asyncSubmenu(
+      asyncChildren: () async => [],
+    );
+    final paging = SmartContextMenuItem.pagingSubmenu(
+      asyncPagingChildren: (_) async => [],
+      initialMetadata: const SmartContextMenuPagingMetadata(),
+    );
+
+    expect(async.loadingTimeout, SmartContextMenuDefaults.loadingTimeout);
+    expect(paging.loadingTimeout, SmartContextMenuDefaults.loadingTimeout);
   });
 
   group('separator', () {
