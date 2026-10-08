@@ -81,6 +81,9 @@ It returns a list of slivers, which fade in and out with the menu. The builder g
 - `close()` closes the menu. It completes halfway through the closing, as an item does,
   so the result of the action is seen as the menu closes.
 
+A tap on your widgets in the slivers keeps the menu open; a tap on empty space next to them
+closes it, as a tap anywhere outside the menu does.
+
 ```dart
 SmartContextMenu(
   headerSliversBuilder: (context, header) => [

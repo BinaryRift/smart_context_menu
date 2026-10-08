@@ -2,6 +2,7 @@ import 'dart:async' show FutureOr;
 import 'dart:math' as math;
 import 'dart:ui' as ui show Image, ImageFilter;
 import 'package:flutter/cupertino.dart' show CupertinoDynamicColor;
+import 'package:flutter/gestures.dart' show HitTestResult;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show HapticFeedback;
 import '../../core/ui/gestures/gesture_thresholds.dart';
@@ -48,6 +49,7 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
   late final ScrollController _scrollController;
   final GlobalKey _menuKey = GlobalKey();
   final GlobalKey _previewKey = GlobalKey();
+  final GlobalKey _headerKey = GlobalKey();
   final ValueNotifier<double> _currentMenuHeight = ValueNotifier(0.0);
   final ValueNotifier<Offset> _previewMotion = ValueNotifier(Offset.zero);
 
@@ -218,6 +220,7 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
             right: _rightPadding ?? 0,
           ),
           sliver: SliverMainAxisGroup(
+            key: _headerKey,
             slivers: widget.headerSliversBuilder!(context, header),
           ),
         ),
@@ -355,6 +358,24 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
     return renderBox.paintBounds.contains(localPos);
   }
 
+  /// Whether [globalPos] hits a widget in the header slivers.
+  ///
+  /// Unlike [_isPointInside], empty space next to the widgets does not
+  /// count: a sliver is in the hit test path only if one of its children
+  /// is hit.
+  bool _isPointOnHeader(Offset globalPos) {
+    final header = _headerKey.currentContext?.findRenderObject();
+    if (header == null) return false;
+
+    final result = HitTestResult();
+    WidgetsBinding.instance.hitTestInView(
+      result,
+      globalPos,
+      View.of(context).viewId,
+    );
+    return result.path.any((entry) => entry.target == header);
+  }
+
   void _handlePointerDown(PointerDownEvent event) {
     _pointerDownPos = event.position;
   }
@@ -379,7 +400,7 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
     final bool hitMenu = _isPointInside(event.position, _menuKey);
     final bool hitPreview = _isPointInside(event.position, _previewKey);
 
-    if (!hitMenu && !hitPreview) {
+    if (!hitMenu && !hitPreview && !_isPointOnHeader(event.position)) {
       Navigator.of(context).pop();
     }
   }

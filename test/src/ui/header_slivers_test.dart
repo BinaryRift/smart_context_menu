@@ -19,6 +19,9 @@ Widget _menu({
   double targetHeight = 40,
   double? headerHeight = 20,
   ValueChanged<SmartContextMenuHeaderDetails>? onHeader,
+  VoidCallback? onHeaderTap,
+  SmartContextMenuConfig config = const SmartContextMenuConfig(),
+  List<SmartContextMenuItem>? items,
 }) {
   return CupertinoApp(
     home: Padding(
@@ -26,7 +29,8 @@ Widget _menu({
       child: Align(
         alignment: alignment,
         child: SmartContextMenu(
-          items: _items,
+          items: items ?? _items,
+          config: config,
           headerSliversBuilder: headerHeight == null
               ? null
               : (context, header) {
@@ -35,11 +39,15 @@ Widget _menu({
                     SliverToBoxAdapter(
                       child: Align(
                         alignment: header.alignment,
-                        child: SizedBox(
-                          key: const ValueKey(_headerText),
-                          width: 60,
-                          height: headerHeight,
-                          child: const Text(_headerText),
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: onHeaderTap,
+                          child: SizedBox(
+                            key: const ValueKey(_headerText),
+                            width: 60,
+                            height: headerHeight,
+                            child: const Text(_headerText),
+                          ),
                         ),
                       ),
                     ),
@@ -54,6 +62,13 @@ Widget _menu({
       ),
     ),
   );
+}
+
+/// Opens the menu and waits until it takes pointers.
+Future<void> _openMenu(WidgetTester tester) async {
+  await tester.openMenu();
+  // The route ignores pointers until its transition ends.
+  await tester.pump(const Duration(milliseconds: 100));
 }
 
 ScrollPosition _scrollPosition(WidgetTester tester) {
@@ -207,5 +222,70 @@ void main() {
 
     expect(find.text('Copy'), findsNothing);
     expect(navigator.canPop(), isTrue);
+  });
+
+  group('taps', () {
+    testWidgets('a tap on a widget in the slivers keeps the menu open', (
+      tester,
+    ) async {
+      var taps = 0;
+      await tester.pumpWidget(_menu(onHeaderTap: () => taps++));
+      await _openMenu(tester);
+
+      await tester.tap(_header);
+      await tester.settleMenu();
+
+      expect(taps, 1);
+      expect(find.text('Copy'), findsOneWidget);
+    });
+
+    testWidgets('a tap next to the widgets in the slivers closes the menu', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_menu());
+      await _openMenu(tester);
+
+      await tester.tapAt(tester.getCenter(_header) + const Offset(150, 0));
+      await tester.settleMenu();
+
+      expect(find.text('Copy'), findsNothing);
+    });
+
+    testWidgets('a tap next to the slivers keeps a non-dismissible menu', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _menu(config: const SmartContextMenuConfig(barrierDismissible: false)),
+      );
+      await _openMenu(tester);
+
+      await tester.tapAt(tester.getCenter(_header) + const Offset(150, 0));
+      await tester.settleMenu();
+
+      expect(find.text('Copy'), findsOneWidget);
+    });
+
+    testWidgets('a drag from the slivers does not select an item', (
+      tester,
+    ) async {
+      var copies = 0;
+      await tester.pumpWidget(
+        _menu(
+          items: [
+            SmartContextMenuItem.simple(title: 'Copy', onTap: () => copies++),
+          ],
+        ),
+      );
+      await _openMenu(tester);
+
+      final gesture = await tester.startGesture(tester.getCenter(_header));
+      await gesture.moveTo(tester.getCenter(find.text('Copy')));
+      await tester.pump();
+      await gesture.up();
+      await tester.settleMenu();
+
+      expect(copies, 0);
+      expect(find.text('Copy'), findsOneWidget);
+    });
   });
 }
