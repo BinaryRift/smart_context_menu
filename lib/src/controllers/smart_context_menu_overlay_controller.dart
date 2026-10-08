@@ -50,7 +50,7 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
     SmartContextMenuSubmenuLoader? asyncLoader,
     SmartContextMenuPagingMetadata? initialMetadata,
     Duration? loadingTimeout,
-    SmartContextMenuItem? loadingItem,
+    SmartContextMenuLoadingItem? loadingItem,
     bool loading = false,
   }) {
     _isForward = true;

@@ -11,7 +11,7 @@ final class SmartMenuLevel {
   final Duration? loadingTimeout;
 
   /// The item shown while the items or a page load, if not the default one.
-  final SmartContextMenuItem? loadingItem;
+  final SmartContextMenuLoadingItem? loadingItem;
   SmartContextMenuPagingMetadata? nextMetadata;
   bool isLoading;
   bool isPaginating;

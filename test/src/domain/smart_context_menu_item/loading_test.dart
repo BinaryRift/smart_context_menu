@@ -26,7 +26,8 @@ void main() {
   });
 
   test('is loading and has no actions', () {
-    final item = SmartContextMenuItem.loading();
+    // The declared type checks that the item is a loading item.
+    final SmartContextMenuLoadingItem item = SmartContextMenuItem.loading();
 
     expect(item.isLoading, isTrue);
     expect(item.title, isNull);

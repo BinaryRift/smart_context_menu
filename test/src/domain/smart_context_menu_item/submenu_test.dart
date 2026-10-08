@@ -88,24 +88,4 @@ void main() {
       isNull,
     );
   });
-
-  test('loading submenus assert when loading is not a loading item', () {
-    final notLoading = SmartContextMenuItem.simple(title: 'Loading');
-
-    expect(
-      () => SmartContextMenuItem.asyncSubmenu(
-        asyncChildren: () async => [],
-        loading: notLoading,
-      ),
-      throwsAssertionError,
-    );
-    expect(
-      () => SmartContextMenuItem.pagingSubmenu(
-        asyncPagingChildren: (_) async => [],
-        initialMetadata: const SmartContextMenuPagingMetadata(),
-        loading: notLoading,
-      ),
-      throwsAssertionError,
-    );
-  });
 }

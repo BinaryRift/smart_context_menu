@@ -73,8 +73,6 @@ typedef SmartContextMenuItemBuilder =
 final class SmartContextMenuItem {
   static int _nextId = 0;
   static String _generateId() => "smart_context_menu_item_${_nextId++}";
-  static const String _loadingMustBeLoadingItem =
-      'loading must be a SmartContextMenuItem.loading.';
 
   /// Identifies the item within the menu.
   ///
@@ -143,8 +141,8 @@ final class SmartContextMenuItem {
 
   /// Whether the item shows that it is loading.
   ///
-  /// Set by [SmartContextMenuItem.loading].
-  final bool isLoading;
+  /// True for a [SmartContextMenuLoadingItem].
+  bool get isLoading => this is SmartContextMenuLoadingItem;
 
   /// Whether the menu closes when the item is tapped.
   ///
@@ -179,7 +177,7 @@ final class SmartContextMenuItem {
   /// and [SmartContextMenuItem.pagingSubmenu]. If null in a submenu, it shows
   /// an activity indicator in the middle, see
   /// [SmartContextMenuStyle.loaderVerticalPadding].
-  final SmartContextMenuItem? loadingItem;
+  final SmartContextMenuLoadingItem? loadingItem;
 
   /// Notifies when the item of [listenableBuilder] should be built again.
   ///
@@ -256,7 +254,6 @@ final class SmartContextMenuItem {
     this.tintColor,
     this.isDisabled = false,
     this.isSeparator = false,
-    this.isLoading = false,
     this.onTap,
     this.children,
     this.asyncChildren,
@@ -374,7 +371,7 @@ final class SmartContextMenuItem {
   factory SmartContextMenuItem.asyncSubmenu({
     required SmartContextMenuSubmenuLoader asyncChildren,
     Duration timeout = SmartContextMenuDefaults.loadingTimeout,
-    SmartContextMenuItem? loading,
+    SmartContextMenuLoadingItem? loading,
     String? id,
     String? title,
     TextStyle? titleStyle,
@@ -386,25 +383,22 @@ final class SmartContextMenuItem {
     SmartContextMenuItemBuilder? customBuilder,
     EdgeInsets? padding,
     double? childrenGap,
-  }) {
-    assert(loading == null || loading.isLoading, _loadingMustBeLoadingItem);
-    return SmartContextMenuItem._(
-      id: id ?? _generateId(),
-      title: title,
-      titleStyle: titleStyle,
-      leading: leading,
-      trailing: trailing,
-      isDestructive: isDestructive,
-      tintColor: tintColor,
-      isDisabled: isDisabled,
-      asyncChildren: asyncChildren,
-      loadingTimeout: timeout,
-      customBuilder: customBuilder,
-      padding: padding,
-      childrenGap: childrenGap,
-      loadingItem: loading,
-    );
-  }
+  }) => SmartContextMenuItem._(
+    id: id ?? _generateId(),
+    title: title,
+    titleStyle: titleStyle,
+    leading: leading,
+    trailing: trailing,
+    isDestructive: isDestructive,
+    tintColor: tintColor,
+    isDisabled: isDisabled,
+    asyncChildren: asyncChildren,
+    loadingTimeout: timeout,
+    customBuilder: customBuilder,
+    padding: padding,
+    childrenGap: childrenGap,
+    loadingItem: loading,
+  );
 
   /// Creates an item that opens a submenu with items loaded page by page.
   ///
@@ -448,7 +442,7 @@ final class SmartContextMenuItem {
     required SmartContextMenuPageLoader asyncPagingChildren,
     required SmartContextMenuPagingMetadata initialMetadata,
     Duration timeout = SmartContextMenuDefaults.loadingTimeout,
-    SmartContextMenuItem? loading,
+    SmartContextMenuLoadingItem? loading,
     String? id,
     String? title,
     TextStyle? titleStyle,
@@ -460,26 +454,23 @@ final class SmartContextMenuItem {
     SmartContextMenuItemBuilder? customBuilder,
     EdgeInsets? padding,
     double? childrenGap,
-  }) {
-    assert(loading == null || loading.isLoading, _loadingMustBeLoadingItem);
-    return SmartContextMenuItem._(
-      id: id ?? _generateId(),
-      title: title,
-      asyncPagingChildren: asyncPagingChildren,
-      pagingMetadata: initialMetadata,
-      loadingTimeout: timeout,
-      titleStyle: titleStyle,
-      leading: leading,
-      trailing: trailing,
-      isDestructive: isDestructive,
-      tintColor: tintColor,
-      isDisabled: isDisabled,
-      customBuilder: customBuilder,
-      padding: padding,
-      childrenGap: childrenGap,
-      loadingItem: loading,
-    );
-  }
+  }) => SmartContextMenuItem._(
+    id: id ?? _generateId(),
+    title: title,
+    asyncPagingChildren: asyncPagingChildren,
+    pagingMetadata: initialMetadata,
+    loadingTimeout: timeout,
+    titleStyle: titleStyle,
+    leading: leading,
+    trailing: trailing,
+    isDestructive: isDestructive,
+    tintColor: tintColor,
+    isDisabled: isDisabled,
+    customBuilder: customBuilder,
+    padding: padding,
+    childrenGap: childrenGap,
+    loadingItem: loading,
+  );
 
   /// Creates a separator between groups of items.
   ///
@@ -548,10 +539,9 @@ final class SmartContextMenuItem {
     required SmartContextMenuItemLoader asyncItem,
     String? id,
     Duration timeout = SmartContextMenuDefaults.loadingTimeout,
-    SmartContextMenuItem? loading,
+    SmartContextMenuLoadingItem? loading,
     SmartContextMenuItemBuilder? errorBuilder,
   }) {
-    assert(loading == null || loading.isLoading, _loadingMustBeLoadingItem);
     return SmartContextMenuItem._(
       id: id ?? _generateId(),
       asyncItem: asyncItem,
@@ -629,7 +619,7 @@ final class SmartContextMenuItem {
   ///   },
   /// )
   /// ```
-  factory SmartContextMenuItem.loading({
+  static SmartContextMenuLoadingItem loading({
     String? id,
     String? title,
     TextStyle? titleStyle,
@@ -637,15 +627,28 @@ final class SmartContextMenuItem {
     SmartContextMenuItemBuilder? loadingBuilder,
     EdgeInsets? padding,
     double? childrenGap,
-  }) => SmartContextMenuItem._(
+  }) => SmartContextMenuLoadingItem._(
     id: id ?? _generateId(),
     title: title,
     titleStyle: titleStyle,
     leading: leading,
-    isLoading: true,
-    closeOnTap: false,
     loadingBuilder: loadingBuilder,
     padding: padding,
     childrenGap: childrenGap,
   );
+}
+
+/// A [SmartContextMenuItem] that shows a loading state.
+///
+/// Create it with [SmartContextMenuItem.loading].
+final class SmartContextMenuLoadingItem extends SmartContextMenuItem {
+  const SmartContextMenuLoadingItem._({
+    required super.id,
+    super.title,
+    super.titleStyle,
+    super.leading,
+    super.loadingBuilder,
+    super.padding,
+    super.childrenGap,
+  }) : super._(closeOnTap: false);
 }

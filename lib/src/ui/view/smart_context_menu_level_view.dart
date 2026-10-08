@@ -157,7 +157,7 @@ final class SmartContextMenuLevelView extends StatelessWidget {
     );
   }
 
-  SmartContextMenuItem _defaultLoadingItem() {
+  SmartContextMenuLoadingItem _defaultLoadingItem() {
     return SmartContextMenuItem.loading(
       padding: EdgeInsets.symmetric(
         vertical: config.style.loaderVerticalPadding,

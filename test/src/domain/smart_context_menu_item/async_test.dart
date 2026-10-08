@@ -42,14 +42,4 @@ void main() {
     expect(item.showTransitionIcon, isFalse);
     expect(item.isInternalInteracted, isTrue);
   });
-
-  test('asserts when loading is not a loading item', () {
-    expect(
-      () => SmartContextMenuItem.async(
-        asyncItem: loader,
-        loading: SmartContextMenuItem.simple(title: 'Loading'),
-      ),
-      throwsAssertionError,
-    );
-  });
 }

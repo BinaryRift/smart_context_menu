@@ -92,7 +92,7 @@ void main() {
   group('before the loading row of the next page', () {
     Future<Completer<List<SmartContextMenuItem>>> openPagingSubmenu(
       WidgetTester tester, {
-      SmartContextMenuItem? loading,
+      SmartContextMenuLoadingItem? loading,
     }) async {
       final nextPage = Completer<List<SmartContextMenuItem>>();
       await tester.pumpMenu(
