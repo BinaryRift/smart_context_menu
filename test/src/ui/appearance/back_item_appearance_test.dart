@@ -14,14 +14,14 @@ void main() {
     expect(back.fontFamily, 'Custom');
     expect(back.fontSize, 13);
     expect(back.fontWeight, FontWeight.w600);
-    expect(back.color, isSameColorAs(customStyle.textStyle.color!));
+    expect(back.color, isSameColorAs(customStyle.titleStyle.color!));
   });
 
   testWidgets('merges the back button text style', (tester) async {
     await tester.pumpMenu(
       config: customConfig.copyWith(
         style: customStyle.copyWith(
-          backButtonTextStyle: const TextStyle(
+          backButtonTitleStyle: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w300,
             color: Color(0xFF0000FF),
@@ -47,7 +47,7 @@ void main() {
       config: customConfig.copyWith(
         style: customStyle.copyWith(
           backButtonColor: backColor,
-          backButtonTextStyle: const TextStyle(color: Color(0xFF0000FF)),
+          backButtonTitleStyle: const TextStyle(color: Color(0xFF0000FF)),
         ),
       ),
       items: submenuItems(),

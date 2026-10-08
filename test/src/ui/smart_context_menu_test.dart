@@ -22,7 +22,7 @@ void main() {
 
       expect(
         titleColor(tester, 'Copy'),
-        isSameColorAs(SmartContextMenuDefaults.textColor.color),
+        isSameColorAs(SmartContextMenuDefaults.foregroundColor.color),
       );
       expect(
         titleColor(tester, 'Delete'),
@@ -42,7 +42,7 @@ void main() {
 
       expect(
         titleColor(tester, 'Copy'),
-        isSameColorAs(SmartContextMenuDefaults.textColor.darkColor),
+        isSameColorAs(SmartContextMenuDefaults.foregroundColor.darkColor),
       );
       expect(
         titleColor(tester, 'Delete'),

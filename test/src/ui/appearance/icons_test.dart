@@ -61,12 +61,12 @@ void main() {
     );
     await tester.openMenu();
 
-    final textColor = customStyle.textStyle.color!;
-    expect(tester.iconColorOf(Icons.edit), isSameColorAs(textColor));
-    expect(tester.iconColorOf(Icons.star), isSameColorAs(textColor));
+    final foregroundColor = customStyle.titleStyle.color!;
+    expect(tester.iconColorOf(Icons.edit), isSameColorAs(foregroundColor));
+    expect(tester.iconColorOf(Icons.star), isSameColorAs(foregroundColor));
     expect(
       tester.iconColorOf(Icons.block),
-      isSameColorAs(customStyle.secondaryTextColor),
+      isSameColorAs(customStyle.disabledForegroundColor),
     );
     expect(
       tester.iconColorOf(Icons.delete),
@@ -74,7 +74,7 @@ void main() {
     );
     expect(
       tester.iconColorOf(SmartContextMenuDefaults.submenuIcon),
-      isSameColorAs(textColor),
+      isSameColorAs(foregroundColor),
     );
   });
 

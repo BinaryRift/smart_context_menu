@@ -6,14 +6,14 @@ import 'menu_tester.dart';
 
 /// A style where every color differs from the defaults.
 const customStyle = SmartContextMenuStyle(
-  textStyle: TextStyle(
+  titleStyle: TextStyle(
     fontFamily: 'Custom',
     fontSize: 13,
     color: Color(0xFF00FF00),
   ),
-  secondaryTextColor: Color(0xFF000002),
+  disabledForegroundColor: Color(0xFF000002),
   destructiveColor: Color(0xFF000003),
-  disabledItemColor: Color(0xFF000004),
+  disabledBackgroundColor: Color(0xFF000004),
   dividerColor: Color(0xFF000005),
 );
 

@@ -18,12 +18,13 @@ final class SmartContextMenuItemState {
   /// Whether the item is destructive, see [SmartContextMenuItem.isDestructive].
   final bool isDestructive;
 
-  /// The title color for the current state, resolved for the current theme.
+  /// The color of the title and icons for the current state, resolved for
+  /// the current theme.
   ///
   /// Depends on [isDisabled], [isDestructive],
   /// [SmartContextMenuItem.tintColor], the color of
   /// [SmartContextMenuItem.titleStyle] and [SmartContextMenuStyle].
-  final Color textColor;
+  final Color foregroundColor;
 
   /// Creates an item state. Used by the menu.
   @internal
@@ -31,6 +32,6 @@ final class SmartContextMenuItemState {
     required this.isPressed,
     required this.isDisabled,
     required this.isDestructive,
-    required this.textColor,
+    required this.foregroundColor,
   });
 }

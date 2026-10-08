@@ -19,11 +19,11 @@ void main() {
 
     expect(
       tester.titleStyleOf('Enabled').color,
-      isSameColorAs(light(SmartContextMenuDefaults.textColor)),
+      isSameColorAs(light(SmartContextMenuDefaults.foregroundColor)),
     );
     expect(
       tester.titleStyleOf('Disabled').color,
-      isSameColorAs(light(SmartContextMenuDefaults.secondaryTextColor)),
+      isSameColorAs(light(SmartContextMenuDefaults.disabledForegroundColor)),
     );
     expect(
       tester.titleStyleOf('Destructive').color,
@@ -45,7 +45,7 @@ void main() {
 
     expect(
       tester.titleStyleOf('Disabled').color,
-      isSameColorAs(customStyle.secondaryTextColor),
+      isSameColorAs(customStyle.disabledForegroundColor),
     );
     expect(
       tester.titleStyleOf('Destructive').color,
@@ -53,20 +53,20 @@ void main() {
     );
     expect(
       tester.backgroundOf('Disabled'),
-      isSameColorAs(customStyle.disabledItemColor!),
+      isSameColorAs(customStyle.disabledBackgroundColor!),
     );
     expect(dividerColorOf(tester), isSameColorAs(customStyle.dividerColor));
   });
 
   testWidgets('resolves dynamic colors for the theme', (tester) async {
-    const textColor = CupertinoDynamicColor.withBrightness(
+    const foregroundColor = CupertinoDynamicColor.withBrightness(
       color: Color(0xFF000001),
       darkColor: Color(0xFF000002),
     );
     await tester.pumpMenu(
       items: appearanceItems(),
       config: const SmartContextMenuConfig(
-        style: SmartContextMenuStyle(textStyle: TextStyle(color: textColor)),
+        style: SmartContextMenuStyle(titleStyle: TextStyle(color: foregroundColor)),
       ),
       brightness: Brightness.dark,
     );
@@ -74,12 +74,12 @@ void main() {
 
     expect(
       tester.titleStyleOf('Enabled').color,
-      isSameColorAs(textColor.darkColor),
+      isSameColorAs(foregroundColor.darkColor),
     );
   });
 
   group('press highlight', () {
-    final textColor = SmartContextMenuDefaults.textColor;
+    final foregroundColor = SmartContextMenuDefaults.foregroundColor;
 
     testWidgets('is lighter in the light theme', (tester) async {
       await tester.pumpMenu(
@@ -91,7 +91,7 @@ void main() {
 
       expect(
         tester.backgroundOf('Enabled'),
-        isSameColorAs(textColor.color.withValues(alpha: 0.06)),
+        isSameColorAs(foregroundColor.color.withValues(alpha: 0.06)),
       );
       await tester.releaseOutside(gesture);
     });
@@ -106,7 +106,7 @@ void main() {
 
       expect(
         tester.backgroundOf('Enabled'),
-        isSameColorAs(textColor.darkColor.withValues(alpha: 0.1)),
+        isSameColorAs(foregroundColor.darkColor.withValues(alpha: 0.1)),
       );
       await tester.releaseOutside(gesture);
     });
@@ -127,7 +127,7 @@ void main() {
 
       expect(
         tester.backgroundAt(back),
-        isSameColorAs(textColor.color.withValues(alpha: 0.16)),
+        isSameColorAs(foregroundColor.color.withValues(alpha: 0.16)),
       );
       await tester.releaseOutside(gesture);
     });
@@ -324,11 +324,11 @@ void main() {
 
       expect(
         tester.backgroundOf('Tinted'),
-        isSameColorAs(customStyle.disabledItemColor!),
+        isSameColorAs(customStyle.disabledBackgroundColor!),
       );
       expect(
         tester.backgroundOf('Destructive'),
-        isSameColorAs(customStyle.disabledItemColor!),
+        isSameColorAs(customStyle.disabledBackgroundColor!),
       );
     });
 

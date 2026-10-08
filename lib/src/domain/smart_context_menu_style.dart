@@ -24,7 +24,7 @@ import 'smart_context_menu_blur.dart';
 /// const menuConfig = SmartContextMenuConfig(
 ///   style: SmartContextMenuStyle(
 ///     menuBlur: SmartContextMenuBlur.small,
-///     textStyle: TextStyle(fontSize: 15, color: Color(0xFF1C1C1E)),
+///     titleStyle: TextStyle(fontSize: 15, color: Color(0xFF1C1C1E)),
 ///   ),
 /// );
 /// ```
@@ -96,15 +96,15 @@ final class SmartContextMenuStyle {
 
   /// The title and icon color of the back item in a submenu.
   ///
-  /// If null, the title uses the color of [textStyle] and the icon uses
+  /// If null, the title uses the color of [titleStyle] and the icon uses
   /// [defaultIconColor].
   final Color? backButtonColor;
 
-  /// The style of the back item title, merged over [textStyle].
+  /// The style of the back item title, merged over [titleStyle].
   ///
   /// [backButtonColor] takes precedence over its color.
-  /// Defaults to [SmartContextMenuDefaults.backButtonTextStyle].
-  final TextStyle backButtonTextStyle;
+  /// Defaults to [SmartContextMenuDefaults.backButtonTitleStyle].
+  final TextStyle backButtonTitleStyle;
 
   // Items
 
@@ -125,13 +125,13 @@ final class SmartContextMenuStyle {
   /// The base style of item titles.
   ///
   /// Used for items without [SmartContextMenuItem.titleStyle] and for the
-  /// retry and loading items. The back item merges [backButtonTextStyle]
+  /// retry and loading items. The back item merges [backButtonTitleStyle]
   /// over it. Its color is used only while an item is
   /// enabled, not destructive and has no [SmartContextMenuItem.tintColor],
   /// and also tints the press highlight unless [highlightColor] is set.
-  /// If the style has no color, [SmartContextMenuDefaults.textColor] is used.
-  /// Defaults to [SmartContextMenuDefaults.textStyle].
-  final TextStyle textStyle;
+  /// If the style has no color, [SmartContextMenuDefaults.foregroundColor] is used.
+  /// Defaults to [SmartContextMenuDefaults.titleStyle].
+  final TextStyle titleStyle;
 
   /// The maximum number of lines of an item title.
   ///
@@ -139,12 +139,13 @@ final class SmartContextMenuStyle {
   /// Defaults to [SmartContextMenuDefaults.titleMaxLines].
   final int titleMaxLines;
 
-  /// The title and submenu chevron color of a disabled item.
+  /// The color of the title, icons and submenu chevron of a disabled item.
   ///
-  /// Defaults to [SmartContextMenuDefaults.secondaryTextColor].
-  final Color secondaryTextColor;
+  /// Defaults to [SmartContextMenuDefaults.disabledForegroundColor].
+  final Color disabledForegroundColor;
 
-  /// The title and press highlight color of a destructive item.
+  /// The color of the title, icons and background tint of a destructive
+  /// item.
   ///
   /// [SmartContextMenuItem.tintColor] takes precedence over it.
   /// Defaults to [SmartContextMenuDefaults.destructiveColor].
@@ -153,12 +154,12 @@ final class SmartContextMenuStyle {
   /// The background of a disabled item, including a tinted one.
   ///
   /// If null, which is the default, disabled items have no background.
-  final Color? disabledItemColor;
+  final Color? disabledBackgroundColor;
 
   /// The background of a pressed item, including the back item.
   ///
   /// Tinted and destructive items keep their own pressed tint. If null,
-  /// which is the default, the color of [textStyle] is used with
+  /// which is the default, the color of [titleStyle] is used with
   /// [SmartContextMenuDefaults.highlightOpacity] in the light theme and
   /// [SmartContextMenuDefaults.darkHighlightOpacity] in the dark one.
   final Color? highlightColor;
@@ -242,14 +243,14 @@ final class SmartContextMenuStyle {
     this.backButtonBorderRadius =
         SmartContextMenuDefaults.backButtonBorderRadius,
     this.backButtonColor,
-    this.backButtonTextStyle = SmartContextMenuDefaults.backButtonTextStyle,
+    this.backButtonTitleStyle = SmartContextMenuDefaults.backButtonTitleStyle,
     this.itemPadding = SmartContextMenuDefaults.itemPadding,
     this.itemChildrenGap = SmartContextMenuDefaults.itemChildrenGap,
-    this.textStyle = SmartContextMenuDefaults.textStyle,
+    this.titleStyle = SmartContextMenuDefaults.titleStyle,
     this.titleMaxLines = SmartContextMenuDefaults.titleMaxLines,
-    this.secondaryTextColor = SmartContextMenuDefaults.secondaryTextColor,
+    this.disabledForegroundColor = SmartContextMenuDefaults.disabledForegroundColor,
     this.destructiveColor = SmartContextMenuDefaults.destructiveColor,
-    this.disabledItemColor,
+    this.disabledBackgroundColor,
     this.highlightColor,
     this.dividerColor = SmartContextMenuDefaults.dividerColor,
     this.dividerThickness = SmartContextMenuDefaults.dividerThickness,
@@ -280,14 +281,14 @@ final class SmartContextMenuStyle {
     SmartContextMenuBlur? backButtonBlur,
     BorderRadiusGeometry? backButtonBorderRadius,
     Color? backButtonColor,
-    TextStyle? backButtonTextStyle,
+    TextStyle? backButtonTitleStyle,
     EdgeInsets? itemPadding,
     double? itemChildrenGap,
-    TextStyle? textStyle,
+    TextStyle? titleStyle,
     int? titleMaxLines,
-    Color? secondaryTextColor,
+    Color? disabledForegroundColor,
     Color? destructiveColor,
-    Color? disabledItemColor,
+    Color? disabledBackgroundColor,
     Color? highlightColor,
     Color? dividerColor,
     double? dividerThickness,
@@ -314,14 +315,14 @@ final class SmartContextMenuStyle {
       backButtonBorderRadius:
           backButtonBorderRadius ?? this.backButtonBorderRadius,
       backButtonColor: backButtonColor ?? this.backButtonColor,
-      backButtonTextStyle: backButtonTextStyle ?? this.backButtonTextStyle,
+      backButtonTitleStyle: backButtonTitleStyle ?? this.backButtonTitleStyle,
       itemPadding: itemPadding ?? this.itemPadding,
       itemChildrenGap: itemChildrenGap ?? this.itemChildrenGap,
-      textStyle: textStyle ?? this.textStyle,
+      titleStyle: titleStyle ?? this.titleStyle,
       titleMaxLines: titleMaxLines ?? this.titleMaxLines,
-      secondaryTextColor: secondaryTextColor ?? this.secondaryTextColor,
+      disabledForegroundColor: disabledForegroundColor ?? this.disabledForegroundColor,
       destructiveColor: destructiveColor ?? this.destructiveColor,
-      disabledItemColor: disabledItemColor ?? this.disabledItemColor,
+      disabledBackgroundColor: disabledBackgroundColor ?? this.disabledBackgroundColor,
       highlightColor: highlightColor ?? this.highlightColor,
       dividerColor: dividerColor ?? this.dividerColor,
       dividerThickness: dividerThickness ?? this.dividerThickness,

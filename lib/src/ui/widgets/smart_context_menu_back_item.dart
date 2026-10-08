@@ -48,8 +48,8 @@ final class SmartContextMenuBackItem extends StatelessWidget {
       item: SmartContextMenuItem.simple(
         closeOnTap: false,
         title: config.labels.back,
-        titleStyle: style.textStyle
-            .merge(style.backButtonTextStyle)
+        titleStyle: style.titleStyle
+            .merge(style.backButtonTitleStyle)
             .copyWith(color: style.backButtonColor),
         leading: Icon(
           style.backIcon,

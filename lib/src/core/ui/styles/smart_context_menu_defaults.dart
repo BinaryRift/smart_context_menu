@@ -73,16 +73,16 @@ abstract final class SmartContextMenuDefaults {
         darkColor: Color(0xFF636366),
       );
 
-  /// The title of an enabled item that is not destructive, used when
-  /// [SmartContextMenuStyle.textStyle] has no color.
-  static const CupertinoDynamicColor textColor =
+  /// The color of the title and icons of an enabled item that is not
+  /// tinted, used when [SmartContextMenuStyle.titleStyle] has no color.
+  static const CupertinoDynamicColor foregroundColor =
       CupertinoDynamicColor.withBrightness(
         color: Color(0xFF000000),
         darkColor: Color(0xFFFAFAFA),
       );
 
-  /// The default of [SmartContextMenuStyle.secondaryTextColor].
-  static const CupertinoDynamicColor secondaryTextColor =
+  /// The default of [SmartContextMenuStyle.disabledForegroundColor].
+  static const CupertinoDynamicColor disabledForegroundColor =
       CupertinoDynamicColor.withBrightness(
         color: Color(0x993C3C43),
         darkColor: Color(0x66FFFFFF),
@@ -144,7 +144,7 @@ abstract final class SmartContextMenuDefaults {
   static const double darkTintPressedOpacity = 0.24;
 
   /// The title and icon opacity of a disabled tinted item.
-  static const double tintDisabledTextOpacity = 0.5;
+  static const double tintDisabledForegroundOpacity = 0.5;
 
   /// The opacity of the title color in the press highlight of an item
   /// in the light theme, used when [SmartContextMenuStyle.highlightColor]
@@ -188,16 +188,16 @@ abstract final class SmartContextMenuDefaults {
 
   // Text
 
-  /// The default of [SmartContextMenuStyle.textStyle].
+  /// The default of [SmartContextMenuStyle.titleStyle].
   ///
-  /// Has no color, so [textColor] is used.
-  static const TextStyle textStyle = TextStyle(
+  /// Has no color, so [foregroundColor] is used.
+  static const TextStyle titleStyle = TextStyle(
     fontSize: 17,
     fontWeight: FontWeight.w400,
   );
 
-  /// The default of [SmartContextMenuStyle.backButtonTextStyle]: bold.
-  static const TextStyle backButtonTextStyle = TextStyle(
+  /// The default of [SmartContextMenuStyle.backButtonTitleStyle]: bold.
+  static const TextStyle backButtonTitleStyle = TextStyle(
     fontWeight: FontWeight.w600,
   );
 

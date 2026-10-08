@@ -175,7 +175,7 @@ SmartContextMenuItem.async(
   },
   errorBuilder: (context, state) => Text(
     'Could not check access. Tap to retry',
-    style: TextStyle(color: state.textColor),
+    style: TextStyle(color: state.foregroundColor),
   ),
 )
 ```
@@ -252,12 +252,12 @@ can match the app theme:
 
 ```dart
 const menuStyle = SmartContextMenuStyle(
-  textStyle: TextStyle(
+  titleStyle: TextStyle(
     fontFamily: 'Montserrat',
     fontSize: 17,
     color: Color(0xFFFFFFFF),
   ),
-  secondaryTextColor: Color(0x99FFFFFF),
+  disabledForegroundColor: Color(0x99FFFFFF),
   destructiveColor: Color(0xFFFF453A),
   highlightColor: Color(0x1FFFFFFF),
   dividerColor: Color(0x999E9E9E),
@@ -269,14 +269,14 @@ const menuStyle = SmartContextMenuStyle(
 );
 ```
 
-The color of `textStyle` is used for enabled items that are not destructive.
-Disabled and destructive items use `secondaryTextColor` and `destructiveColor`.
-Disabled items have no background unless `disabledItemColor` is set.
-A pressed item is highlighted with a translucent `textStyle` color; `highlightColor`
+The color of `titleStyle` is used for enabled items that are not destructive.
+Disabled and destructive items use `disabledForegroundColor` and `destructiveColor`.
+Disabled items have no background unless `disabledBackgroundColor` is set.
+A pressed item is highlighted with a translucent `titleStyle` color; `highlightColor`
 replaces it. Tinted and destructive items keep their own pressed tint.
 Icons in `leading` and `trailing` take the title color unless they set their own.
-The back item of a submenu merges `backButtonTextStyle` (bold by default) over
-`textStyle`; `backButtonColor` sets the color of its title and icon.
+The back item of a submenu merges `backButtonTitleStyle` (bold by default) over
+`titleStyle`; `backButtonColor` sets the color of its title and icon.
 Titles take up to `titleMaxLines` lines (2 by default) and are truncated with an ellipsis.
 `itemPadding` and `itemChildrenGap` set the padding of items and the gap between
 their icons and title.
@@ -288,7 +288,7 @@ all items, and an item changes it only for itself:
 // The style: padding and text of all items.
 const style = SmartContextMenuStyle(
   itemPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-  textStyle: TextStyle(fontSize: 17),
+  titleStyle: TextStyle(fontSize: 17),
 );
 
 // This item uses its own padding and text style instead.
@@ -363,16 +363,17 @@ SmartContextMenuItem.simple(
 `customBuilder` replaces the content of an item. The item padding, press highlight
 and divider are kept, and taps work as usual. Interactive widgets inside, such as
 buttons, handle their own taps: the item is not triggered over them. The builder
-receives the item state, including the title color for the current state and theme.
+receives the item state, including `foregroundColor`: the color of the title and icons
+for the current state and theme.
 
 ```dart
 SmartContextMenuItem.simple(
   onTap: () => reply(),
   customBuilder: (context, state) => Row(
     children: [
-      Icon(CupertinoIcons.reply, color: state.textColor),
+      Icon(CupertinoIcons.reply, color: state.foregroundColor),
       const SizedBox(width: 12),
-      Text('Reply', style: TextStyle(color: state.textColor)),
+      Text('Reply', style: TextStyle(color: state.foregroundColor)),
     ],
   ),
 )

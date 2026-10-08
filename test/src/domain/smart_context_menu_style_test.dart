@@ -17,14 +17,14 @@ void main() {
       backButtonBlur: SmartContextMenuBlur(3),
       backButtonBorderRadius: BorderRadius.all(Radius.circular(2)),
       backButtonColor: Color(0xFF00000A),
-      backButtonTextStyle: TextStyle(fontSize: 12),
+      backButtonTitleStyle: TextStyle(fontSize: 12),
       itemPadding: EdgeInsets.all(1),
       itemChildrenGap: 1,
-      textStyle: TextStyle(fontSize: 11),
+      titleStyle: TextStyle(fontSize: 11),
       titleMaxLines: 1,
-      secondaryTextColor: Color(0xFF000005),
+      disabledForegroundColor: Color(0xFF000005),
       destructiveColor: Color(0xFF000006),
-      disabledItemColor: Color(0xFF000007),
+      disabledBackgroundColor: Color(0xFF000007),
       highlightColor: Color(0xFF00000B),
       dividerColor: Color(0xFF000008),
       dividerThickness: 1,
@@ -51,14 +51,14 @@ void main() {
       'backButtonBlur': (s) => s.backButtonBlur,
       'backButtonBorderRadius': (s) => s.backButtonBorderRadius,
       'backButtonColor': (s) => s.backButtonColor,
-      'backButtonTextStyle': (s) => s.backButtonTextStyle,
+      'backButtonTitleStyle': (s) => s.backButtonTitleStyle,
       'itemPadding': (s) => s.itemPadding,
       'itemChildrenGap': (s) => s.itemChildrenGap,
-      'textStyle': (s) => s.textStyle,
+      'titleStyle': (s) => s.titleStyle,
       'titleMaxLines': (s) => s.titleMaxLines,
-      'secondaryTextColor': (s) => s.secondaryTextColor,
+      'disabledForegroundColor': (s) => s.disabledForegroundColor,
       'destructiveColor': (s) => s.destructiveColor,
-      'disabledItemColor': (s) => s.disabledItemColor,
+      'disabledBackgroundColor': (s) => s.disabledBackgroundColor,
       'highlightColor': (s) => s.highlightColor,
       'dividerColor': (s) => s.dividerColor,
       'dividerThickness': (s) => s.dividerThickness,
@@ -77,7 +77,7 @@ void main() {
     const radius = BorderRadius.all(Radius.circular(9));
     const blur = SmartContextMenuBlur(9);
     const decoration = BoxDecoration(color: color);
-    const textStyle = TextStyle(fontSize: 19);
+    const titleStyle = TextStyle(fontSize: 19);
     final changes = <String, (Object, SmartContextMenuStyle Function())>{
       'menuColor': (color, () => original.copyWith(menuColor: color)),
       'borderColor': (color, () => original.copyWith(borderColor: color)),
@@ -110,23 +110,23 @@ void main() {
         () => original.copyWith(itemPadding: const EdgeInsets.all(9)),
       ),
       'itemChildrenGap': (9.0, () => original.copyWith(itemChildrenGap: 9)),
-      'textStyle': (textStyle, () => original.copyWith(textStyle: textStyle)),
-      'backButtonTextStyle': (
-        textStyle,
-        () => original.copyWith(backButtonTextStyle: textStyle),
+      'titleStyle': (titleStyle, () => original.copyWith(titleStyle: titleStyle)),
+      'backButtonTitleStyle': (
+        titleStyle,
+        () => original.copyWith(backButtonTitleStyle: titleStyle),
       ),
       'titleMaxLines': (9, () => original.copyWith(titleMaxLines: 9)),
-      'secondaryTextColor': (
+      'disabledForegroundColor': (
         color,
-        () => original.copyWith(secondaryTextColor: color),
+        () => original.copyWith(disabledForegroundColor: color),
       ),
       'destructiveColor': (
         color,
         () => original.copyWith(destructiveColor: color),
       ),
-      'disabledItemColor': (
+      'disabledBackgroundColor': (
         color,
-        () => original.copyWith(disabledItemColor: color),
+        () => original.copyWith(disabledBackgroundColor: color),
       ),
       'highlightColor': (
         color,

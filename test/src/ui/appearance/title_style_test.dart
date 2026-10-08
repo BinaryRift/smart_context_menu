@@ -12,7 +12,7 @@ void main() {
 
     expect(
       tester.titleStyleOf('Enabled').fontSize,
-      SmartContextMenuDefaults.textStyle.fontSize,
+      SmartContextMenuDefaults.titleStyle.fontSize,
     );
   });
 
@@ -23,7 +23,7 @@ void main() {
     final enabled = tester.titleStyleOf('Enabled');
     expect(enabled.fontFamily, 'Custom');
     expect(enabled.fontSize, 13);
-    expect(enabled.color, isSameColorAs(customStyle.textStyle.color!));
+    expect(enabled.color, isSameColorAs(customStyle.titleStyle.color!));
   });
 
   testWidgets('uses the default text color if the style has none', (
@@ -32,7 +32,7 @@ void main() {
     await tester.pumpMenu(
       items: appearanceItems(),
       config: const SmartContextMenuConfig(
-        style: SmartContextMenuStyle(textStyle: TextStyle(fontSize: 13)),
+        style: SmartContextMenuStyle(titleStyle: TextStyle(fontSize: 13)),
       ),
       brightness: Brightness.light,
     );
@@ -42,7 +42,7 @@ void main() {
     expect(enabled.fontSize, 13);
     expect(
       enabled.color,
-      isSameColorAs(light(SmartContextMenuDefaults.textColor)),
+      isSameColorAs(light(SmartContextMenuDefaults.foregroundColor)),
     );
   });
 

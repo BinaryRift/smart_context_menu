@@ -88,7 +88,7 @@ final class SmartContextMenuItem {
 
   /// The style of [title].
   ///
-  /// Defaults to [SmartContextMenuStyle.textStyle]. Its color is used
+  /// Defaults to [SmartContextMenuStyle.titleStyle]. Its color is used
   /// only while the item is enabled, not destructive and has no [tintColor].
   final TextStyle? titleStyle;
 
@@ -123,7 +123,7 @@ final class SmartContextMenuItem {
   ///
   /// The title and icons take this color, and the background takes
   /// a translucent shade of it. A disabled item has only the dimmed title
-  /// and icons, see [SmartContextMenuStyle.disabledItemColor]. Takes
+  /// and icons, see [SmartContextMenuStyle.disabledBackgroundColor]. Takes
   /// precedence over [SmartContextMenuStyle.destructiveColor] and the color
   /// of [titleStyle]. May be a [CupertinoDynamicColor] to follow the theme.
   final Color? tintColor;

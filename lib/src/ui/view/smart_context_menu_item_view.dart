@@ -76,8 +76,8 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
 
   Color _resolve(Color color) => CupertinoDynamicColor.resolve(color, context);
 
-  Color get _baseTextColor =>
-      _style.textStyle.color ?? SmartContextMenuDefaults.textColor;
+  Color get _baseForegroundColor =>
+      _style.titleStyle.color ?? SmartContextMenuDefaults.foregroundColor;
 
   // The same brightness that CupertinoDynamicColor.resolve uses.
   bool get _isDark =>
@@ -107,10 +107,10 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
 
   Color get _overlayColor {
     if (_item.isDisabled) {
-      final disabledItemColor = _style.disabledItemColor;
-      return disabledItemColor == null
+      final disabledBackgroundColor = _style.disabledBackgroundColor;
+      return disabledBackgroundColor == null
           ? Colors.transparent
-          : _resolve(disabledItemColor);
+          : _resolve(disabledBackgroundColor);
     }
     final tintColor = _tintColor;
     if (tintColor != null) {
@@ -120,23 +120,23 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
     final highlightColor = _style.highlightColor;
     return highlightColor != null
         ? _resolve(highlightColor)
-        : _resolve(_baseTextColor).withValues(alpha: _highlightOpacity);
+        : _resolve(_baseForegroundColor).withValues(alpha: _highlightOpacity);
   }
 
-  Color get _textColor {
+  Color get _foregroundColor {
     final tintColor = _tintColor;
     if (tintColor != null) {
       return _resolve(tintColor).withValues(
         alpha: _item.isDisabled
-            ? SmartContextMenuDefaults.tintDisabledTextOpacity
+            ? SmartContextMenuDefaults.tintDisabledForegroundOpacity
             : 1,
       );
     }
     if (_item.isDisabled) {
-      return _resolve(_style.secondaryTextColor);
+      return _resolve(_style.disabledForegroundColor);
     }
     return _resolve(
-      _item.titleStyle?.color ?? _baseTextColor,
+      _item.titleStyle?.color ?? _baseForegroundColor,
     );
   }
 
@@ -178,7 +178,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
       isPressed: _isHighlight,
       isDisabled: _item.isDisabled,
       isDestructive: _item.isDestructive,
-      textColor: _textColor,
+      foregroundColor: _foregroundColor,
     );
 
     // Without MetaData, drag-to-select does not find the separator.
@@ -235,7 +235,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
 
   Widget _body(SmartContextMenuItem item) {
     return IconTheme.merge(
-      data: IconThemeData(color: _textColor),
+      data: IconThemeData(color: _foregroundColor),
       child: _buildRow(item),
     );
   }
@@ -248,8 +248,8 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
         Expanded(
           child: Text(
             item.title ?? "",
-            style: (item.titleStyle ?? _style.textStyle).copyWith(
-              color: _textColor,
+            style: (item.titleStyle ?? _style.titleStyle).copyWith(
+              color: _foregroundColor,
             ),
             maxLines: _style.titleMaxLines,
             overflow: TextOverflow.ellipsis,
@@ -262,7 +262,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
             _style.submenuIcon,
             size: _style.defaultIconSize,
             color: item.isDisabled
-                ? _resolve(_style.secondaryTextColor)
+                ? _resolve(_style.disabledForegroundColor)
                 : CupertinoDynamicColor.maybeResolve(
                     _style.defaultIconColor,
                     context,
