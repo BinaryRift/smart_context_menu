@@ -2,15 +2,10 @@ import 'dart:async' show FutureOr;
 import 'dart:ui' as ui;
 
 import 'package:flutter/cupertino.dart' show CupertinoLocalizations;
-import 'package:flutter/gestures.dart'
-    show LongPressGestureRecognizer, TapGestureRecognizer, GestureBinding;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show RenderRepaintBoundary;
 import 'package:flutter/services.dart' show HapticFeedback;
 
-import '../../core/ui/motion/tokens/motion_curves.dart';
-import '../../core/ui/motion/tokens/motion_durations.dart';
-import '../../core/ui/motion/tokens/motion_scales.dart';
 import '../../controllers/smart_context_menu_controller.dart';
 import '../../domain/smart_context_menu_activation_mode.dart';
 import '../../domain/smart_context_menu_config.dart';
@@ -19,6 +14,7 @@ import '../../domain/smart_context_menu_item.dart';
 import '../routes/smart_context_menu_route.dart';
 import '../state/smart_context_menu_session.dart';
 import '../theme/smart_context_menu_theme.dart';
+import '../widgets/smart_context_menu_press_detector.dart';
 
 /// Shows an iOS-style context menu for [child] on long press.
 ///
@@ -128,21 +124,13 @@ final class SmartContextMenu extends StatefulWidget {
   State<SmartContextMenu> createState() => _SmartContextMenuState();
 }
 
-final class _SmartContextMenuState extends State<SmartContextMenu>
-    with SingleTickerProviderStateMixin {
+final class _SmartContextMenuState extends State<SmartContextMenu> {
   final GlobalKey _previewKey = GlobalKey();
   final GlobalKey _persistentKey = GlobalKey();
-  final Duration _pressDuration = MotionDurations.medium;
   late final String _heroTag;
-  late final LongPressGestureRecognizer _longPressRecognizer;
-  late final TapGestureRecognizer _tapRecognizer;
-  late final AnimationController _scaleController;
-  late final CurvedAnimation _scaleCurve;
-  late final Animation<double> _scaleAnimation;
 
   late final SmartContextMenuSession _session;
   late SmartContextMenuConfig _config;
-  int? _activePointer;
 
   List<SmartContextMenuItem> get _items => widget.items;
   bool get _hasInternalActivation =>
@@ -153,8 +141,6 @@ final class _SmartContextMenuState extends State<SmartContextMenu>
     super.initState();
     _heroTag = "menu_hero_${identityHashCode(widget)}";
     _session = SmartContextMenuSession();
-    _setupAnimations();
-    _setupRecognizers();
     _bindController();
   }
 
@@ -184,54 +170,21 @@ final class _SmartContextMenuState extends State<SmartContextMenu>
     }
     _session.invalidate();
     widget.controller?.detach();
-    _longPressRecognizer.dispose();
-    _scaleCurve.dispose();
-    _scaleController.dispose();
-    _tapRecognizer.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final hasInternalActivation = _hasInternalActivation;
-    final contentStack = Stack(
-      alignment: Alignment.center,
-      children: [
-        _buildSourceContent(),
-        _buildPhantomHero(),
-      ],
-    );
-    final content = hasInternalActivation
-        ? ScaleTransition(
-            scale: _scaleAnimation,
-            child: contentStack,
-          )
-        : contentStack;
-
-    if (!hasInternalActivation) {
-      return content;
-    }
-
-    return Listener(
-      onPointerDown: _handlePointerDown,
-      onPointerCancel: (_) {
-        if (!_session.hasActiveSession) _scaleController.reverse();
-      },
-      child: RawGestureDetector(
-        behavior: HitTestBehavior.translucent,
-        gestures: {
-          LongPressGestureRecognizer:
-              GestureRecognizerFactoryWithHandlers<LongPressGestureRecognizer>(
-            () => _longPressRecognizer,
-            (instance) {},
-          ),
-          TapGestureRecognizer:
-              GestureRecognizerFactoryWithHandlers<TapGestureRecognizer>(
-            () => _tapRecognizer,
-            (instance) {},
-          ),
-        },
-        child: content,
+    return SmartContextMenuPressDetector(
+      enabled: _hasInternalActivation && _items.isNotEmpty,
+      isMenuActive: _session.hasActiveSession,
+      onLongPress: _handleLongPress,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          _buildSourceContent(),
+          _buildPhantomHero(),
+        ],
       ),
     );
   }
@@ -284,54 +237,9 @@ final class _SmartContextMenuState extends State<SmartContextMenu>
         : const SizedBox.shrink();
   }
 
-  void _setupRecognizers() {
-    _longPressRecognizer = LongPressGestureRecognizer(
-      debugOwner: this,
-      duration: _pressDuration,
-    );
-
-    _tapRecognizer = TapGestureRecognizer();
-  }
-
-  void _setupAnimations() {
-    _scaleController = AnimationController(
-      vsync: this,
-      duration: _pressDuration,
-    );
-
-    _scaleCurve = CurvedAnimation(
-      parent: _scaleController,
-      curve: MotionCurves.standard,
-    );
-    _scaleAnimation = Tween<double>(
-      begin: MotionScale.none.value,
-      end: MotionScale.pressed.value,
-    ).animate(_scaleCurve);
-  }
-
   void _resolveConfig() {
     _config = widget.config ?? SmartContextMenuTheme.of(context);
     _debugValidateConfiguration();
-    _syncRecognizers();
-  }
-
-  void _syncRecognizers() {
-    final canHandleGestures = _hasInternalActivation && _items.isNotEmpty;
-
-    _longPressRecognizer.onLongPress =
-        canHandleGestures ? _handleLongPress : null;
-    _tapRecognizer.onTapDown = canHandleGestures ? (_) => _startScale() : null;
-    _tapRecognizer.onTapUp = canHandleGestures ? (_) => _stopScale() : null;
-    _tapRecognizer.onTapCancel = canHandleGestures ? _stopScale : null;
-
-    if (!canHandleGestures) {
-      _scaleController.reset();
-      return;
-    }
-
-    if (!_session.hasActiveSession && _scaleController.value != 0) {
-      _scaleController.reset();
-    }
   }
 
   void _bindController() {
@@ -346,22 +254,7 @@ final class _SmartContextMenuState extends State<SmartContextMenu>
     widget.controller?.syncVisibility(_session.isMenuVisible);
   }
 
-  void _startScale() {
-    if (!_session.hasActiveSession) _scaleController.forward();
-  }
-
-  void _stopScale() {
-    if (_session.hasActiveSession) return;
-    _scaleController.animateTo(0, duration: MotionDurations.ultraFast);
-  }
-
   Future<void> _handleLongPress() async {
-    if (_session.hasActiveSession) return;
-
-    _interruptInternalGestures();
-
-    await _scaleController.animateTo(0, duration: MotionDurations.fast);
-
     if (_config.enableHaptics) {
       await HapticFeedback.lightImpact();
     }
@@ -495,17 +388,6 @@ final class _SmartContextMenuState extends State<SmartContextMenu>
   void _refreshSessionState() {
     if (mounted) setState(() {});
     _syncControllerVisibility();
-  }
-
-  void _interruptInternalGestures() {
-    if (_activePointer != null) {
-      GestureBinding.instance.gestureArena.close(_activePointer!);
-      GestureBinding.instance.gestureArena.sweep(_activePointer!);
-    }
-  }
-
-  void _handlePointerDown(PointerDownEvent event) {
-    _activePointer = event.pointer;
   }
 
   void _debugValidateConfiguration() {
