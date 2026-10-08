@@ -14,6 +14,7 @@ import '../../domain/smart_context_menu_item.dart';
 import '../routes/smart_context_menu_route.dart';
 import '../state/smart_context_menu_session.dart';
 import '../theme/smart_context_menu_theme.dart';
+import '../widgets/smart_context_menu_anchor.dart';
 import '../widgets/smart_context_menu_press_detector.dart';
 
 /// Shows an iOS-style context menu for [child] on long press.
@@ -179,62 +180,16 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
       enabled: _hasInternalActivation && _items.isNotEmpty,
       isMenuActive: _session.hasActiveSession,
       onLongPress: _handleLongPress,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          _buildSourceContent(),
-          _buildPhantomHero(),
-        ],
+      child: SmartContextMenuAnchor(
+        previewKey: _previewKey,
+        contentKey: _persistentKey,
+        heroTag: _heroTag,
+        snapshot: () => _session.snapshot,
+        isMenuActive: _session.hasActiveSession,
+        isMenuVisible: _session.isMenuVisible,
+        child: widget.child,
       ),
     );
-  }
-
-  Widget _buildSourceContent() {
-    return RepaintBoundary(
-      key: _previewKey,
-      child: Visibility(
-        visible: !_session.isMenuVisible,
-        maintainState: true,
-        maintainAnimation: true,
-        maintainSize: true,
-        child: KeyedSubtree(
-          key: _persistentKey,
-          child: widget.child,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPhantomHero() {
-    if (!_session.hasActiveSession) {
-      return const SizedBox.shrink();
-    }
-
-    return Positioned.fill(
-      child: IgnorePointer(
-        child: Hero(
-          tag: _heroTag,
-          flightShuttleBuilder: _buildFlightShuttle,
-          child: _session.isMenuVisible && _session.snapshot != null
-              ? RawImage(image: _session.snapshot, fit: BoxFit.fill)
-              : const DecoratedBox(
-                  decoration: BoxDecoration(color: Colors.transparent),
-                ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFlightShuttle(
-    BuildContext flightContext,
-    Animation<double> animation,
-    HeroFlightDirection flightDirection,
-    BuildContext fromHeroContext,
-    BuildContext toHeroContext,
-  ) {
-    return _session.snapshot != null
-        ? RawImage(image: _session.snapshot, fit: BoxFit.fill)
-        : const SizedBox.shrink();
   }
 
   void _resolveConfig() {
