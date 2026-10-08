@@ -127,4 +127,129 @@ void main() {
       expect(find.text('Loaded'), findsOneWidget);
     });
   });
+
+  group('when the builder returns a loading item', () {
+    testWidgets('shows its title, then the built item', (tester) async {
+      await tester.pumpMenu(
+        items: [
+          SmartContextMenuItem.listenable(
+            listenable: notifier,
+            builder: () => notifier.isLoading
+                ? SmartContextMenuItem.loading(title: 'Syncing')
+                : SmartContextMenuItem.simple(title: 'Synced'),
+          ),
+        ],
+      );
+      await tester.openMenu();
+
+      expect(find.text('Syncing'), findsOneWidget);
+      expect(find.byType(CupertinoActivityIndicator), findsOneWidget);
+
+      notifier.finishLoading();
+      await tester.settleMenu();
+
+      expect(find.text('Syncing'), findsNothing);
+      expect(find.byType(CupertinoActivityIndicator), findsNothing);
+      expect(find.text('Synced'), findsOneWidget);
+    });
+
+    testWidgets('shows the loading label without a title', (tester) async {
+      await tester.pumpMenu(
+        items: [
+          SmartContextMenuItem.listenable(
+            listenable: notifier,
+            builder: SmartContextMenuItem.loading,
+          ),
+        ],
+      );
+      await tester.openMenu();
+
+      expect(find.text(const SmartContextMenuLabels().loading), findsOneWidget);
+    });
+
+    testWidgets('uses its loadingBuilder', (tester) async {
+      await tester.pumpMenu(
+        items: [
+          SmartContextMenuItem.listenable(
+            listenable: notifier,
+            builder: () => SmartContextMenuItem.loading(
+              title: 'Syncing',
+              loadingBuilder: (context, state) => const Text('Custom loading'),
+            ),
+          ),
+        ],
+      );
+      await tester.openMenu();
+
+      expect(find.text('Custom loading'), findsOneWidget);
+      expect(find.text('Syncing'), findsNothing);
+    });
+
+    testWidgets('uses its padding', (tester) async {
+      const padding = EdgeInsets.all(24);
+      await tester.pumpMenu(
+        items: [
+          SmartContextMenuItem.listenable(
+            listenable: notifier,
+            builder: () => SmartContextMenuItem.loading(
+              title: 'Syncing',
+              padding: padding,
+            ),
+          ),
+        ],
+      );
+      await tester.openMenu();
+
+      final container = tester.widget<AnimatedContainer>(
+        find
+            .ancestor(
+              of: find.text('Syncing'),
+              matching: find.byType(AnimatedContainer),
+            )
+            .first,
+      );
+      expect(container.padding, padding);
+    });
+
+    testWidgets('changes its title while loading', (tester) async {
+      await tester.pumpMenu(
+        items: [
+          SmartContextMenuItem.listenable(
+            listenable: notifier,
+            builder: () =>
+                SmartContextMenuItem.loading(title: 'Step ${notifier.count}'),
+          ),
+        ],
+      );
+      await tester.openMenu();
+      expect(find.text('Step 0'), findsOneWidget);
+
+      notifier.increment();
+      await tester.settleMenu();
+
+      expect(find.text('Step 0'), findsNothing);
+      expect(find.text('Step 1'), findsOneWidget);
+      expect(find.byType(CupertinoActivityIndicator), findsOneWidget);
+    });
+
+    testWidgets('is not highlighted under the finger', (tester) async {
+      await tester.pumpMenu(
+        items: [
+          SmartContextMenuItem.listenable(
+            listenable: notifier,
+            builder: () => SmartContextMenuItem.loading(title: 'Syncing'),
+          ),
+        ],
+      );
+      await tester.openMenu();
+
+      final gesture = await tester.pressAt(find.text('Syncing'));
+      expect(
+        tester.backgroundOf('Syncing'),
+        isSameColorAs(const Color(0x00000000)),
+      );
+
+      await tester.releaseOutside(gesture);
+    });
+  });
 }

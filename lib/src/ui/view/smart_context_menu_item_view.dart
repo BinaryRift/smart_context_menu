@@ -371,7 +371,7 @@ final class _SmartContextMenuItemViewState
       'a SmartContextMenuItem.simple or null.',
     );
     _resolvedItem = item;
-    _isLoading = item == null;
+    _isLoading = item == null || item.isLoading;
     _isHighlight = widget.hoverController?.value == widget.key && !_isDisabled;
   }
 

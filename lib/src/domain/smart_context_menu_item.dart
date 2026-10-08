@@ -47,6 +47,8 @@ typedef SmartContextMenuItemBuilder =
 ///   the item loaded by [asyncItem].
 /// * [SmartContextMenuItem.listenable] builds the item with
 ///   [listenableBuilder] and rebuilds it when [listenable] notifies.
+/// * [SmartContextMenuItem.loading] shows that the item of
+///   a [SmartContextMenuItem.listenable] is loading.
 /// * [SmartContextMenuItem.separator] separates groups of items.
 ///
 /// A submenu replaces the current menu and shows a back item at the top.
@@ -137,6 +139,11 @@ final class SmartContextMenuItem {
   ///
   /// Set by [SmartContextMenuItem.separator].
   final bool isSeparator;
+
+  /// Whether the item shows that it is loading.
+  ///
+  /// Set by [SmartContextMenuItem.loading].
+  final bool isLoading;
 
   /// Whether the menu closes when the item is tapped.
   ///
@@ -241,6 +248,7 @@ final class SmartContextMenuItem {
     this.tintColor,
     this.isDisabled = false,
     this.isSeparator = false,
+    this.isLoading = false,
     this.onTap,
     this.children,
     this.asyncChildren,
@@ -601,4 +609,46 @@ final class SmartContextMenuItem {
       childrenGap: childrenGap,
     );
   }
+
+  /// Creates an item that shows that the item of
+  /// a [SmartContextMenuItem.listenable] is loading.
+  ///
+  /// Return it from the builder of [SmartContextMenuItem.listenable] when
+  /// the loading states differ, for example by their titles. The item shows
+  /// [title] (or [SmartContextMenuLabels.loading]) with [leading] and
+  /// an activity indicator, and does not respond to taps. Use
+  /// [loadingBuilder] to replace this content.
+  ///
+  /// ```dart
+  /// SmartContextMenuItem.listenable(
+  ///   listenable: sync,
+  ///   builder: () => switch (sync.state) {
+  ///     SyncState.checking => SmartContextMenuItem.loading(title: 'Checking'),
+  ///     SyncState.syncing => SmartContextMenuItem.loading(title: 'Syncing'),
+  ///     SyncState.idle => SmartContextMenuItem.simple(
+  ///       title: 'Sync now',
+  ///       onTap: sync.start,
+  ///     ),
+  ///   },
+  /// )
+  /// ```
+  factory SmartContextMenuItem.loading({
+    String? id,
+    String? title,
+    TextStyle? titleStyle,
+    Widget? leading,
+    SmartContextMenuItemBuilder? loadingBuilder,
+    EdgeInsets? padding,
+    double? childrenGap,
+  }) => SmartContextMenuItem._(
+    id: id ?? _generateId(),
+    title: title,
+    titleStyle: titleStyle,
+    leading: leading,
+    isLoading: true,
+    closeOnTap: false,
+    loadingBuilder: loadingBuilder,
+    padding: padding,
+    childrenGap: childrenGap,
+  );
 }
