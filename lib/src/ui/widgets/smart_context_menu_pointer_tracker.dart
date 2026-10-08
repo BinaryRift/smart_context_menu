@@ -101,8 +101,10 @@ final class _SmartContextMenuPointerTrackerState
       _handlePointerDown(event);
     } else if (event is PointerMoveEvent) {
       _handlePointerMove(event);
-    } else if (event is PointerUpEvent || event is PointerCancelEvent) {
-      _handlePointerReset();
+    } else if (event is PointerUpEvent) {
+      _handlePointerReset(isCanceled: false);
+    } else if (event is PointerCancelEvent) {
+      _handlePointerReset(isCanceled: true);
     }
   }
 
@@ -119,8 +121,10 @@ final class _SmartContextMenuPointerTrackerState
     widget.onDrag(event.position - startPosition);
   }
 
-  void _handlePointerReset() {
-    if (_hoverController.value != null && !_isSelectionBlocked) {
+  /// A canceled pointer, for example interrupted by the system,
+  /// only clears the highlight and does not tap the item under it.
+  void _handlePointerReset({required bool isCanceled}) {
+    if (!isCanceled && _hoverController.value != null && !_isSelectionBlocked) {
       _hoverController.setReleased();
     }
 

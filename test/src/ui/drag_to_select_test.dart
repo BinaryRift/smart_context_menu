@@ -32,6 +32,33 @@ void main() {
     expect(taps, ['Second']);
   });
 
+  testWidgets('canceling the pointer triggers nothing', (tester) async {
+    var taps = 0;
+
+    await tester.pumpMenu(
+      items: [
+        SmartContextMenuItem.simple(
+          title: 'First',
+          closeOnTap: false,
+          onTap: () => taps++,
+        ),
+      ],
+    );
+    await tester.openMenu();
+
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.text('First')),
+    );
+    await tester.pump();
+    await gesture.moveBy(const Offset(2, 0));
+    await tester.pump();
+    await gesture.cancel();
+    await tester.settleMenu();
+
+    expect(taps, 0);
+    expect(find.text('First'), findsOneWidget);
+  });
+
   testWidgets('releasing outside the items triggers nothing', (tester) async {
     var taps = 0;
 
