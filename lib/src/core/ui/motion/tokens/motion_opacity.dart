@@ -8,8 +8,10 @@ final class MotionOpacity {
 
   /// 1.0
   static const visible = MotionOpacity._(1.0);
+
   /// 0.0
   static const hidden = MotionOpacity._(0.0);
+
   /// 0.5
   static const medium = MotionOpacity._(0.5);
 }

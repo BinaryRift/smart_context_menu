@@ -42,10 +42,12 @@ final class SmartContextMenuOverlay extends StatefulWidget {
   });
 
   @override
-  State<SmartContextMenuOverlay> createState() => _SmartContextMenuOverlayState();
+  State<SmartContextMenuOverlay> createState() =>
+      _SmartContextMenuOverlayState();
 }
 
-final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay> {
+final class _SmartContextMenuOverlayState
+    extends State<SmartContextMenuOverlay> {
   late final ScrollController _scrollController;
   final GlobalKey _menuKey = GlobalKey();
   final GlobalKey _previewKey = GlobalKey();
@@ -141,8 +143,9 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
     final double bottomSafe =
         media.padding.bottom + _config.screenPadding.bottom;
     // Pinned header slivers pin below this space, not under the status bar.
-    final double statusBarHeight =
-        widget.headerSliversBuilder == null ? 0 : media.padding.top;
+    final double statusBarHeight = widget.headerSliversBuilder == null
+        ? 0
+        : media.padding.top;
 
     _verticalLayout.setBounds(
       screenHeight: screenHeight,
@@ -336,7 +339,8 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
   }
 
   double _totalHeaderExtent() {
-    return _headerExtents.fold(0.0, (sum, extent) => sum + extent)
+    return _headerExtents
+        .fold(0.0, (sum, extent) => sum + extent)
         .roundToDouble();
   }
 

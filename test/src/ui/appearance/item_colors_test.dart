@@ -74,7 +74,9 @@ void main() {
     await tester.pumpMenu(
       items: appearanceItems(),
       config: const SmartContextMenuConfig(
-        style: SmartContextMenuStyle(titleStyle: TextStyle(color: foregroundColor)),
+        style: SmartContextMenuStyle(
+          titleStyle: TextStyle(color: foregroundColor),
+        ),
       ),
       brightness: Brightness.dark,
     );

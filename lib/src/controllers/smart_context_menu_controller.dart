@@ -50,10 +50,7 @@ final class SmartContextMenuController extends ChangeNotifier {
     required Future<void> Function() close,
     required bool isOpen,
   }) {
-    _binding = _SmartContextMenuBinding(
-      open: open,
-      close: close,
-    );
+    _binding = _SmartContextMenuBinding(open: open, close: close);
     syncVisibility(isOpen);
   }
 
@@ -78,8 +75,5 @@ final class _SmartContextMenuBinding {
   final _SmartContextMenuAction open;
   final _SmartContextMenuAction close;
 
-  const _SmartContextMenuBinding({
-    required this.open,
-    required this.close,
-  });
+  const _SmartContextMenuBinding({required this.open, required this.close});
 }

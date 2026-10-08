@@ -5,18 +5,14 @@ import 'helpers/menu_tester.dart';
 
 void main() {
   testWidgets('renders child without opening the menu', (tester) async {
-    await tester.pumpMenu(
-      items: [SmartContextMenuItem.simple(title: 'Copy')],
-    );
+    await tester.pumpMenu(items: [SmartContextMenuItem.simple(title: 'Copy')]);
 
     expect(find.text(menuTargetText), findsOneWidget);
     expect(find.text('Copy'), findsNothing);
   });
 
   testWidgets('opens the menu on long press', (tester) async {
-    await tester.pumpMenu(
-      items: [SmartContextMenuItem.simple(title: 'Copy')],
-    );
+    await tester.pumpMenu(items: [SmartContextMenuItem.simple(title: 'Copy')]);
 
     await tester.openMenu();
 

@@ -31,8 +31,7 @@ Widget _swipeable({int depth = 2, bool enableSwipeBack = true}) {
   );
 }
 
-Widget _level(int depth) =>
-    Text('Level $depth', key: ValueKey('Level $depth'));
+Widget _level(int depth) => Text('Level $depth', key: ValueKey('Level $depth'));
 
 /// Levels of different heights: level n is 100 * n high.
 Widget _sizedSwitcher({
@@ -107,9 +106,7 @@ void main() {
     expect(tester.slideOf('Root'), lessThan(0));
   });
 
-  testWidgets('a nested submenu pushes its parent to the left', (
-    tester,
-  ) async {
+  testWidgets('a nested submenu pushes its parent to the left', (tester) async {
     await tester.pumpWidget(_switcher('Root', isForward: true));
     await tester.pumpWidget(_switcher('Submenu', isForward: true));
     await tester.pumpAndSettle();
@@ -138,9 +135,7 @@ void main() {
     expect(tester.slideOf('Root'), 0);
   });
 
-  testWidgets('keeps only the new level after the transition', (
-    tester,
-  ) async {
+  testWidgets('keeps only the new level after the transition', (tester) async {
     await tester.pumpWidget(_switcher('Root', isForward: true));
     await tester.pumpWidget(_switcher('Submenu', isForward: true));
     await tester.pumpHalfway();
@@ -275,9 +270,7 @@ void main() {
       expect(clipOf('Level 2').clipBehavior, Clip.none);
     });
 
-    testWidgets('returns to the parent past half of the width', (
-      tester,
-    ) async {
+    testWidgets('returns to the parent past half of the width', (tester) async {
       await tester.pumpWidget(_swipeable());
       await tester.slowSwipe('Level 2', 500);
 
@@ -329,9 +322,7 @@ void main() {
   });
 
   group('height', () {
-    testWidgets('moves between the levels with a transition', (
-      tester,
-    ) async {
+    testWidgets('moves between the levels with a transition', (tester) async {
       await tester.pumpWidget(_sizedSwitcher(depth: 1));
       expect(tester.switcherHeight, 100);
 

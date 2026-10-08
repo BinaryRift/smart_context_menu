@@ -57,9 +57,8 @@ void main() {
     await tester.tap(find.text('More'));
     await tester.settleMenu();
 
-    double menuHeight() => tester
-        .getSize(find.byType(SmartContextMenuLevelSwitcher))
-        .height;
+    double menuHeight() =>
+        tester.getSize(find.byType(SmartContextMenuLevelSwitcher)).height;
     final loadingHeight = menuHeight();
 
     completer.complete(_items(['A', 'B', 'C', 'D']));

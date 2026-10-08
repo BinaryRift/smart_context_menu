@@ -29,9 +29,7 @@ final class _WidgetSizeListenerState extends State<WidgetSizeListener> {
   Widget build(BuildContext context) {
     return NotificationListener<SizeChangedLayoutNotification>(
       onNotification: _onNotification,
-      child: SizeChangedLayoutNotifier(
-        child: widget.child,
-      ),
+      child: SizeChangedLayoutNotifier(child: widget.child),
     );
   }
 

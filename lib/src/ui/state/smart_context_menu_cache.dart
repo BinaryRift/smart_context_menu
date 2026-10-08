@@ -1,7 +1,10 @@
 import '../../domain/smart_context_menu_item.dart';
 import '../../domain/smart_context_menu_paging_metadata.dart';
 
-typedef PagingData = (List<SmartContextMenuItem> items, SmartContextMenuPagingMetadata? meta);
+typedef PagingData = (
+  List<SmartContextMenuItem> items,
+  SmartContextMenuPagingMetadata? meta,
+);
 
 final class SmartContextMenuCache {
   /// Resolved items of [SmartContextMenuItem.async].

@@ -64,7 +64,10 @@ final class SmartContextMenuBackItem extends StatelessWidget {
     );
     final itemWithDivider = Column(
       mainAxisSize: MainAxisSize.min,
-      children: [item, SmartContextMenuDivider(style: style)],
+      children: [
+        item,
+        SmartContextMenuDivider(style: style),
+      ],
     );
 
     if (_isPlaceholder) {

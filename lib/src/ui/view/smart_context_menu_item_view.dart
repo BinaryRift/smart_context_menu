@@ -29,9 +29,9 @@ final class SmartContextMenuItemView extends StatefulWidget {
     required this.config,
     this.onTap,
     this.hoverController,
-  })  : cachedItem = null,
-        onLoaded = null,
-        onRetry = null;
+  }) : cachedItem = null,
+       onLoaded = null,
+       onRetry = null;
 
   const SmartContextMenuItemView.async({
     super.key,
@@ -49,15 +49,17 @@ final class SmartContextMenuItemView extends StatefulWidget {
     required this.config,
     required this.onRetry,
     this.hoverController,
-  })  : onTap = null,
-        cachedItem = null,
-        onLoaded = null;
+  }) : onTap = null,
+       cachedItem = null,
+       onLoaded = null;
 
   @override
-  State<SmartContextMenuItemView> createState() => _SmartContextMenuItemViewState();
+  State<SmartContextMenuItemView> createState() =>
+      _SmartContextMenuItemViewState();
 }
 
-final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemView> {
+final class _SmartContextMenuItemViewState
+    extends State<SmartContextMenuItemView> {
   bool _isHighlight = false;
   SmartContextMenuItem? _resolvedItem;
   bool _isLoading = false;
@@ -134,9 +136,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
     if (_item.isDisabled) {
       return _resolve(_style.disabledForegroundColor);
     }
-    return _resolve(
-      _item.titleStyle?.color ?? _baseForegroundColor,
-    );
+    return _resolve(_item.titleStyle?.color ?? _baseForegroundColor);
   }
 
   @override
@@ -278,10 +278,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
       childrenGap: _item.childrenGap,
       trailing: CupertinoActivityIndicator(),
     );
-    return KeyedSubtree(
-      key: ItemContentKey.loading,
-      child: _body(loadingItem),
-    );
+    return KeyedSubtree(key: ItemContentKey.loading, child: _body(loadingItem));
   }
 
   Widget _buildErrorBody(SmartContextMenuItemState state) {
@@ -304,10 +301,7 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
         size: _style.defaultIconSize,
       ),
     );
-    return KeyedSubtree(
-      key: ItemContentKey.error,
-      child: _body(errorItem),
-    );
+    return KeyedSubtree(key: ItemContentKey.error, child: _body(errorItem));
   }
 
   void _handleTap() {
@@ -327,8 +321,8 @@ final class _SmartContextMenuItemViewState extends State<SmartContextMenuItemVie
     });
 
     try {
-      final Duration timeout = widget.item.loadingTimeout ??
-          SmartContextMenuDefaults.loadingTimeout;
+      final Duration timeout =
+          widget.item.loadingTimeout ?? SmartContextMenuDefaults.loadingTimeout;
       final result = await widget.item.asyncItem!().timeout(timeout);
 
       if (mounted) {

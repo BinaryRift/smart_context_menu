@@ -11,7 +11,7 @@ final class SmartContextMenuHoverController extends ValueNotifier<Key?> {
   }
 
   void setReleased() {
-    if (value == null) return; 
+    if (value == null) return;
     isPointerReleased = true;
     notifyListeners();
   }

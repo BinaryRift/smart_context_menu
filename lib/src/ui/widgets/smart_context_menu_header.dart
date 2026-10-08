@@ -48,9 +48,7 @@ final class SmartContextMenuHeader {
     );
     final slivers = builder(context, header);
 
-    return [
-      for (var i = 0; i < slivers.length; i++) _wrap(i, slivers[i]),
-    ];
+    return [for (var i = 0; i < slivers.length; i++) _wrap(i, slivers[i])];
   }
 
   Widget _wrap(int index, Widget sliver) {

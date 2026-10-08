@@ -112,7 +112,10 @@ void main() {
         () => original.copyWith(itemPadding: const EdgeInsets.all(9)),
       ),
       'itemChildrenGap': (9.0, () => original.copyWith(itemChildrenGap: 9)),
-      'titleStyle': (titleStyle, () => original.copyWith(titleStyle: titleStyle)),
+      'titleStyle': (
+        titleStyle,
+        () => original.copyWith(titleStyle: titleStyle),
+      ),
       'backButtonTitleStyle': (
         titleStyle,
         () => original.copyWith(backButtonTitleStyle: titleStyle),
@@ -130,10 +133,7 @@ void main() {
         color,
         () => original.copyWith(disabledBackgroundColor: color),
       ),
-      'highlightColor': (
-        color,
-        () => original.copyWith(highlightColor: color),
-      ),
+      'highlightColor': (color, () => original.copyWith(highlightColor: color)),
       'dividerColor': (color, () => original.copyWith(dividerColor: color)),
       'dividerThickness': (9.0, () => original.copyWith(dividerThickness: 9)),
       'dividerIndent': (9.0, () => original.copyWith(dividerIndent: 9)),
@@ -143,10 +143,7 @@ void main() {
         () => original.copyWith(dividersBetweenItems: false),
       ),
       'separatorHeight': (9.0, () => original.copyWith(separatorHeight: 9)),
-      'separatorColor': (
-        color,
-        () => original.copyWith(separatorColor: color),
-      ),
+      'separatorColor': (color, () => original.copyWith(separatorColor: color)),
       'defaultIconSize': (19.0, () => original.copyWith(defaultIconSize: 19)),
       'defaultIconColor': (
         color,

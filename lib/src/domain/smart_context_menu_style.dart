@@ -253,7 +253,8 @@ final class SmartContextMenuStyle {
     this.itemChildrenGap = SmartContextMenuDefaults.itemChildrenGap,
     this.titleStyle = SmartContextMenuDefaults.titleStyle,
     this.titleMaxLines = SmartContextMenuDefaults.titleMaxLines,
-    this.disabledForegroundColor = SmartContextMenuDefaults.disabledForegroundColor,
+    this.disabledForegroundColor =
+        SmartContextMenuDefaults.disabledForegroundColor,
     this.destructiveColor = SmartContextMenuDefaults.destructiveColor,
     this.disabledBackgroundColor,
     this.highlightColor,
@@ -327,9 +328,11 @@ final class SmartContextMenuStyle {
       itemChildrenGap: itemChildrenGap ?? this.itemChildrenGap,
       titleStyle: titleStyle ?? this.titleStyle,
       titleMaxLines: titleMaxLines ?? this.titleMaxLines,
-      disabledForegroundColor: disabledForegroundColor ?? this.disabledForegroundColor,
+      disabledForegroundColor:
+          disabledForegroundColor ?? this.disabledForegroundColor,
       destructiveColor: destructiveColor ?? this.destructiveColor,
-      disabledBackgroundColor: disabledBackgroundColor ?? this.disabledBackgroundColor,
+      disabledBackgroundColor:
+          disabledBackgroundColor ?? this.disabledBackgroundColor,
       highlightColor: highlightColor ?? this.highlightColor,
       dividerColor: dividerColor ?? this.dividerColor,
       dividerThickness: dividerThickness ?? this.dividerThickness,

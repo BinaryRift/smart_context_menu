@@ -54,8 +54,11 @@ final class SmartContextMenuRoute extends PageRoute<void> {
   bool get maintainState => true;
 
   @override
-  Widget buildPage(BuildContext context, Animation<double> animation,
-      Animation<double> secondaryAnimation) {
+  Widget buildPage(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+  ) {
     return SmartContextMenuOverlay(
       routeAnimation: animation,
       anchorRect: anchorRect,

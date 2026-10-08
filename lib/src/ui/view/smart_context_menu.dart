@@ -234,8 +234,9 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
 
   Future<void> _runOpenSession(int sessionId) async {
     final navigator = Navigator.of(context, rootNavigator: true);
-    final barrierLabel =
-      CupertinoLocalizations.of(context).modalBarrierDismissLabel;
+    final barrierLabel = CupertinoLocalizations.of(
+      context,
+    ).modalBarrierDismissLabel;
 
     final image = await _captureSnapshot();
     if (!_session.canContinueOpening(sessionId, mounted: mounted) ||
@@ -301,8 +302,9 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
   }
 
   Future<ui.Image?> _captureSnapshot() async {
-    final boundary = _previewKey.currentContext?.findRenderObject()
-        as RenderRepaintBoundary?;
+    final boundary =
+        _previewKey.currentContext?.findRenderObject()
+            as RenderRepaintBoundary?;
     if (boundary == null) return null;
 
     return await boundary.toImage(

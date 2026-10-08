@@ -12,5 +12,5 @@ enum SmartContextMenuActivationMode {
   ///
   /// The menu does not listen to gestures of [SmartContextMenu.child],
   /// so it can use the long press itself.
-  manual;
+  manual,
 }
