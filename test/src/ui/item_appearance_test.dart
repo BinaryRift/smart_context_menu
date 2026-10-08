@@ -218,6 +218,42 @@ void main() {
     });
   });
 
+  group('menu border', () {
+    List<Decoration> foregroundsOf(WidgetTester tester) => [
+      for (final container in tester.widgetList<AnimatedContainer>(
+        find.byType(AnimatedContainer),
+      ))
+        ?container.foregroundDecoration,
+    ];
+
+    testWidgets('is painted over the menu content', (tester) async {
+      await tester.pumpMenu(items: items, brightness: Brightness.light);
+      await tester.openMenu();
+
+      final foregrounds = foregroundsOf(tester);
+      expect(foregrounds, hasLength(1));
+      final border = (foregrounds.single as BoxDecoration).border! as Border;
+      expect(
+        border.top.color,
+        isSameColorAs(light(SmartContextMenuDefaults.borderColor)),
+      );
+    });
+
+    testWidgets('is not added to a custom decoration', (tester) async {
+      await tester.pumpMenu(
+        items: items,
+        config: const SmartContextMenuConfig(
+          style: SmartContextMenuStyle(
+            menuDecoration: BoxDecoration(color: Color(0xFF000001)),
+          ),
+        ),
+      );
+      await tester.openMenu();
+
+      expect(foregroundsOf(tester), isEmpty);
+    });
+  });
+
   group('icons', () {
     final submenu = [
       SmartContextMenuItem.submenu(

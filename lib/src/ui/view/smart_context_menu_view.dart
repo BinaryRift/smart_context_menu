@@ -48,6 +48,12 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
   BoxDecoration get _defaultDecoration => BoxDecoration(
     color: CupertinoDynamicColor.resolve(_config.style.menuColor, context),
     borderRadius: _config.style.borderRadius,
+  );
+
+  // The border is painted over the levels, so the back item does not
+  // cover it while a level slides.
+  BoxDecoration get _defaultBorder => BoxDecoration(
+    borderRadius: _config.style.borderRadius,
     border: Border.all(
       color: CupertinoDynamicColor.resolve(_config.style.borderColor, context),
     ),
@@ -107,6 +113,9 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
               transform: _stretchController.transform,
               width: _config.menuWidth,
               decoration: _config.style.menuDecoration ?? _defaultDecoration,
+              foregroundDecoration: _config.style.menuDecoration == null
+                  ? _defaultBorder
+                  : null,
               clipBehavior: Clip.antiAlias,
               child: child,
             ),
