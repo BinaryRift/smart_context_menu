@@ -88,7 +88,8 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
     if (!mounted || route == null) return;
 
     if (Navigator.of(context).canPop()) {
-      final delay = route.transitionDuration * MotionTiming.closingAction;
+      final delay =
+          route.reverseTransitionDuration * MotionTiming.closingAction;
       Navigator.of(context).pop();
       await Future.delayed(delay);
     }

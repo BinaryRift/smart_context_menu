@@ -69,7 +69,7 @@ final class SmartContextMenuHeaderDetails {
 
   /// Closes the menu.
   ///
-  /// Completes halfway through the closing animation, as an item that
+  /// Completes three quarters through the closing animation, as an item that
   /// closes on tap does, so an action started after it is seen as the menu
   /// closes. Does nothing if the menu is already closing.
   Future<void> close() => _close();

@@ -87,8 +87,8 @@ when it is dragged or the menu is stretched. The builder gets `SmartContextMenuH
   your content at the edge of the widget.
 - `animation` runs from 0 to 1 as the menu opens and back as it closes, to animate
   your content with the menu.
-- `close()` closes the menu. It completes halfway through the closing, as an item does,
-  so the result of the action is seen as the menu closes.
+- `close()` closes the menu. It completes three quarters through the closing, as an item
+  does, so the result of the action is seen as the menu closes.
 
 A tap on your widgets in the slivers keeps the menu open; a tap on empty space next to them
 closes it, as a tap anywhere outside the menu does.

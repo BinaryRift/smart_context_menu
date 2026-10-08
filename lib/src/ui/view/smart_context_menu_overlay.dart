@@ -346,7 +346,7 @@ final class _SmartContextMenuOverlayState
   }
 
   /// Closes the menu and calls [SmartContextMenuOverlay.onPreviewTap]
-  /// halfway through the closing, as an item that closes on tap does.
+  /// three quarters through the closing, as an item that closes on tap does.
   Future<void> _onPreviewTap() async {
     if (_closing != null) return;
     if (_config.enableHaptics) HapticFeedback.lightImpact();
@@ -355,7 +355,7 @@ final class _SmartContextMenuOverlayState
     await widget.onPreviewTap?.call();
   }
 
-  /// Closes the menu once and completes halfway through the closing.
+  /// Closes the menu once and completes three quarters through the closing.
   ///
   /// Does nothing if the menu is already closing, so it never pops
   /// the route below the menu.
@@ -366,7 +366,7 @@ final class _SmartContextMenuOverlayState
 
       Navigator.of(context).pop();
       await Future<void>.delayed(
-        route.transitionDuration * MotionTiming.closingAction,
+        route.reverseTransitionDuration * MotionTiming.closingAction,
       );
     }();
   }

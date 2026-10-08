@@ -19,6 +19,10 @@ import 'smart_context_menu_item_view.dart';
 /// The content of a menu [level]: its items, the back item of a submenu
 /// and the loading, retry and paging rows.
 final class SmartContextMenuLevelView extends StatelessWidget {
+  // Covers the gap between the menu border and the pinned back item that
+  // shows while the items scroll under it.
+  static const double _backItemOverlap = 0.5;
+
   final SmartMenuLevel level;
   final SmartContextMenuOverlayController controller;
   final SmartContextMenuConfig config;
@@ -58,7 +62,7 @@ final class SmartContextMenuLevelView extends StatelessWidget {
         ),
         if (hasBack)
           Positioned(
-            top: -SmartContextMenuDefaults.dividerThickness,
+            top: -_backItemOverlap,
             left: 0,
             right: 0,
             child: SmartContextMenuBackItem(
