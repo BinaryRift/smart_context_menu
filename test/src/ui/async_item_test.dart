@@ -49,7 +49,9 @@ void main() {
     await tester.settleMenu();
   });
 
-  testWidgets('uses loadingBuilder while loading', (tester) async {
+  testWidgets('uses the child of the loading item while loading', (
+    tester,
+  ) async {
     final completer = Completer<SmartContextMenuItem>();
 
     await tester.pumpMenu(
@@ -57,7 +59,7 @@ void main() {
         SmartContextMenuItem.async(
           loading: SmartContextMenuItem.loading(
             title: 'Loading',
-            loadingBuilder: (context, state) => const Text('Custom loading'),
+            child: const Text('Custom loading'),
           ),
           asyncItem: () => completer.future,
         ),

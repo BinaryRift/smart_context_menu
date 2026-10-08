@@ -215,14 +215,6 @@ final class SmartContextMenuItem {
   /// buttons, handle their own taps: the item is not triggered over them.
   final SmartContextMenuItemBuilder? customBuilder;
 
-  /// Builds the content of a loading item.
-  ///
-  /// The item [padding] is still applied. If null, the item shows [title]
-  /// (or [SmartContextMenuLabels.loading]), [leading] and an activity
-  /// indicator.
-  /// Set by [SmartContextMenuItem.loading].
-  final SmartContextMenuItemBuilder? loadingBuilder;
-
   /// Builds the content of the placeholder after [asyncItem] has failed.
   ///
   /// Tapping the placeholder retries loading. The padding of [loadingItem]
@@ -265,7 +257,6 @@ final class SmartContextMenuItem {
     this.loadingTimeout,
     this.pagingMetadata,
     this.customBuilder,
-    this.loadingBuilder,
     this.errorBuilder,
     this.padding,
     this.childrenGap,
@@ -604,7 +595,8 @@ final class SmartContextMenuItem {
   ///
   /// The item shows [title] (or [SmartContextMenuLabels.loading]) with
   /// [leading] and an activity indicator, and does not respond to taps.
-  /// Use [loadingBuilder] to replace this content.
+  /// Pass [child] to replace this content; text and icons in it take the
+  /// color of the item.
   ///
   /// ```dart
   /// SmartContextMenuItem.listenable(
@@ -624,7 +616,7 @@ final class SmartContextMenuItem {
     String? title,
     TextStyle? titleStyle,
     Widget? leading,
-    SmartContextMenuItemBuilder? loadingBuilder,
+    Widget? child,
     EdgeInsets? padding,
     double? childrenGap,
   }) => SmartContextMenuLoadingItem._(
@@ -632,7 +624,7 @@ final class SmartContextMenuItem {
     title: title,
     titleStyle: titleStyle,
     leading: leading,
-    loadingBuilder: loadingBuilder,
+    child: child,
     padding: padding,
     childrenGap: childrenGap,
   );
@@ -642,12 +634,19 @@ final class SmartContextMenuItem {
 ///
 /// Create it with [SmartContextMenuItem.loading].
 final class SmartContextMenuLoadingItem extends SmartContextMenuItem {
+  /// The content shown instead of [title], [leading] and the activity
+  /// indicator.
+  ///
+  /// The item [padding] is still applied. Text and icons in it take
+  /// the color of the item.
+  final Widget? child;
+
   const SmartContextMenuLoadingItem._({
     required super.id,
     super.title,
     super.titleStyle,
     super.leading,
-    super.loadingBuilder,
+    this.child,
     super.padding,
     super.childrenGap,
   }) : super._(closeOnTap: false);

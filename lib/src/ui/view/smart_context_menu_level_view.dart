@@ -162,8 +162,7 @@ final class SmartContextMenuLevelView extends StatelessWidget {
       padding: EdgeInsets.symmetric(
         vertical: config.style.loaderVerticalPadding,
       ),
-      loadingBuilder: (context, state) =>
-          const Center(child: CupertinoActivityIndicator(radius: 12)),
+      child: const Center(child: CupertinoActivityIndicator(radius: 12)),
     );
   }
 

@@ -343,9 +343,10 @@ Create the adapter next to the state it listens to and dispose it there as well.
 #### Loading item
 
 A loading item shows its `title` (the loading label by default) with `leading` and an activity
-indicator, and ignores taps. `loadingBuilder` replaces this content. The menu replaces the item
-once loading finishes when it is the `loading` of an async item or an async or paginated
-submenu, or when a listenable item returns it. Anywhere else it stays until the menu closes.
+indicator, and ignores taps. `child` replaces this content; text and icons in it take the color
+of the item. The menu replaces the item once loading finishes when it is the `loading` of an async
+item or an async or paginated submenu, or when a listenable item returns it. Anywhere else
+it stays until the menu closes.
 
 ```dart
 SmartContextMenuItem.listenable(

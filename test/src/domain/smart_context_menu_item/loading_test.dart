@@ -5,23 +5,20 @@ import 'package:smart_context_menu/smart_context_menu.dart';
 void main() {
   test('keeps the given fields', () {
     const leading = SizedBox();
+    const child = SizedBox();
     const titleStyle = TextStyle(fontSize: 20);
-    Widget loadingBuilder(
-      BuildContext context,
-      SmartContextMenuItemState state,
-    ) => const SizedBox();
     final item = SmartContextMenuItem.loading(
       title: 'Syncing',
       titleStyle: titleStyle,
       leading: leading,
-      loadingBuilder: loadingBuilder,
+      child: child,
       childrenGap: 4,
     );
 
     expect(item.title, 'Syncing');
     expect(item.titleStyle, titleStyle);
     expect(item.leading, same(leading));
-    expect(item.loadingBuilder, loadingBuilder);
+    expect(item.child, same(child));
     expect(item.childrenGap, 4);
   });
 

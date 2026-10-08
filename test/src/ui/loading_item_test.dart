@@ -51,4 +51,25 @@ void main() {
     expect(find.text('Syncing'), findsOneWidget);
     expect(find.byType(CupertinoActivityIndicator), findsOneWidget);
   });
+
+  testWidgets('gives its child the color of the item', (tester) async {
+    await tester.pumpMenu(
+      items: [
+        SmartContextMenuItem.simple(title: 'Enabled'),
+        SmartContextMenuItem.loading(
+          child: const Row(
+            children: [Text('Custom'), Icon(CupertinoIcons.clock)],
+          ),
+        ),
+      ],
+    );
+    await tester.openMenu();
+
+    final color = tester.titleStyleOf('Enabled').color;
+    expect(
+      DefaultTextStyle.of(tester.element(find.text('Custom'))).style.color,
+      color,
+    );
+    expect(tester.iconColorOf(CupertinoIcons.clock), color);
+  });
 }

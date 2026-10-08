@@ -225,7 +225,7 @@ final class _SmartContextMenuItemViewState
   }
 
   Widget _buildContent(SmartContextMenuItemState state) {
-    if (_isLoading) return _buildLoadingBody(state);
+    if (_isLoading) return _buildLoadingBody();
     if (_error != null) return _buildErrorBody(state);
 
     return KeyedSubtree(
@@ -276,12 +276,19 @@ final class _SmartContextMenuItemViewState
     );
   }
 
-  Widget _buildLoadingBody(SmartContextMenuItemState state) {
-    final loadingBuilder = _item.loadingBuilder;
-    if (loadingBuilder != null) {
+  Widget _buildLoadingBody() {
+    if (_item case SmartContextMenuLoadingItem(:final child?)) {
       return KeyedSubtree(
         key: ItemContentKey.loading,
-        child: loadingBuilder(context, state),
+        child: DefaultTextStyle.merge(
+          style: (_item.titleStyle ?? _style.titleStyle).copyWith(
+            color: _foregroundColor,
+          ),
+          child: IconTheme.merge(
+            data: IconThemeData(color: _foregroundColor),
+            child: child,
+          ),
+        ),
       );
     }
 

@@ -27,7 +27,6 @@ void main() {
     expect(item.closeOnTap, isFalse);
     expect(item.onTap, isNull);
     expect(item.title, isNull);
-    expect(item.loadingBuilder, isNull);
     expect(item.asyncItem, isNull);
     expect(item.loadingTimeout, isNull);
     expect(item.errorBuilder, isNull);

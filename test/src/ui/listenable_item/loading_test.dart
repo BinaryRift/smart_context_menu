@@ -53,14 +53,14 @@ void main() {
       expect(find.text(const SmartContextMenuLabels().loading), findsOneWidget);
     });
 
-    testWidgets('uses its loadingBuilder', (tester) async {
+    testWidgets('uses its child', (tester) async {
       await tester.pumpMenu(
         items: [
           SmartContextMenuItem.listenable(
             listenable: notifier,
             builder: () => SmartContextMenuItem.loading(
               title: 'Syncing',
-              loadingBuilder: (context, state) => const Text('Custom loading'),
+              child: const Text('Custom loading'),
             ),
           ),
         ],
