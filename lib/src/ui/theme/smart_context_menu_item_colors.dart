@@ -1,3 +1,5 @@
+import 'dart:ui' show Brightness;
+
 import 'package:flutter/cupertino.dart'
     show CupertinoDynamicColor, CupertinoTheme;
 import 'package:flutter/widgets.dart';
