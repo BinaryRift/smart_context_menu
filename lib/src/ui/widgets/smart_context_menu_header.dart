@@ -10,8 +10,8 @@ import 'smart_context_menu_motion.dart';
 /// Builds the slivers from [builder] for the scroll view above the preview.
 ///
 /// Each sliver gets the horizontal padding of the preview, moves with it by
-/// [motion], fades with [animation] if [fade] is true and reports its
-/// height to [onExtentChanged].
+/// [motion], fades with [animation] if [fade] is true, ignores pointers
+/// while [animation] is at 0 and reports its height to [onExtentChanged].
 ///
 /// The slivers are not grouped: a [PinnedHeaderSliver] stays pinned only
 /// as a direct child of the scroll view.
@@ -65,9 +65,16 @@ final class SmartContextMenuHeader {
         builder: (context, offset, child) {
           return SliverPaintOffset(offset: offset, sliver: child);
         },
-        child: fade
-            ? SliverFadeTransition(opacity: animation, sliver: padded)
-            : padded,
+        child: ListenableBuilder(
+          listenable: animation,
+          builder: (context, sliver) => SliverIgnorePointer(
+            ignoring: animation.value == 0,
+            sliver: sliver,
+          ),
+          child: fade
+              ? SliverFadeTransition(opacity: animation, sliver: padded)
+              : padded,
+        ),
       ),
     );
   }

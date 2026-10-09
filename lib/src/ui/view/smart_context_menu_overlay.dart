@@ -13,6 +13,7 @@ import '../components/smart_menu_reactive_physics.dart';
 import '../extensions/render_object_ext.dart';
 import '../layout/smart_context_menu_horizontal_layout.dart';
 import '../layout/smart_context_menu_vertical_layout.dart';
+import '../state/smart_context_menu_header_animation.dart';
 import '../widgets/smart_context_menu_background.dart';
 import '../widgets/smart_context_menu_header.dart';
 import '../widgets/smart_context_menu_preview.dart';
@@ -28,6 +29,7 @@ final class SmartContextMenuOverlay extends StatefulWidget {
   final FutureOr<void> Function()? onPreviewTap;
   final SmartContextMenuHeaderBuilder? headerSliversBuilder;
   final bool fadeHeaderSlivers;
+  final Duration headerSliversDelay;
 
   const SmartContextMenuOverlay({
     super.key,
@@ -40,6 +42,7 @@ final class SmartContextMenuOverlay extends StatefulWidget {
     this.onPreviewTap,
     this.headerSliversBuilder,
     this.fadeHeaderSlivers = true,
+    this.headerSliversDelay = Duration.zero,
   });
 
   @override
@@ -47,8 +50,8 @@ final class SmartContextMenuOverlay extends StatefulWidget {
       _SmartContextMenuOverlayState();
 }
 
-final class _SmartContextMenuOverlayState
-    extends State<SmartContextMenuOverlay> {
+final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
+    with SingleTickerProviderStateMixin {
   late final ScrollController _scrollController;
   final GlobalKey _menuKey = GlobalKey();
   final GlobalKey _previewKey = GlobalKey();
@@ -58,6 +61,7 @@ final class _SmartContextMenuOverlayState
   final ValueNotifier<Offset> _previewMotion = ValueNotifier(Offset.zero);
 
   late final CurvedAnimation _menuAnimation;
+  late final SmartContextMenuHeaderAnimation _headerAnimation;
 
   late SmartContextMenuHorizontalLayout _horizontalLayout;
   late final SmartContextMenuVerticalLayout _verticalLayout;
@@ -82,6 +86,13 @@ final class _SmartContextMenuOverlayState
       curve: MotionCurves.menuScaleIn,
       reverseCurve: MotionCurves.menuScaleOut,
     );
+    _headerAnimation = SmartContextMenuHeaderAnimation(
+      route: widget.routeAnimation,
+      delay: widget.headerSliversDelay,
+      isScrolled: () =>
+          _scrollController.hasClients && _scrollController.offset > 0,
+      vsync: this,
+    );
   }
 
   @override
@@ -105,6 +116,7 @@ final class _SmartContextMenuOverlayState
     _currentMenuHeight.dispose();
     _previewMotion.dispose();
     _menuAnimation.dispose();
+    _headerAnimation.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -219,7 +231,7 @@ final class _SmartContextMenuOverlayState
     final slivers = SmartContextMenuHeader(
       builder: builder,
       layout: _horizontalLayout,
-      animation: widget.routeAnimation,
+      animation: _headerAnimation.animation,
       fade: widget.fadeHeaderSlivers,
       motion: _previewMotion,
       close: _close,
@@ -307,8 +319,14 @@ final class _SmartContextMenuOverlayState
     return false;
   }
 
+  /// Scrolls to the menu after this frame.
+  ///
+  /// While the menu opens, the header slivers then wait for the preview,
+  /// so it does not fly over a pinned sliver.
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _headerAnimation.waitForPreview();
       if (_scrollController.hasClients) {
         final max = _scrollController.position.maxScrollExtent;
         _scrollController.jumpTo(max);

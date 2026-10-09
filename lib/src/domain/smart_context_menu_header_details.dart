@@ -38,7 +38,12 @@ final class SmartContextMenuHeaderDetails {
   /// `Align(alignment: alignment)` puts a widget at the edge of the preview.
   final Alignment alignment;
 
-  /// Runs from 0 to 1 as the menu opens and back to 0 as it closes.
+  /// Runs from 0 to 1 as the slivers appear and back to 0 as they hide.
+  ///
+  /// The slivers appear with the menu, or later with
+  /// [SmartContextMenu.headerSliversDelay]. If the content scrolls as the
+  /// menu opens, they appear once the preview is in place. They hide with
+  /// the menu, or at once if the content is scrolled when it closes.
   ///
   /// Use it to animate the slivers with the menu, for example to scale
   /// a reactions bar from the edge of the preview:

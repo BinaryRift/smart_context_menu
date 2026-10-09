@@ -91,7 +91,7 @@ final class SmartContextMenu extends StatefulWidget {
   /// Use it for content tied to [child], for example a reactions bar above
   /// a message. The slivers move with the preview when it is dragged or
   /// the menu is stretched, and fade in and out with the menu, see
-  /// [fadeHeaderSlivers]. To line them up with the preview, animate them
+  /// [fadeHeaderSlivers] and [headerSliversDelay]. To line them up with the preview, animate them
   /// with the menu and close the menu, use the
   /// [SmartContextMenuHeaderDetails] passed to the builder.
   ///
@@ -109,6 +109,20 @@ final class SmartContextMenu extends StatefulWidget {
   /// [SmartContextMenuHeaderDetails.animation]. Defaults to true.
   final bool fadeHeaderSlivers;
 
+  /// How long after the menu starts opening the slivers from
+  /// [headerSliversBuilder] start to appear.
+  ///
+  /// With the default [Duration.zero], they appear with the menu. The menu
+  /// opens in 300 milliseconds, so a shorter delay starts them while the
+  /// preview moves into place, and a longer one after that.
+  ///
+  /// If the preview and the menu do not fit on the screen and the content
+  /// scrolls as the menu opens, the slivers also wait until the preview is
+  /// in place, and hide at once when the menu closes while the content is
+  /// scrolled. The preview moves above the menu as it opens and closes, so
+  /// it would cover a [PinnedHeaderSliver] over it.
+  final Duration headerSliversDelay;
+
   /// Creates a context menu for [child].
   const SmartContextMenu({
     super.key,
@@ -119,6 +133,7 @@ final class SmartContextMenu extends StatefulWidget {
     this.onPreviewTap,
     this.headerSliversBuilder,
     this.fadeHeaderSlivers = true,
+    this.headerSliversDelay = Duration.zero,
   });
 
   @override
@@ -265,6 +280,7 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
       onPreviewTap: widget.onPreviewTap,
       headerSliversBuilder: widget.headerSliversBuilder,
       fadeHeaderSlivers: widget.fadeHeaderSlivers,
+      headerSliversDelay: widget.headerSliversDelay,
       barrierLabel: barrierLabel,
     );
 
