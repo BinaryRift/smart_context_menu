@@ -64,7 +64,8 @@ sealed class SmartContextMenuListenableResult
 /// An entry of a [SmartContextMenu].
 ///
 /// Create items with the method that matches what the item does. Each one
-/// returns its own subtype, so a `switch` on an item covers all of them:
+/// returns its own subtype, so a `switch` on an item can read the fields of
+/// its type:
 ///
 /// * [SmartContextMenuItem.simple] runs an action,
 ///   a [SmartContextMenuSimpleItem].
@@ -87,6 +88,9 @@ sealed class SmartContextMenuListenableResult
 ///   a [SmartContextMenuEmptyItem].
 /// * [SmartContextMenuItem.separator] separates groups of items,
 ///   a [SmartContextMenuSeparatorItem].
+///
+/// New item types may be added in minor versions, so keep a `_` case when
+/// you switch on items.
 ///
 /// A submenu replaces the current menu and shows a back item at the top.
 /// Tapping the back item or swiping right returns to the parent menu,

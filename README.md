@@ -191,7 +191,8 @@ Create items with the method that matches what the item does:
 | `SmartContextMenuItem.separator` | Separates groups of items. |
 
 Each method returns its own subtype of `SmartContextMenuItem`, such as `SmartContextMenuSimpleItem`,
-so you can `switch` on an item and read the fields of its type.
+so you can `switch` on an item and read the fields of its type. New item types may be added in minor
+versions, so keep a `_` case when you switch on items.
 
 #### Submenu
 
