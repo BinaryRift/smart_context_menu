@@ -84,28 +84,29 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
   }
 
   void handleItemTap(SmartContextMenuItem item) async {
-    if (item.isDisabled || currentLevel.isLoading) return;
+    if (currentLevel.isLoading) return;
+    if (item case SmartContextMenuContentItem(isDisabled: true)) return;
 
-    if (item.children != null) {
-      final id = item.id;
-      _pushSubmenuLevel(items: item.children!, parentId: id);
-      return;
+    switch (item) {
+      case SmartContextMenuSimpleItem():
+        _handleOnTap(item);
+      case SmartContextMenuSubmenuItem():
+        _pushSubmenuLevel(items: item.children, parentId: item.id);
+      case SmartContextMenuAsyncSubmenuItem():
+        _handleAsyncSubmenu(item);
+      case SmartContextMenuPagingSubmenuItem():
+        _handleAsyncPagingStart(item);
+      // Not tapped themselves: async and listenable items pass the item
+      // they show.
+      case SmartContextMenuAsyncItem() ||
+          SmartContextMenuListenableItem() ||
+          SmartContextMenuStatusItem() ||
+          SmartContextMenuSeparatorItem():
+        break;
     }
-
-    if (item.asyncChildren != null) {
-      _handleAsyncSubmenu(item);
-      return;
-    }
-
-    if (item.asyncPagingChildren != null) {
-      _handleAsyncPagingStart(item);
-      return;
-    }
-
-    _handleOnTap(item);
   }
 
-  Future<void> _handleOnTap(SmartContextMenuItem item) async {
+  Future<void> _handleOnTap(SmartContextMenuSimpleItem item) async {
     if (item.onTap == null && !item.closeOnTap) return;
     if (enableHaptics) HapticFeedback.lightImpact();
     if (item.closeOnTap) {
@@ -114,20 +115,24 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
     await item.onTap?.call();
   }
 
-  Future<void> _handleAsyncSubmenu(SmartContextMenuItem item) async {
-    if (_tryRestoreSubmenuFromCache(item)) return;
-    final task = item.asyncChildren?.call()._limit(item.loadingTimeout);
-    if (task == null) return;
+  Future<void> _handleAsyncSubmenu(
+    SmartContextMenuAsyncSubmenuItem item,
+  ) async {
+    if (_cache.submenus[item.id] case final items?) {
+      _pushSubmenuLevel(items: items, emptyItem: item.empty, parentId: item.id);
+      return;
+    }
+    final task = item.asyncChildren()._limit(item.timeout);
 
     final level = _pushSubmenuLevel(
       items: [],
       loading: true,
       parentId: item.id,
       asyncLoader: item.asyncChildren,
-      loadingTimeout: item.loadingTimeout,
-      loadingItem: item.loadingItem,
-      errorItem: item.errorItem,
-      emptyItem: item.emptyItem,
+      loadingTimeout: item.timeout,
+      loadingItem: item.loading,
+      errorItem: item.error,
+      emptyItem: item.empty,
     );
 
     await _runAsyncLoad(
@@ -140,13 +145,26 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
     );
   }
 
-  Future<void> _handleAsyncPagingStart(SmartContextMenuItem item) async {
-    if (_tryRestoreSubmenuFromCache(item)) return;
+  Future<void> _handleAsyncPagingStart(
+    SmartContextMenuPagingSubmenuItem item,
+  ) async {
+    if (_cache.paging[item.id] case (final items, final nextMetadata)?) {
+      _pushSubmenuLevel(
+        items: List.from(items),
+        pagingMethod: item.asyncPagingChildren,
+        initialMetadata: nextMetadata,
+        loadingTimeout: item.timeout,
+        loadingItem: item.loading,
+        errorItem: item.error,
+        emptyItem: item.empty,
+        parentId: item.id,
+      );
+      return;
+    }
 
     final loader = item.asyncPagingChildren;
-    final metadata = item.pagingMetadata;
-    if (loader == null || metadata == null) return;
-    final task = loader(metadata)._limit(item.loadingTimeout);
+    final metadata = item.initialMetadata;
+    final task = loader(metadata)._limit(item.timeout);
 
     final level = _pushSubmenuLevel(
       items: [],
@@ -154,19 +172,17 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
       parentId: item.id,
       pagingMethod: loader,
       initialMetadata: metadata,
-      loadingTimeout: item.loadingTimeout,
-      loadingItem: item.loadingItem,
-      errorItem: item.errorItem,
-      emptyItem: item.emptyItem,
+      loadingTimeout: item.timeout,
+      loadingItem: item.loading,
+      errorItem: item.error,
+      emptyItem: item.empty,
     );
 
     await _runAsyncLoad(
       task,
       level,
       onData: (results) {
-        final nextMeta = results.isNotEmpty
-            ? results.last.pagingMetadata
-            : null;
+        final nextMeta = _nextPageMetadata(results);
         _cache.paging[item.id] = (List.from(results), nextMeta);
 
         level.items.addAll(results);
@@ -235,9 +251,7 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
     List<SmartContextMenuItem> newItems,
   ) {
     if (hasListeners && level.items == targetList) {
-      final nextMeta = newItems.isNotEmpty
-          ? newItems.last.pagingMetadata
-          : null;
+      final nextMeta = _nextPageMetadata(newItems);
       level.items.addAll(newItems);
       level.nextMetadata = nextMeta;
       level.isPaginating = false;
@@ -255,48 +269,26 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
     if (parentId != null) {
       final currentCached = _cache.paging[parentId] ?? ([], null);
       final updatedList = [...currentCached.$1, ...newItems];
-      final nextMeta = newItems.isNotEmpty
-          ? newItems.last.pagingMetadata
-          : null;
+      final nextMeta = _nextPageMetadata(newItems);
       _cache.paging[parentId] = (updatedList, nextMeta);
     }
   }
+
+  // The last item of a page describes the next page; a page without
+  // metadata on its last item is the last one.
+  static SmartContextMenuPagingMetadata? _nextPageMetadata(
+    List<SmartContextMenuItem> page,
+  ) => switch (page.lastOrNull) {
+    SmartContextMenuSimpleItem(:final pagingMetadata) ||
+    SmartContextMenuSeparatorItem(:final pagingMetadata) => pagingMetadata,
+    _ => null,
+  };
 
   void _handlePaginationError(SmartMenuLevel level) {
     if (!hasListeners) return;
     level.isPaginating = false;
     level.hasError = true;
     notifyListeners();
-  }
-
-  bool _tryRestoreSubmenuFromCache(SmartContextMenuItem item) {
-    final id = item.id;
-
-    if (_cache.submenus.containsKey(id)) {
-      _pushSubmenuLevel(
-        items: _cache.submenus[id]!,
-        emptyItem: item.emptyItem,
-        parentId: id,
-      );
-      return true;
-    }
-
-    if (_cache.paging.containsKey(id)) {
-      final (items, meta) = _cache.paging[id]!;
-      _pushSubmenuLevel(
-        items: List.from(items),
-        pagingMethod: item.asyncPagingChildren,
-        initialMetadata: meta,
-        loadingTimeout: item.loadingTimeout,
-        loadingItem: item.loadingItem,
-        errorItem: item.errorItem,
-        emptyItem: item.emptyItem,
-        parentId: id,
-      );
-      return true;
-    }
-
-    return false;
   }
 
   /// Retries the failed load of [level]: the next page of a paginated

@@ -66,6 +66,32 @@ void main() {
     expect(itemTitles(level.items), ['Page 1']);
   });
 
+  // The first page of a nested paging submenu is not the next page.
+  test('ends at a page whose last item is a paging submenu', () async {
+    final requested = <int>[];
+    final nested = SmartContextMenuItem.pagingSubmenu(
+      title: 'Nested',
+      initialMetadata: const SmartContextMenuPagingMetadata(page: 7),
+      asyncPagingChildren: (_) async => [],
+    );
+    final paging = SmartContextMenuItem.pagingSubmenu(
+      initialMetadata: const SmartContextMenuPagingMetadata(),
+      asyncPagingChildren: (metadata) async {
+        requested.add(metadata.page);
+        return [SmartContextMenuItem.simple(title: 'Page 1'), nested];
+      },
+    );
+    final controller = overlayController([paging]);
+
+    controller.handleItemTap(paging);
+    await pumpEventQueue();
+    final level = controller.currentLevel;
+    expect(level.hasPaging, isFalse);
+
+    await controller.handlePagination(level);
+    expect(requested, [1]);
+  });
+
   test('does not repeat a page that is loading', () async {
     final requested = <int>[];
     final pages = <int, Completer<List<SmartContextMenuItem>>>{};
