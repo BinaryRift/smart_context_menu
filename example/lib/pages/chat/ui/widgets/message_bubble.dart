@@ -16,13 +16,17 @@ final class MessageBubble extends StatelessWidget {
     final borderRadius = BorderRadius.circular(18);
 
     if (message.image case final image?) {
-      return ClipRRect(
-        borderRadius: borderRadius,
-        child: SizedBox(
-          width: _imageWidth,
-          child: AspectRatio(
-            aspectRatio: image.aspectRatio,
-            child: Image.asset(image.path, fit: BoxFit.cover),
+      // Flies to the photo page, tagged with the message.
+      return Hero(
+        tag: message,
+        child: ClipRRect(
+          borderRadius: borderRadius,
+          child: SizedBox(
+            width: _imageWidth,
+            child: AspectRatio(
+              aspectRatio: image.aspectRatio,
+              child: Image.asset(image.path, fit: BoxFit.cover),
+            ),
           ),
         ),
       );

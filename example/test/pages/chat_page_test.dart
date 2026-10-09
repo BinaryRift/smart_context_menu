@@ -134,6 +134,16 @@ void main() {
 
   testWidgets('a tap on a photo opens it', (tester) async {
     await openChat(tester);
+
+    await tester.tap(photo(AppImages.waterfall));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(DetailPage), findsOneWidget);
+    expect(find.byType(InteractiveViewer), findsOneWidget);
+  });
+
+  testWidgets('a tap on the preview of a photo opens it', (tester) async {
+    await openChat(tester);
     await tester.openMenu(photo(AppImages.waterfall));
     // The route ignores pointers until its transition ends.
     await tester.settleMenu();

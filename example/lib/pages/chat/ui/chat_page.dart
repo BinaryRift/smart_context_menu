@@ -5,7 +5,6 @@ import 'package:smart_context_menu/smart_context_menu.dart';
 
 import '../../../core/data/demo_loader.dart';
 import '../../../core/ui/reactions_bar.dart';
-import '../../../resources/assets/app_images.dart';
 import '../../detail/ui/detail_page.dart';
 import '../../settings/ui/widgets/settings_button.dart';
 import '../domain/chat.dart';
@@ -145,8 +144,15 @@ final class _ChatPageState extends State<ChatPage> {
             controller: menu,
             items: _menuItems(message),
             headerSliversBuilder: _reactionsBar(message),
-            onPreviewTap: image == null ? null : () => _openPhoto(image),
-            child: MessageBubble(message: message),
+            // The photo has a Hero, which flies from its place both after
+            // a tap on the photo and after a tap on the preview.
+            onPreviewTap: image == null ? null : () => _openPhoto(message),
+            child: image == null
+                ? MessageBubble(message: message)
+                : GestureDetector(
+                    onTap: () => _openPhoto(message),
+                    child: MessageBubble(message: message),
+                  ),
           ),
           MessageFooter(message: message, isPinned: _chat.isPinned(message)),
         ],
@@ -300,12 +306,14 @@ final class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  void _openPhoto(AppImage image) {
+  void _openPhoto(ChatMessage message) {
     Navigator.of(context).push(
       CupertinoPageRoute<void>(
         builder: (context) => DetailPage(
           title: 'Photo',
-          child: InteractiveViewer(child: Image.asset(image.path)),
+          child: InteractiveViewer(
+            child: Hero(tag: message, child: Image.asset(message.image!.path)),
+          ),
         ),
       ),
     );

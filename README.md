@@ -9,6 +9,9 @@ drag-to-select and rich submenus.
 
 - **Long press to open** with a lifted preview of the pressed widget; tap the preview
   to run the widget's main action.
+- **Works with your `Hero` widgets**: the menu never wraps the pressed widget in a `Hero`
+  of its own, so a photo that opens full screen keeps its `Hero`, and it flies from its place
+  when the preview is tapped.
 - **Smart positioning**: the pressed widget stays in place whenever there is room for the menu;
   very tall widgets can be scrolled, and long menus scroll inside themselves.
 - **Drag-to-select**: slide a finger across the items and release on the one you want.
@@ -164,6 +167,35 @@ SmartContextMenu(
   child: MessageBubble(message),
 )
 ```
+
+### Hero widgets
+
+<!-- GIF: tap on the preview opens the photo with its Hero -->
+
+The widget can have its own `Hero`, for example a photo in a chat that opens full screen.
+The menu flies the preview with a `Hero` too, but never puts it around your widget: it adds
+it next to the widget, and only while the menu is open. So there is no `Hero` inside
+a `Hero`, and while the menu is open, your widget stays in its place, hidden, with its
+state kept.
+
+Open the page from `onPreviewTap`, and your `Hero` flies from the place of the widget,
+as it does after a tap on the widget itself:
+
+```dart
+SmartContextMenu(
+  items: items,
+  onPreviewTap: () => openPhoto(photo),
+  child: GestureDetector(
+    onTap: () => openPhoto(photo),
+    child: Hero(
+      tag: photo.id,
+      child: Image.network(photo.url),
+    ),
+  ),
+)
+```
+
+Here `openPhoto` pushes a page with a `Hero` of the same tag.
 
 ### Positioning
 
