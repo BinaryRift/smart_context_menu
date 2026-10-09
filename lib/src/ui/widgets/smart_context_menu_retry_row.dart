@@ -6,16 +6,19 @@ import '../keys/service_item_key.dart';
 import '../state/smart_context_menu_hover_controller.dart';
 import '../view/smart_context_menu_item_view.dart';
 
-/// The item that retries a failed submenu or page load.
+/// The row that retries a failed submenu or page load.
 ///
-/// Its content is the error content of [SmartContextMenuItemView].
-final class SmartContextMenuRetryItem extends StatelessWidget {
+/// Shows [item], or a default [SmartContextMenuItem.error], with the retry
+/// title and icon unless the item has its own.
+final class SmartContextMenuRetryRow extends StatelessWidget {
+  final SmartContextMenuErrorItem? item;
   final SmartContextMenuConfig config;
   final SmartContextMenuHoverController hoverController;
   final VoidCallback onRetry;
 
-  const SmartContextMenuRetryItem({
+  const SmartContextMenuRetryRow({
     super.key,
+    required this.item,
     required this.config,
     required this.hoverController,
     required this.onRetry,
@@ -28,7 +31,7 @@ final class SmartContextMenuRetryItem extends StatelessWidget {
       onRetry: onRetry,
       config: config,
       hoverController: hoverController,
-      item: SmartContextMenuItem.error(),
+      item: item ?? SmartContextMenuItem.error(),
     );
   }
 }

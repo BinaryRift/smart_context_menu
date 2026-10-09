@@ -217,13 +217,17 @@ final class SmartContextMenuItem {
   /// buttons, handle their own taps: the item is not triggered over them.
   final SmartContextMenuItemBuilder? customBuilder;
 
-  /// The item shown in place of this placeholder after [asyncItem] has
-  /// failed.
+  /// The item shown after [asyncItem], the items of [asyncChildren] or
+  /// a page of [asyncPagingChildren] have failed to load.
   ///
   /// Tapping it retries loading. Without its own [title] and [trailing], it
   /// shows [SmartContextMenuLabels.retry] and
-  /// [SmartContextMenuDefaults.retryIcon]. Without its own [padding], it
-  /// keeps the padding of [loadingItem]. Set by [SmartContextMenuItem.async].
+  /// [SmartContextMenuDefaults.retryIcon]. In place of an async item, it
+  /// keeps the padding of [loadingItem] unless it has its own [padding].
+  ///
+  /// Set by [SmartContextMenuItem.async], [SmartContextMenuItem.asyncSubmenu]
+  /// and [SmartContextMenuItem.pagingSubmenu]. If null in a submenu, it is
+  /// a default [SmartContextMenuItem.error].
   final SmartContextMenuErrorItem? errorItem;
 
   /// Whether the item shows a submenu chevron.
@@ -343,11 +347,14 @@ final class SmartContextMenuItem {
   ///
   /// [asyncChildren] is called when the item is tapped. Until it completes,
   /// the submenu shows [loading], a [SmartContextMenuItem.loading], or by
-  /// default an activity indicator in the middle; if it fails or takes
-  /// longer than [timeout], a retry item. The loaded items are cached by [id]
-  /// until the menu closes.
+  /// default an activity indicator in the middle. If it fails or takes
+  /// longer than [timeout], the submenu shows [error], a
+  /// [SmartContextMenuItem.error], and tapping it retries loading. The loaded
+  /// items are cached by [id] until the menu closes.
   ///
   /// [timeout] defaults to [SmartContextMenuDefaults.loadingTimeout].
+  /// Without its own title and trailing, [error] shows
+  /// [SmartContextMenuLabels.retry] and [SmartContextMenuDefaults.retryIcon].
   ///
   /// ```dart
   /// SmartContextMenuItem.asyncSubmenu(
@@ -366,6 +373,7 @@ final class SmartContextMenuItem {
     required SmartContextMenuSubmenuLoader asyncChildren,
     Duration timeout = SmartContextMenuDefaults.loadingTimeout,
     SmartContextMenuLoadingItem? loading,
+    SmartContextMenuErrorItem? error,
     String? id,
     String? title,
     TextStyle? titleStyle,
@@ -392,6 +400,7 @@ final class SmartContextMenuItem {
     padding: padding,
     childrenGap: childrenGap,
     loadingItem: loading,
+    errorItem: error,
   );
 
   /// Creates an item that opens a submenu with items loaded page by page.
@@ -405,10 +414,13 @@ final class SmartContextMenuItem {
   /// an activity indicator in the middle, after the loaded items.
   ///
   /// If a page fails to load or takes longer than [timeout], the submenu
-  /// shows a retry item. The loaded pages are cached by [id] until the menu
-  /// closes.
+  /// shows [error], a [SmartContextMenuItem.error], after the loaded items,
+  /// and tapping it retries loading the page. The loaded pages are cached
+  /// by [id] until the menu closes.
   ///
   /// [timeout] defaults to [SmartContextMenuDefaults.loadingTimeout].
+  /// Without its own title and trailing, [error] shows
+  /// [SmartContextMenuLabels.retry] and [SmartContextMenuDefaults.retryIcon].
   ///
   /// ```dart
   /// SmartContextMenuItem.pagingSubmenu(
@@ -437,6 +449,7 @@ final class SmartContextMenuItem {
     required SmartContextMenuPagingMetadata initialMetadata,
     Duration timeout = SmartContextMenuDefaults.loadingTimeout,
     SmartContextMenuLoadingItem? loading,
+    SmartContextMenuErrorItem? error,
     String? id,
     String? title,
     TextStyle? titleStyle,
@@ -464,6 +477,7 @@ final class SmartContextMenuItem {
     padding: padding,
     childrenGap: childrenGap,
     loadingItem: loading,
+    errorItem: error,
   );
 
   /// Creates a separator between groups of items.
@@ -647,8 +661,10 @@ final class SmartContextMenuItem {
   /// this content; text and icons in it take the color of the item.
   /// Interactive widgets in [child], such as buttons, handle their own taps.
   ///
-  /// Pass it as `error` to [SmartContextMenuItem.async]: tapping it there
-  /// retries loading, see [SmartContextMenuItem.async]. Anywhere else, for
+  /// Pass it as `error` to [SmartContextMenuItem.async],
+  /// [SmartContextMenuItem.asyncSubmenu] or
+  /// [SmartContextMenuItem.pagingSubmenu]: tapping it there retries loading,
+  /// see [errorItem]. Anywhere else, for
   /// example from the builder of [SmartContextMenuItem.listenable], it does
   /// not respond to taps. To retry from it there, add a button to [child],
   /// or return a [SmartContextMenuItem.simple] with `onTap` instead.

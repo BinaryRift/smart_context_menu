@@ -88,4 +88,27 @@ void main() {
       isNull,
     );
   });
+
+  test('loading submenus keep their error item', () {
+    final error = SmartContextMenuItem.error(title: 'Could not load');
+    final async = SmartContextMenuItem.asyncSubmenu(
+      asyncChildren: () async => [],
+      error: error,
+    );
+    final paging = SmartContextMenuItem.pagingSubmenu(
+      asyncPagingChildren: (_) async => [],
+      initialMetadata: const SmartContextMenuPagingMetadata(),
+      error: error,
+    );
+
+    expect(async.errorItem, same(error));
+    expect(paging.errorItem, same(error));
+    expect(SmartContextMenuItem.submenu(children: []).errorItem, isNull);
+    expect(
+      SmartContextMenuItem.asyncSubmenu(
+        asyncChildren: () async => [],
+      ).errorItem,
+      isNull,
+    );
+  });
 }

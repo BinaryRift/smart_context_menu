@@ -152,6 +152,65 @@ void main() {
     expect(find.text('Loaded'), findsOneWidget);
   });
 
+  testWidgets('shows the retry label with the retry icon by default', (
+    tester,
+  ) async {
+    await tester.pumpMenu(
+      items: [
+        SmartContextMenuItem.asyncSubmenu(
+          title: 'More',
+          asyncChildren: () => Future.error(Exception('Failed')),
+        ),
+      ],
+    );
+    await tester.openMenu();
+
+    await tester.tap(find.text('More'));
+    await tester.settleMenu();
+
+    expect(find.text(_labels.retry), findsOneWidget);
+    expect(find.byIcon(SmartContextMenuDefaults.retryIcon), findsOneWidget);
+    expect(find.byIcon(SmartContextMenuDefaults.errorIcon), findsNothing);
+  });
+
+  testWidgets('shows its error item on error and retries on tap', (
+    tester,
+  ) async {
+    var calls = 0;
+
+    await tester.pumpMenu(
+      items: [
+        SmartContextMenuItem.asyncSubmenu(
+          title: 'More',
+          error: SmartContextMenuItem.error(
+            title: 'Could not load files',
+            trailing: const Icon(CupertinoIcons.clock),
+          ),
+          asyncChildren: () async {
+            calls++;
+            if (calls == 1) throw Exception('Failed');
+            return _items(['Loaded']);
+          },
+        ),
+      ],
+    );
+    await tester.openMenu();
+
+    await tester.tap(find.text('More'));
+    await tester.settleMenu();
+    expect(find.text('Could not load files'), findsOneWidget);
+    expect(find.byIcon(CupertinoIcons.clock), findsOneWidget);
+    expect(find.text(_labels.retry), findsNothing);
+    expect(find.byIcon(SmartContextMenuDefaults.retryIcon), findsNothing);
+
+    await tester.tap(find.text('Could not load files'));
+    await tester.settleMenu();
+
+    expect(calls, 2);
+    expect(find.text('Could not load files'), findsNothing);
+    expect(find.text('Loaded'), findsOneWidget);
+  });
+
   testWidgets('loads the next page until the last one', (tester) async {
     final pages = <int>[];
 
@@ -352,6 +411,56 @@ void main() {
 
     expect(page2Calls, 2);
     expect(find.text(_labels.retry), findsNothing);
+    expect(find.text('Page 2'), findsOneWidget);
+  });
+
+  testWidgets('shows its error item when a page fails, also after reopening', (
+    tester,
+  ) async {
+    var page2Calls = 0;
+
+    await tester.pumpMenu(
+      items: [
+        SmartContextMenuItem.pagingSubmenu(
+          title: 'More',
+          error: SmartContextMenuItem.error(title: 'Could not load page'),
+          initialMetadata: const SmartContextMenuPagingMetadata(limit: 1),
+          asyncPagingChildren: (metadata) async {
+            if (metadata.page == 1) {
+              return [
+                SmartContextMenuItem.simple(
+                  title: 'Page 1',
+                  pagingMetadata: metadata.copyWith(page: 2),
+                ),
+              ];
+            }
+            page2Calls++;
+            if (page2Calls <= 2) throw Exception('Failed');
+            return _items(['Page 2']);
+          },
+        ),
+      ],
+    );
+    await tester.openMenu();
+
+    await tester.tap(find.text('More'));
+    await tester.settleMenu(frames: 10);
+    expect(find.text('Could not load page'), findsOneWidget);
+    expect(find.text(_labels.retry), findsNothing);
+
+    await tester.tap(find.text(_labels.back).last);
+    await tester.settleMenu();
+    await tester.tap(find.text('More'));
+    await tester.settleMenu(frames: 10);
+
+    expect(page2Calls, 2);
+    expect(find.text('Could not load page'), findsOneWidget);
+
+    await tester.tap(find.text('Could not load page'));
+    await tester.settleMenu(frames: 10);
+
+    expect(page2Calls, 3);
+    expect(find.text('Could not load page'), findsNothing);
     expect(find.text('Page 2'), findsOneWidget);
   });
 }

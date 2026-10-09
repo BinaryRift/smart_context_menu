@@ -12,6 +12,10 @@ final class SmartMenuLevel {
 
   /// The item shown while the items or a page load, if not the default one.
   final SmartContextMenuLoadingItem? loadingItem;
+
+  /// The item shown after the items or a page fail to load, if not
+  /// the default one.
+  final SmartContextMenuErrorItem? errorItem;
   SmartContextMenuPagingMetadata? nextMetadata;
   bool isLoading;
   bool isPaginating;
@@ -24,6 +28,7 @@ final class SmartMenuLevel {
     this.pagingMethod,
     this.loadingTimeout,
     this.loadingItem,
+    this.errorItem,
     this.nextMetadata,
     this.isLoading = false,
     this.isPaginating = false,

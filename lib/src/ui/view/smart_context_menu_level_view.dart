@@ -13,7 +13,7 @@ import '../state/smart_context_menu_hover_controller.dart';
 import '../widgets/smart_context_menu_back_item.dart';
 import '../widgets/smart_context_menu_divider.dart';
 import '../widgets/smart_context_menu_pagination_trigger.dart';
-import '../widgets/smart_context_menu_retry_item.dart';
+import '../widgets/smart_context_menu_retry_row.dart';
 import 'smart_context_menu_item_view.dart';
 
 /// The content of a menu [level]: its items, the back item of a submenu
@@ -100,7 +100,8 @@ final class SmartContextMenuLevelView extends StatelessWidget {
       child = _buildLoadingRow();
       isTransitionState = true;
     } else if (hasError && relativeIndex == itemsCount) {
-      child = SmartContextMenuRetryItem(
+      child = SmartContextMenuRetryRow(
+        item: level.errorItem,
         config: config,
         hoverController: hoverController,
         onRetry: () => controller.onRetryLoad(level),
