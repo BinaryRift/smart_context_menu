@@ -23,7 +23,7 @@ final class SmartContextMenuLevelEntry {
   double _toValue = 1;
   Offset _toOffset = MotionSlide.none.offset;
   Curve _curve = MotionCurves.emphasized;
-  Curve? _fade = MotionCurves.levelFadeIn;
+  Curve? _fade;
 
   /// Where a tracked level hides, see [track].
   Offset _hiddenOffset;
@@ -35,13 +35,15 @@ final class SmartContextMenuLevelEntry {
   late final Animation<double> fade = _EntryValue(controller, () => opacity);
 
   /// Creates a level that comes in from [enterFrom] as [controller] goes
-  /// from 0 to 1.
+  /// from 0 to 1, fading in if [fades] is true.
   SmartContextMenuLevelEntry({
     required this.child,
     required this.controller,
     required Offset enterFrom,
+    bool fades = true,
   }) : _fromOffset = enterFrom,
-       _hiddenOffset = enterFrom;
+       _hiddenOffset = enterFrom,
+       _fade = fades ? MotionCurves.levelFadeIn : null;
 
   /// The current shift of the level, as a fraction of its size.
   Offset get offset => Offset.lerp(_fromOffset, _toOffset, _progress)!;
@@ -64,10 +66,10 @@ final class SmartContextMenuLevelEntry {
   double get opacity =>
       _fade?.transform(controller.value) ?? MotionOpacity.visible.value;
 
-  /// Leaves towards [to], fading out.
-  TickerFuture leave(Offset to) {
+  /// Leaves towards [to], fading out if [fades] is true.
+  TickerFuture leave(Offset to, {bool fades = true}) {
     _moveTo(value: 0, offset: to, curve: MotionCurves.emphasized);
-    _fade = MotionCurves.levelFadeOut;
+    _fade = fades ? MotionCurves.levelFadeOut : null;
     return controller.reverse();
   }
 

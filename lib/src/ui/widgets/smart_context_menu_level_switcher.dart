@@ -9,9 +9,11 @@ import '../../core/ui/motion/transitions/fade_slide_transition.dart';
 import '../state/smart_context_menu_level_entry.dart';
 import 'smart_context_menu_level_stack.dart';
 
-/// Switches menu levels: a submenu slides in from the right and pushes
-/// the current level to the left; going back, the parent slides in from
-/// the left and pushes the submenu to the right.
+/// Switches menu levels: a submenu slides in from the right over the
+/// current level, which moves to the left; going back, the submenu slides
+/// away to the right and the parent comes out from under it. The submenu
+/// stays opaque and the level under it shows only to its left, as in
+/// a swipe back.
 ///
 /// With [enableSwipeBack] and a [previous] level, swiping right drags
 /// the current level away and reveals [previous]. If the swipe goes far
@@ -65,8 +67,8 @@ final class _SmartContextMenuLevelSwitcherState
   /// The parent level revealed by a swipe back.
   SmartContextMenuLevelEntry? _swipeParent;
 
-  /// While a swipe back moves the levels, [_revealed] is visible only
-  /// to the left of [_cover], as if [_cover] were opaque.
+  /// While the levels move, [_revealed] is visible only to the left of
+  /// [_cover], as if [_cover] were opaque.
   SmartContextMenuLevelEntry? _revealed;
   SmartContextMenuLevelEntry? _cover;
   bool _isTracking = false;
@@ -101,20 +103,33 @@ final class _SmartContextMenuLevelSwitcherState
       return;
     }
 
-    _removeWhenHidden(
-      _current,
-      _current.leave(
-        widget.isForward
-            ? MotionSlide.leftHalf.offset
-            : MotionSlide.rightHalf.offset,
-      ),
+    final isForward = widget.isForward;
+    final leaving = _current;
+    final hidden = leaving.leave(
+      isForward ? MotionSlide.leftHalf.offset : MotionSlide.right.offset,
+      fades: isForward,
     );
-    _current = _createEntry(
+    _removeWhenHidden(leaving, hidden);
+    final entering = _createEntry(
       widget.child,
-      enterFrom: widget.isForward
-          ? MotionSlide.rightHalf.offset
+      enterFrom: isForward
+          ? MotionSlide.right.offset
           : MotionSlide.leftHalf.offset,
-    )..controller.forward();
+      fades: !isForward,
+    );
+    final shown = entering.controller.forward();
+    _current = entering;
+
+    final cover = isForward ? entering : leaving;
+    _revealed = isForward ? leaving : entering;
+    _cover = cover;
+    (isForward ? shown : hidden).whenCompleteOrCancel(() {
+      if (!mounted || _cover != cover) return;
+      setState(() {
+        _revealed = null;
+        _cover = null;
+      });
+    });
   }
 
   @override
@@ -194,6 +209,7 @@ final class _SmartContextMenuLevelSwitcherState
   SmartContextMenuLevelEntry _createEntry(
     Widget child, {
     required Offset enterFrom,
+    bool fades = true,
   }) {
     return SmartContextMenuLevelEntry(
       child: child,
@@ -202,6 +218,7 @@ final class _SmartContextMenuLevelSwitcherState
         duration: MotionDurations.standard,
       ),
       enterFrom: enterFrom,
+      fades: fades,
     );
   }
 
