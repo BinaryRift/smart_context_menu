@@ -19,6 +19,9 @@ _flutter.loader.load({
 // even when the app loads at once.
 const splashMinimum = 2000;
 
+// How long the splash fades out, as in index.html.
+const splashFade = 600;
+
 // Fades out the splash from index.html once the app draws its first frame.
 function hideSplash() {
   const splash = document.querySelector('#splash');
@@ -26,8 +29,8 @@ function hideSplash() {
   const wait = Math.max(0, splashMinimum - performance.now());
   setTimeout(() => requestAnimationFrame(() => {
     splash.classList.add('is-hidden');
-    splash.addEventListener('transitionend', () => splash.remove(), {
-      once: true,
-    });
+    // Removed by time rather than on transitionend, which may not come:
+    // a hidden splash left above the app would slow down every frame.
+    setTimeout(() => splash.remove(), splashFade);
   }), wait);
 }
