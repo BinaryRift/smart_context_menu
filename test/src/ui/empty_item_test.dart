@@ -98,4 +98,16 @@ void main() {
 
     expect(find.text('No drafts'), findsOneWidget);
   });
+
+  testWidgets('centers its title', (tester) async {
+    await tester.pumpMenu(
+      items: [SmartContextMenuItem.empty(title: 'No drafts')],
+    );
+    await tester.openMenu();
+
+    expect(
+      tester.widget<Text>(find.text('No drafts')).textAlign,
+      TextAlign.center,
+    );
+  });
 }

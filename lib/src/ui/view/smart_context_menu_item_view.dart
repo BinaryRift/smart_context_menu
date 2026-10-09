@@ -244,14 +244,17 @@ final class _SmartContextMenuItemViewState
     );
   }
 
-  Widget _body(SmartContextMenuItem item) {
+  Widget _body(
+    SmartContextMenuItem item, {
+    TextAlign titleAlign = TextAlign.start,
+  }) {
     return IconTheme.merge(
       data: IconThemeData(color: _foregroundColor),
-      child: _buildRow(item),
+      child: _buildRow(item, titleAlign: titleAlign),
     );
   }
 
-  Widget _buildRow(SmartContextMenuItem item) {
+  Widget _buildRow(SmartContextMenuItem item, {required TextAlign titleAlign}) {
     final gap = SizedBox(width: item.childrenGap ?? _style.itemChildrenGap);
     return Row(
       children: [
@@ -262,6 +265,7 @@ final class _SmartContextMenuItemViewState
             style: (item.titleStyle ?? _style.titleStyle).copyWith(
               color: _foregroundColor,
             ),
+            textAlign: titleAlign,
             maxLines: _style.titleMaxLines,
             overflow: TextOverflow.ellipsis,
           ),
@@ -333,7 +337,11 @@ final class _SmartContextMenuItemViewState
       trailing: item.trailing ?? sign,
       childrenGap: item.childrenGap,
     );
-    return KeyedSubtree(key: key, child: _body(row));
+    // A status title stands in the middle, unlike the title of an action.
+    return KeyedSubtree(
+      key: key,
+      child: _body(row, titleAlign: TextAlign.center),
+    );
   }
 
   void _handleTap() {

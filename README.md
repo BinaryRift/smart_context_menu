@@ -373,8 +373,8 @@ content; text and icons in it take the color of the item. The menu replaces the 
 finishes when it is the `loading` of an async item or an async or paginated submenu, or when
 a listenable item returns it. Anywhere else it stays until the menu closes.
 
-Loading, error and empty items look alike: the title, a sign of the state after it,
-and `leading` free for your own icon. They do not respond to taps and are not dimmed.
+Loading, error and empty items look alike: the title in the middle, a sign of the state
+after it, and `leading` free for your own icon. They do not respond to taps and are not dimmed.
 
 | Item | Title | After the title |
 | --- | --- | --- |

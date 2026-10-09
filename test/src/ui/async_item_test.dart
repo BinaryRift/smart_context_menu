@@ -355,4 +355,22 @@ void main() {
     expect(find.text('Loaded'), findsOneWidget);
     expect(find.text(const SmartContextMenuLabels().loading), findsNothing);
   });
+
+  testWidgets('centers the retry label', (tester) async {
+    await tester.pumpMenu(
+      items: [
+        SmartContextMenuItem.async(
+          asyncItem: () => Future.error(Exception('Failed')),
+        ),
+      ],
+    );
+    await tester.openMenu();
+
+    expect(
+      tester
+          .widget<Text>(find.text(const SmartContextMenuLabels().retry))
+          .textAlign,
+      TextAlign.center,
+    );
+  });
 }

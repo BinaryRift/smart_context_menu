@@ -772,7 +772,8 @@ final class SmartContextMenuItem {
 /// A [SmartContextMenuItem] that shows a state, such as loading, instead
 /// of an action.
 ///
-/// It does not respond to taps and is not dimmed. A sign of the state is
+/// It does not respond to taps and is not dimmed. Its [title] stands in
+/// the middle between [leading] and [trailing]. A sign of the state is
 /// shown after [title] unless [trailing] is set.
 ///
 /// See [SmartContextMenuLoadingItem], [SmartContextMenuErrorItem] and

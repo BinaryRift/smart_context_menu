@@ -90,4 +90,20 @@ void main() {
     );
     expect(tester.iconColorOf(CupertinoIcons.clock), color);
   });
+
+  testWidgets('centers its title, unlike an action', (tester) async {
+    await tester.pumpMenu(
+      items: [
+        SmartContextMenuItem.simple(title: 'Copy'),
+        SmartContextMenuItem.loading(title: 'Syncing'),
+      ],
+    );
+    await tester.openMenu();
+
+    expect(
+      tester.widget<Text>(find.text('Syncing')).textAlign,
+      TextAlign.center,
+    );
+    expect(tester.widget<Text>(find.text('Copy')).textAlign, TextAlign.start);
+  });
 }

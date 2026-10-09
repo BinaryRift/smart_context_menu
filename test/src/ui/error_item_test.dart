@@ -125,4 +125,16 @@ void main() {
     expect(taps, 1);
     expect(find.text('Could not sync'), findsOneWidget);
   });
+
+  testWidgets('centers its title', (tester) async {
+    await tester.pumpMenu(
+      items: [SmartContextMenuItem.error(title: 'Could not sync')],
+    );
+    await tester.openMenu();
+
+    expect(
+      tester.widget<Text>(find.text('Could not sync')).textAlign,
+      TextAlign.center,
+    );
+  });
 }
