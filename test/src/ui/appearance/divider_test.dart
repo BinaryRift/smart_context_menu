@@ -89,7 +89,7 @@ void main() {
     expect(dividers, findsOneWidget);
   });
 
-  group('before the loading row of the next page', () {
+  group('before the row of the next page', () {
     Future<Completer<List<SmartContextMenuItem>>> openPagingSubmenu(
       WidgetTester tester, {
       SmartContextMenuLoadingItem? loading,
@@ -146,6 +146,37 @@ void main() {
       nextPage.complete([]);
       await tester.settleMenu();
     });
+
+    testWidgets('a divider is drawn before the retry item', (tester) async {
+      final nextPage = await openPagingSubmenu(tester);
+
+      nextPage.completeError(Exception('Failed'));
+      await tester.settleMenu();
+
+      expect(find.text(const SmartContextMenuLabels().retry), findsOneWidget);
+      expect(dividers, findsNWidgets(backDividers + 2));
+    });
+  });
+
+  testWidgets('no divider is drawn before the retry item without items', (
+    tester,
+  ) async {
+    await tester.pumpMenu(
+      config: const SmartContextMenuConfig(style: style),
+      items: [
+        SmartContextMenuItem.asyncSubmenu(
+          title: 'More',
+          asyncChildren: () => Future.error(Exception('Failed')),
+        ),
+      ],
+    );
+    await tester.openMenu();
+    await tester.tap(find.text('More'));
+    await tester.settleMenu();
+
+    expect(find.text(const SmartContextMenuLabels().retry), findsOneWidget);
+    // Only the back item and its placeholder have dividers.
+    expect(dividers, findsNWidgets(2));
   });
 
   testWidgets('the back item has a divider with the style', (tester) async {

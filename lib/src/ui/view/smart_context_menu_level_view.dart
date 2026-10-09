@@ -100,11 +100,13 @@ final class SmartContextMenuLevelView extends StatelessWidget {
       child = _buildLoadingRow();
       isTransitionState = true;
     } else if (hasError && relativeIndex == itemsCount) {
-      child = SmartContextMenuRetryRow(
-        item: level.errorItem,
-        config: config,
-        hoverController: hoverController,
-        onRetry: () => controller.onRetryLoad(level),
+      child = _dividedFromItems(
+        SmartContextMenuRetryRow(
+          item: level.errorItem,
+          config: config,
+          hoverController: hoverController,
+          onRetry: () => controller.onRetryLoad(level),
+        ),
       );
       isTransitionState = true;
     } else if (!hasError && hasPaging && relativeIndex == itemsCount) {
@@ -143,13 +145,17 @@ final class SmartContextMenuLevelView extends StatelessWidget {
     );
   }
 
-  // A loading item of the app is a row of the list, so it is divided from
-  // the items above as they are from each other.
+  // A loading item of the app is a row of the list, unlike the default
+  // loader.
   Widget _buildPageLoadingRow() {
     final row = _buildLoadingRow();
+    return level.loadingItem == null ? row : _dividedFromItems(row);
+  }
+
+  // A row after the items is divided from them as they are from each other.
+  Widget _dividedFromItems(Widget row) {
     final items = level.items;
-    if (level.loadingItem == null ||
-        !config.style.dividersBetweenItems ||
+    if (!config.style.dividersBetweenItems ||
         items.isEmpty ||
         items.last.isSeparator) {
       return row;
