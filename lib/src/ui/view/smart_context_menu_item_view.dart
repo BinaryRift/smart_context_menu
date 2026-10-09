@@ -63,8 +63,8 @@ final class _SmartContextMenuItemViewState
   bool _isHighlight = false;
   SmartContextMenuItem? _resolvedItem;
   Object? _error;
-  bool get _isLoading => _error == null && _item.isLoading;
-  bool get _isDisabled => _item.isDisabled || _isLoading || !_hasInteractions;
+  bool get _isStatus => _error == null && _item is SmartContextMenuStatusItem;
+  bool get _isDisabled => _item.isDisabled || _isStatus || !_hasInteractions;
   bool get _hasInteractions =>
       _item.onTap != null ||
       _item.isInternalInteracted ||
@@ -281,6 +281,7 @@ final class _SmartContextMenuItemViewState
   Widget _buildStatusBody(SmartContextMenuStatusItem item) {
     final key = switch (item) {
       SmartContextMenuLoadingItem() => ItemContentKey.loading,
+      SmartContextMenuErrorItem() => ItemContentKey.error,
     };
 
     final child = item.child;
@@ -303,6 +304,10 @@ final class _SmartContextMenuItemViewState
       SmartContextMenuLoadingItem() => (
         _config.labels.loading,
         const CupertinoActivityIndicator(),
+      ),
+      SmartContextMenuErrorItem() => (
+        _config.labels.error,
+        Icon(SmartContextMenuDefaults.errorIcon, size: _style.defaultIconSize),
       ),
     };
     final row = SmartContextMenuItem.simple(
@@ -339,7 +344,7 @@ final class _SmartContextMenuItemViewState
   }
 
   void _handleTap() {
-    if (_isLoading) return;
+    if (_isStatus) return;
     if (_error != null) {
       widget.onRetry != null ? widget.onRetry!() : _loadAsyncData();
       return;
@@ -383,7 +388,8 @@ final class _SmartContextMenuItemViewState
           item.isInternalInteracted ||
           item.listenableBuilder != null),
       'The builder of SmartContextMenuItem.listenable must return '
-      'a SmartContextMenuItem.simple or a SmartContextMenuItem.loading.',
+      'a SmartContextMenuItem.simple, a SmartContextMenuItem.loading '
+      'or a SmartContextMenuItem.error.',
     );
     _resolvedItem = item;
     _isHighlight = widget.hoverController?.value == widget.key && !_isDisabled;

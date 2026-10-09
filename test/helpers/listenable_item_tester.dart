@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 final class ItemNotifier extends ChangeNotifier {
   int count = 0;
   bool isLoading = true;
+  bool hasFailed = true;
   bool isOn = false;
 
   bool get isListened => hasListeners;
@@ -15,6 +16,11 @@ final class ItemNotifier extends ChangeNotifier {
 
   void finishLoading() {
     isLoading = false;
+    notifyListeners();
+  }
+
+  void recover() {
+    hasFailed = false;
     notifyListeners();
   }
 

@@ -57,6 +57,7 @@ void main() {
         builder: SmartContextMenuItem.simple,
       ),
       SmartContextMenuItem.separator(),
+      SmartContextMenuItem.error(),
     ];
 
     for (final item in items) {

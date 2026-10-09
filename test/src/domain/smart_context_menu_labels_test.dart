@@ -8,5 +8,6 @@ void main() {
     expect(labels.back, 'Back');
     expect(labels.retry, 'Try again');
     expect(labels.loading, 'Loading…');
+    expect(labels.error, 'Could not load');
   });
 }

@@ -7,7 +7,7 @@ final class ItemContentKey extends ValueKey<String> {
   /// The placeholder while an async item loads.
   static const loading = ItemContentKey._("loading");
 
-  /// The retry content after a load fails.
+  /// The content of a failed load: the retry content or an error item.
   static const error = ItemContentKey._("error");
 
   /// The content of a loaded or plain item.

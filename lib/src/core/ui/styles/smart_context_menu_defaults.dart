@@ -222,7 +222,8 @@ abstract final class SmartContextMenuDefaults {
   /// The default of [SmartContextMenuStyle.backIcon].
   static const IconData backIcon = CupertinoIcons.chevron_back;
 
-  /// The leading icon of a retry item shown after a failed load.
+  /// The icon after the title of a [SmartContextMenuItem.error] item, and
+  /// the leading icon of a retry item shown after a failed load.
   static const IconData errorIcon = CupertinoIcons.exclamationmark_triangle;
 
   /// The trailing icon of a retry item shown after a failed load.

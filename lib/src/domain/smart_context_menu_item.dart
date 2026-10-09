@@ -25,7 +25,8 @@ typedef SmartContextMenuItemLoader = Future<SmartContextMenuItem> Function();
 /// Builds the item of [SmartContextMenuItem.listenable] from the current
 /// state of the app.
 ///
-/// Returns a [SmartContextMenuItem.loading] while the item is loading.
+/// Returns a [SmartContextMenuItem.loading] while the item is loading and
+/// a [SmartContextMenuItem.error] if it failed to load.
 typedef SmartContextMenuListenableItemBuilder = SmartContextMenuItem Function();
 
 /// Builds the content of an item from its current state.
@@ -48,6 +49,7 @@ typedef SmartContextMenuItemBuilder =
 ///   [listenableBuilder] and rebuilds it when [listenable] notifies.
 /// * [SmartContextMenuItem.loading] shows a loading state, usually of
 ///   an async or a listenable item.
+/// * [SmartContextMenuItem.error] shows a failed load.
 /// * [SmartContextMenuItem.separator] separates groups of items.
 ///
 /// A submenu replaces the current menu and shows a back item at the top.
@@ -554,7 +556,8 @@ final class SmartContextMenuItem {
   ///
   /// [builder] returns the item to show: a [SmartContextMenuItem.simple],
   /// whose [onTap] and [closeOnTap] are used, so it can act on the current
-  /// state, or a [SmartContextMenuItem.loading] while the item is loading.
+  /// state, a [SmartContextMenuItem.loading] while the item is loading, or
+  /// a [SmartContextMenuItem.error] if it failed to load.
   ///
   /// ```dart
   /// SmartContextMenuItem.listenable(
@@ -630,6 +633,53 @@ final class SmartContextMenuItem {
     padding: padding,
     childrenGap: childrenGap,
   );
+
+  /// Creates an item that shows a failed load.
+  ///
+  /// The item shows [title] (or [SmartContextMenuLabels.error]) with
+  /// [leading] and [SmartContextMenuDefaults.errorIcon], and does not
+  /// respond to taps. [trailing] replaces the icon. Pass [child] to replace
+  /// this content; text and icons in it take the color of the item.
+  /// Interactive widgets in [child], such as buttons, handle their own taps.
+  ///
+  /// Return it from the builder of [SmartContextMenuItem.listenable] when
+  /// the state of the app has an error. To retry from the item, add
+  /// a button to [child], or return a [SmartContextMenuItem.simple] with
+  /// `onTap` instead.
+  ///
+  /// ```dart
+  /// SmartContextMenuItem.listenable(
+  ///   listenable: views,
+  ///   builder: () => switch (views.state) {
+  ///     ViewsState.loading => SmartContextMenuItem.loading(title: 'Views'),
+  ///     ViewsState.failed => SmartContextMenuItem.error(
+  ///       title: 'Could not load views',
+  ///     ),
+  ///     ViewsState.loaded => SmartContextMenuItem.simple(
+  ///       title: 'Views: ${views.count}',
+  ///     ),
+  ///   },
+  /// )
+  /// ```
+  static SmartContextMenuErrorItem error({
+    String? id,
+    String? title,
+    TextStyle? titleStyle,
+    Widget? leading,
+    Widget? trailing,
+    Widget? child,
+    EdgeInsets? padding,
+    double? childrenGap,
+  }) => SmartContextMenuErrorItem._(
+    id: id ?? _generateId(),
+    title: title,
+    titleStyle: titleStyle,
+    leading: leading,
+    trailing: trailing,
+    child: child,
+    padding: padding,
+    childrenGap: childrenGap,
+  );
 }
 
 /// A [SmartContextMenuItem] that shows a state, such as loading, instead
@@ -638,7 +688,7 @@ final class SmartContextMenuItem {
 /// It does not respond to taps and is not dimmed. A sign of the state is
 /// shown after [title] unless [trailing] is set.
 ///
-/// See [SmartContextMenuLoadingItem].
+/// See [SmartContextMenuLoadingItem] and [SmartContextMenuErrorItem].
 sealed class SmartContextMenuStatusItem extends SmartContextMenuItem {
   /// The content shown instead of [title], [leading] and [trailing].
   ///
@@ -663,6 +713,22 @@ sealed class SmartContextMenuStatusItem extends SmartContextMenuItem {
 /// Create it with [SmartContextMenuItem.loading].
 final class SmartContextMenuLoadingItem extends SmartContextMenuStatusItem {
   const SmartContextMenuLoadingItem._({
+    required super.id,
+    super.title,
+    super.titleStyle,
+    super.leading,
+    super.trailing,
+    super.child,
+    super.padding,
+    super.childrenGap,
+  }) : super._();
+}
+
+/// A [SmartContextMenuStatusItem] that shows a failed load.
+///
+/// Create it with [SmartContextMenuItem.error].
+final class SmartContextMenuErrorItem extends SmartContextMenuStatusItem {
+  const SmartContextMenuErrorItem._({
     required super.id,
     super.title,
     super.titleStyle,

@@ -12,7 +12,7 @@ void main() {
   setUp(() => notifier = ItemNotifier());
   tearDown(() => notifier.dispose());
 
-  group('the builder must return a simple or a loading item', () {
+  group('the builder must return a simple, a loading or an error item', () {
     final invalidItems = <String, SmartContextMenuItem Function()>{
       'separator': SmartContextMenuItem.separator,
       'submenu': () => SmartContextMenuItem.submenu(children: []),
