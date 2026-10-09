@@ -232,6 +232,14 @@ final class SmartContextMenuItem {
   /// a default [SmartContextMenuItem.error].
   final SmartContextMenuErrorItem? errorItem;
 
+  /// The item shown when [asyncChildren] or the first page of
+  /// [asyncPagingChildren] has loaded no items.
+  ///
+  /// Set by [SmartContextMenuItem.asyncSubmenu] and
+  /// [SmartContextMenuItem.pagingSubmenu]. If null, a submenu without items
+  /// shows a default [SmartContextMenuItem.empty].
+  final SmartContextMenuEmptyItem? emptyItem;
+
   /// Whether the item shows a submenu chevron.
   @internal
   bool get showTransitionIcon =>
@@ -267,6 +275,7 @@ final class SmartContextMenuItem {
     this.pagingMetadata,
     this.customBuilder,
     this.errorItem,
+    this.emptyItem,
     this.padding,
     this.childrenGap,
     this.closeOnTap = true,
@@ -316,6 +325,8 @@ final class SmartContextMenuItem {
   );
 
   /// Creates an item that opens a submenu with [children].
+  ///
+  /// Without [children], the submenu shows a [SmartContextMenuItem.empty].
   factory SmartContextMenuItem.submenu({
     required List<SmartContextMenuItem> children,
     String? id,
@@ -352,7 +363,8 @@ final class SmartContextMenuItem {
   /// default an activity indicator in the middle. If it fails or takes
   /// longer than [timeout], the submenu shows [error], a
   /// [SmartContextMenuItem.error], and tapping it retries loading. The loaded
-  /// items are cached by [id] until the menu closes.
+  /// items are cached by [id] until the menu closes. If there are no items,
+  /// the submenu shows [empty], or by default a [SmartContextMenuItem.empty].
   ///
   /// [timeout] defaults to [SmartContextMenuDefaults.loadingTimeout].
   /// Without its own title and trailing, [error] shows
@@ -376,6 +388,7 @@ final class SmartContextMenuItem {
     Duration timeout = SmartContextMenuDefaults.loadingTimeout,
     SmartContextMenuLoadingItem? loading,
     SmartContextMenuErrorItem? error,
+    SmartContextMenuEmptyItem? empty,
     String? id,
     String? title,
     TextStyle? titleStyle,
@@ -403,6 +416,7 @@ final class SmartContextMenuItem {
     childrenGap: childrenGap,
     loadingItem: loading,
     errorItem: error,
+    emptyItem: empty,
   );
 
   /// Creates an item that opens a submenu with items loaded page by page.
@@ -418,7 +432,8 @@ final class SmartContextMenuItem {
   /// If a page fails to load or takes longer than [timeout], the submenu
   /// shows [error], a [SmartContextMenuItem.error], after the loaded items,
   /// and tapping it retries loading the page. The loaded pages are cached
-  /// by [id] until the menu closes.
+  /// by [id] until the menu closes. If the first page has no items, the
+  /// submenu shows [empty], or by default a [SmartContextMenuItem.empty].
   ///
   /// [timeout] defaults to [SmartContextMenuDefaults.loadingTimeout].
   /// Without its own title and trailing, [error] shows
@@ -452,6 +467,7 @@ final class SmartContextMenuItem {
     Duration timeout = SmartContextMenuDefaults.loadingTimeout,
     SmartContextMenuLoadingItem? loading,
     SmartContextMenuErrorItem? error,
+    SmartContextMenuEmptyItem? empty,
     String? id,
     String? title,
     TextStyle? titleStyle,
@@ -480,6 +496,7 @@ final class SmartContextMenuItem {
     childrenGap: childrenGap,
     loadingItem: loading,
     errorItem: error,
+    emptyItem: empty,
   );
 
   /// Creates a separator between groups of items.
@@ -713,8 +730,12 @@ final class SmartContextMenuItem {
   /// respond to taps. [trailing] replaces the icon. Pass [child] to replace
   /// this content; text and icons in it take the color of the item.
   ///
-  /// Return it from the builder of [SmartContextMenuItem.listenable] when
-  /// the state of the app has nothing to show.
+  /// A submenu without items shows it by itself: pass it as `empty` to
+  /// [SmartContextMenuItem.asyncSubmenu] or
+  /// [SmartContextMenuItem.pagingSubmenu] to change it, and return no items
+  /// from the loader. Return it from the builder of
+  /// [SmartContextMenuItem.listenable] when the state of the app has nothing
+  /// to show.
   ///
   /// ```dart
   /// SmartContextMenuItem.listenable(

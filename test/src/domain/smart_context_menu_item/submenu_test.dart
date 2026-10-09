@@ -111,4 +111,27 @@ void main() {
       isNull,
     );
   });
+
+  test('loading submenus keep their empty item', () {
+    final empty = SmartContextMenuItem.empty(title: 'No files');
+    final async = SmartContextMenuItem.asyncSubmenu(
+      asyncChildren: () async => [],
+      empty: empty,
+    );
+    final paging = SmartContextMenuItem.pagingSubmenu(
+      asyncPagingChildren: (_) async => [],
+      initialMetadata: const SmartContextMenuPagingMetadata(),
+      empty: empty,
+    );
+
+    expect(async.emptyItem, same(empty));
+    expect(paging.emptyItem, same(empty));
+    expect(SmartContextMenuItem.submenu(children: []).emptyItem, isNull);
+    expect(
+      SmartContextMenuItem.asyncSubmenu(
+        asyncChildren: () async => [],
+      ).emptyItem,
+      isNull,
+    );
+  });
 }

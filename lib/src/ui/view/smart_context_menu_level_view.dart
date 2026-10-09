@@ -99,6 +99,14 @@ final class SmartContextMenuLevelView extends StatelessWidget {
     if (level.isLoading && itemsCount == 0) {
       child = _buildLoadingRow();
       isTransitionState = true;
+    } else if (level.isEmpty && relativeIndex == 0) {
+      child = SmartContextMenuItemView(
+        key: ServiceItemKey.empty,
+        item: level.emptyItem ?? SmartContextMenuItem.empty(),
+        config: config,
+        hoverController: hoverController,
+      );
+      isTransitionState = true;
     } else if (hasError && relativeIndex == itemsCount) {
       child = _dividedFromItems(
         SmartContextMenuRetryRow(

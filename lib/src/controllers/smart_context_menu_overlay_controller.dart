@@ -52,6 +52,7 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
     Duration? loadingTimeout,
     SmartContextMenuLoadingItem? loadingItem,
     SmartContextMenuErrorItem? errorItem,
+    SmartContextMenuEmptyItem? emptyItem,
     bool loading = false,
   }) {
     _isForward = true;
@@ -62,6 +63,7 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
       loadingTimeout: loadingTimeout,
       loadingItem: loadingItem,
       errorItem: errorItem,
+      emptyItem: emptyItem,
       nextMetadata: initialMetadata,
       parentId: parentId,
       isLoading: loading,
@@ -125,6 +127,7 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
       loadingTimeout: item.loadingTimeout,
       loadingItem: item.loadingItem,
       errorItem: item.errorItem,
+      emptyItem: item.emptyItem,
     );
 
     await _runAsyncLoad(
@@ -154,6 +157,7 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
       loadingTimeout: item.loadingTimeout,
       loadingItem: item.loadingItem,
       errorItem: item.errorItem,
+      emptyItem: item.emptyItem,
     );
 
     await _runAsyncLoad(
@@ -269,7 +273,11 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
     final id = item.id;
 
     if (_cache.submenus.containsKey(id)) {
-      _pushSubmenuLevel(items: _cache.submenus[id]!, parentId: id);
+      _pushSubmenuLevel(
+        items: _cache.submenus[id]!,
+        emptyItem: item.emptyItem,
+        parentId: id,
+      );
       return true;
     }
 
@@ -282,6 +290,7 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
         loadingTimeout: item.loadingTimeout,
         loadingItem: item.loadingItem,
         errorItem: item.errorItem,
+        emptyItem: item.emptyItem,
         parentId: id,
       );
       return true;

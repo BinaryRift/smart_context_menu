@@ -7,6 +7,26 @@ import 'package:smart_context_menu/smart_context_menu.dart';
 import '../../helpers/menu_tester.dart';
 
 void main() {
+  testWidgets('shows the default empty item without children', (tester) async {
+    await tester.pumpMenu(
+      items: [SmartContextMenuItem.submenu(title: 'More', children: [])],
+    );
+    await tester.openMenu();
+
+    await tester.tap(find.text('More'));
+    await tester.settleMenu();
+
+    expect(find.text(const SmartContextMenuLabels().empty), findsOneWidget);
+    expect(find.byIcon(SmartContextMenuDefaults.emptyIcon), findsOneWidget);
+  });
+
+  testWidgets('shows no empty item in the root menu', (tester) async {
+    await tester.pumpMenu(items: [SmartContextMenuItem.separator()]);
+    await tester.openMenu();
+
+    expect(find.text(const SmartContextMenuLabels().empty), findsNothing);
+  });
+
   testWidgets('back item does not trigger an item with the same id', (
     tester,
   ) async {

@@ -25,6 +25,9 @@ final class ServiceItemKey extends ValueKey<String> {
   /// The item that retries a failed submenu load.
   static const retry = ServiceItemKey._("retry");
 
+  /// The item shown in a submenu without items.
+  static const empty = ServiceItemKey._("empty");
+
   /// The loader shown while a submenu loads its first items.
   static const loader = ServiceItemKey._("loader");
 }
