@@ -22,7 +22,8 @@ final class SmartContextMenuLabels {
   /// The title of the item that retries a failed load.
   ///
   /// Shown when a submenu or a [SmartContextMenuItem.async] item fails
-  /// to load. Defaults to `'Try again'`.
+  /// to load, unless its [SmartContextMenuItem.error] item has its own
+  /// title. Defaults to `'Try again'`.
   final String retry;
 
   /// The title of a [SmartContextMenuItem.loading] item without its own

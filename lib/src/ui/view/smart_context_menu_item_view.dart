@@ -75,6 +75,13 @@ final class _SmartContextMenuItemViewState
   SmartContextMenuConfig get _config => widget.config;
   SmartContextMenuStyle get _style => widget.config.style;
 
+  // A failed load keeps the padding of the loading item, so the item does
+  // not change its size.
+  EdgeInsetsGeometry get _padding =>
+      _item.padding ??
+      (_error != null ? widget.item.loadingItem?.padding : null) ??
+      _style.itemPadding;
+
   Color _resolve(Color color) => CupertinoDynamicColor.resolve(color, context);
 
   Color get _baseForegroundColor =>
@@ -203,7 +210,7 @@ final class _SmartContextMenuItemViewState
       child: AnimatedContainer(
         duration: MotionDurations.instant,
         color: _overlayColor,
-        padding: _item.padding ?? _style.itemPadding,
+        padding: _padding,
         child: AnimatedSwitcher(
           duration: MotionDurations.fast,
           transitionBuilder: (child, animation) =>
@@ -225,7 +232,6 @@ final class _SmartContextMenuItemViewState
   }
 
   Widget _buildContent(SmartContextMenuItemState state) {
-    if (_error != null) return _buildErrorBody(state);
     if (_item case final SmartContextMenuStatusItem item) {
       return _buildStatusBody(item);
     }
@@ -301,6 +307,11 @@ final class _SmartContextMenuItemViewState
     }
 
     final (String title, Widget sign) = switch (item) {
+      // The menu retries the failed load on tap.
+      _ when _error != null => (
+        _config.labels.retry,
+        Icon(SmartContextMenuDefaults.retryIcon, size: _style.defaultIconSize),
+      ),
       SmartContextMenuLoadingItem() => (
         _config.labels.loading,
         const CupertinoActivityIndicator(),
@@ -318,29 +329,6 @@ final class _SmartContextMenuItemViewState
       childrenGap: item.childrenGap,
     );
     return KeyedSubtree(key: key, child: _body(row));
-  }
-
-  Widget _buildErrorBody(SmartContextMenuItemState state) {
-    final errorBuilder = widget.item.errorBuilder;
-    if (errorBuilder != null) {
-      return KeyedSubtree(
-        key: ItemContentKey.error,
-        child: errorBuilder(context, state),
-      );
-    }
-
-    final errorItem = SmartContextMenuItem.simple(
-      title: _config.labels.retry,
-      leading: Icon(
-        SmartContextMenuDefaults.errorIcon,
-        size: _style.defaultIconSize,
-      ),
-      trailing: Icon(
-        SmartContextMenuDefaults.retryIcon,
-        size: _style.defaultIconSize,
-      ),
-    );
-    return KeyedSubtree(key: ItemContentKey.error, child: _body(errorItem));
   }
 
   void _handleTap() {
@@ -374,6 +362,7 @@ final class _SmartContextMenuItemViewState
       if (mounted) {
         setState(() {
           _error = e;
+          _resolvedItem = widget.item.errorItem;
         });
       }
     }

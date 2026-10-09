@@ -28,7 +28,7 @@ final class SmartContextMenuRetryItem extends StatelessWidget {
       onRetry: onRetry,
       config: config,
       hoverController: hoverController,
-      item: SmartContextMenuItem.simple(),
+      item: SmartContextMenuItem.error(),
     );
   }
 }

@@ -3,8 +3,7 @@ import 'package:meta/meta.dart' show internal;
 
 /// The current state of an item, passed to its builders.
 ///
-/// Received by [SmartContextMenuItem.customBuilder] and
-/// [SmartContextMenuItem.errorBuilder]. Created by the menu.
+/// Received by [SmartContextMenuItem.customBuilder]. Created by the menu.
 final class SmartContextMenuItemState {
   /// Whether the finger is over the item and releasing it will tap the item.
   ///

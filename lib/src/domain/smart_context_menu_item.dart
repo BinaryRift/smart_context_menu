@@ -217,13 +217,14 @@ final class SmartContextMenuItem {
   /// buttons, handle their own taps: the item is not triggered over them.
   final SmartContextMenuItemBuilder? customBuilder;
 
-  /// Builds the content of the placeholder after [asyncItem] has failed.
+  /// The item shown in place of this placeholder after [asyncItem] has
+  /// failed.
   ///
-  /// Tapping the placeholder retries loading. The padding of [loadingItem]
-  /// and the press highlight are still applied. If null, the placeholder
-  /// shows [SmartContextMenuLabels.retry] with error and retry icons.
-  /// Set by [SmartContextMenuItem.async].
-  final SmartContextMenuItemBuilder? errorBuilder;
+  /// Tapping it retries loading. Without its own [title] and [trailing], it
+  /// shows [SmartContextMenuLabels.retry] and
+  /// [SmartContextMenuDefaults.retryIcon]. Without its own [padding], it
+  /// keeps the padding of [loadingItem]. Set by [SmartContextMenuItem.async].
+  final SmartContextMenuErrorItem? errorItem;
 
   /// Whether the item shows a submenu chevron.
   @internal
@@ -259,7 +260,7 @@ final class SmartContextMenuItem {
     this.loadingTimeout,
     this.pagingMetadata,
     this.customBuilder,
-    this.errorBuilder,
+    this.errorItem,
     this.padding,
     this.childrenGap,
     this.closeOnTap = true,
@@ -507,17 +508,21 @@ final class SmartContextMenuItem {
   /// completes, the placeholder shows [loading], a
   /// [SmartContextMenuItem.loading]; by default its title is
   /// [SmartContextMenuLabels.loading]. If loading fails or takes longer than
-  /// [timeout], the placeholder turns into a retry item. The loaded item is
-  /// cached by [id] until the menu closes.
+  /// [timeout], the placeholder shows [error], a [SmartContextMenuItem.error],
+  /// and tapping it retries loading. The loaded item is cached by [id] until
+  /// the menu closes.
   ///
   /// [timeout] defaults to [SmartContextMenuDefaults.loadingTimeout].
   ///
-  /// Use [errorBuilder] to replace the default error content. The retry item
-  /// keeps the padding of [loading]; the loaded item uses its own.
+  /// Without its own title and trailing, [error] shows
+  /// [SmartContextMenuLabels.retry] and [SmartContextMenuDefaults.retryIcon].
+  /// Without its own padding, it keeps the padding of [loading]; the loaded
+  /// item uses its own.
   ///
   /// ```dart
   /// SmartContextMenuItem.async(
   ///   loading: SmartContextMenuItem.loading(title: 'Checking access'),
+  ///   error: SmartContextMenuItem.error(title: 'Could not check access'),
   ///   asyncItem: () async {
   ///     await Future<void>.delayed(const Duration(seconds: 1));
   ///     return SmartContextMenuItem.simple(
@@ -533,15 +538,15 @@ final class SmartContextMenuItem {
     String? id,
     Duration timeout = SmartContextMenuDefaults.loadingTimeout,
     SmartContextMenuLoadingItem? loading,
-    SmartContextMenuItemBuilder? errorBuilder,
+    SmartContextMenuErrorItem? error,
   }) {
     return SmartContextMenuItem._(
       id: id ?? _generateId(),
       asyncItem: asyncItem,
       loadingItem: loading ?? SmartContextMenuItem.loading(),
+      errorItem: error ?? SmartContextMenuItem.error(),
       loadingTimeout: timeout,
       closeOnTap: false,
-      errorBuilder: errorBuilder,
     );
   }
 
@@ -642,10 +647,11 @@ final class SmartContextMenuItem {
   /// this content; text and icons in it take the color of the item.
   /// Interactive widgets in [child], such as buttons, handle their own taps.
   ///
-  /// Return it from the builder of [SmartContextMenuItem.listenable] when
-  /// the state of the app has an error. To retry from the item, add
-  /// a button to [child], or return a [SmartContextMenuItem.simple] with
-  /// `onTap` instead.
+  /// Pass it as `error` to [SmartContextMenuItem.async]: tapping it there
+  /// retries loading, see [SmartContextMenuItem.async]. Anywhere else, for
+  /// example from the builder of [SmartContextMenuItem.listenable], it does
+  /// not respond to taps. To retry from it there, add a button to [child],
+  /// or return a [SmartContextMenuItem.simple] with `onTap` instead.
   ///
   /// ```dart
   /// SmartContextMenuItem.listenable(

@@ -29,7 +29,7 @@ void main() {
     expect(item.title, isNull);
     expect(item.asyncItem, isNull);
     expect(item.loadingTimeout, isNull);
-    expect(item.errorBuilder, isNull);
+    expect(item.errorItem, isNull);
     expect(item.showTransitionIcon, isFalse);
     expect(item.isInternalInteracted, isFalse);
   });

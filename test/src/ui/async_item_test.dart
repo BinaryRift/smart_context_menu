@@ -77,7 +77,9 @@ void main() {
     expect(find.text('Loaded'), findsOneWidget);
   });
 
-  testWidgets('shows the retry label when loading fails', (tester) async {
+  testWidgets('shows the retry label with the retry icon when loading fails', (
+    tester,
+  ) async {
     await tester.pumpMenu(
       items: [
         SmartContextMenuItem.async(
@@ -88,20 +90,48 @@ void main() {
     await tester.openMenu();
 
     expect(find.text(const SmartContextMenuLabels().retry), findsOneWidget);
+    expect(find.byIcon(SmartContextMenuDefaults.retryIcon), findsOneWidget);
+    expect(find.byIcon(SmartContextMenuDefaults.errorIcon), findsNothing);
   });
 
-  testWidgets('uses errorBuilder and retries on tap', (tester) async {
+  testWidgets('shows the title, leading and trailing of the error item', (
+    tester,
+  ) async {
+    await tester.pumpMenu(
+      items: [
+        SmartContextMenuItem.async(
+          error: SmartContextMenuItem.error(
+            title: 'Could not check',
+            leading: const Icon(CupertinoIcons.lock),
+            trailing: const Icon(CupertinoIcons.clock),
+          ),
+          asyncItem: () => Future.error(Exception('Failed')),
+        ),
+      ],
+    );
+    await tester.openMenu();
+
+    expect(find.text('Could not check'), findsOneWidget);
+    expect(find.byIcon(CupertinoIcons.lock), findsOneWidget);
+    expect(find.byIcon(CupertinoIcons.clock), findsOneWidget);
+    expect(find.text(const SmartContextMenuLabels().retry), findsNothing);
+    expect(find.byIcon(SmartContextMenuDefaults.retryIcon), findsNothing);
+  });
+
+  testWidgets('uses the child of the error item and retries on tap', (
+    tester,
+  ) async {
     var calls = 0;
 
     await tester.pumpMenu(
       items: [
         SmartContextMenuItem.async(
+          error: SmartContextMenuItem.error(child: const Text('Custom error')),
           asyncItem: () async {
             calls++;
             if (calls == 1) throw Exception('Failed');
             return loadedItem;
           },
-          errorBuilder: (context, state) => const Text('Custom error'),
         ),
       ],
     );
@@ -115,6 +145,47 @@ void main() {
 
     expect(calls, 2);
     expect(find.text('Custom error'), findsNothing);
+    expect(find.text('Loaded'), findsOneWidget);
+  });
+
+  testWidgets('lets a button in the child of the error item handle the tap', (
+    tester,
+  ) async {
+    var calls = 0;
+    var buttonTaps = 0;
+
+    await tester.pumpMenu(
+      items: [
+        SmartContextMenuItem.async(
+          error: SmartContextMenuItem.error(
+            child: Row(
+              children: [
+                const Expanded(child: Text('No access')),
+                CupertinoButton(
+                  onPressed: () => buttonTaps++,
+                  child: const Text('Settings'),
+                ),
+              ],
+            ),
+          ),
+          asyncItem: () async {
+            calls++;
+            if (calls == 1) throw Exception('Failed');
+            return loadedItem;
+          },
+        ),
+      ],
+    );
+    await tester.openMenu();
+
+    await tester.tap(find.text('Settings'));
+    await tester.settleMenu();
+    expect(buttonTaps, 1);
+    expect(calls, 1);
+
+    await tester.tap(find.text('No access'));
+    await tester.settleMenu();
+    expect(calls, 2);
     expect(find.text('Loaded'), findsOneWidget);
   });
 
@@ -178,6 +249,27 @@ void main() {
       items: [
         SmartContextMenuItem.async(
           loading: SmartContextMenuItem.loading(padding: padding),
+          asyncItem: () => Future.error(Exception('Failed')),
+        ),
+      ],
+    );
+    await tester.openMenu();
+
+    expect(tester.itemPaddingOf(const SmartContextMenuLabels().retry), padding);
+  });
+
+  testWidgets('uses the padding of the error item after a failure', (
+    tester,
+  ) async {
+    const padding = EdgeInsets.all(8);
+
+    await tester.pumpMenu(
+      items: [
+        SmartContextMenuItem.async(
+          loading: SmartContextMenuItem.loading(
+            padding: const EdgeInsets.all(24),
+          ),
+          error: SmartContextMenuItem.error(padding: padding),
           asyncItem: () => Future.error(Exception('Failed')),
         ),
       ],
