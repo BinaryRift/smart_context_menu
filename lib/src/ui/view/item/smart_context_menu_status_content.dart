@@ -67,13 +67,11 @@ final class SmartContextMenuStatusContent extends StatelessWidget {
       ),
     };
     return SmartContextMenuItemRow(
-      item: SmartContextMenuItem.simple(
-        title: item.title ?? title,
-        titleStyle: item.titleStyle,
-        leading: item.leading,
-        trailing: item.trailing ?? sign,
-        childrenGap: item.childrenGap,
-      ),
+      title: item.title ?? title,
+      titleStyle: item.titleStyle,
+      leading: item.leading,
+      trailing: item.trailing ?? sign,
+      childrenGap: item.childrenGap,
       style: style,
       foregroundColor: foregroundColor,
       titleAlign: style.statusTitleAlign,

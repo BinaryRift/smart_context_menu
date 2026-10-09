@@ -37,24 +37,38 @@ final class SmartContextMenuItemColors {
         Brightness.dark;
     final baseForeground =
         style.titleStyle.color ?? SmartContextMenuDefaults.foregroundColor;
-    final tintColor =
-        item.tintColor ?? (item.isDestructive ? style.destructiveColor : null);
+    final (
+      TextStyle? titleStyle,
+      bool isDisabled,
+      Color? tintColor,
+    ) = switch (item) {
+      SmartContextMenuContentItem() => (
+        item.titleStyle,
+        item.isDisabled,
+        item.tintColor ?? (item.isDestructive ? style.destructiveColor : null),
+      ),
+      SmartContextMenuStatusItem() => (item.titleStyle, false, null),
+      // Shown through the item they load or build, or without colors.
+      SmartContextMenuAsyncItem() ||
+      SmartContextMenuListenableItem() ||
+      SmartContextMenuSeparatorItem() => (null, false, null),
+    };
 
     final Color foreground;
     if (tintColor != null) {
       foreground = resolve(tintColor).withValues(
-        alpha: item.isDisabled
+        alpha: isDisabled
             ? SmartContextMenuDefaults.tintDisabledForegroundOpacity
             : 1,
       );
-    } else if (item.isDisabled) {
+    } else if (isDisabled) {
       foreground = resolve(style.disabledForegroundColor);
     } else {
-      foreground = resolve(item.titleStyle?.color ?? baseForeground);
+      foreground = resolve(titleStyle?.color ?? baseForeground);
     }
 
     final Color overlay;
-    if (item.isDisabled) {
+    if (isDisabled) {
       final disabledBackgroundColor = style.disabledBackgroundColor;
       overlay = disabledBackgroundColor == null
           ? const Color(0x00000000)

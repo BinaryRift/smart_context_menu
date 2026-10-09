@@ -8,7 +8,7 @@ typedef PagingData = (
 
 final class SmartContextMenuCache {
   /// Resolved items of [SmartContextMenuItem.async].
-  final Map<String, SmartContextMenuItem> resolvedItems = {};
+  final Map<String, SmartContextMenuAsyncResult> resolvedItems = {};
 
   /// Fully loaded submenu lists (`asyncChildren`).
   final Map<String, List<SmartContextMenuItem>> submenus = {};

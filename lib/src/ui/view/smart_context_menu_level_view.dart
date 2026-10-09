@@ -165,7 +165,7 @@ final class SmartContextMenuLevelView extends StatelessWidget {
     final items = level.items;
     if (!config.style.dividersBetweenItems ||
         items.isEmpty ||
-        items.last.isSeparator) {
+        items.last is SmartContextMenuSeparatorItem) {
       return row;
     }
     return Column(
@@ -198,7 +198,8 @@ final class SmartContextMenuLevelView extends StatelessWidget {
     }
 
     final item = level.items[relativeIndex];
-    if (item.isSeparator && !_showsSeparatorAt(relativeIndex)) {
+    if (item is SmartContextMenuSeparatorItem &&
+        !_showsSeparatorAt(relativeIndex)) {
       return const SizedBox.shrink();
     }
 
@@ -221,21 +222,29 @@ final class SmartContextMenuLevelView extends StatelessWidget {
   static bool _needsDividerBetween(
     SmartContextMenuItem item,
     SmartContextMenuItem next,
-  ) => !item.isSeparator && !next.isSeparator;
+  ) =>
+      item is! SmartContextMenuSeparatorItem &&
+      next is! SmartContextMenuSeparatorItem;
 
   // A separator is shown only between items: not at the start or the end
   // of the level, and only the first one of several in a row. Items shown
   // on condition can keep their separators without extra checks.
   bool _showsSeparatorAt(int index) {
     final items = level.items;
-    if (index > 0 && items[index - 1].isSeparator) return false;
-    final hasItemBefore = items.take(index).any((item) => !item.isSeparator);
-    final hasItemAfter = items.skip(index + 1).any((item) => !item.isSeparator);
+    if (index > 0 && items[index - 1] is SmartContextMenuSeparatorItem) {
+      return false;
+    }
+    final hasItemBefore = items
+        .take(index)
+        .any((item) => item is! SmartContextMenuSeparatorItem);
+    final hasItemAfter = items
+        .skip(index + 1)
+        .any((item) => item is! SmartContextMenuSeparatorItem);
     return hasItemBefore && hasItemAfter;
   }
 
   Widget _buildItemView(SmartContextMenuItem item) {
-    if (item.asyncItem != null) {
+    if (item is SmartContextMenuAsyncItem) {
       final parentId = item.id;
       return SmartContextMenuItemView.async(
         key: ValueKey(item.id),

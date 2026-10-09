@@ -3,7 +3,6 @@ import 'package:flutter/services.dart' show HapticFeedback;
 import 'package:flutter/widgets.dart';
 
 import '../../../core/ui/motion/tokens/motion_durations.dart';
-import '../../../core/ui/styles/smart_context_menu_defaults.dart';
 import '../../../core/ui/motion/transitions/tricky_transition.dart';
 import '../../../domain/smart_context_menu_config.dart';
 import '../../../domain/smart_context_menu_item.dart';
@@ -19,8 +18,8 @@ import 'smart_context_menu_status_content.dart';
 final class SmartContextMenuItemView extends StatefulWidget {
   final SmartContextMenuItem item;
   final SmartContextMenuConfig config;
-  final SmartContextMenuItem? cachedItem;
-  final void Function(SmartContextMenuItem item)? onLoaded;
+  final SmartContextMenuAsyncResult? cachedItem;
+  final void Function(SmartContextMenuAsyncResult item)? onLoaded;
   final VoidCallback? onRetry;
   final ValueChanged<SmartContextMenuItem>? onTap;
   final SmartContextMenuHoverController? hoverController;
@@ -63,16 +62,32 @@ final class SmartContextMenuItemView extends StatefulWidget {
 final class _SmartContextMenuItemViewState
     extends State<SmartContextMenuItemView> {
   bool _isHighlight = false;
-  SmartContextMenuItem? _resolvedItem;
+
+  /// The item loaded by an async item or built by a listenable item.
+  SmartContextMenuAsyncResult? _resolvedItem;
   Object? _error;
   bool get _isStatus => _error == null && _item is SmartContextMenuStatusItem;
-  bool get _isDisabled => _item.isDisabled || _isStatus || !_hasInteractions;
+  bool get _isDisabled =>
+      _isStatus ||
+      !_hasInteractions ||
+      switch (_item) {
+        SmartContextMenuContentItem(:final isDisabled) => isDisabled,
+        _ => false,
+      };
   bool get _hasInteractions =>
-      _item.onTap != null ||
-      _item.isInternalInteracted ||
-      _item.closeOnTap ||
       widget.onRetry != null ||
-      widget.onTap != null;
+      widget.onTap != null ||
+      switch (_item) {
+        SmartContextMenuSimpleItem(:final onTap, :final closeOnTap) =>
+          onTap != null || closeOnTap,
+        SmartContextMenuSubmenuItem() ||
+        SmartContextMenuAsyncSubmenuItem() ||
+        SmartContextMenuPagingSubmenuItem() ||
+        SmartContextMenuAsyncItem() => true,
+        SmartContextMenuListenableItem() ||
+        SmartContextMenuStatusItem() ||
+        SmartContextMenuSeparatorItem() => false,
+      };
   SmartContextMenuItem get _item => _resolvedItem ?? widget.item;
   SmartContextMenuConfig get _config => widget.config;
   SmartContextMenuStyle get _style => widget.config.style;
@@ -80,9 +95,22 @@ final class _SmartContextMenuItemViewState
   // A failed load keeps the padding of the loading item, so the item does
   // not change its size.
   EdgeInsetsGeometry get _padding =>
-      _item.padding ??
-      (_error != null ? widget.item.loadingItem?.padding : null) ??
+      switch (_item) {
+        SmartContextMenuContentItem(:final padding) ||
+        SmartContextMenuStatusItem(:final padding) => padding,
+        _ => null,
+      } ??
+      switch (widget.item) {
+        SmartContextMenuAsyncItem(:final loading) when _error != null =>
+          loading.padding,
+        _ => null,
+      } ??
       _style.itemPadding;
+
+  static Listenable? _listenableOf(SmartContextMenuItem item) => switch (item) {
+    SmartContextMenuListenableItem(:final listenable) => listenable,
+    _ => null,
+  };
 
   @override
   void initState() {
@@ -92,28 +120,32 @@ final class _SmartContextMenuItemViewState
       _error = "External error";
     }
 
-    if (widget.item.asyncItem != null) {
-      if (widget.cachedItem != null) {
-        _resolvedItem = widget.cachedItem;
-      } else {
-        _loadAsyncData();
-      }
-    }
-
-    if (widget.item.listenableBuilder != null) {
-      widget.item.listenable?.addListener(_onListenableChanged);
-      _buildListenableItem();
+    switch (widget.item) {
+      case SmartContextMenuAsyncItem item:
+        if (widget.cachedItem case final cachedItem?) {
+          _resolvedItem = cachedItem;
+        } else {
+          _loadAsyncData(item);
+        }
+      case SmartContextMenuListenableItem item:
+        item.listenable.addListener(_onListenableChanged);
+        _buildListenableItem(item);
+      default:
     }
   }
 
   @override
   void didUpdateWidget(SmartContextMenuItemView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.item.listenable != oldWidget.item.listenable) {
-      oldWidget.item.listenable?.removeListener(_onListenableChanged);
-      widget.item.listenable?.addListener(_onListenableChanged);
+    final listenable = _listenableOf(widget.item);
+    final oldListenable = _listenableOf(oldWidget.item);
+    if (listenable != oldListenable) {
+      oldListenable?.removeListener(_onListenableChanged);
+      listenable?.addListener(_onListenableChanged);
     }
-    if (widget.item.listenableBuilder != null) _buildListenableItem();
+    if (widget.item case SmartContextMenuListenableItem item) {
+      _buildListenableItem(item);
+    }
   }
 
   @override
@@ -126,12 +158,17 @@ final class _SmartContextMenuItemViewState
   @override
   void dispose() {
     widget.hoverController?.removeListener(_handleGlobalPointer);
-    widget.item.listenable?.removeListener(_onListenableChanged);
+    _listenableOf(widget.item)?.removeListener(_onListenableChanged);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // Without MetaData, drag-to-select does not find the separator.
+    if (_item case SmartContextMenuSeparatorItem item) {
+      return _buildSeparator(item);
+    }
+
     final colors = SmartContextMenuItemColors.resolve(
       context,
       item: _item,
@@ -139,15 +176,16 @@ final class _SmartContextMenuItemViewState
       isPressed: _isHighlight,
       isBack: widget.key == ServiceItemKey.back,
     );
+    final (isDisabled, isDestructive) = switch (_item) {
+      SmartContextMenuContentItem item => (item.isDisabled, item.isDestructive),
+      _ => (false, false),
+    };
     final itemState = SmartContextMenuItemState(
       isPressed: _isHighlight,
-      isDisabled: _item.isDisabled,
-      isDestructive: _item.isDestructive,
+      isDisabled: isDisabled,
+      isDestructive: isDestructive,
       foregroundColor: colors.foreground,
     );
-
-    // Without MetaData, drag-to-select does not find the separator.
-    if (_item.isSeparator) return _buildSeparator(itemState);
 
     return MetaData(
       metaData: widget.key,
@@ -166,19 +204,17 @@ final class _SmartContextMenuItemViewState
     );
   }
 
-  Widget _buildSeparator(SmartContextMenuItemState state) {
-    final customBuilder = _item.customBuilder;
-    if (customBuilder != null) return customBuilder(context, state);
-
-    return Container(
-      height: _style.separatorHeight,
-      color: CupertinoDynamicColor.resolve(_style.separatorColor, context),
-    );
+  Widget _buildSeparator(SmartContextMenuSeparatorItem item) {
+    return item.child ??
+        Container(
+          height: _style.separatorHeight,
+          color: CupertinoDynamicColor.resolve(_style.separatorColor, context),
+        );
   }
 
   Widget _buildContent(SmartContextMenuItemState state) {
-    if (_item case final SmartContextMenuStatusItem item) {
-      return SmartContextMenuStatusContent(
+    return switch (_item) {
+      SmartContextMenuStatusItem item => SmartContextMenuStatusContent(
         key: switch (item) {
           SmartContextMenuLoadingItem() => ItemContentKey.loading,
           SmartContextMenuErrorItem() => ItemContentKey.error,
@@ -189,41 +225,47 @@ final class _SmartContextMenuItemViewState
         foregroundColor: state.foregroundColor,
         // The menu retries the failed load on tap.
         retries: _error != null,
-      );
-    }
-
-    return KeyedSubtree(
-      key: ItemContentKey.content,
-      child:
-          _item.customBuilder?.call(context, state) ??
-          SmartContextMenuItemRow(
-            item: _item,
-            style: _style,
-            foregroundColor: state.foregroundColor,
-          ),
-    );
+      ),
+      SmartContextMenuContentItem item => KeyedSubtree(
+        key: ItemContentKey.content,
+        child:
+            item.customBuilder?.call(context, state) ??
+            SmartContextMenuItemRow.content(
+              item: item,
+              style: _style,
+              foregroundColor: state.foregroundColor,
+            ),
+      ),
+      // Async and listenable items show the item they load or build, and
+      // a separator is built without the item frame.
+      SmartContextMenuAsyncItem() ||
+      SmartContextMenuListenableItem() ||
+      SmartContextMenuSeparatorItem() => const SizedBox.shrink(),
+    };
   }
 
   void _handleTap() {
     if (_isStatus) return;
     if (_error != null) {
-      widget.onRetry != null ? widget.onRetry!() : _loadAsyncData();
+      if (widget.onRetry case final onRetry?) {
+        onRetry();
+      } else if (widget.item case SmartContextMenuAsyncItem item) {
+        _loadAsyncData(item);
+      }
       return;
     }
-    if (_item.isDisabled) return;
+    if (_item case SmartContextMenuContentItem(isDisabled: true)) return;
     widget.onTap?.call(_item);
   }
 
-  Future<void> _loadAsyncData() async {
+  Future<void> _loadAsyncData(SmartContextMenuAsyncItem item) async {
     setState(() {
-      _resolvedItem = widget.item.loadingItem;
+      _resolvedItem = item.loading;
       _error = null;
     });
 
     try {
-      final Duration timeout =
-          widget.item.loadingTimeout ?? SmartContextMenuDefaults.loadingTimeout;
-      final result = await widget.item.asyncItem!().timeout(timeout);
+      final result = await item.asyncItem().timeout(item.timeout);
 
       if (mounted) {
         widget.onLoaded?.call(result);
@@ -235,25 +277,20 @@ final class _SmartContextMenuItemViewState
       if (mounted) {
         setState(() {
           _error = e;
-          _resolvedItem = widget.item.errorItem;
+          _resolvedItem = item.error;
         });
       }
     }
   }
 
-  void _onListenableChanged() => setState(_buildListenableItem);
+  void _onListenableChanged() {
+    if (widget.item case SmartContextMenuListenableItem item) {
+      setState(() => _buildListenableItem(item));
+    }
+  }
 
-  void _buildListenableItem() {
-    final item = widget.item.listenableBuilder!();
-    assert(
-      !(item.isSeparator ||
-          item.isInternalInteracted ||
-          item.listenableBuilder != null),
-      'The builder of SmartContextMenuItem.listenable must return '
-      'a SmartContextMenuItem.simple, a SmartContextMenuItem.loading, '
-      'a SmartContextMenuItem.error or a SmartContextMenuItem.empty.',
-    );
-    _resolvedItem = item;
+  void _buildListenableItem(SmartContextMenuListenableItem item) {
+    _resolvedItem = item.builder();
     _isHighlight = widget.hoverController?.value == widget.key && !_isDisabled;
   }
 
