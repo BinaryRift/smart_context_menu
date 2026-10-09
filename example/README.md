@@ -78,10 +78,13 @@ one `SmartContextMenuTheme` above the app (`lib/main.dart`).
 
 Basic menus on files in a grid and a list ([files_page.dart](lib/pages/files/ui/files_page.dart)).
 
-- The grid shows where the menu goes for a widget on the left, in the middle and on the right.
+- The grid shows where the menu goes for a widget on the left, in the middle and on the right;
+  it fits as many files in a row as the width allows.
 - `Open` and a tap on the preview open the file: an item can open a page.
 - `Share` is a submenu with `Messages` inside that loads the contacts; `Move to` loads the folders.
 - `Add to Favorites` is a listenable item: it shows saving and then the new title without closing the menu.
+- `Download` is a listenable item too: it shows the progress in the open menu, and the download
+  keeps running after the menu closes.
 - `Rename` is disabled in read-only files; `Delete` is destructive, after a separator.
 - The `⋯` button in a row opens the same menu from code with `SmartContextMenuController`.
 
