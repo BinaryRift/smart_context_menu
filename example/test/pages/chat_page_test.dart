@@ -1,0 +1,112 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:smart_context_menu_example/core/data/demo_loader.dart';
+import 'package:smart_context_menu_example/core/ui/reactions_bar.dart';
+import 'package:smart_context_menu_example/pages/chat/domain/demo_chat.dart';
+import 'package:smart_context_menu_example/pages/detail/ui/detail_page.dart';
+import 'package:smart_context_menu_example/resources/assets/app_images.dart';
+
+import '../helpers/menu_tester.dart';
+
+void main() {
+  final myMessage = find.text('I am in. I will bring snacks for everyone');
+
+  Finder photo(AppImage image) => find.byWidgetPredicate(
+    (widget) =>
+        widget is Image &&
+        widget.image is AssetImage &&
+        (widget.image as AssetImage).assetName == image.path,
+  );
+
+  Future<void> openChat(WidgetTester tester) async {
+    await tester.pumpPhoneApp();
+    await tester.tap(find.text('Chat'));
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('a message opens its menu with the reactions above it', (
+    tester,
+  ) async {
+    await openChat(tester);
+
+    await tester.openMenu(myMessage);
+
+    expect(find.byType(ReactionsBar), findsOneWidget);
+    expect(find.text('Reply'), findsOneWidget);
+    expect(find.text('Copy'), findsOneWidget);
+    // Lets the Seen by item finish loading.
+    await tester.pump(demoLoadDelay);
+  });
+
+  testWidgets('a reaction closes the menu and shows under the message', (
+    tester,
+  ) async {
+    await openChat(tester);
+    await tester.openMenu(myMessage);
+
+    await tester.tap(find.text('❤️'));
+    await tester.settleMenu();
+
+    expect(find.byType(ReactionsBar), findsNothing);
+    expect(find.text('❤️ 1'), findsOneWidget);
+  });
+
+  testWidgets('Seen by turns into a submenu once loaded', (tester) async {
+    await openChat(tester);
+    await tester.openMenu(myMessage);
+    expect(find.text('Seen by'), findsOneWidget);
+
+    await tester.pump(demoLoadDelay);
+    await tester.settleMenu();
+    await tester.tap(find.text('Seen by ${readers.length}'));
+    await tester.settleMenu();
+
+    expect(find.text(readers.last), findsOneWidget);
+  });
+
+  testWidgets('Pin pins the message without closing the menu', (tester) async {
+    await openChat(tester);
+    await tester.openMenu(myMessage);
+
+    await tester.tap(find.text('Pin'));
+    await tester.pump();
+
+    expect(find.text('Unpin'), findsOneWidget);
+    expect(find.byIcon(CupertinoIcons.pin_fill), findsOneWidget);
+    // Lets the Seen by item finish loading.
+    await tester.pump(demoLoadDelay);
+  });
+
+  testWidgets('Reactions lists the people who reacted', (tester) async {
+    await openChat(tester);
+    final lake = photo(AppImages.lake);
+    await tester.dragUntilVisible(
+      lake,
+      find.byType(ListView),
+      const Offset(0, 300),
+    );
+    await tester.pumpAndSettle();
+    await tester.openMenu(lake);
+
+    await tester.tap(find.text('Reactions: 240'));
+    await tester.pump(demoLoadDelay);
+    await tester.settleMenu();
+
+    expect(find.text(personName(0)), findsOneWidget);
+  });
+
+  testWidgets('a tap on a photo opens it', (tester) async {
+    await openChat(tester);
+    await tester.openMenu(photo(AppImages.waterfall));
+    // The route ignores pointers until its transition ends.
+    await tester.settleMenu();
+
+    // The photo is a RawImage too; the preview is above the page.
+    await tester.tap(find.byType(RawImage).last);
+    await tester.settleMenu();
+    await tester.pumpAndSettle();
+
+    expect(find.byType(DetailPage), findsOneWidget);
+    expect(find.byType(InteractiveViewer), findsOneWidget);
+  });
+}
