@@ -1,6 +1,16 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:smart_context_menu_example/main.dart';
 
 extension MenuTester on WidgetTester {
+  /// Pumps the app on a phone-sized screen.
+  Future<void> pumpPhoneApp() async {
+    view.physicalSize = const Size(1170, 2532);
+    view.devicePixelRatio = 3;
+    addTearDown(view.reset);
+    await pumpWidget(const ExampleApp());
+  }
+
   /// Long-presses [target] and waits until its menu is open.
   Future<void> openMenu(Finder target) async {
     await longPress(target);
