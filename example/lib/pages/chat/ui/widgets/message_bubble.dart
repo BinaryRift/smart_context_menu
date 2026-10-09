@@ -36,24 +36,25 @@ final class MessageBubble extends StatelessWidget {
     }
 
     final isMine = message.isMine;
-    return Container(
-      constraints: BoxConstraints(
-        maxWidth: MediaQuery.sizeOf(context).width * 0.75,
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: CupertinoDynamicColor.resolve(
-          isMine ? ChatColors.myBubble : ChatColors.bubble,
-          context,
+    // At most three quarters of the width of the chat.
+    return LayoutBuilder(
+      builder: (context, constraints) => Container(
+        constraints: BoxConstraints(maxWidth: constraints.maxWidth * 0.75),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: CupertinoDynamicColor.resolve(
+            isMine ? ChatColors.myBubble : ChatColors.bubble,
+            context,
+          ),
+          borderRadius: borderRadius,
         ),
-        borderRadius: borderRadius,
-      ),
-      child: Text(
-        message.text!,
-        style: TextStyle(
-          color: isMine
-              ? CupertinoColors.white
-              : CupertinoDynamicColor.resolve(CupertinoColors.label, context),
+        child: Text(
+          message.text!,
+          style: TextStyle(
+            color: isMine
+                ? CupertinoColors.white
+                : CupertinoDynamicColor.resolve(CupertinoColors.label, context),
+          ),
         ),
       ),
     );

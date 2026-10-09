@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu_example/core/data/demo_loader.dart';
 import 'package:smart_context_menu_example/core/ui/reactions_bar.dart';
+import 'package:smart_context_menu_example/main.dart';
 import 'package:smart_context_menu_example/pages/chat/domain/demo_chat.dart';
 import 'package:smart_context_menu_example/pages/detail/ui/detail_page.dart';
 import 'package:smart_context_menu_example/resources/assets/app_images.dart';
@@ -155,5 +156,16 @@ void main() {
 
     expect(find.byType(DetailPage), findsOneWidget);
     expect(find.byType(InteractiveViewer), findsOneWidget);
+  });
+
+  testWidgets('on a tablet the chat is not wider than 640', (tester) async {
+    tester.view.physicalSize = const Size(2048, 2732);
+    tester.view.devicePixelRatio = 2;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(const ExampleApp());
+    await tester.tap(find.text('Chat'));
+    await tester.pumpAndSettle();
+
+    expect(tester.getSize(find.byType(ListView)).width, 640);
   });
 }

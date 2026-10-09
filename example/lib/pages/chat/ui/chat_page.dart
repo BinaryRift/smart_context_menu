@@ -17,6 +17,9 @@ import 'widgets/message_footer.dart';
 
 const _reactionsPageSize = 20;
 
+/// The widest the messages and the input field get, on a tablet.
+const _maxChatWidth = 640.0;
+
 /// A group chat with messages of different sizes on both sides.
 ///
 /// Each message has a reactions bar above it and a menu below it; the menu
@@ -70,27 +73,36 @@ final class _ChatPageState extends State<ChatPage> {
         trailing: SettingsButton(),
       ),
       child: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: ListenableBuilder(
-                listenable: _chat,
-                builder: (context, _) => ListView.builder(
-                  // Starts at the newest message, at the bottom.
-                  reverse: true,
-                  padding: const EdgeInsets.all(12),
-                  itemCount: _chat.messages.length,
-                  itemBuilder: (context, index) {
-                    final messages = _chat.messages;
-                    return _buildMessage(messages[messages.length - 1 - index]);
-                  },
-                ),
-              ),
-            ),
-            const ChatInputBar(),
-          ],
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: _maxChatWidth),
+            child: _buildChat(),
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildChat() {
+    return Column(
+      children: [
+        Expanded(
+          child: ListenableBuilder(
+            listenable: _chat,
+            builder: (context, _) => ListView.builder(
+              // Starts at the newest message, at the bottom.
+              reverse: true,
+              padding: const EdgeInsets.all(12),
+              itemCount: _chat.messages.length,
+              itemBuilder: (context, index) {
+                final messages = _chat.messages;
+                return _buildMessage(messages[messages.length - 1 - index]);
+              },
+            ),
+          ),
+        ),
+        const ChatInputBar(),
+      ],
     );
   }
 
