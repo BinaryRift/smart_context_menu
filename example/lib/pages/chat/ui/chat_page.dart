@@ -20,7 +20,8 @@ const _reactionsPageSize = 20;
 
 /// A group chat with messages of different sizes on both sides.
 ///
-/// Each message has a reactions bar above it and a menu below it.
+/// Each message has a reactions bar above it and a menu below it; the menu
+/// opens on a long press of the message or a double tap next to it.
 /// A tall photo and its menu do not fit on the screen and scroll together;
 /// the last message is near the bottom edge, so the menu moves it up.
 final class ChatPage extends StatefulWidget {
@@ -34,14 +35,35 @@ final class _ChatPageState extends State<ChatPage> {
   final _chat = Chat();
   final _loader = DemoLoader();
 
+  /// Open the menus of the messages on a double tap next to them.
+  late final _messageMenus = {
+    for (final message in _chat.messages) message: SmartContextMenuController(),
+  };
+
   @override
   void dispose() {
     _chat.dispose();
+    for (final controller in _messageMenus.values) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = SmartContextMenuTheme.of(context);
+
+    // The menus of the chat: loading items line up their titles
+    // with the titles of the other items.
+    return SmartContextMenuTheme(
+      config: theme.copyWith(
+        style: theme.style.copyWith(statusTitleAlign: TextAlign.start),
+      ),
+      child: _buildPage(),
+    );
+  }
+
+  Widget _buildPage() {
     return CupertinoPageScaffold(
       backgroundColor: ChatColors.background,
       navigationBar: const CupertinoNavigationBar(
@@ -74,6 +96,30 @@ final class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _buildMessage(ChatMessage message) {
+    final menu = _messageMenus[message]!;
+
+    return Stack(
+      children: [
+        // The empty space next to the message, under it in the stack:
+        // a tap on the message itself does not reach it.
+        Positioned.fill(
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onDoubleTap: menu.open,
+          ),
+        ),
+        SizedBox(
+          width: double.infinity,
+          child: _buildMessageContent(message, menu),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMessageContent(
+    ChatMessage message,
+    SmartContextMenuController menu,
+  ) {
     final image = message.image;
     final secondaryLabel = CupertinoDynamicColor.resolve(
       CupertinoColors.secondaryLabel,
@@ -96,6 +142,7 @@ final class _ChatPageState extends State<ChatPage> {
               ),
             ),
           SmartContextMenu(
+            controller: menu,
             items: _menuItems(message),
             headerSliversBuilder: _reactionsBar(message),
             onPreviewTap: image == null ? null : () => _openPhoto(image),
@@ -182,7 +229,8 @@ final class _ChatPageState extends State<ChatPage> {
   SmartContextMenuItem _reactionsItem(ChatMessage message) {
     final count = message.reactionCount;
     return SmartContextMenuItem.pagingSubmenu(
-      title: 'Reactions: $count',
+      title: 'Reactions',
+      trailing: _count(count),
       leading: const Icon(CupertinoIcons.smiley),
       initialMetadata: const SmartContextMenuPagingMetadata(
         limit: _reactionsPageSize,
@@ -209,15 +257,32 @@ final class _ChatPageState extends State<ChatPage> {
   /// An async item that turns into a submenu once loaded.
   SmartContextMenuItem _seenByItem() {
     return SmartContextMenuItem.async(
-      loading: SmartContextMenuItem.loading(title: 'Seen by'),
+      loading: SmartContextMenuItem.loading(
+        title: 'Seen by',
+        leading: const Icon(CupertinoIcons.eye),
+      ),
       asyncItem: () async {
         await _loader.load('Seen by');
         return SmartContextMenuItem.submenu(
-          title: 'Seen by ${readers.length}',
+          title: 'Seen by',
+          trailing: _count(readers.length),
           leading: const Icon(CupertinoIcons.eye),
           children: [for (final reader in readers) _action(reader, null)],
         );
       },
+    );
+  }
+
+  /// A count before the chevron of a submenu, as in the menus of iOS.
+  Widget _count(int count) {
+    return Text(
+      '$count',
+      style: TextStyle(
+        color: CupertinoDynamicColor.resolve(
+          CupertinoColors.secondaryLabel,
+          context,
+        ),
+      ),
     );
   }
 

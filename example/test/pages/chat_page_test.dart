@@ -24,6 +24,40 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  Future<void> doubleTapAt(WidgetTester tester, Offset position) async {
+    await tester.tapAt(position);
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.tapAt(position);
+    await tester.settleMenu();
+  }
+
+  testWidgets('a double tap left of a message of the user opens its menu', (
+    tester,
+  ) async {
+    await openChat(tester);
+
+    final message = tester.getRect(myMessage);
+    await doubleTapAt(tester, Offset(20, message.center.dy));
+
+    expect(find.text('Reply'), findsOneWidget);
+    expect(find.text('Copy'), findsOneWidget);
+    // Lets the Seen by item finish loading.
+    await tester.pump(demoLoadDelay);
+  });
+
+  testWidgets('a double tap right of an incoming photo opens its menu', (
+    tester,
+  ) async {
+    await openChat(tester);
+
+    final photoRect = tester.getRect(photo(AppImages.waterfall));
+    final screenWidth =
+        tester.view.physicalSize.width / tester.view.devicePixelRatio;
+    await doubleTapAt(tester, Offset(screenWidth - 20, photoRect.center.dy));
+
+    expect(find.text('Save'), findsOneWidget);
+  });
+
   testWidgets('a message opens its menu with the reactions above it', (
     tester,
   ) async {
@@ -55,10 +89,12 @@ void main() {
     await openChat(tester);
     await tester.openMenu(myMessage);
     expect(find.text('Seen by'), findsOneWidget);
+    expect(find.byIcon(CupertinoIcons.eye), findsOneWidget);
 
     await tester.pump(demoLoadDelay);
     await tester.settleMenu();
-    await tester.tap(find.text('Seen by ${readers.length}'));
+    expect(find.text('${readers.length}'), findsOneWidget);
+    await tester.tap(find.text('Seen by'));
     await tester.settleMenu();
 
     expect(find.text(readers.last), findsOneWidget);
@@ -88,7 +124,8 @@ void main() {
     await tester.pumpAndSettle();
     await tester.openMenu(lake);
 
-    await tester.tap(find.text('Reactions: 240'));
+    expect(find.text('240'), findsOneWidget);
+    await tester.tap(find.text('Reactions'));
     await tester.pump(demoLoadDelay);
     await tester.settleMenu();
 
