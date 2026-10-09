@@ -222,4 +222,49 @@ void main() {
     await tester.settleMenu();
     expect(itemTaps, 1);
   });
+
+  testWidgets('does not scroll the content that does not fit on the screen', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final taps = <String>[];
+
+    await tester.pumpWidget(
+      CupertinoApp(
+        home: Center(
+          child: SmartContextMenu(
+            items: [
+              for (final title in ['First', 'Second', 'Third'])
+                SmartContextMenuItem.simple(
+                  title: title,
+                  onTap: () => taps.add(title),
+                ),
+            ],
+            child: const SizedBox(height: 700, child: Text(menuTargetText)),
+          ),
+        ),
+      ),
+    );
+    await tester.openMenu();
+    final content = tester.state<ScrollableState>(
+      find.byType(Scrollable).first,
+    );
+    final offset = content.position.pixels;
+    expect(content.position.maxScrollExtent, greaterThan(0));
+
+    final from = tester.getCenter(find.text('First'));
+    final to = tester.getCenter(find.text('Third'));
+    final gesture = await tester.startGesture(from);
+    for (var step = 1; step <= 10; step++) {
+      await gesture.moveTo(Offset.lerp(from, to, step / 10)!);
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    expect(content.position.pixels, offset);
+
+    await gesture.up();
+    await tester.settleMenu();
+    expect(taps, ['Third']);
+  });
 }

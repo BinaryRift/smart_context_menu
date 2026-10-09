@@ -227,7 +227,6 @@ final class _SmartContextMenuOverlayState
       keyOf: _headerKeyOf,
     ).build(context);
 
-    // Forget the heights of the slivers the builder no longer returns.
     if (_headerExtents.length > slivers.length) {
       _headerExtents.length = slivers.length;
       _verticalLayout.headerExtent = _totalHeaderExtent();
@@ -246,7 +245,7 @@ final class _SmartContextMenuOverlayState
           child: Padding(
             padding: _horizontalLayout.menuPadding,
             child: GestureDetector(
-              onPanStart: (_) => (),
+              onVerticalDragStart: (_) {},
               child: SmartContextMenuView(
                 key: _menuKey,
                 config: _config,
