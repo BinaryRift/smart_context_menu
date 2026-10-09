@@ -71,9 +71,11 @@ void main() {
       String title, {
       bool isDisabled = false,
       bool isDestructive = false,
+      bool closeOnTap = true,
     }) => SmartContextMenuItem.simple(
       isDisabled: isDisabled,
       isDestructive: isDestructive,
+      closeOnTap: closeOnTap,
       customBuilder: (context, state) {
         states[title] = state;
         return Text(title);
@@ -136,6 +138,21 @@ void main() {
 
       final gesture = await tester.pressAt(find.text('Copy'));
       expect(states['Copy']!.isPressed, isFalse);
+
+      await tester.releaseOutside(gesture);
+    });
+
+    testWidgets('is never pressed on an item without an action', (
+      tester,
+    ) async {
+      // No onTap and closeOnTap off: a tap does nothing, for example on
+      // a row of buttons that handle their own taps.
+      await tester.pumpMenu(items: [item('Colors', closeOnTap: false)]);
+      await tester.openMenu();
+
+      final gesture = await tester.pressAt(find.text('Colors'));
+      expect(states['Colors']!.isPressed, isFalse);
+      expect(states['Colors']!.isDisabled, isFalse);
 
       await tester.releaseOutside(gesture);
     });

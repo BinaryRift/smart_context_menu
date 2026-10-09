@@ -47,6 +47,7 @@ final class SmartContextMenuBackItem extends StatelessWidget {
       config: config,
       hoverController: hoverController,
       item: SmartContextMenuItem.simple(
+        onTap: onTap,
         closeOnTap: false,
         title: config.labels.back,
         titleStyle: style.titleStyle

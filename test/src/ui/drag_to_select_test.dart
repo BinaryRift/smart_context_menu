@@ -31,7 +31,11 @@ void main() {
     await tester.pumpMenu(
       items: [
         for (final title in ['First', 'Second'])
-          SmartContextMenuItem.simple(title: title, closeOnTap: false),
+          SmartContextMenuItem.simple(
+            title: title,
+            closeOnTap: false,
+            onTap: () {},
+          ),
       ],
     );
     await tester.openMenu();

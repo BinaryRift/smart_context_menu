@@ -74,9 +74,12 @@ final class _SmartContextMenuItemViewState
         SmartContextMenuContentItem(:final isDisabled) => isDisabled,
         _ => false,
       };
+
+  /// Whether the item does something on tap: a failed load retries, other
+  /// items act by their kind. [widget.onTap] does not count: the menu passes
+  /// it to every item to run their actions.
   bool get _hasInteractions =>
-      widget.onRetry != null ||
-      widget.onTap != null ||
+      _error != null ||
       switch (_item) {
         SmartContextMenuSimpleItem(:final onTap, :final closeOnTap) =>
           onTap != null || closeOnTap,
