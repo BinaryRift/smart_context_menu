@@ -147,7 +147,7 @@ headerSliversBuilder: (context, header) => [
 ```
 
 If the widget and the menu do not fit on the screen and the content scrolls as the menu
-opens, the slivers appear once the widget is in place, and hide at once when the menu
+opens, the slivers appear once the widget is nearly in place, and hide at once when the menu
 closes while the content is scrolled. The widget moves above everything as the menu opens
 and closes, so it would cover a pinned sliver otherwise.
 

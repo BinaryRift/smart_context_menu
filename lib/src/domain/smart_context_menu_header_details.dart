@@ -42,8 +42,8 @@ final class SmartContextMenuHeaderDetails {
   ///
   /// The slivers appear with the menu, or later with
   /// [SmartContextMenu.headerSliversDelay]. If the content scrolls as the
-  /// menu opens, they appear once the preview is in place. They hide with
-  /// the menu, or at once if the content is scrolled when it closes.
+  /// menu opens, they appear once the preview is nearly in place. They hide
+  /// with the menu, or at once if the content is scrolled when it closes.
   ///
   /// Use it to animate the slivers with the menu, for example to scale
   /// a reactions bar from the edge of the preview:

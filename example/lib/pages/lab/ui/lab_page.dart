@@ -11,6 +11,10 @@ import 'widgets/tap_empty_area.dart';
 /// Content shown above the preview.
 enum _Header { none, short, tall }
 
+/// How long after the menu starts opening the header appears with
+/// the Header delay option; the menu opens in 300 milliseconds.
+const _headerDelay = Duration(milliseconds: 500);
+
 /// Menus for checking edge cases: all item types, levels of different
 /// heights, tall widgets and a widget near the bottom edge.
 final class LabPage extends StatefulWidget {
@@ -30,6 +34,7 @@ final class _LabPageState extends State<LabPage> {
   bool _dividersBetweenItems = false;
   _Header _header = _Header.none;
   bool _pinHeader = false;
+  bool _delayHeader = false;
 
   /// The config of the app theme with the settings of this page.
   SmartContextMenuConfig _menuConfig(BuildContext context) {
@@ -168,6 +173,11 @@ final class _LabPageState extends State<LabPage> {
           onChanged: (value) => setState(() => _pinHeader = value),
         ),
         _buildSwitch(
+          title: 'Header delay',
+          value: _delayHeader,
+          onChanged: (value) => setState(() => _delayHeader = value),
+        ),
+        _buildSwitch(
           title: 'Dividers between items',
           value: _dividersBetweenItems,
           onChanged: (value) => setState(() => _dividersBetweenItems = value),
@@ -219,6 +229,9 @@ final class _LabPageState extends State<LabPage> {
                   ),
                   items: items,
                   headerSliversBuilder: _headerBuilder(title),
+                  headerSliversDelay: _delayHeader
+                      ? _headerDelay
+                      : Duration.zero,
                   child: DemoCard(title: title, subtitle: subtitle),
                 ),
               ),
@@ -242,6 +255,7 @@ final class _LabPageState extends State<LabPage> {
         items: items,
         onPreviewTap: () => debugPrint('Preview tapped: $title'),
         headerSliversBuilder: _headerBuilder(title),
+        headerSliversDelay: _delayHeader ? _headerDelay : Duration.zero,
         child: DemoCard(title: title, subtitle: subtitle, height: height),
       ),
     );

@@ -50,7 +50,7 @@ final class SmartContextMenuHeaderAnimation {
     route.addStatusListener(_onRouteStatus);
   }
 
-  /// Keeps the slivers hidden until the preview is in place.
+  /// Keeps the slivers hidden until the preview is nearly in place.
   ///
   /// Call it when the content scrolls as the menu opens. Does nothing once
   /// the menu is open.

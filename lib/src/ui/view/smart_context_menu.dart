@@ -118,7 +118,7 @@ final class SmartContextMenu extends StatefulWidget {
   ///
   /// If the preview and the menu do not fit on the screen and the content
   /// scrolls as the menu opens, the slivers also wait until the preview is
-  /// in place, and hide at once when the menu closes while the content is
+  /// nearly in place, and hide at once when the menu closes while the content is
   /// scrolled. The preview moves above the menu as it opens and closes, so
   /// it would cover a [PinnedHeaderSliver] over it.
   final Duration headerSliversDelay;
