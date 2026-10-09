@@ -11,6 +11,7 @@ import '../../settings/ui/widgets/settings_button.dart';
 import '../domain/chat.dart';
 import '../domain/chat_message.dart';
 import '../domain/demo_chat.dart';
+import 'chat_colors.dart';
 import 'widgets/chat_input_bar.dart';
 import 'widgets/message_bubble.dart';
 import 'widgets/message_footer.dart';
@@ -42,6 +43,7 @@ final class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
+      backgroundColor: ChatColors.background,
       navigationBar: const CupertinoNavigationBar(
         middle: Text('Hiking club'),
         trailing: SettingsButton(),

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
 import '../../domain/chat_message.dart';
+import '../chat_colors.dart';
 
 /// The pin and the reactions under [message].
 final class MessageFooter extends StatelessWidget {
@@ -39,7 +40,7 @@ final class MessageFooter extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
                 color: CupertinoDynamicColor.resolve(
-                  CupertinoColors.systemGrey6,
+                  ChatColors.bubble,
                   context,
                 ),
                 borderRadius: BorderRadius.circular(12),

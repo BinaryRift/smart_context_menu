@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
 import '../../domain/chat_message.dart';
+import '../chat_colors.dart';
 
 const _imageWidth = 260.0;
 
@@ -35,7 +36,7 @@ final class MessageBubble extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: CupertinoDynamicColor.resolve(
-          isMine ? CupertinoColors.activeBlue : CupertinoColors.systemGrey5,
+          isMine ? ChatColors.myBubble : ChatColors.bubble,
           context,
         ),
         borderRadius: borderRadius,
