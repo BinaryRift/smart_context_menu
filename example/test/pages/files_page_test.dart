@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu_example/core/data/demo_loader.dart';
+import 'package:smart_context_menu_example/main.dart';
 import 'package:smart_context_menu_example/pages/detail/ui/detail_page.dart';
+import 'package:smart_context_menu_example/pages/files/ui/widgets/file_tile.dart';
 
 import '../helpers/menu_tester.dart';
 
@@ -92,5 +94,32 @@ void main() {
     await tester.settleMenu();
 
     expect(find.text('Rename'), findsOneWidget);
+  });
+
+  testWidgets('Download shows its progress without closing the menu', (
+    tester,
+  ) async {
+    await tester.pumpPhoneApp();
+    await tester.openMenu(contract);
+
+    await tester.tap(find.text('Download'));
+    await tester.pump();
+    expect(find.text('Downloading 0%'), findsOneWidget);
+
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.text('Downloading 10%'), findsOneWidget);
+
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pump();
+    expect(find.text('Remove Download'), findsOneWidget);
+  });
+
+  testWidgets('a tablet shows two rows of six recent files', (tester) async {
+    tester.view.physicalSize = const Size(1668, 2388);
+    tester.view.devicePixelRatio = 2;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(const ExampleApp());
+
+    expect(find.byType(FileTile), findsNWidgets(12));
   });
 }

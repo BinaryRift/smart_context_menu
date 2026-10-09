@@ -52,9 +52,6 @@ const documents = [
   DemoFile('Ideas.txt', DemoFileKind.text, size: '2 KB', folder: 'Documents'),
 ];
 
-/// The files shown in the grid above the list.
-final recentFiles = documents.take(6).toList();
-
 const folders = ['Documents', 'Work', 'Photos', 'Archive'];
 
 const contacts = ['Anna', 'Boris', 'Chris', 'Diana', 'Emma'];

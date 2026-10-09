@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/rendering.dart' show SliverConstraints;
 import 'package:smart_context_menu/smart_context_menu.dart';
 
 import '../../../core/data/demo_loader.dart';
@@ -6,10 +9,15 @@ import '../../detail/ui/detail_page.dart';
 import '../../settings/ui/widgets/settings_button.dart';
 import '../domain/demo_file.dart';
 import '../domain/demo_files.dart';
+import '../domain/file_downloads.dart';
 import '../domain/file_favorites.dart';
 import 'widgets/file_icon.dart';
 import 'widgets/file_row.dart';
 import 'widgets/file_tile.dart';
+
+/// The widest a tile of the grid gets: a phone fits three of them in a row,
+/// a tablet six.
+const _tileExtent = 130.0;
 
 /// Files in a grid and a list, each with the same menu.
 ///
@@ -26,6 +34,7 @@ final class FilesPage extends StatefulWidget {
 final class _FilesPageState extends State<FilesPage> {
   final _loader = DemoLoader();
   final _favorites = FileFavorites();
+  final _downloads = FileDownloads();
 
   /// Open the menus of the rows from their buttons.
   final _rowMenus = {
@@ -35,6 +44,7 @@ final class _FilesPageState extends State<FilesPage> {
   @override
   void dispose() {
     _favorites.dispose();
+    _downloads.dispose();
     for (final controller in _rowMenus.values) {
       controller.dispose();
     }
@@ -55,18 +65,7 @@ final class _FilesPageState extends State<FilesPage> {
             _buildHeader('Recent'),
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              sliver: SliverGrid.count(
-                crossAxisCount: 3,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
-                children: [
-                  for (final file in recentFiles)
-                    _buildMenu(
-                      file,
-                      child: FileTile(file: file, favorites: _favorites),
-                    ),
-                ],
-              ),
+              sliver: SliverLayoutBuilder(builder: _buildRecentFiles),
             ),
             _buildHeader('Documents'),
             SliverPadding(
@@ -92,6 +91,26 @@ final class _FilesPageState extends State<FilesPage> {
           ],
         ),
       ),
+    );
+  }
+
+  /// Two rows of the most recent files, as many in a row as fit.
+  Widget _buildRecentFiles(
+    BuildContext context,
+    SliverConstraints constraints,
+  ) {
+    final columns = max(3, (constraints.crossAxisExtent / _tileExtent).floor());
+    return SliverGrid.count(
+      crossAxisCount: columns,
+      mainAxisSpacing: 12,
+      crossAxisSpacing: 12,
+      children: [
+        for (final file in documents.take(columns * 2))
+          _buildMenu(
+            file,
+            child: FileTile(file: file, favorites: _favorites),
+          ),
+      ],
     );
   }
 
@@ -133,6 +152,7 @@ final class _FilesPageState extends State<FilesPage> {
     _shareItem(file),
     _moveToItem(file),
     _favoriteItem(file),
+    _downloadItem(file),
     SmartContextMenuItem.simple(
       title: 'Rename',
       leading: const Icon(CupertinoIcons.pencil),
@@ -224,6 +244,36 @@ final class _FilesPageState extends State<FilesPage> {
           ),
           closeOnTap: false,
           onTap: () => _favorites.toggle(file),
+        );
+      },
+    );
+  }
+
+  /// Rebuilds from [_downloads] while the menu is open: shows the progress
+  /// of the download, which keeps running after the menu closes.
+  SmartContextMenuItem _downloadItem(DemoFile file) {
+    return SmartContextMenuItem.listenable(
+      listenable: _downloads,
+      builder: () {
+        if (_downloads.isRunning(file)) {
+          return SmartContextMenuItem.loading(
+            title: 'Downloading ${_downloads.percent(file)}%',
+          );
+        }
+        if (_downloads.isDone(file)) {
+          return SmartContextMenuItem.simple(
+            title: 'Remove Download',
+            leading: const Icon(CupertinoIcons.delete),
+            isDestructive: true,
+            closeOnTap: false,
+            onTap: () => _downloads.remove(file),
+          );
+        }
+        return SmartContextMenuItem.simple(
+          title: 'Download',
+          leading: const Icon(CupertinoIcons.cloud_download),
+          closeOnTap: false,
+          onTap: () => _downloads.start(file),
         );
       },
     );
