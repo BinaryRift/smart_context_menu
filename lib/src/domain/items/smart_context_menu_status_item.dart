@@ -24,12 +24,14 @@ sealed class SmartContextMenuStatusItem extends SmartContextMenuItem
 
   /// A widget shown before [title], usually an [Icon].
   ///
-  /// Icons without their own color take the title color.
+  /// Text without its own style takes the style and the color of the title;
+  /// icons without their own color take the title color.
   final Widget? leading;
 
   /// A widget shown after [title] instead of the sign of the state.
   ///
-  /// Icons without their own color take the title color.
+  /// Text without its own style takes the style and the color of the title;
+  /// icons without their own color take the title color.
   final Widget? trailing;
 
   /// The content shown instead of [title], [leading] and [trailing].

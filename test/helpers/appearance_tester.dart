@@ -41,6 +41,11 @@ extension AppearanceTester on WidgetTester {
   TextStyle titleStyleOf(String title) =>
       widget<Text>(find.text(title).first).style!;
 
+  /// The style [text] is painted with, including the default text style.
+  TextStyle paintedStyleOf(String text) => widget<RichText>(
+    find.descendant(of: find.text(text), matching: find.byType(RichText)),
+  ).text.style!;
+
   /// The background color of the item with [title].
   Color? backgroundOf(String title) => backgroundAt(find.text(title));
 

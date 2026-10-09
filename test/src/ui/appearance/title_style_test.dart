@@ -84,4 +84,54 @@ void main() {
 
     expect(tester.widget<Text>(find.text('Enabled')).maxLines, 1);
   });
+
+  testWidgets('text in leading and trailing takes the title style', (
+    tester,
+  ) async {
+    await tester.pumpMenu(
+      config: customConfig,
+      items: [
+        SmartContextMenuItem.simple(
+          title: 'Enabled',
+          leading: const Text('A'),
+          trailing: const Text('4'),
+        ),
+        SmartContextMenuItem.simple(
+          title: 'Destructive',
+          isDestructive: true,
+          trailing: const Text('9'),
+        ),
+      ],
+    );
+    await tester.openMenu();
+
+    for (final text in ['A', '4']) {
+      final style = tester.paintedStyleOf(text);
+      expect(style.fontFamily, 'Custom');
+      expect(style.fontSize, 13);
+      expect(style.color, isSameColorAs(customStyle.titleStyle.color!));
+    }
+    expect(
+      tester.paintedStyleOf('9').color,
+      isSameColorAs(customStyle.destructiveColor),
+    );
+  });
+
+  testWidgets('text in trailing keeps its own style', (tester) async {
+    const color = Color(0xFF0000FF);
+    await tester.pumpMenu(
+      config: customConfig,
+      items: [
+        SmartContextMenuItem.simple(
+          title: 'Enabled',
+          trailing: const Text('4', style: TextStyle(color: color)),
+        ),
+      ],
+    );
+    await tester.openMenu();
+
+    final style = tester.paintedStyleOf('4');
+    expect(style.color, isSameColorAs(color));
+    expect(style.fontSize, 13);
+  });
 }

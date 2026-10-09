@@ -282,6 +282,7 @@ final class _ChatPageState extends State<ChatPage> {
           CupertinoColors.secondaryLabel,
           context,
         ),
+        fontWeight: FontWeight.w600,
       ),
     );
   }

@@ -6,6 +6,9 @@ import '../../../domain/smart_context_menu_style.dart';
 
 /// The default content of an item: [leading], [title], [trailing] and
 /// the submenu chevron.
+///
+/// Text in [leading] and [trailing] takes the style and the color of the
+/// title unless it has its own; icons take the title color.
 final class SmartContextMenuItemRow extends StatelessWidget {
   final String title;
   final TextStyle? titleStyle;
@@ -20,7 +23,7 @@ final class SmartContextMenuItemRow extends StatelessWidget {
   final bool isDisabled;
   final SmartContextMenuStyle style;
 
-  /// The color of the title and of icons without their own color.
+  /// The color of the title and of text and icons without their own color.
   final Color foregroundColor;
   final TextAlign titleAlign;
 
@@ -56,40 +59,44 @@ final class SmartContextMenuItemRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final gap = SizedBox(width: childrenGap ?? style.itemChildrenGap);
-    return IconTheme.merge(
-      data: IconThemeData(color: foregroundColor),
-      child: Row(
-        children: [
-          if (leading case final leading?) ...[leading, gap],
-          Expanded(
-            child: Text(
-              title,
-              style: (titleStyle ?? style.titleStyle).copyWith(
-                color: foregroundColor,
+    final textStyle = (titleStyle ?? style.titleStyle).copyWith(
+      color: foregroundColor,
+    );
+    return DefaultTextStyle.merge(
+      style: textStyle,
+      child: IconTheme.merge(
+        data: IconThemeData(color: foregroundColor),
+        child: Row(
+          children: [
+            if (leading case final leading?) ...[leading, gap],
+            Expanded(
+              child: Text(
+                title,
+                style: textStyle,
+                textAlign: titleAlign,
+                maxLines: style.titleMaxLines,
+                overflow: TextOverflow.ellipsis,
               ),
-              textAlign: titleAlign,
-              maxLines: style.titleMaxLines,
-              overflow: TextOverflow.ellipsis,
             ),
-          ),
-          if (trailing case final trailing?) ...[gap, trailing],
-          if (hasSubmenu) ...[
-            gap,
-            Icon(
-              style.submenuIcon,
-              size: style.defaultIconSize,
-              color: isDisabled
-                  ? CupertinoDynamicColor.resolve(
-                      style.disabledForegroundColor,
-                      context,
-                    )
-                  : CupertinoDynamicColor.maybeResolve(
-                      style.defaultIconColor,
-                      context,
-                    ),
-            ),
+            if (trailing case final trailing?) ...[gap, trailing],
+            if (hasSubmenu) ...[
+              gap,
+              Icon(
+                style.submenuIcon,
+                size: style.defaultIconSize,
+                color: isDisabled
+                    ? CupertinoDynamicColor.resolve(
+                        style.disabledForegroundColor,
+                        context,
+                      )
+                    : CupertinoDynamicColor.maybeResolve(
+                        style.defaultIconColor,
+                        context,
+                      ),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

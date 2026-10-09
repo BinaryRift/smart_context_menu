@@ -22,13 +22,15 @@ sealed class SmartContextMenuContentItem extends SmartContextMenuItem
 
   /// A widget shown before [title], usually an [Icon].
   ///
-  /// Icons without their own color take the title color.
+  /// Text without its own style takes the style and the color of the title;
+  /// icons without their own color take the title color.
   final Widget? leading;
 
   /// A widget shown after [title].
   ///
   /// Items that open a submenu also show a chevron after it.
-  /// Icons without their own color take the title color.
+  /// Text without its own style takes the style and the color of the title;
+  /// icons without their own color take the title color.
   final Widget? trailing;
 
   /// Whether the item performs a destructive action.
