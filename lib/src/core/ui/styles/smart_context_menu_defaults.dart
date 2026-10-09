@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 ///
 /// Most of them are defaults of [SmartContextMenuConfig],
 /// [SmartContextMenuStyle] and [SmartContextMenuItem] fields. The rest, such
-/// as [errorIcon] and the opacities, are fixed. All are public, so custom
+/// as the opacities, are fixed. All are public, so custom
 /// content, for example from [SmartContextMenuItem.customBuilder], can match
 /// the default look.
 ///
@@ -38,7 +38,8 @@ abstract final class SmartContextMenuDefaults {
   /// The default of [SmartContextMenuStyle.loaderVerticalPadding].
   static const double loaderVerticalPadding = 12;
 
-  /// The radius of the activity indicator of a loading submenu or page.
+  /// The radius of the activity indicator of a loading submenu or page
+  /// without [SmartContextMenuStyle.loadingIndicator].
   static const double loaderIndicatorRadius = 12;
 
   /// The default of [SmartContextMenuStyle.defaultIconSize].
@@ -214,6 +215,9 @@ abstract final class SmartContextMenuDefaults {
   /// The default of [SmartContextMenuStyle.titleMaxLines].
   static const int titleMaxLines = 2;
 
+  /// The default of [SmartContextMenuStyle.statusTitleAlign].
+  static const TextAlign statusTitleAlign = TextAlign.center;
+
   // Icons
 
   /// The default of [SmartContextMenuStyle.submenuIcon].
@@ -222,13 +226,12 @@ abstract final class SmartContextMenuDefaults {
   /// The default of [SmartContextMenuStyle.backIcon].
   static const IconData backIcon = CupertinoIcons.chevron_back;
 
-  /// The icon after the title of a [SmartContextMenuItem.error] item.
+  /// The default of [SmartContextMenuStyle.errorIcon].
   static const IconData errorIcon = CupertinoIcons.exclamationmark_triangle;
 
-  /// The icon after the title of a [SmartContextMenuItem.error] item that
-  /// retries a failed load, unless the item has its own trailing.
+  /// The default of [SmartContextMenuStyle.retryIcon].
   static const IconData retryIcon = CupertinoIcons.refresh;
 
-  /// The icon after the title of a [SmartContextMenuItem.empty] item.
+  /// The default of [SmartContextMenuStyle.emptyIcon].
   static const IconData emptyIcon = CupertinoIcons.tray;
 }

@@ -224,7 +224,7 @@ final class SmartContextMenuItem {
   ///
   /// Tapping it retries loading. Without its own [title] and [trailing], it
   /// shows [SmartContextMenuLabels.retry] and
-  /// [SmartContextMenuDefaults.retryIcon]. In place of an async item, it
+  /// [SmartContextMenuStyle.retryIcon]. In place of an async item, it
   /// keeps the padding of [loadingItem] unless it has its own [padding].
   ///
   /// Set by [SmartContextMenuItem.async], [SmartContextMenuItem.asyncSubmenu]
@@ -368,7 +368,7 @@ final class SmartContextMenuItem {
   ///
   /// [timeout] defaults to [SmartContextMenuDefaults.loadingTimeout].
   /// Without its own title and trailing, [error] shows
-  /// [SmartContextMenuLabels.retry] and [SmartContextMenuDefaults.retryIcon].
+  /// [SmartContextMenuLabels.retry] and [SmartContextMenuStyle.retryIcon].
   ///
   /// ```dart
   /// SmartContextMenuItem.asyncSubmenu(
@@ -437,7 +437,7 @@ final class SmartContextMenuItem {
   ///
   /// [timeout] defaults to [SmartContextMenuDefaults.loadingTimeout].
   /// Without its own title and trailing, [error] shows
-  /// [SmartContextMenuLabels.retry] and [SmartContextMenuDefaults.retryIcon].
+  /// [SmartContextMenuLabels.retry] and [SmartContextMenuStyle.retryIcon].
   ///
   /// ```dart
   /// SmartContextMenuItem.pagingSubmenu(
@@ -548,7 +548,7 @@ final class SmartContextMenuItem {
   /// [timeout] defaults to [SmartContextMenuDefaults.loadingTimeout].
   ///
   /// Without its own title and trailing, [error] shows
-  /// [SmartContextMenuLabels.retry] and [SmartContextMenuDefaults.retryIcon].
+  /// [SmartContextMenuLabels.retry] and [SmartContextMenuStyle.retryIcon].
   /// Without its own padding, it keeps the padding of [loading]; the loaded
   /// item uses its own.
   ///
@@ -676,7 +676,7 @@ final class SmartContextMenuItem {
   /// Creates an item that shows a failed load.
   ///
   /// The item shows [title] (or [SmartContextMenuLabels.error]) with
-  /// [leading] and [SmartContextMenuDefaults.errorIcon], and does not
+  /// [leading] and [SmartContextMenuStyle.errorIcon], and does not
   /// respond to taps. [trailing] replaces the icon. Pass [child] to replace
   /// this content; text and icons in it take the color of the item.
   /// Interactive widgets in [child], such as buttons, handle their own taps.
@@ -726,7 +726,7 @@ final class SmartContextMenuItem {
   /// Creates an item that shows that there are no items.
   ///
   /// The item shows [title] (or [SmartContextMenuLabels.empty]) with
-  /// [leading] and [SmartContextMenuDefaults.emptyIcon], and does not
+  /// [leading] and [SmartContextMenuStyle.emptyIcon], and does not
   /// respond to taps. [trailing] replaces the icon. Pass [child] to replace
   /// this content; text and icons in it take the color of the item.
   ///
@@ -772,9 +772,10 @@ final class SmartContextMenuItem {
 /// A [SmartContextMenuItem] that shows a state, such as loading, instead
 /// of an action.
 ///
-/// It does not respond to taps and is not dimmed. Its [title] stands in
-/// the middle between [leading] and [trailing]. A sign of the state is
-/// shown after [title] unless [trailing] is set.
+/// It does not respond to taps and is not dimmed. Its [title] is aligned
+/// between [leading] and [trailing] by
+/// [SmartContextMenuStyle.statusTitleAlign], in the middle by default. A sign
+/// of the state is shown after [title] unless [trailing] is set.
 ///
 /// See [SmartContextMenuLoadingItem], [SmartContextMenuErrorItem] and
 /// [SmartContextMenuEmptyItem].

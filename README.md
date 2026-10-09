@@ -375,6 +375,7 @@ a listenable item returns it. Anywhere else it stays until the menu closes.
 
 Loading, error and empty items look alike: the title in the middle, a sign of the state
 after it, and `leading` free for your own icon. They do not respond to taps and are not dimmed.
+The [style](#style) sets their alignment, icons and loading indicator for all menus.
 
 | Item | Title | After the title |
 | --- | --- | --- |
@@ -665,6 +666,20 @@ The back item of a submenu merges `backButtonTitleStyle` (bold by default) over
 Titles take up to `titleMaxLines` lines (2 by default) and are truncated with an ellipsis.
 `itemPadding` and `itemChildrenGap` set the padding of items and the gap between
 their icons and title.
+Loading, error and empty items center their titles; `statusTitleAlign` changes this, and
+`errorIcon`, `retryIcon` and `emptyIcon` change their icons, also for the items the menu
+shows by itself, such as the empty item of a submenu without items. `loadingIndicator`
+replaces the activity indicator, both in loading items and in the middle of a loading submenu.
+It is used at its own size, so size it to fit an item row:
+
+```dart
+const style = SmartContextMenuStyle(
+  loadingIndicator: SizedBox.square(
+    dimension: 20,
+    child: CircularProgressIndicator(strokeWidth: 2),
+  ),
+);
+```
 
 **Settings of an item take precedence over the style.** The style sets the look of
 all items, and an item changes it only for itself:

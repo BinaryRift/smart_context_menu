@@ -22,6 +22,7 @@ void main() {
       itemChildrenGap: 1,
       titleStyle: TextStyle(fontSize: 11),
       titleMaxLines: 1,
+      statusTitleAlign: TextAlign.end,
       disabledForegroundColor: Color(0xFF000005),
       destructiveColor: Color(0xFF000006),
       disabledBackgroundColor: Color(0xFF000007),
@@ -37,6 +38,10 @@ void main() {
       defaultIconColor: Color(0xFF000009),
       submenuIcon: Icons.arrow_forward_ios,
       backIcon: Icons.arrow_back_ios_new,
+      errorIcon: Icons.error,
+      retryIcon: Icons.refresh,
+      emptyIcon: Icons.inbox,
+      loadingIndicator: SizedBox(width: 1),
       loaderVerticalPadding: 11,
     );
 
@@ -57,6 +62,7 @@ void main() {
       'itemChildrenGap': (s) => s.itemChildrenGap,
       'titleStyle': (s) => s.titleStyle,
       'titleMaxLines': (s) => s.titleMaxLines,
+      'statusTitleAlign': (s) => s.statusTitleAlign,
       'disabledForegroundColor': (s) => s.disabledForegroundColor,
       'destructiveColor': (s) => s.destructiveColor,
       'disabledBackgroundColor': (s) => s.disabledBackgroundColor,
@@ -72,6 +78,10 @@ void main() {
       'defaultIconColor': (s) => s.defaultIconColor,
       'submenuIcon': (s) => s.submenuIcon,
       'backIcon': (s) => s.backIcon,
+      'errorIcon': (s) => s.errorIcon,
+      'retryIcon': (s) => s.retryIcon,
+      'emptyIcon': (s) => s.emptyIcon,
+      'loadingIndicator': (s) => s.loadingIndicator,
       'loaderVerticalPadding': (s) => s.loaderVerticalPadding,
     };
 
@@ -80,6 +90,7 @@ void main() {
     const blur = SmartContextMenuBlur(9);
     const decoration = BoxDecoration(color: color);
     const titleStyle = TextStyle(fontSize: 19);
+    const indicator = SizedBox(width: 9);
     final changes = <String, (Object, SmartContextMenuStyle Function())>{
       'menuColor': (color, () => original.copyWith(menuColor: color)),
       'borderColor': (color, () => original.copyWith(borderColor: color)),
@@ -121,6 +132,10 @@ void main() {
         () => original.copyWith(backButtonTitleStyle: titleStyle),
       ),
       'titleMaxLines': (9, () => original.copyWith(titleMaxLines: 9)),
+      'statusTitleAlign': (
+        TextAlign.start,
+        () => original.copyWith(statusTitleAlign: TextAlign.start),
+      ),
       'disabledForegroundColor': (
         color,
         () => original.copyWith(disabledForegroundColor: color),
@@ -156,6 +171,22 @@ void main() {
       'backIcon': (
         CupertinoIcons.chevron_left,
         () => original.copyWith(backIcon: CupertinoIcons.chevron_left),
+      ),
+      'errorIcon': (
+        CupertinoIcons.xmark_circle,
+        () => original.copyWith(errorIcon: CupertinoIcons.xmark_circle),
+      ),
+      'retryIcon': (
+        CupertinoIcons.arrow_clockwise,
+        () => original.copyWith(retryIcon: CupertinoIcons.arrow_clockwise),
+      ),
+      'emptyIcon': (
+        CupertinoIcons.square_stack,
+        () => original.copyWith(emptyIcon: CupertinoIcons.square_stack),
+      ),
+      'loadingIndicator': (
+        indicator,
+        () => original.copyWith(loadingIndicator: indicator),
       ),
       'loaderVerticalPadding': (
         19.0,

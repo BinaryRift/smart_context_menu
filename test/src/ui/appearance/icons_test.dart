@@ -37,6 +37,33 @@ void main() {
     expect(find.byIcon(SmartContextMenuDefaults.backIcon), findsNothing);
   });
 
+  testWidgets('applies the error, retry and empty icons', (tester) async {
+    await tester.pumpMenu(
+      items: [
+        SmartContextMenuItem.error(title: 'Could not sync'),
+        SmartContextMenuItem.empty(title: 'No drafts'),
+        SmartContextMenuItem.async(
+          asyncItem: () => Future.error(Exception('Failed')),
+        ),
+      ],
+      config: const SmartContextMenuConfig(
+        style: SmartContextMenuStyle(
+          errorIcon: Icons.error,
+          retryIcon: Icons.refresh,
+          emptyIcon: Icons.inbox,
+        ),
+      ),
+    );
+    await tester.openMenu();
+
+    expect(find.byIcon(Icons.error), findsOneWidget);
+    expect(find.byIcon(Icons.refresh), findsOneWidget);
+    expect(find.byIcon(Icons.inbox), findsOneWidget);
+    expect(find.byIcon(SmartContextMenuDefaults.errorIcon), findsNothing);
+    expect(find.byIcon(SmartContextMenuDefaults.retryIcon), findsNothing);
+    expect(find.byIcon(SmartContextMenuDefaults.emptyIcon), findsNothing);
+  });
+
   testWidgets('tints icons with the title color', (tester) async {
     await tester.pumpMenu(
       config: customConfig,

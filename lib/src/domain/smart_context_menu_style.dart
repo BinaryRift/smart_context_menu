@@ -6,7 +6,9 @@ import 'package:flutter/widgets.dart'
         Decoration,
         EdgeInsets,
         IconData,
-        TextStyle;
+        TextAlign,
+        TextStyle,
+        Widget;
 
 import '../core/ui/styles/smart_context_menu_defaults.dart';
 import 'smart_context_menu_blur.dart';
@@ -139,6 +141,13 @@ final class SmartContextMenuStyle {
   /// Defaults to [SmartContextMenuDefaults.titleMaxLines].
   final int titleMaxLines;
 
+  /// The alignment of the titles of loading, error and empty items in the
+  /// space between their leading and trailing.
+  ///
+  /// Does not affect their child. Defaults to
+  /// [SmartContextMenuDefaults.statusTitleAlign], the middle.
+  final TextAlign statusTitleAlign;
+
   /// The color of the title, icons and submenu chevron of a disabled item.
   ///
   /// Defaults to [SmartContextMenuDefaults.disabledForegroundColor].
@@ -203,7 +212,8 @@ final class SmartContextMenuStyle {
   // Icons
 
   /// The size of the icons drawn by the menu itself: the submenu chevron,
-  /// the back icon and the error, retry and empty icons.
+  /// the back icon, the error, retry and empty icons, and the activity
+  /// indicator of loading items.
   ///
   /// Does not affect [SmartContextMenuItem.leading] and
   /// [SmartContextMenuItem.trailing].
@@ -226,7 +236,44 @@ final class SmartContextMenuStyle {
   /// Defaults to [SmartContextMenuDefaults.backIcon].
   final IconData backIcon;
 
+  /// The icon after the title of a [SmartContextMenuItem.error] item
+  /// without its own trailing.
+  ///
+  /// Defaults to [SmartContextMenuDefaults.errorIcon].
+  final IconData errorIcon;
+
+  /// The icon after the title of an error item that retries a failed load,
+  /// unless the item has its own trailing.
+  ///
+  /// Defaults to [SmartContextMenuDefaults.retryIcon].
+  final IconData retryIcon;
+
+  /// The icon after the title of a [SmartContextMenuItem.empty] item
+  /// without its own trailing.
+  ///
+  /// Defaults to [SmartContextMenuDefaults.emptyIcon].
+  final IconData emptyIcon;
+
   // Loader
+
+  /// The activity indicator of loading items without their own trailing,
+  /// and of a loading submenu or page.
+  ///
+  /// The widget is used at its own size, so size it to fit an item row:
+  ///
+  /// ```dart
+  /// const style = SmartContextMenuStyle(
+  ///   loadingIndicator: SizedBox.square(
+  ///     dimension: 20,
+  ///     child: CircularProgressIndicator(strokeWidth: 2),
+  ///   ),
+  /// );
+  /// ```
+  ///
+  /// If null, which is the default, a [CupertinoActivityIndicator] is used:
+  /// in loading items as large as [defaultIconSize], and in a submenu with
+  /// [SmartContextMenuDefaults.loaderIndicatorRadius].
+  final Widget? loadingIndicator;
 
   /// The vertical padding around the activity indicator of a loading
   /// submenu or page.
@@ -253,6 +300,7 @@ final class SmartContextMenuStyle {
     this.itemChildrenGap = SmartContextMenuDefaults.itemChildrenGap,
     this.titleStyle = SmartContextMenuDefaults.titleStyle,
     this.titleMaxLines = SmartContextMenuDefaults.titleMaxLines,
+    this.statusTitleAlign = SmartContextMenuDefaults.statusTitleAlign,
     this.disabledForegroundColor =
         SmartContextMenuDefaults.disabledForegroundColor,
     this.destructiveColor = SmartContextMenuDefaults.destructiveColor,
@@ -269,6 +317,10 @@ final class SmartContextMenuStyle {
     this.defaultIconColor,
     this.submenuIcon = SmartContextMenuDefaults.submenuIcon,
     this.backIcon = SmartContextMenuDefaults.backIcon,
+    this.errorIcon = SmartContextMenuDefaults.errorIcon,
+    this.retryIcon = SmartContextMenuDefaults.retryIcon,
+    this.emptyIcon = SmartContextMenuDefaults.emptyIcon,
+    this.loadingIndicator,
     this.loaderVerticalPadding = SmartContextMenuDefaults.loaderVerticalPadding,
   });
 
@@ -293,6 +345,7 @@ final class SmartContextMenuStyle {
     double? itemChildrenGap,
     TextStyle? titleStyle,
     int? titleMaxLines,
+    TextAlign? statusTitleAlign,
     Color? disabledForegroundColor,
     Color? destructiveColor,
     Color? disabledBackgroundColor,
@@ -308,6 +361,10 @@ final class SmartContextMenuStyle {
     Color? defaultIconColor,
     IconData? submenuIcon,
     IconData? backIcon,
+    IconData? errorIcon,
+    IconData? retryIcon,
+    IconData? emptyIcon,
+    Widget? loadingIndicator,
     double? loaderVerticalPadding,
   }) {
     return SmartContextMenuStyle(
@@ -328,6 +385,7 @@ final class SmartContextMenuStyle {
       itemChildrenGap: itemChildrenGap ?? this.itemChildrenGap,
       titleStyle: titleStyle ?? this.titleStyle,
       titleMaxLines: titleMaxLines ?? this.titleMaxLines,
+      statusTitleAlign: statusTitleAlign ?? this.statusTitleAlign,
       disabledForegroundColor:
           disabledForegroundColor ?? this.disabledForegroundColor,
       destructiveColor: destructiveColor ?? this.destructiveColor,
@@ -345,6 +403,10 @@ final class SmartContextMenuStyle {
       defaultIconColor: defaultIconColor ?? this.defaultIconColor,
       submenuIcon: submenuIcon ?? this.submenuIcon,
       backIcon: backIcon ?? this.backIcon,
+      errorIcon: errorIcon ?? this.errorIcon,
+      retryIcon: retryIcon ?? this.retryIcon,
+      emptyIcon: emptyIcon ?? this.emptyIcon,
+      loadingIndicator: loadingIndicator ?? this.loadingIndicator,
       loaderVerticalPadding:
           loaderVerticalPadding ?? this.loaderVerticalPadding,
     );

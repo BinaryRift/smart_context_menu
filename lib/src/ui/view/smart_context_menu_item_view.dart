@@ -315,19 +315,20 @@ final class _SmartContextMenuItemViewState
       // The menu retries the failed load on tap.
       _ when _error != null => (
         _config.labels.retry,
-        Icon(SmartContextMenuDefaults.retryIcon, size: _style.defaultIconSize),
+        Icon(_style.retryIcon, size: _style.defaultIconSize),
       ),
       SmartContextMenuLoadingItem() => (
         _config.labels.loading,
-        const CupertinoActivityIndicator(),
+        _style.loadingIndicator ??
+            CupertinoActivityIndicator(radius: _style.defaultIconSize / 2),
       ),
       SmartContextMenuErrorItem() => (
         _config.labels.error,
-        Icon(SmartContextMenuDefaults.errorIcon, size: _style.defaultIconSize),
+        Icon(_style.errorIcon, size: _style.defaultIconSize),
       ),
       SmartContextMenuEmptyItem() => (
         _config.labels.empty,
-        Icon(SmartContextMenuDefaults.emptyIcon, size: _style.defaultIconSize),
+        Icon(_style.emptyIcon, size: _style.defaultIconSize),
       ),
     };
     final row = SmartContextMenuItem.simple(
@@ -337,10 +338,9 @@ final class _SmartContextMenuItemViewState
       trailing: item.trailing ?? sign,
       childrenGap: item.childrenGap,
     );
-    // A status title stands in the middle, unlike the title of an action.
     return KeyedSubtree(
       key: key,
-      child: _body(row, titleAlign: TextAlign.center),
+      child: _body(row, titleAlign: _style.statusTitleAlign),
     );
   }
 

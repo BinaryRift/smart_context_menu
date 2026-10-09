@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
@@ -105,5 +107,97 @@ void main() {
       TextAlign.center,
     );
     expect(tester.widget<Text>(find.text('Copy')).textAlign, TextAlign.start);
+  });
+
+  testWidgets('aligns its title by the style', (tester) async {
+    await tester.pumpMenu(
+      items: [SmartContextMenuItem.loading(title: 'Syncing')],
+      config: const SmartContextMenuConfig(
+        style: SmartContextMenuStyle(statusTitleAlign: TextAlign.start),
+      ),
+    );
+    await tester.openMenu();
+
+    expect(
+      tester.widget<Text>(find.text('Syncing')).textAlign,
+      TextAlign.start,
+    );
+  });
+
+  testWidgets('sizes its activity indicator as the icons', (tester) async {
+    await tester.pumpMenu(
+      items: [SmartContextMenuItem.loading(title: 'Syncing')],
+      config: const SmartContextMenuConfig(
+        style: SmartContextMenuStyle(defaultIconSize: 28),
+      ),
+    );
+    await tester.openMenu();
+
+    expect(
+      tester
+          .widget<CupertinoActivityIndicator>(
+            find.byType(CupertinoActivityIndicator),
+          )
+          .radius,
+      14,
+    );
+  });
+
+  group('with the loading indicator of the style', () {
+    const config = SmartContextMenuConfig(
+      style: SmartContextMenuStyle(
+        loadingIndicator: Icon(CupertinoIcons.hourglass),
+      ),
+    );
+
+    testWidgets('shows it instead of the activity indicator', (tester) async {
+      await tester.pumpMenu(
+        items: [SmartContextMenuItem.loading(title: 'Syncing')],
+        config: config,
+      );
+      await tester.openMenu();
+
+      expect(find.byIcon(CupertinoIcons.hourglass), findsOneWidget);
+      expect(find.byType(CupertinoActivityIndicator), findsNothing);
+    });
+
+    testWidgets('keeps the trailing of the item', (tester) async {
+      await tester.pumpMenu(
+        items: [
+          SmartContextMenuItem.loading(
+            title: 'Syncing',
+            trailing: const Icon(CupertinoIcons.clock),
+          ),
+        ],
+        config: config,
+      );
+      await tester.openMenu();
+
+      expect(find.byIcon(CupertinoIcons.clock), findsOneWidget);
+      expect(find.byIcon(CupertinoIcons.hourglass), findsNothing);
+    });
+
+    testWidgets('shows it in the middle of a loading submenu', (tester) async {
+      final completer = Completer<List<SmartContextMenuItem>>();
+      await tester.pumpMenu(
+        items: [
+          SmartContextMenuItem.asyncSubmenu(
+            title: 'More',
+            asyncChildren: () => completer.future,
+          ),
+        ],
+        config: config,
+      );
+      await tester.openMenu();
+      await tester.tap(find.text('More'));
+      await tester.settleMenu();
+
+      expect(find.byIcon(CupertinoIcons.hourglass), findsOneWidget);
+      expect(find.byType(CupertinoActivityIndicator), findsNothing);
+      expect(find.text(const SmartContextMenuLabels().loading), findsNothing);
+
+      completer.complete([]);
+      await tester.settleMenu();
+    });
   });
 }
