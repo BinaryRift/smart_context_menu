@@ -29,6 +29,8 @@ void main() {
       ),
     );
     await tester.openMenuForPointers();
+    // The content scrolls, so the bar appears once the preview is in place.
+    await tester.settleMenu();
 
     final position = tester.menuScrollPosition;
     expect(position.pixels, position.maxScrollExtent);

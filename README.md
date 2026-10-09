@@ -86,7 +86,7 @@ when it is dragged or the menu is stretched. The builder gets `SmartContextMenuH
 - `alignment` tells how the widget and the menu are aligned horizontally. The slivers have
   the same horizontal padding as the widget, so `Align(alignment: header.alignment)` puts
   your content at the edge of the widget.
-- `animation` runs from 0 to 1 as the menu opens and back as it closes, to animate
+- `animation` runs from 0 to 1 as the slivers appear and back as they hide, to animate
   your content with the menu.
 - `close()` closes the menu. It completes three quarters through the closing, as an item
   does, so the result of the action is seen as the menu closes.
@@ -144,6 +144,25 @@ headerSliversBuilder: (context, header) => [
     ),
   ),
 ],
+```
+
+If the widget and the menu do not fit on the screen and the content scrolls as the menu
+opens, the slivers appear once the widget is in place, and hide at once when the menu
+closes while the content is scrolled. The widget moves above everything as the menu opens
+and closes, so it would cover a pinned sliver otherwise.
+
+To show the slivers later, set `headerSliversDelay`. It counts from the start of the opening,
+which takes 300 milliseconds: a shorter delay starts the slivers while the widget moves
+into place, a longer one after that.
+
+```dart
+SmartContextMenu(
+  headerSliversBuilder: (context, header) => [reactionsBar],
+  // The bar appears a moment after the menu.
+  headerSliversDelay: const Duration(milliseconds: 150),
+  items: items,
+  child: MessageBubble(message),
+)
 ```
 
 ### Positioning

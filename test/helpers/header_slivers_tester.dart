@@ -25,6 +25,7 @@ Widget headerMenu({
   SmartContextMenuConfig config = const SmartContextMenuConfig(),
   List<SmartContextMenuItem>? items,
   bool fadeHeaderSlivers = true,
+  Duration headerSliversDelay = Duration.zero,
 }) {
   return CupertinoApp(
     home: Padding(
@@ -35,6 +36,7 @@ Widget headerMenu({
           items: items ?? headerItems,
           config: config,
           fadeHeaderSlivers: fadeHeaderSlivers,
+          headerSliversDelay: headerSliversDelay,
           headerSliversBuilder: headerHeight == null
               ? null
               : (context, header) {
