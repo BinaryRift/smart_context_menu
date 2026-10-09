@@ -38,7 +38,7 @@ List<SmartContextMenuItem> customContentItems(
   _action(
     'Favorite',
     CupertinoIcons.heart,
-    tintColor: readableTint(CupertinoColors.systemPink),
+    tintColor: readableTint(CupertinoColors.systemPurple),
   ),
   _action(
     'Mark as done',

@@ -9,7 +9,7 @@ const brandStyle = SmartContextMenuStyle(
   borderRadius: BorderRadius.all(Radius.circular(20)),
   titleStyle: TextStyle(fontSize: 17, color: CupertinoColors.white),
   disabledForegroundColor: Color(0x80FFFFFF),
-  destructiveColor: Color(0xFFFF9F97),
+  destructiveColor: Color(0xFFFF6961),
   highlightColor: Color(0x33FFFFFF),
   separatorColor: Color(0x33FFFFFF),
 );
