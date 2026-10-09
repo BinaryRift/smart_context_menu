@@ -1,15 +1,12 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show ThemeMode;
 import 'package:smart_context_menu/smart_context_menu.dart';
 
+import 'core/settings/example_settings.dart';
+import 'core/settings/settings_scope.dart';
 import 'pages/lab/ui/lab_page.dart';
+import 'resources/app_theme/menu_config.dart';
 
 void main() => runApp(const ExampleApp());
-
-/// The config of all menus in the app.
-const _menuConfig = SmartContextMenuConfig(
-  style: SmartContextMenuStyle(menuBlur: SmartContextMenuBlur.small),
-);
 
 final class ExampleApp extends StatefulWidget {
   const ExampleApp({super.key});
@@ -19,24 +16,30 @@ final class ExampleApp extends StatefulWidget {
 }
 
 final class _ExampleAppState extends State<ExampleApp> {
-  ThemeMode _themeMode = ThemeMode.system;
+  final _settings = ExampleSettings();
 
-  Brightness? get _brightness => switch (_themeMode) {
-    ThemeMode.system => null,
-    ThemeMode.light => Brightness.light,
-    ThemeMode.dark => Brightness.dark,
-  };
+  @override
+  void dispose() {
+    _settings.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoApp(
-      title: 'smart_context_menu',
-      theme: CupertinoThemeData(brightness: _brightness),
-      builder: (context, child) =>
-          SmartContextMenuTheme(config: _menuConfig, child: child!),
-      home: LabPage(
-        themeMode: _themeMode,
-        onThemeModeChanged: (mode) => setState(() => _themeMode = mode),
+    return SettingsScope(
+      settings: _settings,
+      child: ListenableBuilder(
+        listenable: _settings,
+        builder: (context, _) => CupertinoApp(
+          title: 'smart_context_menu',
+          theme: CupertinoThemeData(brightness: _settings.brightness),
+          // One config for all menus of the app.
+          builder: (context, child) => SmartContextMenuTheme(
+            config: _settings.menuConfig(appMenuConfig),
+            child: child!,
+          ),
+          home: const LabPage(),
+        ),
       ),
     );
   }

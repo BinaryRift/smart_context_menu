@@ -1,10 +1,9 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show ThemeMode;
-import 'package:flutter/scheduler.dart' show timeDilation;
 import 'package:smart_context_menu/smart_context_menu.dart';
 
 import '../../../core/data/demo_loader.dart';
 import '../../../core/ui/demo_card.dart';
+import '../../settings/ui/widgets/settings_button.dart';
 import '../domain/lab_items.dart';
 import 'widgets/reactions_bar.dart';
 import 'widgets/tap_empty_area.dart';
@@ -15,14 +14,7 @@ enum _Header { none, short, tall }
 /// Menus for checking edge cases: all item types, levels of different
 /// heights, tall widgets and a widget near the bottom edge.
 final class LabPage extends StatefulWidget {
-  final ThemeMode themeMode;
-  final ValueChanged<ThemeMode> onThemeModeChanged;
-
-  const LabPage({
-    super.key,
-    required this.themeMode,
-    required this.onThemeModeChanged,
-  });
+  const LabPage({super.key});
 
   @override
   State<LabPage> createState() => _LabPageState();
@@ -35,10 +27,6 @@ final class _LabPageState extends State<LabPage> {
   final _download = DemoDownload();
   final _buttonMenuController = SmartContextMenuController();
   final _tapAreaMenuController = SmartContextMenuController();
-  bool _swipeBack = true;
-  bool _haptics = true;
-  bool _moveBackDown = false;
-  bool _slowAnimations = false;
   bool _dividersBetweenItems = false;
   _Header _header = _Header.none;
   bool _pinHeader = false;
@@ -47,9 +35,6 @@ final class _LabPageState extends State<LabPage> {
   SmartContextMenuConfig _menuConfig(BuildContext context) {
     final theme = SmartContextMenuTheme.of(context);
     return theme.copyWith(
-      enableSwipeBack: _swipeBack,
-      enableHaptics: _haptics,
-      moveBackDown: _moveBackDown,
       style: theme.style.copyWith(dividersBetweenItems: _dividersBetweenItems),
     );
   }
@@ -61,7 +46,6 @@ final class _LabPageState extends State<LabPage> {
     _favorite.dispose();
     _isMuted.dispose();
     _download.dispose();
-    timeDilation = 1;
     super.dispose();
   }
 
@@ -77,7 +61,8 @@ final class _LabPageState extends State<LabPage> {
     return CupertinoPageScaffold(
       backgroundColor: CupertinoColors.systemGroupedBackground,
       navigationBar: const CupertinoNavigationBar(
-        middle: Text('Smart Context Menu'),
+        middle: Text('Lab'),
+        trailing: SettingsButton(),
       ),
       child: SafeArea(
         child: Column(
@@ -161,22 +146,8 @@ final class _LabPageState extends State<LabPage> {
 
   Widget _buildSettings() {
     return CupertinoListSection.insetGrouped(
-      header: const Text('Settings'),
+      header: const Text('Options'),
       children: [
-        CupertinoListTile(
-          title: const Text('Theme'),
-          trailing: CupertinoSlidingSegmentedControl<ThemeMode>(
-            groupValue: widget.themeMode,
-            onValueChanged: (mode) {
-              if (mode != null) widget.onThemeModeChanged(mode);
-            },
-            children: const {
-              ThemeMode.system: Text('System'),
-              ThemeMode.light: Text('Light'),
-              ThemeMode.dark: Text('Dark'),
-            },
-          ),
-        ),
         CupertinoListTile(
           title: const Text('Header'),
           trailing: CupertinoSlidingSegmentedControl<_Header>(
@@ -197,32 +168,9 @@ final class _LabPageState extends State<LabPage> {
           onChanged: (value) => setState(() => _pinHeader = value),
         ),
         _buildSwitch(
-          title: 'Swipe back',
-          value: _swipeBack,
-          onChanged: (value) => setState(() => _swipeBack = value),
-        ),
-        _buildSwitch(
-          title: 'Haptics',
-          value: _haptics,
-          onChanged: (value) => setState(() => _haptics = value),
-        ),
-        _buildSwitch(
-          title: 'Move back down',
-          value: _moveBackDown,
-          onChanged: (value) => setState(() => _moveBackDown = value),
-        ),
-        _buildSwitch(
           title: 'Dividers between items',
           value: _dividersBetweenItems,
           onChanged: (value) => setState(() => _dividersBetweenItems = value),
-        ),
-        _buildSwitch(
-          title: 'Slow animations',
-          value: _slowAnimations,
-          onChanged: (value) {
-            setState(() => _slowAnimations = value);
-            timeDilation = value ? 5 : 1;
-          },
         ),
         _buildSwitch(
           title: 'Every other load fails',
