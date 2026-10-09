@@ -10,6 +10,7 @@ import '../../domain/smart_context_menu_header_details.dart';
 import '../../domain/smart_context_menu_item.dart';
 import '../components/fixed_extent_header_delegate.dart';
 import '../components/smart_menu_reactive_physics.dart';
+import '../extensions/animation_ext.dart';
 import '../extensions/render_object_ext.dart';
 import '../layout/smart_context_menu_horizontal_layout.dart';
 import '../layout/smart_context_menu_vertical_layout.dart';
@@ -362,29 +363,31 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
         .roundToDouble();
   }
 
-  /// Closes the menu and calls [SmartContextMenuOverlay.onPreviewTap]
-  /// three quarters through the closing, as an item that closes on tap does.
+  /// Closes the menu and calls [SmartContextMenuOverlay.onPreviewTap] once
+  /// it has closed and the preview is back in place.
+  ///
+  /// It often opens the widget, so a [Hero] in the widget flies from its
+  /// place only after the preview has landed there.
   Future<void> _onPreviewTap() async {
     if (_closing != null) return;
     if (_config.enableHaptics) HapticFeedback.lightImpact();
 
-    await _close();
+    await _close(actionAt: 1);
     await widget.onPreviewTap?.call();
   }
 
-  /// Closes the menu once and completes three quarters through the closing.
+  /// Closes the menu once and completes [actionAt] through the closing,
+  /// three quarters by default.
   ///
   /// Does nothing if the menu is already closing, so it never pops
   /// the route below the menu.
-  Future<void> _close() {
+  Future<void> _close({double actionAt = MotionTiming.closingAction}) {
     return _closing ??= () async {
       final route = ModalRoute.of(context);
       if (route == null || !route.isCurrent) return;
 
       Navigator.of(context).pop();
-      await Future<void>.delayed(
-        route.reverseTransitionDuration * MotionTiming.closingAction,
-      );
+      await widget.routeAnimation.closedBy(actionAt);
     }();
   }
 }

@@ -68,7 +68,8 @@ Only the long press is taken from the child: its taps, drags and other gestures 
 
 The preview above the open menu is a snapshot of the child, so its own buttons do not
 work there. To run the main action of the child when the preview is tapped, for example
-to open a message, pass `onPreviewTap`. The menu starts closing first, as with an item:
+to open a message, pass `onPreviewTap`. The menu closes first, and `onPreviewTap` is called
+once the preview is back in place:
 
 ```dart
 SmartContextMenu(
@@ -178,8 +179,9 @@ it next to the widget, and only while the menu is open. So there is no `Hero` in
 a `Hero`, and while the menu is open, your widget stays in its place, hidden, with its
 state kept.
 
-Open the page from `onPreviewTap`, and your `Hero` flies from the place of the widget,
-as it does after a tap on the widget itself:
+Open the page from `onPreviewTap`: it is called once the menu has closed and the preview
+is back in place, so your `Hero` flies from the place of the widget, as it does after a tap
+on the widget itself:
 
 ```dart
 SmartContextMenu(

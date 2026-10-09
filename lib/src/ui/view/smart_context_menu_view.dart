@@ -8,6 +8,7 @@ import '../../core/ui/motion/tokens/motion_translation.dart';
 import '../../controllers/smart_context_menu_overlay_controller.dart';
 import '../../domain/smart_context_menu_level.dart';
 import '../../domain/smart_context_menu_navigator.dart';
+import '../extensions/animation_ext.dart';
 import '../state/smart_context_menu_hover_controller.dart';
 import '../state/smart_context_menu_stretch_controller.dart';
 import '../widgets/smart_context_menu_blur_box.dart';
@@ -88,10 +89,8 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
     if (!mounted || route == null) return;
 
     if (Navigator.of(context).canPop()) {
-      final delay =
-          route.reverseTransitionDuration * MotionTiming.closingAction;
       Navigator.of(context).pop();
-      await Future.delayed(delay);
+      await route.animation?.closedBy(MotionTiming.closingAction);
     }
   }
 

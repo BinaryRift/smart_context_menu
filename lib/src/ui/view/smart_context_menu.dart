@@ -81,9 +81,10 @@ final class SmartContextMenu extends StatefulWidget {
 
   /// Called when the preview above the open menu is tapped.
   ///
-  /// The menu starts closing before it is called, as with an item that
-  /// closes on tap. Use it for the main action of [child], for example to
-  /// open a message. If null, tapping the preview does nothing.
+  /// The menu closes first, and it is called once the preview is back in
+  /// place. Use it for the main action of [child], for example to open
+  /// a message: a [Hero] in [child] then flies from its place. If null,
+  /// tapping the preview does nothing.
   final FutureOr<void> Function()? onPreviewTap;
 
   /// Builds slivers shown above the preview while the menu is open.
