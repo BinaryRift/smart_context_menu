@@ -28,6 +28,9 @@ final class SubmenuDemoPage extends StatefulWidget {
 
 final class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
   final _loader = DemoLoader();
+  final _favorite = DemoFavorite();
+  final _isMuted = ValueNotifier(false);
+  final _download = DemoDownload();
   final _buttonMenuController = SmartContextMenuController();
   final _tapAreaMenuController = SmartContextMenuController();
   bool _swipeBack = true;
@@ -53,6 +56,9 @@ final class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
   void dispose() {
     _buttonMenuController.dispose();
     _tapAreaMenuController.dispose();
+    _favorite.dispose();
+    _isMuted.dispose();
+    _download.dispose();
     timeDilation = 1;
     super.dispose();
   }
@@ -100,6 +106,15 @@ final class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
                     items: allSubmenuTypes(_loader),
                     leading: TapEmptyArea(
                       onDoubleTap: _tapAreaMenuController.open,
+                    ),
+                  ),
+                  _buildMenu(
+                    title: 'Listenable items',
+                    subtitle: 'Change while the menu is open',
+                    items: listenableItems(
+                      favorite: _favorite,
+                      isMuted: _isMuted,
+                      download: _download,
                     ),
                   ),
                   _buildMenu(

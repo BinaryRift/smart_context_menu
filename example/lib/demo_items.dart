@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
 
 const _loadDelay = Duration(milliseconds: 800);
 const _pageCount = 5;
 const _pageSize = 20;
+const _downloadTick = Duration(milliseconds: 500);
+const _downloadStep = 10;
 
 /// Simulates network loads of the demo submenus.
 class DemoLoader {
@@ -22,6 +26,122 @@ class DemoLoader {
     }
   }
 }
+
+/// A favorite mark that is saved with a delay, like a network request.
+class DemoFavorite extends ChangeNotifier {
+  bool _isFavorite = false;
+  bool _isSaving = false;
+
+  bool get isFavorite => _isFavorite;
+  bool get isSaving => _isSaving;
+
+  Future<void> toggle() async {
+    _isSaving = true;
+    notifyListeners();
+    await Future<void>.delayed(_loadDelay);
+    _isFavorite = !_isFavorite;
+    _isSaving = false;
+    notifyListeners();
+  }
+}
+
+/// A download that keeps running after the menu closes.
+class DemoDownload extends ChangeNotifier {
+  Timer? _timer;
+  int _percent = 0;
+
+  bool get isRunning => _timer != null;
+  bool get isDone => _percent == 100;
+  int get percent => _percent;
+
+  void start() {
+    _timer = Timer.periodic(_downloadTick, (timer) {
+      _percent += _downloadStep;
+      if (isDone) {
+        timer.cancel();
+        _timer = null;
+      }
+      notifyListeners();
+    });
+    notifyListeners();
+  }
+
+  void remove() {
+    _percent = 0;
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+}
+
+/// Items built from the state of the app, also while the menu is open.
+List<SmartContextMenuItem> listenableItems({
+  required DemoFavorite favorite,
+  required ValueNotifier<bool> isMuted,
+  required DemoDownload download,
+}) => [
+  SmartContextMenuItem.listenable(
+    listenable: favorite,
+    builder: () {
+      if (favorite.isSaving) {
+        return SmartContextMenuItem.loading(title: 'Saving');
+      }
+      return SmartContextMenuItem.simple(
+        title: favorite.isFavorite
+            ? 'Remove from Favorites'
+            : 'Add to Favorites',
+        leading: Icon(
+          favorite.isFavorite
+              ? CupertinoIcons.heart_fill
+              : CupertinoIcons.heart,
+        ),
+        closeOnTap: false,
+        onTap: favorite.toggle,
+      );
+    },
+  ),
+  SmartContextMenuItem.listenable(
+    listenable: isMuted,
+    builder: () => SmartContextMenuItem.simple(
+      title: isMuted.value ? 'Unmute' : 'Mute',
+      leading: Icon(
+        isMuted.value ? CupertinoIcons.bell_slash : CupertinoIcons.bell,
+      ),
+      closeOnTap: false,
+      onTap: () => isMuted.value = !isMuted.value,
+    ),
+  ),
+  SmartContextMenuItem.separator(),
+  SmartContextMenuItem.listenable(
+    listenable: download,
+    builder: () {
+      if (download.isRunning) {
+        return SmartContextMenuItem.loading(
+          title: 'Downloading ${download.percent}%',
+        );
+      }
+      if (download.isDone) {
+        return SmartContextMenuItem.simple(
+          title: 'Remove download',
+          leading: const Icon(CupertinoIcons.delete),
+          isDestructive: true,
+          closeOnTap: false,
+          onTap: download.remove,
+        );
+      }
+      return SmartContextMenuItem.simple(
+        title: 'Download',
+        leading: const Icon(CupertinoIcons.cloud_download),
+        closeOnTap: false,
+        onTap: download.start,
+      );
+    },
+  ),
+];
 
 /// Every kind of submenu: static, async, paginated and nested.
 List<SmartContextMenuItem> allSubmenuTypes(DemoLoader loader) => [
