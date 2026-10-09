@@ -742,7 +742,8 @@ the space before and after them with `dividerIndent` and `dividerEndIndent`.
 const style = SmartContextMenuStyle(
   dividersBetweenItems: true,
   dividerThickness: 1,
-  dividerIndent: 52,
+  // Lines up with the title after a leading icon.
+  dividerIndent: 48,
 );
 ```
 
