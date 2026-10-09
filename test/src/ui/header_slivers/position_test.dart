@@ -124,9 +124,10 @@ void main() {
     await tester.openMenu();
 
     count = 1;
-    // A new screen size rebuilds the open menu.
-    tester.view.physicalSize = tester.view.physicalSize + const Offset(0, 1);
-    addTearDown(tester.view.resetPhysicalSize);
+    // A new platform brightness rebuilds the open menu without changing
+    // its layout; a new screen size would close it.
+    tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
+    addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
     await tester.settleMenu();
 
     expect(find.byKey(const ValueKey('b')), findsNothing);

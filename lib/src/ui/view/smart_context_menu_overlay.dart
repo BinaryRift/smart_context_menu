@@ -70,6 +70,9 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
   bool _isScrolling = false;
   Future<void>? _closing;
 
+  /// The size of the screen when the menu opened.
+  Size? _openedScreenSize;
+
   SmartContextMenuConfig get _config => widget.config;
 
   @override
@@ -100,6 +103,18 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
   void didChangeDependencies() {
     super.didChangeDependencies();
     final media = MediaQuery.of(context);
+
+    // The place of the widget and its snapshot are measured once, so they
+    // are out of date after the screen turns or the window is resized:
+    // the menu closes, keeping its layout, as the system menu of iOS does.
+    final openedScreenSize = _openedScreenSize ??= media.size;
+    if (media.size != openedScreenSize) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _close();
+      });
+      return;
+    }
+
     final screenPadding = _config.screenPadding;
     _horizontalLayout = SmartContextMenuHorizontalLayout(
       anchorRect: widget.anchorRect,

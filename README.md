@@ -226,6 +226,10 @@ the slivers scroll out at the top.
 of the safe area such as the status bar or the notch in landscape. `menuGap` sets the distance
 between the widget and the menu.
 
+The place of the widget and its snapshot are taken when the menu opens. If the screen size
+changes while it is open, for example when the device turns or a window is resized, the menu
+closes without an action, as the system menu of iOS does.
+
 ### Item types
 
 Create items with the method that matches what the item does:

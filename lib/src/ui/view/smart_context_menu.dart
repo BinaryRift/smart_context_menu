@@ -22,7 +22,9 @@ import '../widgets/smart_context_menu_press_detector.dart';
 /// While pressed, [child] shrinks slightly. When the menu opens, [child]
 /// is lifted above the blurred screen and the menu with [items] appears
 /// next to it. The preview is a snapshot of [child] taken at the moment
-/// of opening, so it does not update while the menu is open.
+/// of opening, so it does not update while the menu is open. If the screen
+/// size changes, for example when the device turns, the menu closes without
+/// an action, as the system menu of iOS does.
 ///
 /// To open the menu from code, pass a [controller]. To turn off the long
 /// press, set [SmartContextMenuConfig.activationMode] to
