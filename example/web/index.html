@@ -33,19 +33,16 @@
   <link rel="manifest" href="manifest.json">
 
   <style>
+    /* The page is always dark, as the site the demo is shown on; the app
+       has its own theme, set with the gear. */
     html, body {
       height: 100%;
       margin: 0;
       overflow: hidden;
       /* No rubber band of the page itself: only the app scrolls. */
       overscroll-behavior: none;
-      background: #e5e5ea;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      html, body {
-        background: #1c1c1e;
-      }
+      color-scheme: dark;
+      background: #1c1c1e;
     }
 
     #app {
@@ -53,6 +50,10 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
+    }
+
+    .about {
+      display: none;
     }
 
     /* On wide screens, the app runs in a tablet-sized frame. */
@@ -70,6 +71,91 @@
         box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
       }
     }
+
+    /* In the spaces left and right of the frame, when there is room. */
+    @media (min-width: 1480px) {
+      .about {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        width: calc((100% - 834px) / 2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 32px;
+        box-sizing: border-box;
+        font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        color: #f2f2f7;
+      }
+
+      .about-left {
+        left: 0;
+      }
+
+      .about-right {
+        right: 0;
+      }
+
+      .about-content {
+        max-width: 320px;
+      }
+
+      .about h1 {
+        margin: 0 0 10px;
+        font-size: 26px;
+      }
+
+      .about .lead {
+        margin: 0;
+        font-size: 17px;
+      }
+
+      .about h2 {
+        margin: 0 0 10px;
+        font-size: 17px;
+      }
+
+      .about section + section {
+        margin-top: 40px;
+      }
+
+      .about h3 {
+        margin: 18px 0 6px;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #98989d;
+      }
+
+      .about .note {
+        margin: 18px 0 0;
+        font-size: 14px;
+        color: #98989d;
+      }
+
+      .about ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+
+      .about li {
+        margin-bottom: 4px;
+      }
+
+      .about code {
+        display: block;
+        padding: 10px 12px;
+        border-radius: 8px;
+        font: 14px ui-monospace, Menlo, monospace;
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .about a {
+        color: #0a84ff;
+      }
+    }
   </style>
 </head>
 <body>
@@ -81,6 +167,57 @@
     For more details:
     * https://docs.flutter.dev/platform-integration/web/initialization
   -->
+  <aside class="about about-left">
+    <div class="about-content">
+      <section>
+        <h1>smart_context_menu</h1>
+        <p class="lead">
+          A powerful, fully customizable iOS-style context menu for Flutter:
+          smart positioning, fluid animations, drag-to-select, rich submenus
+          and your own content above the widget.
+        </p>
+      </section>
+      <section>
+        <h2>Add it to your app</h2>
+        <code>flutter pub add smart_context_menu</code>
+        <p>
+          <a href="https://github.com/BinaryRift/smart_context_menu">Source on GitHub</a>
+        </p>
+      </section>
+    </div>
+  </aside>
+  <aside class="about about-right">
+    <div class="about-content">
+      <h2>Try it</h2>
+
+      <h3>Everywhere</h3>
+      <ul>
+        <li>Long press any file, message or card to open its menu.</li>
+        <li>Slide across the items and release on one.</li>
+        <li>Swipe right in a submenu to go back, as in iOS.</li>
+        <li>Tap the preview to open the file or the photo.</li>
+      </ul>
+
+      <h3>Files</h3>
+      <ul>
+        <li>The ⋯ button in a row opens the same menu.</li>
+        <li>Tap Download: the progress shows in the open menu.</li>
+      </ul>
+
+      <h3>Chat</h3>
+      <ul>
+        <li>Tap a reaction above a message.</li>
+        <li>Open Reactions of the lake photo: people load as you scroll.</li>
+        <li>Double tap next to a message to open its menu.</li>
+        <li>Photos fly to the photo page with their own Hero.</li>
+      </ul>
+
+      <p class="note">
+        Appearance shows the menu in other styles. The gear sets the theme,
+        haptics and slow animations.
+      </p>
+    </div>
+  </aside>
   <div id="app"></div>
   <script src="flutter_bootstrap.js" async></script>
 </body>
