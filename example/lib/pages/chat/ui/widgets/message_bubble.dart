@@ -7,13 +7,16 @@ const _imageWidth = 260.0;
 
 /// The text or the photo of [message].
 final class MessageBubble extends StatelessWidget {
+  /// The corner radius of the bubble and of the photo.
+  static const cornerRadius = 18.0;
+
   final ChatMessage message;
 
   const MessageBubble({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {
-    final borderRadius = BorderRadius.circular(18);
+    final borderRadius = BorderRadius.circular(cornerRadius);
 
     if (message.image case final image?) {
       // Flies to the photo page, tagged with the message.

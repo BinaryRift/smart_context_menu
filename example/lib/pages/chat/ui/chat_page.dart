@@ -306,13 +306,42 @@ final class _ChatPageState extends State<ChatPage> {
     );
   }
 
+  /// The photo in flight, with the corners of the bubble that straighten
+  /// on the way to the photo page and round again on the way back.
+  Widget _photoFlight(
+    BuildContext flightContext,
+    Animation<double> animation,
+    HeroFlightDirection flightDirection,
+    BuildContext fromHeroContext,
+    BuildContext toHeroContext,
+  ) {
+    final pageHero = switch (flightDirection) {
+      HeroFlightDirection.push => toHeroContext.widget,
+      HeroFlightDirection.pop => fromHeroContext.widget,
+    };
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (context, photo) => ClipRRect(
+        borderRadius: BorderRadius.circular(
+          MessageBubble.cornerRadius * (1 - animation.value),
+        ),
+        child: photo,
+      ),
+      child: (pageHero as Hero).child,
+    );
+  }
+
   void _openPhoto(ChatMessage message) {
     Navigator.of(context).push(
       CupertinoPageRoute<void>(
         builder: (context) => DetailPage(
           title: 'Photo',
           child: InteractiveViewer(
-            child: Hero(tag: message, child: Image.asset(message.image!.path)),
+            child: Hero(
+              tag: message,
+              flightShuttleBuilder: _photoFlight,
+              child: Image.asset(message.image!.path),
+            ),
           ),
         ),
       ),
