@@ -90,6 +90,18 @@ final class _SmartContextMenuLevelSwitcherState
   @override
   void didUpdateWidget(SmartContextMenuLevelSwitcher oldWidget) {
     super.didUpdateWidget(oldWidget);
+    _updateSwipeParent();
+
+    if (Widget.canUpdate(_current.child, widget.child)) {
+      _current.child = widget.child;
+      return;
+    }
+    _switchTo(widget.child, isForward: widget.isForward);
+  }
+
+  /// Keeps the parent revealed by a swipe back up to date with
+  /// [SmartContextMenuLevelSwitcher.previous].
+  void _updateSwipeParent() {
     final previous = widget.previous;
     final swipeParent = _swipeParent;
     if (swipeParent != null &&
@@ -97,21 +109,22 @@ final class _SmartContextMenuLevelSwitcherState
         Widget.canUpdate(swipeParent.child, previous)) {
       swipeParent.child = previous;
     }
+  }
 
-    if (Widget.canUpdate(_current.child, widget.child)) {
-      _current.child = widget.child;
-      return;
-    }
-
-    final isForward = widget.isForward;
+  /// Replaces the current level with [child]: a submenu slides in over
+  /// the current level without fading, and the current level moves aside
+  /// by half and fades; going back, the other way round, as in a swipe
+  /// back.
+  void _switchTo(Widget child, {required bool isForward}) {
     final leaving = _current;
     final hidden = leaving.leave(
       isForward ? MotionSlide.leftHalf.offset : MotionSlide.right.offset,
       fades: isForward,
     );
     _removeWhenHidden(leaving, hidden);
+
     final entering = _createEntry(
-      widget.child,
+      child,
       enterFrom: isForward
           ? MotionSlide.right.offset
           : MotionSlide.leftHalf.offset,
@@ -120,16 +133,30 @@ final class _SmartContextMenuLevelSwitcherState
     final shown = entering.controller.forward();
     _current = entering;
 
-    final cover = isForward ? entering : leaving;
-    _revealed = isForward ? leaving : entering;
+    if (isForward) {
+      _coverUntil(shown, cover: entering, revealed: leaving);
+    } else {
+      _coverUntil(hidden, cover: leaving, revealed: entering);
+    }
+  }
+
+  /// Shows [revealed] only to the left of [cover] until [done] completes,
+  /// unless another level covers before that.
+  void _coverUntil(
+    TickerFuture done, {
+    required SmartContextMenuLevelEntry cover,
+    required SmartContextMenuLevelEntry revealed,
+  }) {
     _cover = cover;
-    (isForward ? shown : hidden).whenCompleteOrCancel(() {
-      if (!mounted || _cover != cover) return;
-      setState(() {
-        _revealed = null;
-        _cover = null;
-      });
+    _revealed = revealed;
+    done.whenCompleteOrCancel(() {
+      if (mounted && _cover == cover) setState(_uncover);
     });
+  }
+
+  void _uncover() {
+    _revealed = null;
+    _cover = null;
   }
 
   @override
@@ -325,8 +352,7 @@ final class _SmartContextMenuLevelSwitcherState
 
   void _endSettling() {
     _isSettling = false;
-    _revealed = null;
-    _cover = null;
+    _uncover();
   }
 }
 
