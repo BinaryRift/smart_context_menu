@@ -143,6 +143,63 @@ List<SmartContextMenuItem> listenableItems({
   ),
 ];
 
+/// Loading, error and empty items, on their own and as states of loads.
+///
+/// Each load fails every other time, so the first load of the async item
+/// and of the shared files fails and can be retried.
+List<SmartContextMenuItem> statusItems() {
+  final editLoader = DemoLoader()..failEveryOther = true;
+  final filesLoader = DemoLoader()..failEveryOther = true;
+  return [
+    SmartContextMenuItem.loading(title: 'Syncing'),
+    SmartContextMenuItem.error(title: 'Could not sync'),
+    SmartContextMenuItem.empty(title: 'No drafts'),
+    SmartContextMenuItem.separator(),
+    SmartContextMenuItem.async(
+      asyncItem: () async {
+        await editLoader.load('Edit');
+        return _action('Edit', icon: CupertinoIcons.pencil);
+      },
+    ),
+    SmartContextMenuItem.asyncSubmenu(
+      title: 'Archive',
+      leading: const Icon(CupertinoIcons.archivebox),
+      asyncChildren: () async {
+        await Future<void>.delayed(_loadDelay);
+        return [];
+      },
+    ),
+    SmartContextMenuItem.asyncSubmenu(
+      title: 'Shared files',
+      leading: const Icon(CupertinoIcons.folder_badge_person_crop),
+      loading: SmartContextMenuItem.loading(title: 'Loading files'),
+      error: SmartContextMenuItem.error(
+        child: Row(
+          children: [
+            const Expanded(child: Text('Could not load files')),
+            GestureDetector(
+              onTap: () => debugPrint('Tapped: Details'),
+              child: const Text(
+                'Details',
+                style: TextStyle(color: CupertinoColors.activeBlue),
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Icon(SmartContextMenuDefaults.retryIcon),
+          ],
+        ),
+      ),
+      asyncChildren: () async {
+        await filesLoader.load('Shared files');
+        return [
+          for (var i = 1; i <= 3; i++)
+            _action('Shared $i.pdf', icon: CupertinoIcons.doc),
+        ];
+      },
+    ),
+  ];
+}
+
 /// Every kind of submenu: static, async, paginated and nested.
 List<SmartContextMenuItem> allSubmenuTypes(DemoLoader loader) => [
   _action('Reply', icon: CupertinoIcons.reply),

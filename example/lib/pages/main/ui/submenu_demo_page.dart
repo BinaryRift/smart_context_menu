@@ -118,6 +118,11 @@ final class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
                     ),
                   ),
                   _buildMenu(
+                    title: 'Status items',
+                    subtitle: 'Loading, error and empty, retry on tap',
+                    items: statusItems(),
+                  ),
+                  _buildMenu(
                     title: 'Nested levels',
                     subtitle: 'Share → Messages',
                     items: nestedLevels(),
