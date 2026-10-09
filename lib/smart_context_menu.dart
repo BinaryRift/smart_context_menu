@@ -22,10 +22,14 @@
 /// * [SmartContextMenuBlur] sets the strength of the blurs.
 /// * [SmartContextMenuPagingMetadata] describes a page of a paginated
 ///   submenu.
-/// * [SmartContextMenuStatusItem] is the base of the items that show
-///   a state: [SmartContextMenuLoadingItem], [SmartContextMenuErrorItem] and
-///   [SmartContextMenuEmptyItem], created by [SmartContextMenuItem.loading],
-///   [SmartContextMenuItem.error] and [SmartContextMenuItem.empty].
+/// * The subtypes of [SmartContextMenuItem], one for each way to create
+///   an item, such as [SmartContextMenuSimpleItem]. Switch on an item to
+///   read the fields of its type. [SmartContextMenuContentItem] is the base
+///   of the actions and submenus, [SmartContextMenuStatusItem] of the
+///   loading, error and empty items.
+/// * [SmartContextMenuAsyncResult] and [SmartContextMenuListenableResult]
+///   are the items that an async item can load and that the builder of
+///   a listenable item can return.
 /// * [SmartContextMenuItemState] is passed to custom item builders.
 /// * [SmartContextMenuHeaderDetails] is passed to the builder of the
 ///   slivers above the preview.
@@ -38,8 +42,7 @@ export 'src/domain/smart_context_menu_activation_mode.dart';
 export 'src/domain/smart_context_menu_blur.dart';
 export 'src/domain/smart_context_menu_config.dart';
 export 'src/domain/smart_context_menu_header_details.dart';
-export 'src/domain/smart_context_menu_item.dart'
-    hide SmartContextMenuItemFields;
+export 'src/domain/smart_context_menu_item.dart';
 export 'src/domain/smart_context_menu_item_state.dart';
 export 'src/domain/smart_context_menu_labels.dart';
 export 'src/domain/smart_context_menu_paging_metadata.dart';

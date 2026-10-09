@@ -9,10 +9,11 @@ import '../core/ui/styles/smart_context_menu_defaults.dart';
 /// pagination, [nextCursor] for cursor pagination and [extra] for anything
 /// else.
 ///
-/// The first page is described by the `initialMetadata` of
-/// [SmartContextMenuItem.pagingSubmenu]. Each next page is described by the
-/// [SmartContextMenuItem.pagingMetadata] of the last item of the previous
-/// page. To mark the last page, leave the metadata of its last item null
+/// The first page is described by
+/// [SmartContextMenuPagingSubmenuItem.initialMetadata]. Each next page is
+/// described by the `pagingMetadata` of the last item of the previous page,
+/// see [SmartContextMenuSimpleItem.pagingMetadata] and
+/// [SmartContextMenuSeparatorItem.pagingMetadata]. To mark the last page, leave the metadata of its last item null
 /// or return an empty page.
 @immutable
 final class SmartContextMenuPagingMetadata {

@@ -1,7 +1,6 @@
 import 'dart:async' show FutureOr;
 import 'package:flutter/widgets.dart'
     show Widget, BuildContext, Color, EdgeInsets, Listenable, TextStyle;
-import 'package:meta/meta.dart' show internal;
 
 import '../core/ui/styles/smart_context_menu_defaults.dart';
 import 'smart_context_menu_item_state.dart';
@@ -119,11 +118,6 @@ sealed class SmartContextMenuItem {
   /// so ids must be unique across the menu and all its submenus.
   /// A unique id is generated when none is given.
   final String id;
-
-  /// Whether the item shows that it is loading.
-  ///
-  /// True for a [SmartContextMenuLoadingItem].
-  bool get isLoading => this is SmartContextMenuLoadingItem;
 
   const SmartContextMenuItem._({required this.id});
 
@@ -600,157 +594,4 @@ sealed class SmartContextMenuItem {
     padding: padding,
     childrenGap: childrenGap,
   );
-}
-
-/// The fields of [SmartContextMenuItem] under their old names, for the code
-/// that does not switch on the type of the item yet.
-@internal
-extension SmartContextMenuItemFields on SmartContextMenuItem {
-  String? get title => switch (this) {
-    SmartContextMenuContentItem(:final title) => title,
-    SmartContextMenuStatusItem(:final title) => title,
-    _ => null,
-  };
-
-  TextStyle? get titleStyle => switch (this) {
-    SmartContextMenuContentItem(:final titleStyle) => titleStyle,
-    SmartContextMenuStatusItem(:final titleStyle) => titleStyle,
-    _ => null,
-  };
-
-  Widget? get leading => switch (this) {
-    SmartContextMenuContentItem(:final leading) => leading,
-    SmartContextMenuStatusItem(:final leading) => leading,
-    _ => null,
-  };
-
-  Widget? get trailing => switch (this) {
-    SmartContextMenuContentItem(:final trailing) => trailing,
-    SmartContextMenuStatusItem(:final trailing) => trailing,
-    _ => null,
-  };
-
-  EdgeInsets? get padding => switch (this) {
-    SmartContextMenuContentItem(:final padding) => padding,
-    SmartContextMenuStatusItem(:final padding) => padding,
-    _ => null,
-  };
-
-  double? get childrenGap => switch (this) {
-    SmartContextMenuContentItem(:final childrenGap) => childrenGap,
-    SmartContextMenuStatusItem(:final childrenGap) => childrenGap,
-    _ => null,
-  };
-
-  bool get isDestructive => switch (this) {
-    SmartContextMenuContentItem(:final isDestructive) => isDestructive,
-    _ => false,
-  };
-
-  Color? get tintColor => switch (this) {
-    SmartContextMenuContentItem(:final tintColor) => tintColor,
-    _ => null,
-  };
-
-  bool get isDisabled => switch (this) {
-    SmartContextMenuContentItem(:final isDisabled) => isDisabled,
-    _ => false,
-  };
-
-  bool get isSeparator => this is SmartContextMenuSeparatorItem;
-
-  bool get closeOnTap => switch (this) {
-    SmartContextMenuSimpleItem(:final closeOnTap) => closeOnTap,
-    SmartContextMenuContentItem() => true,
-    _ => false,
-  };
-
-  FutureOr<void> Function()? get onTap => switch (this) {
-    SmartContextMenuSimpleItem(:final onTap) => onTap,
-    _ => null,
-  };
-
-  List<SmartContextMenuItem>? get children => switch (this) {
-    SmartContextMenuSubmenuItem(:final children) => children,
-    _ => null,
-  };
-
-  SmartContextMenuSubmenuLoader? get asyncChildren => switch (this) {
-    SmartContextMenuAsyncSubmenuItem(:final asyncChildren) => asyncChildren,
-    _ => null,
-  };
-
-  SmartContextMenuPageLoader? get asyncPagingChildren => switch (this) {
-    SmartContextMenuPagingSubmenuItem(:final asyncPagingChildren) =>
-      asyncPagingChildren,
-    _ => null,
-  };
-
-  SmartContextMenuItemLoader? get asyncItem => switch (this) {
-    SmartContextMenuAsyncItem(:final asyncItem) => asyncItem,
-    _ => null,
-  };
-
-  SmartContextMenuLoadingItem? get loadingItem => switch (this) {
-    SmartContextMenuAsyncSubmenuItem(:final loading) => loading,
-    SmartContextMenuPagingSubmenuItem(:final loading) => loading,
-    SmartContextMenuAsyncItem(:final loading) => loading,
-    _ => null,
-  };
-
-  SmartContextMenuErrorItem? get errorItem => switch (this) {
-    SmartContextMenuAsyncSubmenuItem(:final error) => error,
-    SmartContextMenuPagingSubmenuItem(:final error) => error,
-    SmartContextMenuAsyncItem(:final error) => error,
-    _ => null,
-  };
-
-  SmartContextMenuEmptyItem? get emptyItem => switch (this) {
-    SmartContextMenuAsyncSubmenuItem(:final empty) => empty,
-    SmartContextMenuPagingSubmenuItem(:final empty) => empty,
-    _ => null,
-  };
-
-  Duration? get loadingTimeout => switch (this) {
-    SmartContextMenuAsyncSubmenuItem(:final timeout) => timeout,
-    SmartContextMenuPagingSubmenuItem(:final timeout) => timeout,
-    SmartContextMenuAsyncItem(:final timeout) => timeout,
-    _ => null,
-  };
-
-  Listenable? get listenable => switch (this) {
-    SmartContextMenuListenableItem(:final listenable) => listenable,
-    _ => null,
-  };
-
-  SmartContextMenuListenableItemBuilder? get listenableBuilder =>
-      switch (this) {
-        SmartContextMenuListenableItem(:final builder) => builder,
-        _ => null,
-      };
-
-  SmartContextMenuPagingMetadata? get pagingMetadata => switch (this) {
-    SmartContextMenuSimpleItem(:final pagingMetadata) => pagingMetadata,
-    SmartContextMenuSeparatorItem(:final pagingMetadata) => pagingMetadata,
-    SmartContextMenuPagingSubmenuItem(:final initialMetadata) =>
-      initialMetadata,
-    _ => null,
-  };
-
-  SmartContextMenuItemBuilder? get customBuilder => switch (this) {
-    SmartContextMenuContentItem(:final customBuilder) => customBuilder,
-    SmartContextMenuSeparatorItem(:final child?) => (context, state) => child,
-    _ => null,
-  };
-
-  /// Whether the item shows a submenu chevron.
-  bool get showTransitionIcon =>
-      children != null || asyncChildren != null || asyncPagingChildren != null;
-
-  /// Whether a tap is handled by the menu itself.
-  bool get isInternalInteracted =>
-      asyncItem != null ||
-      asyncChildren != null ||
-      asyncPagingChildren != null ||
-      children != null;
 }

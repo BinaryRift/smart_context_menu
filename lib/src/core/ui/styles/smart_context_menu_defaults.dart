@@ -4,9 +4,9 @@ import 'package:flutter/cupertino.dart';
 /// text and icons.
 ///
 /// Most of them are defaults of [SmartContextMenuConfig],
-/// [SmartContextMenuStyle] and [SmartContextMenuItem] fields. The rest, such
+/// [SmartContextMenuStyle] and item fields. The rest, such
 /// as the opacities, are fixed. All are public, so custom
-/// content, for example from [SmartContextMenuItem.customBuilder], can match
+/// content, for example from [SmartContextMenuContentItem.customBuilder], can match
 /// the default look.
 ///
 /// Colors are [CupertinoDynamicColor]s with light and dark variants.
@@ -143,7 +143,8 @@ abstract final class SmartContextMenuDefaults {
   // Opacities
 
   /// The background opacity of a tinted item in the light theme, see
-  /// [SmartContextMenuItem.tintColor] and [SmartContextMenuItem.isDestructive].
+  /// [SmartContextMenuContentItem.tintColor] and
+  /// [SmartContextMenuContentItem.isDestructive].
   ///
   /// A tint fades on a light menu, so the light theme opacities are twice
   /// as high as the dark ones.

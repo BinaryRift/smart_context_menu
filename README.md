@@ -175,9 +175,9 @@ between the widget and the menu.
 
 ### Item types
 
-Create items with the factory that matches what the item does:
+Create items with the method that matches what the item does:
 
-| Factory | What it does |
+| Method | What it does |
 | --- | --- |
 | `SmartContextMenuItem.simple` | Runs `onTap`. |
 | `SmartContextMenuItem.submenu` | Opens a submenu with `children`. |
@@ -189,6 +189,9 @@ Create items with the factory that matches what the item does:
 | `SmartContextMenuItem.error` | Shows a failed load; tapping it retries when it is the `error` of an async item or submenu. |
 | `SmartContextMenuItem.empty` | Shows a submenu without items. |
 | `SmartContextMenuItem.separator` | Separates groups of items. |
+
+Each method returns its own subtype of `SmartContextMenuItem`, such as `SmartContextMenuSimpleItem`,
+so you can `switch` on an item and read the fields of its type.
 
 #### Submenu
 
@@ -238,8 +241,8 @@ SmartContextMenuItem.asyncSubmenu(
 
 <!-- GIF: paginated submenu loads the next page on scroll -->
 
-The first page is loaded with `initialMetadata`. The last item of each page carries
-the metadata of the next page in `pagingMetadata`; the next page is loaded when the
+The first page is loaded with `initialMetadata`. The last item of each page, a `simple` item
+or a separator, carries the metadata of the next page in `pagingMetadata`; the next page is loaded when the
 user scrolls to the end. Leave it `null` on the last page. While a page loads, the submenu
 shows `loading` after the loaded items, as an async submenu does. If a page fails to load
 or takes longer than `timeout` (10 seconds by default), the submenu shows `error` after
@@ -290,8 +293,11 @@ SmartContextMenuItem.async(
 )
 ```
 
-The loader decides what to show for its result: when there is nothing to show,
-it returns a `SmartContextMenuItem.empty` or any other item itself.
+The loader decides what to show for its result: an item that runs an action or opens a submenu,
+or a `loading`, `error` or `empty` item, for example `SmartContextMenuItem.empty` when there is
+nothing to show. Its return type, `SmartContextMenuAsyncResult`, allows only these: returning
+an async item, a listenable item or a separator does not compile. A helper that builds the result
+needs the type of its item, such as `SmartContextMenuSimpleItem`, not `SmartContextMenuItem`.
 
 #### Listenable item
 
@@ -320,6 +326,8 @@ SmartContextMenuItem.listenable(
 Unlike an async item, the state belongs to your app: the item is not loaded once but built
 again on every notification. The builder returns a `SmartContextMenuItem.simple`, whose
 `onTap` and `closeOnTap` are used, or a `loading`, `error` or `empty` item, which ignore taps.
+Its return type, `SmartContextMenuListenableResult`, allows only these, so returning a submenu
+or a separator does not compile; declare helpers with the type of their item, as for an async item.
 To retry a failed load of your app from the item, return a `simple` item:
 
 ```dart

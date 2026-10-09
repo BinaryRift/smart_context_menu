@@ -110,15 +110,17 @@ final class SmartContextMenuStyle {
 
   // Items
 
-  /// The padding around the content of items without their own
-  /// [SmartContextMenuItem.padding].
+  /// The padding around the content of items without their own padding,
+  /// see [SmartContextMenuContentItem.padding] and
+  /// [SmartContextMenuStatusItem.padding].
   ///
   /// Also used by the back and retry items.
   /// Defaults to [SmartContextMenuDefaults.itemPadding].
   final EdgeInsets itemPadding;
 
-  /// The gap between the parts of items without their own
-  /// [SmartContextMenuItem.childrenGap].
+  /// The gap between the parts of items without their own gap, see
+  /// [SmartContextMenuContentItem.childrenGap] and
+  /// [SmartContextMenuStatusItem.childrenGap].
   ///
   /// Also used by the back and retry items.
   /// Defaults to [SmartContextMenuDefaults.itemChildrenGap].
@@ -126,10 +128,12 @@ final class SmartContextMenuStyle {
 
   /// The base style of item titles.
   ///
-  /// Used for items without [SmartContextMenuItem.titleStyle] and for the
+  /// Used for items without their own title style, see
+  /// [SmartContextMenuContentItem.titleStyle], and for the
   /// retry and loading items. The back item merges [backButtonTitleStyle]
   /// over it. Its color is used only while an item is
-  /// enabled, not destructive and has no [SmartContextMenuItem.tintColor],
+  /// enabled, not destructive and has no
+  /// [SmartContextMenuContentItem.tintColor],
   /// and also tints the press highlight unless [highlightColor] is set.
   /// If the style has no color, [SmartContextMenuDefaults.foregroundColor] is used.
   /// Defaults to [SmartContextMenuDefaults.titleStyle].
@@ -156,7 +160,7 @@ final class SmartContextMenuStyle {
   /// The color of the title, icons and background tint of a destructive
   /// item.
   ///
-  /// [SmartContextMenuItem.tintColor] takes precedence over it.
+  /// [SmartContextMenuContentItem.tintColor] takes precedence over it.
   /// Defaults to [SmartContextMenuDefaults.destructiveColor].
   final Color destructiveColor;
 
@@ -215,8 +219,8 @@ final class SmartContextMenuStyle {
   /// the back icon, the error, retry and empty icons, and the activity
   /// indicator of loading items.
   ///
-  /// Does not affect [SmartContextMenuItem.leading] and
-  /// [SmartContextMenuItem.trailing].
+  /// Does not affect the leading and trailing widgets of items, such as
+  /// [SmartContextMenuContentItem.leading].
   /// Defaults to [SmartContextMenuDefaults.iconSize].
   final double defaultIconSize;
 

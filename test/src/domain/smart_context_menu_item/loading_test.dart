@@ -25,41 +25,12 @@ void main() {
     expect(item.childrenGap, 4);
   });
 
-  test('is a status item that is loading', () {
+  test('is a status item', () {
     // The declared type checks that the item is a loading item.
     final SmartContextMenuLoadingItem item = SmartContextMenuItem.loading();
 
     expect(item, isA<SmartContextMenuStatusItem>());
-    expect(item.isLoading, isTrue);
     expect(item.title, isNull);
     expect(item.child, isNull);
-  });
-
-  test('is the only loading item', () {
-    final listenable = ChangeNotifier();
-    addTearDown(listenable.dispose);
-    final items = [
-      SmartContextMenuItem.simple(),
-      SmartContextMenuItem.submenu(children: []),
-      SmartContextMenuItem.asyncSubmenu(asyncChildren: () async => []),
-      SmartContextMenuItem.pagingSubmenu(
-        asyncPagingChildren: (_) async => [],
-        initialMetadata: const SmartContextMenuPagingMetadata(),
-      ),
-      SmartContextMenuItem.async(
-        asyncItem: () async => SmartContextMenuItem.simple(),
-      ),
-      SmartContextMenuItem.listenable(
-        listenable: listenable,
-        builder: SmartContextMenuItem.simple,
-      ),
-      SmartContextMenuItem.separator(),
-      SmartContextMenuItem.error(),
-      SmartContextMenuItem.empty(),
-    ];
-
-    for (final item in items) {
-      expect(item.isLoading, isFalse);
-    }
   });
 }

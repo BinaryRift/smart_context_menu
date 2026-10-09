@@ -33,7 +33,6 @@ void main() {
     final SmartContextMenuEmptyItem item = SmartContextMenuItem.empty();
 
     expect(item, isA<SmartContextMenuStatusItem>());
-    expect(item.isLoading, isFalse);
     expect(item.title, isNull);
     expect(item.child, isNull);
   });
