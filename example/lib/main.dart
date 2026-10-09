@@ -3,7 +3,7 @@ import 'package:smart_context_menu/smart_context_menu.dart';
 
 import 'core/settings/example_settings.dart';
 import 'core/settings/settings_scope.dart';
-import 'pages/lab/ui/lab_page.dart';
+import 'pages/tabs/ui/tabs_page.dart';
 import 'resources/app_theme/menu_config.dart';
 
 void main() => runApp(const ExampleApp());
@@ -38,7 +38,7 @@ final class _ExampleAppState extends State<ExampleApp> {
             config: _settings.menuConfig(appMenuConfig),
             child: child!,
           ),
-          home: const LabPage(),
+          home: const TabsPage(),
         ),
       ),
     );

@@ -2,12 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
 import 'package:smart_context_menu_example/main.dart';
+import 'package:smart_context_menu_example/pages/files/ui/files_page.dart';
 import 'package:smart_context_menu_example/pages/lab/ui/lab_page.dart';
 
 import 'helpers/menu_tester.dart';
 
 void main() {
-  /// Opens the settings sheet from the gear of the current page.
+  /// Opens the settings sheet from the gear of the current tab.
   Future<void> openSettings(WidgetTester tester) async {
     await tester.tap(find.byIcon(CupertinoIcons.gear));
     await tester.pumpAndSettle();
@@ -17,6 +18,23 @@ void main() {
     of: find.widgetWithText(CupertinoListTile, title),
     matching: find.byType(CupertinoSwitch),
   );
+
+  testWidgets('opens on the Files tab', (tester) async {
+    await tester.pumpWidget(const ExampleApp());
+
+    expect(find.byType(FilesPage), findsOneWidget);
+    expect(find.byType(LabPage), findsNothing);
+  });
+
+  testWidgets('switches tabs', (tester) async {
+    await tester.pumpWidget(const ExampleApp());
+
+    await tester.tap(find.text('Lab'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(LabPage), findsOneWidget);
+    expect(find.text('All submenu types'), findsOneWidget);
+  });
 
   testWidgets('the gear opens the settings and Done closes them', (
     tester,
@@ -34,7 +52,7 @@ void main() {
   testWidgets('the settings change the config of all menus', (tester) async {
     await tester.pumpWidget(const ExampleApp());
     SmartContextMenuConfig config() =>
-        SmartContextMenuTheme.of(tester.element(find.byType(LabPage)));
+        SmartContextMenuTheme.of(tester.element(find.byType(FilesPage)));
     expect(config().enableHaptics, isTrue);
     expect(config().enableSwipeBack, isTrue);
     expect(config().moveBackDown, isFalse);
@@ -55,7 +73,7 @@ void main() {
   testWidgets('the theme setting changes the brightness', (tester) async {
     await tester.pumpWidget(const ExampleApp());
     Brightness brightness() =>
-        CupertinoTheme.brightnessOf(tester.element(find.byType(LabPage)));
+        CupertinoTheme.brightnessOf(tester.element(find.byType(FilesPage)));
     expect(brightness(), Brightness.light);
 
     await openSettings(tester);
@@ -67,6 +85,8 @@ void main() {
 
   testWidgets('a Lab card opens its menu', (tester) async {
     await tester.pumpWidget(const ExampleApp());
+    await tester.tap(find.text('Lab'));
+    await tester.pumpAndSettle();
 
     await tester.openMenu(find.text('All submenu types'));
 
