@@ -3,9 +3,9 @@ import 'package:smart_context_menu/smart_context_menu.dart';
 
 import '../../../core/data/demo_loader.dart';
 import '../../../core/ui/demo_card.dart';
+import '../../../core/ui/reactions_bar.dart';
 import '../../settings/ui/widgets/settings_button.dart';
 import '../domain/lab_items.dart';
-import 'widgets/reactions_bar.dart';
 import 'widgets/tap_empty_area.dart';
 
 /// Content shown above the preview.
