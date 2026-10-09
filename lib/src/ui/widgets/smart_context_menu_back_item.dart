@@ -5,7 +5,7 @@ import '../../domain/smart_context_menu_config.dart';
 import '../../domain/smart_context_menu_item.dart';
 import '../keys/service_item_key.dart';
 import '../state/smart_context_menu_hover_controller.dart';
-import '../view/smart_context_menu_item_view.dart';
+import '../view/item/smart_context_menu_item_view.dart';
 import 'smart_context_menu_blur_box.dart';
 import 'smart_context_menu_divider.dart';
 

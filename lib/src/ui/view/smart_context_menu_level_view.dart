@@ -14,7 +14,7 @@ import '../widgets/smart_context_menu_back_item.dart';
 import '../widgets/smart_context_menu_divider.dart';
 import '../widgets/smart_context_menu_pagination_trigger.dart';
 import '../widgets/smart_context_menu_retry_row.dart';
-import 'smart_context_menu_item_view.dart';
+import 'item/smart_context_menu_item_view.dart';
 
 /// The content of a menu [level]: its items, the back item of a submenu
 /// and the loading, retry and paging rows.

@@ -1,18 +1,20 @@
-import 'package:flutter/cupertino.dart'
-    show CupertinoActivityIndicator, CupertinoDynamicColor, CupertinoTheme;
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart' show CupertinoDynamicColor;
 import 'package:flutter/services.dart' show HapticFeedback;
+import 'package:flutter/widgets.dart';
 
-import '../../core/ui/motion/tokens/motion_durations.dart';
-import '../../core/ui/styles/smart_context_menu_defaults.dart';
-import '../../core/ui/motion/transitions/tricky_transition.dart';
-import '../../domain/smart_context_menu_config.dart';
-import '../../domain/smart_context_menu_item.dart';
-import '../../domain/smart_context_menu_item_state.dart';
-import '../../domain/smart_context_menu_style.dart';
-import '../keys/item_content_key.dart';
-import '../keys/service_item_key.dart';
-import '../state/smart_context_menu_hover_controller.dart';
+import '../../../core/ui/motion/tokens/motion_durations.dart';
+import '../../../core/ui/styles/smart_context_menu_defaults.dart';
+import '../../../core/ui/motion/transitions/tricky_transition.dart';
+import '../../../domain/smart_context_menu_config.dart';
+import '../../../domain/smart_context_menu_item.dart';
+import '../../../domain/smart_context_menu_item_state.dart';
+import '../../../domain/smart_context_menu_style.dart';
+import '../../keys/item_content_key.dart';
+import '../../keys/service_item_key.dart';
+import '../../state/smart_context_menu_hover_controller.dart';
+import '../../theme/smart_context_menu_item_colors.dart';
+import 'smart_context_menu_item_row.dart';
+import 'smart_context_menu_status_content.dart';
 
 final class SmartContextMenuItemView extends StatefulWidget {
   final SmartContextMenuItem item;
@@ -82,70 +84,6 @@ final class _SmartContextMenuItemViewState
       (_error != null ? widget.item.loadingItem?.padding : null) ??
       _style.itemPadding;
 
-  Color _resolve(Color color) => CupertinoDynamicColor.resolve(color, context);
-
-  Color get _baseForegroundColor =>
-      _style.titleStyle.color ?? SmartContextMenuDefaults.foregroundColor;
-
-  // The same brightness that CupertinoDynamicColor.resolve uses.
-  bool get _isDark =>
-      (CupertinoTheme.maybeBrightnessOf(context) ?? Brightness.light) ==
-      Brightness.dark;
-
-  double get _tintOpacity {
-    if (_isHighlight) {
-      return _isDark
-          ? SmartContextMenuDefaults.darkTintPressedOpacity
-          : SmartContextMenuDefaults.tintPressedOpacity;
-    }
-    return _isDark
-        ? SmartContextMenuDefaults.darkTintOpacity
-        : SmartContextMenuDefaults.tintOpacity;
-  }
-
-  double get _highlightOpacity {
-    if (_isDark) return SmartContextMenuDefaults.darkHighlightOpacity;
-    return widget.key == ServiceItemKey.back
-        ? SmartContextMenuDefaults.backHighlightOpacity
-        : SmartContextMenuDefaults.highlightOpacity;
-  }
-
-  Color? get _tintColor =>
-      _item.tintColor ?? (_item.isDestructive ? _style.destructiveColor : null);
-
-  Color get _overlayColor {
-    if (_item.isDisabled) {
-      final disabledBackgroundColor = _style.disabledBackgroundColor;
-      return disabledBackgroundColor == null
-          ? Colors.transparent
-          : _resolve(disabledBackgroundColor);
-    }
-    final tintColor = _tintColor;
-    if (tintColor != null) {
-      return _resolve(tintColor).withValues(alpha: _tintOpacity);
-    }
-    if (!_isHighlight) return Colors.transparent;
-    final highlightColor = _style.highlightColor;
-    return highlightColor != null
-        ? _resolve(highlightColor)
-        : _resolve(_baseForegroundColor).withValues(alpha: _highlightOpacity);
-  }
-
-  Color get _foregroundColor {
-    final tintColor = _tintColor;
-    if (tintColor != null) {
-      return _resolve(tintColor).withValues(
-        alpha: _item.isDisabled
-            ? SmartContextMenuDefaults.tintDisabledForegroundOpacity
-            : 1,
-      );
-    }
-    if (_item.isDisabled) {
-      return _resolve(_style.disabledForegroundColor);
-    }
-    return _resolve(_item.titleStyle?.color ?? _baseForegroundColor);
-  }
-
   @override
   void initState() {
     super.initState();
@@ -194,11 +132,18 @@ final class _SmartContextMenuItemViewState
 
   @override
   Widget build(BuildContext context) {
+    final colors = SmartContextMenuItemColors.resolve(
+      context,
+      item: _item,
+      style: _style,
+      isPressed: _isHighlight,
+      isBack: widget.key == ServiceItemKey.back,
+    );
     final itemState = SmartContextMenuItemState(
       isPressed: _isHighlight,
       isDisabled: _item.isDisabled,
       isDestructive: _item.isDestructive,
-      foregroundColor: _foregroundColor,
+      foregroundColor: colors.foreground,
     );
 
     // Without MetaData, drag-to-select does not find the separator.
@@ -209,7 +154,7 @@ final class _SmartContextMenuItemViewState
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
         duration: MotionDurations.instant,
-        color: _overlayColor,
+        color: colors.overlay,
         padding: _padding,
         child: AnimatedSwitcher(
           duration: MotionDurations.fast,
@@ -227,120 +172,35 @@ final class _SmartContextMenuItemViewState
 
     return Container(
       height: _style.separatorHeight,
-      color: _resolve(_style.separatorColor),
+      color: CupertinoDynamicColor.resolve(_style.separatorColor, context),
     );
   }
 
   Widget _buildContent(SmartContextMenuItemState state) {
     if (_item case final SmartContextMenuStatusItem item) {
-      return _buildStatusBody(item);
+      return SmartContextMenuStatusContent(
+        key: switch (item) {
+          SmartContextMenuLoadingItem() => ItemContentKey.loading,
+          SmartContextMenuErrorItem() => ItemContentKey.error,
+          SmartContextMenuEmptyItem() => ItemContentKey.empty,
+        },
+        item: item,
+        config: _config,
+        foregroundColor: state.foregroundColor,
+        // The menu retries the failed load on tap.
+        retries: _error != null,
+      );
     }
 
     return KeyedSubtree(
       key: ItemContentKey.content,
-      child: _item.customBuilder != null
-          ? _item.customBuilder!(context, state)
-          : _body(_item),
-    );
-  }
-
-  Widget _body(
-    SmartContextMenuItem item, {
-    TextAlign titleAlign = TextAlign.start,
-  }) {
-    return IconTheme.merge(
-      data: IconThemeData(color: _foregroundColor),
-      child: _buildRow(item, titleAlign: titleAlign),
-    );
-  }
-
-  Widget _buildRow(SmartContextMenuItem item, {required TextAlign titleAlign}) {
-    final gap = SizedBox(width: item.childrenGap ?? _style.itemChildrenGap);
-    return Row(
-      children: [
-        if (item.leading != null) ...[item.leading!, gap],
-        Expanded(
-          child: Text(
-            item.title ?? "",
-            style: (item.titleStyle ?? _style.titleStyle).copyWith(
-              color: _foregroundColor,
-            ),
-            textAlign: titleAlign,
-            maxLines: _style.titleMaxLines,
-            overflow: TextOverflow.ellipsis,
+      child:
+          _item.customBuilder?.call(context, state) ??
+          SmartContextMenuItemRow(
+            item: _item,
+            style: _style,
+            foregroundColor: state.foregroundColor,
           ),
-        ),
-        if (item.trailing != null) ...[gap, item.trailing!],
-        if (item.showTransitionIcon) ...[
-          gap,
-          Icon(
-            _style.submenuIcon,
-            size: _style.defaultIconSize,
-            color: item.isDisabled
-                ? _resolve(_style.disabledForegroundColor)
-                : CupertinoDynamicColor.maybeResolve(
-                    _style.defaultIconColor,
-                    context,
-                  ),
-          ),
-        ],
-      ],
-    );
-  }
-
-  Widget _buildStatusBody(SmartContextMenuStatusItem item) {
-    final key = switch (item) {
-      SmartContextMenuLoadingItem() => ItemContentKey.loading,
-      SmartContextMenuErrorItem() => ItemContentKey.error,
-      SmartContextMenuEmptyItem() => ItemContentKey.empty,
-    };
-
-    final child = item.child;
-    if (child != null) {
-      return KeyedSubtree(
-        key: key,
-        child: DefaultTextStyle.merge(
-          style: (item.titleStyle ?? _style.titleStyle).copyWith(
-            color: _foregroundColor,
-          ),
-          child: IconTheme.merge(
-            data: IconThemeData(color: _foregroundColor),
-            child: child,
-          ),
-        ),
-      );
-    }
-
-    final (String title, Widget sign) = switch (item) {
-      // The menu retries the failed load on tap.
-      _ when _error != null => (
-        _config.labels.retry,
-        Icon(_style.retryIcon, size: _style.defaultIconSize),
-      ),
-      SmartContextMenuLoadingItem() => (
-        _config.labels.loading,
-        _style.loadingIndicator ??
-            CupertinoActivityIndicator(radius: _style.defaultIconSize / 2),
-      ),
-      SmartContextMenuErrorItem() => (
-        _config.labels.error,
-        Icon(_style.errorIcon, size: _style.defaultIconSize),
-      ),
-      SmartContextMenuEmptyItem() => (
-        _config.labels.empty,
-        Icon(_style.emptyIcon, size: _style.defaultIconSize),
-      ),
-    };
-    final row = SmartContextMenuItem.simple(
-      title: item.title ?? title,
-      titleStyle: item.titleStyle,
-      leading: item.leading,
-      trailing: item.trailing ?? sign,
-      childrenGap: item.childrenGap,
-    );
-    return KeyedSubtree(
-      key: key,
-      child: _body(row, titleAlign: _style.statusTitleAlign),
     );
   }
 

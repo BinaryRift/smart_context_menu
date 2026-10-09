@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
-import 'package:smart_context_menu/src/ui/view/smart_context_menu_item_view.dart';
+import 'package:smart_context_menu/src/ui/view/item/smart_context_menu_item_view.dart';
 
 import '../../../helpers/listenable_item_tester.dart';
 import '../../../helpers/menu_tester.dart';
