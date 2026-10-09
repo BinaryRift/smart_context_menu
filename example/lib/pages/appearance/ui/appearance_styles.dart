@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show CircularProgressIndicator;
 import 'package:smart_context_menu/smart_context_menu.dart';
 
 /// Brand colors with white text and rounder corners, without blur.
@@ -42,10 +43,15 @@ const dividersStyle = SmartContextMenuStyle(
 );
 
 /// Own signs of loading, error and empty items, with the titles at the
-/// start rather than in the middle.
+/// start rather than in the middle: a Material progress indicator instead
+/// of the Cupertino one, and other icons.
 const statusStyle = SmartContextMenuStyle(
-  loadingIndicator: CupertinoActivityIndicator(
-    color: CupertinoColors.systemOrange,
+  loadingIndicator: SizedBox.square(
+    dimension: 18,
+    child: CircularProgressIndicator(
+      strokeWidth: 2,
+      color: CupertinoColors.systemOrange,
+    ),
   ),
   errorIcon: CupertinoIcons.wifi_exclamationmark,
   retryIcon: CupertinoIcons.arrow_clockwise,

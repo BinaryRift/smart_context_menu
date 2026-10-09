@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
 
 import '../../../core/data/demo_loader.dart';
+import '../../../resources/app_theme/tint_colors.dart';
 import '../ui/widgets/tag_color_row.dart';
 
 /// The same items in most presets, so the difference in style is seen:
@@ -28,13 +29,25 @@ List<SmartContextMenuItem> sampleItems(DemoLoader loader) => [
   _action('Delete', CupertinoIcons.delete, isDestructive: true),
 ];
 
-/// Items with their own content: a row of buttons and two lines of text.
+/// Items with their own content: a row of buttons and two lines of text,
+/// and items tinted with their own colors.
 List<SmartContextMenuItem> customContentItems(
   ValueNotifier<Color> tagColor,
 ) => [
   _action('Rename', CupertinoIcons.pencil),
-  // The buttons handle their own taps, and a tap next to them does
-  // nothing: the item has no action and does not close the menu.
+  _action(
+    'Favorite',
+    CupertinoIcons.heart,
+    tintColor: readableTint(CupertinoColors.systemPink),
+  ),
+  _action(
+    'Mark as done',
+    CupertinoIcons.checkmark_circle,
+    tintColor: readableTint(CupertinoColors.systemGreen),
+  ),
+  // The buttons handle their own taps. The item has no action and does
+  // not close the menu, so it is not highlighted and a tap next to the
+  // buttons does nothing.
   SmartContextMenuItem.simple(
     closeOnTap: false,
     customBuilder: (context, state) =>
@@ -130,12 +143,14 @@ SmartContextMenuSimpleItem _action(
   IconData icon, {
   bool isDestructive = false,
   bool isDisabled = false,
+  Color? tintColor,
 }) {
   return SmartContextMenuItem.simple(
     title: title,
     leading: Icon(icon),
     isDestructive: isDestructive,
     isDisabled: isDisabled,
+    tintColor: tintColor,
     onTap: () => debugPrint('Tapped: $title'),
   );
 }

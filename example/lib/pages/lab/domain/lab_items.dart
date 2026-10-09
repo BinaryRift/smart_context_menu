@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
 
 import '../../../core/data/demo_loader.dart';
+import '../../../resources/app_theme/tint_colors.dart';
 
 const _pageCount = 5;
 const _pageSize = 20;
@@ -228,12 +229,12 @@ List<SmartContextMenuItem> longRootShortSubmenu() => [
     title: 'Color',
     leading: const Icon(CupertinoIcons.paintbrush),
     children: [
-      _action('Red', tintColor: _deep(CupertinoColors.systemRed)),
-      _action('Green', tintColor: _deep(CupertinoColors.systemGreen)),
-      _action('Blue', tintColor: _deep(CupertinoColors.systemBlue)),
+      _action('Red', tintColor: readableTint(CupertinoColors.systemRed)),
+      _action('Green', tintColor: readableTint(CupertinoColors.systemGreen)),
+      _action('Blue', tintColor: readableTint(CupertinoColors.systemBlue)),
       _action(
         'Orange',
-        tintColor: _deep(CupertinoColors.systemOrange),
+        tintColor: readableTint(CupertinoColors.systemOrange),
         isDisabled: true,
       ),
     ],
@@ -312,14 +313,6 @@ SmartContextMenuItem _share() {
         children: [_action('Work'), _action('Personal')],
       ),
     ],
-  );
-}
-
-/// A system color with its darker high contrast variant in the light theme.
-CupertinoDynamicColor _deep(CupertinoDynamicColor color) {
-  return CupertinoDynamicColor.withBrightness(
-    color: color.highContrastColor,
-    darkColor: color.darkColor,
   );
 }
 

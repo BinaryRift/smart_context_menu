@@ -77,7 +77,7 @@ final class _AppearancePageState extends State<AppearancePage> {
             ),
             _buildPreset(
               title: 'Custom content',
-              subtitle: 'A row of colors and two lines of text',
+              subtitle: 'A row of colors, two lines of text, tinted items',
               config: (app) => app,
               items: customContentItems(_tagColor),
             ),
