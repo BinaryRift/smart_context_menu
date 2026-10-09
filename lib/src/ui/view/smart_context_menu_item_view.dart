@@ -288,6 +288,7 @@ final class _SmartContextMenuItemViewState
     final key = switch (item) {
       SmartContextMenuLoadingItem() => ItemContentKey.loading,
       SmartContextMenuErrorItem() => ItemContentKey.error,
+      SmartContextMenuEmptyItem() => ItemContentKey.empty,
     };
 
     final child = item.child;
@@ -319,6 +320,10 @@ final class _SmartContextMenuItemViewState
       SmartContextMenuErrorItem() => (
         _config.labels.error,
         Icon(SmartContextMenuDefaults.errorIcon, size: _style.defaultIconSize),
+      ),
+      SmartContextMenuEmptyItem() => (
+        _config.labels.empty,
+        Icon(SmartContextMenuDefaults.emptyIcon, size: _style.defaultIconSize),
       ),
     };
     final row = SmartContextMenuItem.simple(
@@ -377,8 +382,8 @@ final class _SmartContextMenuItemViewState
           item.isInternalInteracted ||
           item.listenableBuilder != null),
       'The builder of SmartContextMenuItem.listenable must return '
-      'a SmartContextMenuItem.simple, a SmartContextMenuItem.loading '
-      'or a SmartContextMenuItem.error.',
+      'a SmartContextMenuItem.simple, a SmartContextMenuItem.loading, '
+      'a SmartContextMenuItem.error or a SmartContextMenuItem.empty.',
     );
     _resolvedItem = item;
     _isHighlight = widget.hoverController?.value == widget.key && !_isDisabled;

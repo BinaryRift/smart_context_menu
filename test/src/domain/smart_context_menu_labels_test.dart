@@ -9,5 +9,6 @@ void main() {
     expect(labels.retry, 'Try again');
     expect(labels.loading, 'Loading…');
     expect(labels.error, 'Could not load');
+    expect(labels.empty, 'No items');
   });
 }

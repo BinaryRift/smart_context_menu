@@ -1,0 +1,44 @@
+import 'package:flutter/widgets.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:smart_context_menu/smart_context_menu.dart';
+
+void main() {
+  test('keeps the given fields', () {
+    const leading = SizedBox();
+    const trailing = SizedBox();
+    const child = SizedBox();
+    const titleStyle = TextStyle(fontSize: 20);
+    const padding = EdgeInsets.all(8);
+    final item = SmartContextMenuItem.empty(
+      title: 'No drafts',
+      titleStyle: titleStyle,
+      leading: leading,
+      trailing: trailing,
+      child: child,
+      padding: padding,
+      childrenGap: 4,
+    );
+
+    expect(item.title, 'No drafts');
+    expect(item.titleStyle, titleStyle);
+    expect(item.leading, same(leading));
+    expect(item.trailing, same(trailing));
+    expect(item.child, same(child));
+    expect(item.padding, padding);
+    expect(item.childrenGap, 4);
+  });
+
+  test('is a status item without actions', () {
+    // The declared type checks that the item is an empty item.
+    final SmartContextMenuEmptyItem item = SmartContextMenuItem.empty();
+
+    expect(item, isA<SmartContextMenuStatusItem>());
+    expect(item.isLoading, isFalse);
+    expect(item.title, isNull);
+    expect(item.closeOnTap, isFalse);
+    expect(item.onTap, isNull);
+    expect(item.isDisabled, isFalse);
+    expect(item.isSeparator, isFalse);
+    expect(item.isInternalInteracted, isFalse);
+  });
+}

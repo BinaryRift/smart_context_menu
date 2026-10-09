@@ -228,4 +228,7 @@ abstract final class SmartContextMenuDefaults {
   /// The icon after the title of a [SmartContextMenuItem.error] item that
   /// retries a failed load, unless the item has its own trailing.
   static const IconData retryIcon = CupertinoIcons.refresh;
+
+  /// The icon after the title of a [SmartContextMenuItem.empty] item.
+  static const IconData emptyIcon = CupertinoIcons.tray;
 }

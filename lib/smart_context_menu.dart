@@ -9,8 +9,8 @@
 /// * [SmartContextMenu] attaches a menu to a widget.
 /// * [SmartContextMenuItem] is an entry of the menu: an action, a submenu,
 ///   an async or paginated submenu, an item loaded on the fly, an item
-///   rebuilt from the state of the app while the menu is open, or a loading
-///   or error state.
+///   rebuilt from the state of the app while the menu is open, or a loading,
+///   error or empty state.
 /// * [SmartContextMenuConfig] sets the behavior and appearance of the menu.
 /// * [SmartContextMenuStyle] sets the appearance, as part of the config.
 /// * [SmartContextMenuTheme] sets the config for the menus below it.
@@ -23,9 +23,9 @@
 /// * [SmartContextMenuPagingMetadata] describes a page of a paginated
 ///   submenu.
 /// * [SmartContextMenuStatusItem] is the base of the items that show
-///   a state: [SmartContextMenuLoadingItem] and [SmartContextMenuErrorItem],
-///   created by [SmartContextMenuItem.loading] and
-///   [SmartContextMenuItem.error].
+///   a state: [SmartContextMenuLoadingItem], [SmartContextMenuErrorItem] and
+///   [SmartContextMenuEmptyItem], created by [SmartContextMenuItem.loading],
+///   [SmartContextMenuItem.error] and [SmartContextMenuItem.empty].
 /// * [SmartContextMenuItemState] is passed to custom item builders.
 /// * [SmartContextMenuHeaderDetails] is passed to the builder of the
 ///   slivers above the preview.

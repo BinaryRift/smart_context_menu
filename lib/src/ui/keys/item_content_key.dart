@@ -10,6 +10,9 @@ final class ItemContentKey extends ValueKey<String> {
   /// The content of a failed load: the retry content or an error item.
   static const error = ItemContentKey._("error");
 
+  /// The content of an empty item.
+  static const empty = ItemContentKey._("empty");
+
   /// The content of a loaded or plain item.
   static const content = ItemContentKey._("content");
 }

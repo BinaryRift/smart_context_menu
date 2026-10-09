@@ -10,6 +10,7 @@
 ///     retry: 'Reintentar',
 ///     loading: 'Cargando…',
 ///     error: 'No se pudo cargar',
+///     empty: 'No hay elementos',
 ///   ),
 /// )
 /// ```
@@ -37,11 +38,17 @@ final class SmartContextMenuLabels {
   /// Defaults to `'Could not load'`.
   final String error;
 
+  /// The title of a [SmartContextMenuItem.empty] item without its own title.
+  ///
+  /// Defaults to `'No items'`.
+  final String empty;
+
   /// Creates the strings of the menu.
   const SmartContextMenuLabels({
     this.back = "Back",
     this.retry = "Try again",
     this.loading = "Loading…",
     this.error = "Could not load",
+    this.empty = "No items",
   });
 }

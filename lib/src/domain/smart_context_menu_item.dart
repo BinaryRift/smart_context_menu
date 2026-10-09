@@ -25,8 +25,9 @@ typedef SmartContextMenuItemLoader = Future<SmartContextMenuItem> Function();
 /// Builds the item of [SmartContextMenuItem.listenable] from the current
 /// state of the app.
 ///
-/// Returns a [SmartContextMenuItem.loading] while the item is loading and
-/// a [SmartContextMenuItem.error] if it failed to load.
+/// Returns a [SmartContextMenuItem.loading] while the item is loading,
+/// a [SmartContextMenuItem.error] if it failed to load and
+/// a [SmartContextMenuItem.empty] if there is nothing to show.
 typedef SmartContextMenuListenableItemBuilder = SmartContextMenuItem Function();
 
 /// Builds the content of an item from its current state.
@@ -50,6 +51,7 @@ typedef SmartContextMenuItemBuilder =
 /// * [SmartContextMenuItem.loading] shows a loading state, usually of
 ///   an async or a listenable item.
 /// * [SmartContextMenuItem.error] shows a failed load.
+/// * [SmartContextMenuItem.empty] shows that there are no items.
 /// * [SmartContextMenuItem.separator] separates groups of items.
 ///
 /// A submenu replaces the current menu and shows a back item at the top.
@@ -575,8 +577,9 @@ final class SmartContextMenuItem {
   ///
   /// [builder] returns the item to show: a [SmartContextMenuItem.simple],
   /// whose [onTap] and [closeOnTap] are used, so it can act on the current
-  /// state, a [SmartContextMenuItem.loading] while the item is loading, or
-  /// a [SmartContextMenuItem.error] if it failed to load.
+  /// state, a [SmartContextMenuItem.loading] while the item is loading,
+  /// a [SmartContextMenuItem.error] if it failed to load, or
+  /// a [SmartContextMenuItem.empty] if there is nothing to show.
   ///
   /// ```dart
   /// SmartContextMenuItem.listenable(
@@ -702,6 +705,47 @@ final class SmartContextMenuItem {
     padding: padding,
     childrenGap: childrenGap,
   );
+
+  /// Creates an item that shows that there are no items.
+  ///
+  /// The item shows [title] (or [SmartContextMenuLabels.empty]) with
+  /// [leading] and [SmartContextMenuDefaults.emptyIcon], and does not
+  /// respond to taps. [trailing] replaces the icon. Pass [child] to replace
+  /// this content; text and icons in it take the color of the item.
+  ///
+  /// Return it from the builder of [SmartContextMenuItem.listenable] when
+  /// the state of the app has nothing to show.
+  ///
+  /// ```dart
+  /// SmartContextMenuItem.listenable(
+  ///   listenable: drafts,
+  ///   builder: () => drafts.isEmpty
+  ///       ? SmartContextMenuItem.empty(title: 'No drafts')
+  ///       : SmartContextMenuItem.simple(
+  ///           title: 'Drafts: ${drafts.count}',
+  ///           onTap: drafts.open,
+  ///         ),
+  /// )
+  /// ```
+  static SmartContextMenuEmptyItem empty({
+    String? id,
+    String? title,
+    TextStyle? titleStyle,
+    Widget? leading,
+    Widget? trailing,
+    Widget? child,
+    EdgeInsets? padding,
+    double? childrenGap,
+  }) => SmartContextMenuEmptyItem._(
+    id: id ?? _generateId(),
+    title: title,
+    titleStyle: titleStyle,
+    leading: leading,
+    trailing: trailing,
+    child: child,
+    padding: padding,
+    childrenGap: childrenGap,
+  );
 }
 
 /// A [SmartContextMenuItem] that shows a state, such as loading, instead
@@ -710,7 +754,8 @@ final class SmartContextMenuItem {
 /// It does not respond to taps and is not dimmed. A sign of the state is
 /// shown after [title] unless [trailing] is set.
 ///
-/// See [SmartContextMenuLoadingItem] and [SmartContextMenuErrorItem].
+/// See [SmartContextMenuLoadingItem], [SmartContextMenuErrorItem] and
+/// [SmartContextMenuEmptyItem].
 sealed class SmartContextMenuStatusItem extends SmartContextMenuItem {
   /// The content shown instead of [title], [leading] and [trailing].
   ///
@@ -751,6 +796,22 @@ final class SmartContextMenuLoadingItem extends SmartContextMenuStatusItem {
 /// Create it with [SmartContextMenuItem.error].
 final class SmartContextMenuErrorItem extends SmartContextMenuStatusItem {
   const SmartContextMenuErrorItem._({
+    required super.id,
+    super.title,
+    super.titleStyle,
+    super.leading,
+    super.trailing,
+    super.child,
+    super.padding,
+    super.childrenGap,
+  }) : super._();
+}
+
+/// A [SmartContextMenuStatusItem] that shows that there are no items.
+///
+/// Create it with [SmartContextMenuItem.empty].
+final class SmartContextMenuEmptyItem extends SmartContextMenuStatusItem {
+  const SmartContextMenuEmptyItem._({
     required super.id,
     super.title,
     super.titleStyle,
