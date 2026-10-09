@@ -763,7 +763,7 @@ const style = SmartContextMenuStyle(
   dividersBetweenItems: true,
   dividerThickness: 1,
   // Lines up with the title after a leading icon.
-  dividerIndent: 48,
+  dividerIndent: 52,
 );
 ```
 
