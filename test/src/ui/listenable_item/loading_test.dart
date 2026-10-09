@@ -111,7 +111,7 @@ void main() {
     });
 
     testWidgets('looks like the loading of an async item', (tester) async {
-      final completer = Completer<SmartContextMenuItem>();
+      final completer = Completer<SmartContextMenuAsyncResult>();
       await tester.pumpMenu(
         items: [
           SmartContextMenuItem.async(

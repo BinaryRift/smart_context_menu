@@ -28,17 +28,13 @@ void main() {
     expect(item.childrenGap, 4);
   });
 
-  test('is a status item without actions', () {
+  test('is a status item', () {
     // The declared type checks that the item is an error item.
     final SmartContextMenuErrorItem item = SmartContextMenuItem.error();
 
     expect(item, isA<SmartContextMenuStatusItem>());
     expect(item.isLoading, isFalse);
     expect(item.title, isNull);
-    expect(item.closeOnTap, isFalse);
-    expect(item.onTap, isNull);
-    expect(item.isDisabled, isFalse);
-    expect(item.isSeparator, isFalse);
-    expect(item.isInternalInteracted, isFalse);
+    expect(item.child, isNull);
   });
 }

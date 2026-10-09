@@ -11,7 +11,7 @@ void main() {
   final loadedItem = SmartContextMenuItem.simple(title: 'Loaded');
 
   testWidgets('shows the loading title, then the loaded item', (tester) async {
-    final completer = Completer<SmartContextMenuItem>();
+    final completer = Completer<SmartContextMenuAsyncResult>();
 
     await tester.pumpMenu(
       items: [
@@ -36,7 +36,7 @@ void main() {
   testWidgets('shows the loading label without a loading title', (
     tester,
   ) async {
-    final completer = Completer<SmartContextMenuItem>();
+    final completer = Completer<SmartContextMenuAsyncResult>();
 
     await tester.pumpMenu(
       items: [SmartContextMenuItem.async(asyncItem: () => completer.future)],
@@ -52,7 +52,7 @@ void main() {
   testWidgets('uses the child of the loading item while loading', (
     tester,
   ) async {
-    final completer = Completer<SmartContextMenuItem>();
+    final completer = Completer<SmartContextMenuAsyncResult>();
 
     await tester.pumpMenu(
       items: [
@@ -192,7 +192,7 @@ void main() {
   testWidgets('shows the retry label when loading takes too long', (
     tester,
   ) async {
-    final completer = Completer<SmartContextMenuItem>();
+    final completer = Completer<SmartContextMenuAsyncResult>();
 
     await tester.pumpMenu(
       items: [
@@ -219,7 +219,7 @@ void main() {
     tester,
   ) async {
     const padding = EdgeInsets.all(24);
-    final completer = Completer<SmartContextMenuItem>();
+    final completer = Completer<SmartContextMenuAsyncResult>();
 
     await tester.pumpMenu(
       items: [
@@ -280,7 +280,7 @@ void main() {
   });
 
   testWidgets('shows the loading item again on retry', (tester) async {
-    final completer = Completer<SmartContextMenuItem>();
+    final completer = Completer<SmartContextMenuAsyncResult>();
     var calls = 0;
 
     await tester.pumpMenu(

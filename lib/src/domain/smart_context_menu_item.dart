@@ -7,6 +7,16 @@ import '../core/ui/styles/smart_context_menu_defaults.dart';
 import 'smart_context_menu_item_state.dart';
 import 'smart_context_menu_paging_metadata.dart';
 
+part 'items/smart_context_menu_async_item.dart';
+part 'items/smart_context_menu_async_submenu_item.dart';
+part 'items/smart_context_menu_content_item.dart';
+part 'items/smart_context_menu_listenable_item.dart';
+part 'items/smart_context_menu_paging_submenu_item.dart';
+part 'items/smart_context_menu_separator_item.dart';
+part 'items/smart_context_menu_simple_item.dart';
+part 'items/smart_context_menu_status_item.dart';
+part 'items/smart_context_menu_submenu_item.dart';
+
 /// Loads one page of items for [SmartContextMenuItem.pagingSubmenu].
 ///
 /// Receives the metadata of the page to load.
@@ -20,39 +30,64 @@ typedef SmartContextMenuSubmenuLoader =
     Future<List<SmartContextMenuItem>> Function();
 
 /// Loads an item for [SmartContextMenuItem.async].
-typedef SmartContextMenuItemLoader = Future<SmartContextMenuItem> Function();
+///
+/// Returns a [SmartContextMenuAsyncResult]: an item that runs an action,
+/// an item that opens a submenu or a status item.
+typedef SmartContextMenuItemLoader =
+    Future<SmartContextMenuAsyncResult> Function();
 
 /// Builds the item of [SmartContextMenuItem.listenable] from the current
 /// state of the app.
 ///
-/// Returns a [SmartContextMenuItem.loading] while the item is loading,
-/// a [SmartContextMenuItem.error] if it failed to load and
-/// a [SmartContextMenuItem.empty] if there is nothing to show.
-typedef SmartContextMenuListenableItemBuilder = SmartContextMenuItem Function();
+/// Returns a [SmartContextMenuItem.simple], a [SmartContextMenuItem.loading]
+/// while the item is loading, a [SmartContextMenuItem.error] if it failed
+/// to load or a [SmartContextMenuItem.empty] if there is nothing to show.
+typedef SmartContextMenuListenableItemBuilder =
+    SmartContextMenuListenableResult Function();
 
 /// Builds the content of an item from its current state.
 typedef SmartContextMenuItemBuilder =
     Widget Function(BuildContext context, SmartContextMenuItemState state);
 
+/// An item that [SmartContextMenuItem.async] can load: a
+/// [SmartContextMenuSimpleItem], an item that opens a submenu
+/// ([SmartContextMenuSubmenuItem], [SmartContextMenuAsyncSubmenuItem],
+/// [SmartContextMenuPagingSubmenuItem]) or a [SmartContextMenuStatusItem].
+///
+/// Includes every [SmartContextMenuListenableResult].
+sealed class SmartContextMenuAsyncResult implements SmartContextMenuItem {}
+
+/// An item that the builder of [SmartContextMenuItem.listenable] can return:
+/// a [SmartContextMenuSimpleItem] or a [SmartContextMenuStatusItem].
+sealed class SmartContextMenuListenableResult
+    implements SmartContextMenuAsyncResult {}
+
 /// An entry of a [SmartContextMenu].
 ///
-/// Create items with the factory that matches what the item does:
+/// Create items with the method that matches what the item does. Each one
+/// returns its own subtype, so a `switch` on an item covers all of them:
 ///
-/// * [SmartContextMenuItem.simple] runs [onTap].
-/// * [SmartContextMenuItem.submenu] opens a submenu with [children].
+/// * [SmartContextMenuItem.simple] runs an action,
+///   a [SmartContextMenuSimpleItem].
+/// * [SmartContextMenuItem.submenu] opens a submenu,
+///   a [SmartContextMenuSubmenuItem].
 /// * [SmartContextMenuItem.asyncSubmenu] opens a submenu and loads its
-///   items with [asyncChildren].
+///   items, a [SmartContextMenuAsyncSubmenuItem].
 /// * [SmartContextMenuItem.pagingSubmenu] opens a submenu and loads its
-///   items page by page with [asyncPagingChildren].
+///   items page by page, a [SmartContextMenuPagingSubmenuItem].
 /// * [SmartContextMenuItem.async] shows a placeholder and replaces it with
-///   the item loaded by [asyncItem].
-/// * [SmartContextMenuItem.listenable] builds the item with
-///   [listenableBuilder] and rebuilds it when [listenable] notifies.
+///   a loaded item, a [SmartContextMenuAsyncItem].
+/// * [SmartContextMenuItem.listenable] builds the item from the state of
+///   the app and rebuilds it while the menu is open,
+///   a [SmartContextMenuListenableItem].
 /// * [SmartContextMenuItem.loading] shows a loading state, usually of
-///   an async or a listenable item.
-/// * [SmartContextMenuItem.error] shows a failed load.
-/// * [SmartContextMenuItem.empty] shows that there are no items.
-/// * [SmartContextMenuItem.separator] separates groups of items.
+///   an async or a listenable item, a [SmartContextMenuLoadingItem].
+/// * [SmartContextMenuItem.error] shows a failed load,
+///   a [SmartContextMenuErrorItem].
+/// * [SmartContextMenuItem.empty] shows that there are no items,
+///   a [SmartContextMenuEmptyItem].
+/// * [SmartContextMenuItem.separator] separates groups of items,
+///   a [SmartContextMenuSeparatorItem].
 ///
 /// A submenu replaces the current menu and shows a back item at the top.
 /// Tapping the back item or swiping right returns to the parent menu,
@@ -74,7 +109,7 @@ typedef SmartContextMenuItemBuilder =
 ///   ],
 /// )
 /// ```
-final class SmartContextMenuItem {
+sealed class SmartContextMenuItem {
   static int _nextId = 0;
   static String _generateId() => "smart_context_menu_item_${_nextId++}";
 
@@ -82,217 +117,21 @@ final class SmartContextMenuItem {
   ///
   /// Loaded submenus and items are cached by [id] until the menu closes,
   /// so ids must be unique across the menu and all its submenus.
-  /// Factories generate a unique id when none is given.
+  /// A unique id is generated when none is given.
   final String id;
-
-  /// The text of the item.
-  ///
-  /// Shown in up to [SmartContextMenuStyle.titleMaxLines] lines and truncated
-  /// with an ellipsis.
-  final String? title;
-
-  /// The style of [title].
-  ///
-  /// Defaults to [SmartContextMenuStyle.titleStyle]. Its color is used
-  /// only while the item is enabled, not destructive and has no [tintColor].
-  final TextStyle? titleStyle;
-
-  /// A widget shown before [title], usually an [Icon].
-  ///
-  /// Icons without their own color take the title color.
-  final Widget? leading;
-
-  /// A widget shown after [title].
-  ///
-  /// Items that open a submenu also show a chevron after it.
-  /// Icons without their own color take the title color.
-  final Widget? trailing;
-
-  /// The padding around the item content.
-  ///
-  /// If null, [SmartContextMenuStyle.itemPadding] is used.
-  final EdgeInsets? padding;
-
-  /// The gap between [leading], [title], [trailing] and the submenu chevron.
-  ///
-  /// If null, [SmartContextMenuStyle.itemChildrenGap] is used.
-  final double? childrenGap;
-
-  /// Whether the item performs a destructive action.
-  ///
-  /// Destructive items are tinted with [SmartContextMenuStyle.destructiveColor]
-  /// unless [tintColor] is set.
-  final bool isDestructive;
-
-  /// The color the item is tinted with, like a destructive item.
-  ///
-  /// The title and icons take this color, and the background takes
-  /// a translucent shade of it. A disabled item has only the dimmed title
-  /// and icons, see [SmartContextMenuStyle.disabledBackgroundColor]. Takes
-  /// precedence over [SmartContextMenuStyle.destructiveColor] and the color
-  /// of [titleStyle]. May be a [CupertinoDynamicColor] to follow the theme.
-  final Color? tintColor;
-
-  /// Whether the item is disabled.
-  ///
-  /// Disabled items are dimmed and do not respond to taps.
-  final bool isDisabled;
-
-  /// Whether the item separates groups of items.
-  ///
-  /// Set by [SmartContextMenuItem.separator].
-  final bool isSeparator;
 
   /// Whether the item shows that it is loading.
   ///
   /// True for a [SmartContextMenuLoadingItem].
   bool get isLoading => this is SmartContextMenuLoadingItem;
 
-  /// Whether the menu closes when the item is tapped.
-  ///
-  /// The menu starts closing before [onTap] is called.
-  /// Ignored for items that open a submenu. Defaults to true.
-  final bool closeOnTap;
-
-  /// Called when the item is tapped.
-  ///
-  /// If [closeOnTap] is true, the menu starts closing first.
-  final FutureOr<void> Function()? onTap;
-
-  /// The items of the submenu opened by this item.
-  ///
-  /// Set by [SmartContextMenuItem.submenu].
-  final List<SmartContextMenuItem>? children;
-
-  /// Loads the items of the submenu opened by this item.
-  ///
-  /// Set by [SmartContextMenuItem.asyncSubmenu].
-  final SmartContextMenuSubmenuLoader? asyncChildren;
-
-  /// Loads the item shown in place of this placeholder.
-  ///
-  /// Set by [SmartContextMenuItem.async].
-  final SmartContextMenuItemLoader? asyncItem;
-
-  /// The item shown while [asyncItem], the items of [asyncChildren] or
-  /// a page of [asyncPagingChildren] are loading.
-  ///
-  /// Set by [SmartContextMenuItem.async], [SmartContextMenuItem.asyncSubmenu]
-  /// and [SmartContextMenuItem.pagingSubmenu]. If null in a submenu, it shows
-  /// an activity indicator in the middle, see
-  /// [SmartContextMenuStyle.loaderVerticalPadding].
-  final SmartContextMenuLoadingItem? loadingItem;
-
-  /// Notifies when the item of [listenableBuilder] should be built again.
-  ///
-  /// Set by [SmartContextMenuItem.listenable].
-  final Listenable? listenable;
-
-  /// Builds the item shown in place of this one.
-  ///
-  /// Set by [SmartContextMenuItem.listenable].
-  final SmartContextMenuListenableItemBuilder? listenableBuilder;
-
-  /// How long loading may take before it fails: the item of [asyncItem],
-  /// the items of [asyncChildren] or each page of [asyncPagingChildren].
-  ///
-  /// Set by [SmartContextMenuItem.async], [SmartContextMenuItem.asyncSubmenu]
-  /// and [SmartContextMenuItem.pagingSubmenu].
-  final Duration? loadingTimeout;
-
-  /// Loads one page of the submenu opened by this item.
-  ///
-  /// Set by [SmartContextMenuItem.pagingSubmenu].
-  final SmartContextMenuPageLoader? asyncPagingChildren;
-
-  /// The metadata of a page of a paginated submenu.
-  ///
-  /// On a [SmartContextMenuItem.pagingSubmenu] item, it describes the first
-  /// page. On the last item of a loaded page, it describes the next page;
-  /// null there marks the last page.
-  final SmartContextMenuPagingMetadata? pagingMetadata;
-
-  /// Builds the item content instead of [leading], [title] and [trailing].
-  ///
-  /// The item [padding] and press highlight are still applied, and taps
-  /// are handled as usual. Interactive widgets inside, such as
-  /// buttons, handle their own taps: the item is not triggered over them.
-  final SmartContextMenuItemBuilder? customBuilder;
-
-  /// The item shown after [asyncItem], the items of [asyncChildren] or
-  /// a page of [asyncPagingChildren] have failed to load.
-  ///
-  /// Tapping it retries loading. Without its own [title] and [trailing], it
-  /// shows [SmartContextMenuLabels.retry] and
-  /// [SmartContextMenuStyle.retryIcon]. In place of an async item, it
-  /// keeps the padding of [loadingItem] unless it has its own [padding].
-  ///
-  /// Set by [SmartContextMenuItem.async], [SmartContextMenuItem.asyncSubmenu]
-  /// and [SmartContextMenuItem.pagingSubmenu]. If null in a submenu, it is
-  /// a default [SmartContextMenuItem.error].
-  final SmartContextMenuErrorItem? errorItem;
-
-  /// The item shown when [asyncChildren] or the first page of
-  /// [asyncPagingChildren] has loaded no items.
-  ///
-  /// Set by [SmartContextMenuItem.asyncSubmenu] and
-  /// [SmartContextMenuItem.pagingSubmenu]. If null, a submenu without items
-  /// shows a default [SmartContextMenuItem.empty].
-  final SmartContextMenuEmptyItem? emptyItem;
-
-  /// Whether the item shows a submenu chevron.
-  @internal
-  bool get showTransitionIcon =>
-      children != null || asyncChildren != null || asyncPagingChildren != null;
-
-  /// Whether a tap is handled by the menu itself.
-  @internal
-  bool get isInternalInteracted =>
-      asyncItem != null ||
-      asyncChildren != null ||
-      asyncPagingChildren != null ||
-      children != null;
-
-  const SmartContextMenuItem._({
-    required this.id,
-    this.title,
-    this.titleStyle,
-    this.leading,
-    this.trailing,
-    this.isDestructive = false,
-    this.tintColor,
-    this.isDisabled = false,
-    this.isSeparator = false,
-    this.onTap,
-    this.children,
-    this.asyncChildren,
-    this.asyncPagingChildren,
-    this.asyncItem,
-    this.loadingItem,
-    this.listenable,
-    this.listenableBuilder,
-    this.loadingTimeout,
-    this.pagingMetadata,
-    this.customBuilder,
-    this.errorItem,
-    this.emptyItem,
-    this.padding,
-    this.childrenGap,
-    this.closeOnTap = true,
-  }) : assert(
-         (children != null ? 1 : 0) +
-                 (asyncChildren != null ? 1 : 0) +
-                 (asyncPagingChildren != null ? 1 : 0) <=
-             1,
-         'Menu item can have only one of children, asyncChildren '
-         'or asyncPagingChildren.',
-       );
+  const SmartContextMenuItem._({required this.id});
 
   /// Creates an item that runs [onTap] when tapped.
   ///
   /// Set [pagingMetadata] only on items returned by a
   /// [SmartContextMenuPageLoader], see [SmartContextMenuItem.pagingSubmenu].
-  factory SmartContextMenuItem.simple({
+  static SmartContextMenuSimpleItem simple({
     String? id,
     String? title,
     TextStyle? titleStyle,
@@ -307,7 +146,7 @@ final class SmartContextMenuItem {
     EdgeInsets? padding,
     double? childrenGap,
     SmartContextMenuPagingMetadata? pagingMetadata,
-  }) => SmartContextMenuItem._(
+  }) => SmartContextMenuSimpleItem._(
     id: id ?? _generateId(),
     title: title,
     titleStyle: titleStyle,
@@ -327,7 +166,7 @@ final class SmartContextMenuItem {
   /// Creates an item that opens a submenu with [children].
   ///
   /// Without [children], the submenu shows a [SmartContextMenuItem.empty].
-  factory SmartContextMenuItem.submenu({
+  static SmartContextMenuSubmenuItem submenu({
     required List<SmartContextMenuItem> children,
     String? id,
     String? title,
@@ -340,7 +179,7 @@ final class SmartContextMenuItem {
     SmartContextMenuItemBuilder? customBuilder,
     EdgeInsets? padding,
     double? childrenGap,
-  }) => SmartContextMenuItem._(
+  }) => SmartContextMenuSubmenuItem._(
     id: id ?? _generateId(),
     title: title,
     titleStyle: titleStyle,
@@ -383,7 +222,7 @@ final class SmartContextMenuItem {
   ///   },
   /// )
   /// ```
-  factory SmartContextMenuItem.asyncSubmenu({
+  static SmartContextMenuAsyncSubmenuItem asyncSubmenu({
     required SmartContextMenuSubmenuLoader asyncChildren,
     Duration timeout = SmartContextMenuDefaults.loadingTimeout,
     SmartContextMenuLoadingItem? loading,
@@ -400,7 +239,7 @@ final class SmartContextMenuItem {
     SmartContextMenuItemBuilder? customBuilder,
     EdgeInsets? padding,
     double? childrenGap,
-  }) => SmartContextMenuItem._(
+  }) => SmartContextMenuAsyncSubmenuItem._(
     id: id ?? _generateId(),
     title: title,
     titleStyle: titleStyle,
@@ -410,24 +249,24 @@ final class SmartContextMenuItem {
     tintColor: tintColor,
     isDisabled: isDisabled,
     asyncChildren: asyncChildren,
-    loadingTimeout: timeout,
+    timeout: timeout,
     customBuilder: customBuilder,
     padding: padding,
     childrenGap: childrenGap,
-    loadingItem: loading,
-    errorItem: error,
-    emptyItem: empty,
+    loading: loading,
+    error: error,
+    empty: empty,
   );
 
   /// Creates an item that opens a submenu with items loaded page by page.
   ///
   /// [asyncPagingChildren] is called with [initialMetadata] when the item
-  /// is tapped. The [SmartContextMenuItem.pagingMetadata] of the last item
-  /// of each page describes the next page, which is loaded when the user
-  /// scrolls to the end of the submenu. A page that is empty or whose last
-  /// item has no metadata is the last one. While a page loads, the submenu
-  /// shows [loading], a [SmartContextMenuItem.loading], or by default
-  /// an activity indicator in the middle, after the loaded items.
+  /// is tapped. The [SmartContextMenuSimpleItem.pagingMetadata] of the last
+  /// item of each page describes the next page, which is loaded when the
+  /// user scrolls to the end of the submenu. A page that is empty or whose
+  /// last item has no metadata is the last one. While a page loads, the
+  /// submenu shows [loading], a [SmartContextMenuItem.loading], or by
+  /// default an activity indicator in the middle, after the loaded items.
   ///
   /// If a page fails to load or takes longer than [timeout], the submenu
   /// shows [error], a [SmartContextMenuItem.error], after the loaded items,
@@ -461,7 +300,7 @@ final class SmartContextMenuItem {
   ///   },
   /// )
   /// ```
-  factory SmartContextMenuItem.pagingSubmenu({
+  static SmartContextMenuPagingSubmenuItem pagingSubmenu({
     required SmartContextMenuPageLoader asyncPagingChildren,
     required SmartContextMenuPagingMetadata initialMetadata,
     Duration timeout = SmartContextMenuDefaults.loadingTimeout,
@@ -479,12 +318,12 @@ final class SmartContextMenuItem {
     SmartContextMenuItemBuilder? customBuilder,
     EdgeInsets? padding,
     double? childrenGap,
-  }) => SmartContextMenuItem._(
+  }) => SmartContextMenuPagingSubmenuItem._(
     id: id ?? _generateId(),
     title: title,
     asyncPagingChildren: asyncPagingChildren,
-    pagingMetadata: initialMetadata,
-    loadingTimeout: timeout,
+    initialMetadata: initialMetadata,
+    timeout: timeout,
     titleStyle: titleStyle,
     leading: leading,
     trailing: trailing,
@@ -494,9 +333,9 @@ final class SmartContextMenuItem {
     customBuilder: customBuilder,
     padding: padding,
     childrenGap: childrenGap,
-    loadingItem: loading,
-    errorItem: error,
-    emptyItem: empty,
+    loading: loading,
+    error: error,
+    empty: empty,
   );
 
   /// Creates a separator between groups of items.
@@ -522,15 +361,13 @@ final class SmartContextMenuItem {
   ///   SmartContextMenuItem.simple(title: 'Delete', isDestructive: true),
   /// ]
   /// ```
-  factory SmartContextMenuItem.separator({
+  static SmartContextMenuSeparatorItem separator({
     String? id,
     Widget? child,
     SmartContextMenuPagingMetadata? pagingMetadata,
-  }) => SmartContextMenuItem._(
+  }) => SmartContextMenuSeparatorItem._(
     id: id ?? _generateId(),
-    isSeparator: true,
-    closeOnTap: false,
-    customBuilder: child == null ? null : (context, state) => child,
+    child: child,
     pagingMetadata: pagingMetadata,
   );
 
@@ -566,22 +403,19 @@ final class SmartContextMenuItem {
   ///   },
   /// )
   /// ```
-  factory SmartContextMenuItem.async({
+  static SmartContextMenuAsyncItem async({
     required SmartContextMenuItemLoader asyncItem,
     String? id,
     Duration timeout = SmartContextMenuDefaults.loadingTimeout,
     SmartContextMenuLoadingItem? loading,
     SmartContextMenuErrorItem? error,
-  }) {
-    return SmartContextMenuItem._(
-      id: id ?? _generateId(),
-      asyncItem: asyncItem,
-      loadingItem: loading ?? SmartContextMenuItem.loading(),
-      errorItem: error ?? SmartContextMenuItem.error(),
-      loadingTimeout: timeout,
-      closeOnTap: false,
-    );
-  }
+  }) => SmartContextMenuAsyncItem._(
+    id: id ?? _generateId(),
+    asyncItem: asyncItem,
+    timeout: timeout,
+    loading: loading ?? SmartContextMenuItem.loading(),
+    error: error ?? SmartContextMenuItem.error(),
+  );
 
   /// Creates an item that is built by [builder] and built again each time
   /// [listenable] notifies, also while the menu is open.
@@ -593,7 +427,7 @@ final class SmartContextMenuItem {
   /// a [ChangeNotifier] that calls `notifyListeners` on each event.
   ///
   /// [builder] returns the item to show: a [SmartContextMenuItem.simple],
-  /// whose [onTap] and [closeOnTap] are used, so it can act on the current
+  /// whose `onTap` and `closeOnTap` are used, so it can act on the current
   /// state, a [SmartContextMenuItem.loading] while the item is loading,
   /// a [SmartContextMenuItem.error] if it failed to load, or
   /// a [SmartContextMenuItem.empty] if there is nothing to show.
@@ -617,15 +451,14 @@ final class SmartContextMenuItem {
   ///   },
   /// )
   /// ```
-  factory SmartContextMenuItem.listenable({
+  static SmartContextMenuListenableItem listenable({
     required Listenable listenable,
     required SmartContextMenuListenableItemBuilder builder,
     String? id,
-  }) => SmartContextMenuItem._(
+  }) => SmartContextMenuListenableItem._(
     id: id ?? _generateId(),
     listenable: listenable,
-    listenableBuilder: builder,
-    closeOnTap: false,
+    builder: builder,
   );
 
   /// Creates an item that shows a loading state.
@@ -684,7 +517,7 @@ final class SmartContextMenuItem {
   /// Pass it as `error` to [SmartContextMenuItem.async],
   /// [SmartContextMenuItem.asyncSubmenu] or
   /// [SmartContextMenuItem.pagingSubmenu]: tapping it there retries loading,
-  /// see [errorItem]. Anywhere else, for
+  /// see [SmartContextMenuAsyncItem.error]. Anywhere else, for
   /// example from the builder of [SmartContextMenuItem.listenable], it does
   /// not respond to taps. To retry from it there, add a button to [child],
   /// or return a [SmartContextMenuItem.simple] with `onTap` instead.
@@ -769,79 +602,155 @@ final class SmartContextMenuItem {
   );
 }
 
-/// A [SmartContextMenuItem] that shows a state, such as loading, instead
-/// of an action.
-///
-/// It does not respond to taps and is not dimmed. Its [title] is aligned
-/// between [leading] and [trailing] by
-/// [SmartContextMenuStyle.statusTitleAlign], in the middle by default. A sign
-/// of the state is shown after [title] unless [trailing] is set.
-///
-/// See [SmartContextMenuLoadingItem], [SmartContextMenuErrorItem] and
-/// [SmartContextMenuEmptyItem].
-sealed class SmartContextMenuStatusItem extends SmartContextMenuItem {
-  /// The content shown instead of [title], [leading] and [trailing].
-  ///
-  /// The item [padding] is still applied. Text and icons in it take
-  /// the color of the item.
-  final Widget? child;
+/// The fields of [SmartContextMenuItem] under their old names, for the code
+/// that does not switch on the type of the item yet.
+@internal
+extension SmartContextMenuItemFields on SmartContextMenuItem {
+  String? get title => switch (this) {
+    SmartContextMenuContentItem(:final title) => title,
+    SmartContextMenuStatusItem(:final title) => title,
+    _ => null,
+  };
 
-  const SmartContextMenuStatusItem._({
-    required super.id,
-    super.title,
-    super.titleStyle,
-    super.leading,
-    super.trailing,
-    this.child,
-    super.padding,
-    super.childrenGap,
-  }) : super._(closeOnTap: false);
-}
+  TextStyle? get titleStyle => switch (this) {
+    SmartContextMenuContentItem(:final titleStyle) => titleStyle,
+    SmartContextMenuStatusItem(:final titleStyle) => titleStyle,
+    _ => null,
+  };
 
-/// A [SmartContextMenuStatusItem] that shows a loading state.
-///
-/// Create it with [SmartContextMenuItem.loading].
-final class SmartContextMenuLoadingItem extends SmartContextMenuStatusItem {
-  const SmartContextMenuLoadingItem._({
-    required super.id,
-    super.title,
-    super.titleStyle,
-    super.leading,
-    super.trailing,
-    super.child,
-    super.padding,
-    super.childrenGap,
-  }) : super._();
-}
+  Widget? get leading => switch (this) {
+    SmartContextMenuContentItem(:final leading) => leading,
+    SmartContextMenuStatusItem(:final leading) => leading,
+    _ => null,
+  };
 
-/// A [SmartContextMenuStatusItem] that shows a failed load.
-///
-/// Create it with [SmartContextMenuItem.error].
-final class SmartContextMenuErrorItem extends SmartContextMenuStatusItem {
-  const SmartContextMenuErrorItem._({
-    required super.id,
-    super.title,
-    super.titleStyle,
-    super.leading,
-    super.trailing,
-    super.child,
-    super.padding,
-    super.childrenGap,
-  }) : super._();
-}
+  Widget? get trailing => switch (this) {
+    SmartContextMenuContentItem(:final trailing) => trailing,
+    SmartContextMenuStatusItem(:final trailing) => trailing,
+    _ => null,
+  };
 
-/// A [SmartContextMenuStatusItem] that shows that there are no items.
-///
-/// Create it with [SmartContextMenuItem.empty].
-final class SmartContextMenuEmptyItem extends SmartContextMenuStatusItem {
-  const SmartContextMenuEmptyItem._({
-    required super.id,
-    super.title,
-    super.titleStyle,
-    super.leading,
-    super.trailing,
-    super.child,
-    super.padding,
-    super.childrenGap,
-  }) : super._();
+  EdgeInsets? get padding => switch (this) {
+    SmartContextMenuContentItem(:final padding) => padding,
+    SmartContextMenuStatusItem(:final padding) => padding,
+    _ => null,
+  };
+
+  double? get childrenGap => switch (this) {
+    SmartContextMenuContentItem(:final childrenGap) => childrenGap,
+    SmartContextMenuStatusItem(:final childrenGap) => childrenGap,
+    _ => null,
+  };
+
+  bool get isDestructive => switch (this) {
+    SmartContextMenuContentItem(:final isDestructive) => isDestructive,
+    _ => false,
+  };
+
+  Color? get tintColor => switch (this) {
+    SmartContextMenuContentItem(:final tintColor) => tintColor,
+    _ => null,
+  };
+
+  bool get isDisabled => switch (this) {
+    SmartContextMenuContentItem(:final isDisabled) => isDisabled,
+    _ => false,
+  };
+
+  bool get isSeparator => this is SmartContextMenuSeparatorItem;
+
+  bool get closeOnTap => switch (this) {
+    SmartContextMenuSimpleItem(:final closeOnTap) => closeOnTap,
+    SmartContextMenuContentItem() => true,
+    _ => false,
+  };
+
+  FutureOr<void> Function()? get onTap => switch (this) {
+    SmartContextMenuSimpleItem(:final onTap) => onTap,
+    _ => null,
+  };
+
+  List<SmartContextMenuItem>? get children => switch (this) {
+    SmartContextMenuSubmenuItem(:final children) => children,
+    _ => null,
+  };
+
+  SmartContextMenuSubmenuLoader? get asyncChildren => switch (this) {
+    SmartContextMenuAsyncSubmenuItem(:final asyncChildren) => asyncChildren,
+    _ => null,
+  };
+
+  SmartContextMenuPageLoader? get asyncPagingChildren => switch (this) {
+    SmartContextMenuPagingSubmenuItem(:final asyncPagingChildren) =>
+      asyncPagingChildren,
+    _ => null,
+  };
+
+  SmartContextMenuItemLoader? get asyncItem => switch (this) {
+    SmartContextMenuAsyncItem(:final asyncItem) => asyncItem,
+    _ => null,
+  };
+
+  SmartContextMenuLoadingItem? get loadingItem => switch (this) {
+    SmartContextMenuAsyncSubmenuItem(:final loading) => loading,
+    SmartContextMenuPagingSubmenuItem(:final loading) => loading,
+    SmartContextMenuAsyncItem(:final loading) => loading,
+    _ => null,
+  };
+
+  SmartContextMenuErrorItem? get errorItem => switch (this) {
+    SmartContextMenuAsyncSubmenuItem(:final error) => error,
+    SmartContextMenuPagingSubmenuItem(:final error) => error,
+    SmartContextMenuAsyncItem(:final error) => error,
+    _ => null,
+  };
+
+  SmartContextMenuEmptyItem? get emptyItem => switch (this) {
+    SmartContextMenuAsyncSubmenuItem(:final empty) => empty,
+    SmartContextMenuPagingSubmenuItem(:final empty) => empty,
+    _ => null,
+  };
+
+  Duration? get loadingTimeout => switch (this) {
+    SmartContextMenuAsyncSubmenuItem(:final timeout) => timeout,
+    SmartContextMenuPagingSubmenuItem(:final timeout) => timeout,
+    SmartContextMenuAsyncItem(:final timeout) => timeout,
+    _ => null,
+  };
+
+  Listenable? get listenable => switch (this) {
+    SmartContextMenuListenableItem(:final listenable) => listenable,
+    _ => null,
+  };
+
+  SmartContextMenuListenableItemBuilder? get listenableBuilder =>
+      switch (this) {
+        SmartContextMenuListenableItem(:final builder) => builder,
+        _ => null,
+      };
+
+  SmartContextMenuPagingMetadata? get pagingMetadata => switch (this) {
+    SmartContextMenuSimpleItem(:final pagingMetadata) => pagingMetadata,
+    SmartContextMenuSeparatorItem(:final pagingMetadata) => pagingMetadata,
+    SmartContextMenuPagingSubmenuItem(:final initialMetadata) =>
+      initialMetadata,
+    _ => null,
+  };
+
+  SmartContextMenuItemBuilder? get customBuilder => switch (this) {
+    SmartContextMenuContentItem(:final customBuilder) => customBuilder,
+    SmartContextMenuSeparatorItem(:final child?) => (context, state) => child,
+    _ => null,
+  };
+
+  /// Whether the item shows a submenu chevron.
+  bool get showTransitionIcon =>
+      children != null || asyncChildren != null || asyncPagingChildren != null;
+
+  /// Whether a tap is handled by the menu itself.
+  bool get isInternalInteracted =>
+      asyncItem != null ||
+      asyncChildren != null ||
+      asyncPagingChildren != null ||
+      children != null;
 }

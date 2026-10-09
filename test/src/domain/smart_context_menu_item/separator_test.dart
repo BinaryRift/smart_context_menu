@@ -3,17 +3,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
 
 void main() {
-  test('is a separator without actions', () {
+  test('has no child and no paging metadata by default', () {
     final item = SmartContextMenuItem.separator();
 
-    expect(item.isSeparator, isTrue);
-    expect(item.closeOnTap, isFalse);
-    expect(item.onTap, isNull);
-    expect(item.customBuilder, isNull);
-    expect(item.isInternalInteracted, isFalse);
+    expect(item.child, isNull);
+    expect(item.pagingMetadata, isNull);
   });
 
-  test('builds the given child', () {
+  test('keeps the given child and paging metadata', () {
     const child = Text('Section');
     const metadata = SmartContextMenuPagingMetadata(page: 2);
     final item = SmartContextMenuItem.separator(
@@ -21,20 +18,7 @@ void main() {
       pagingMetadata: metadata,
     );
 
-    expect(
-      item.customBuilder!(
-        _FakeContext(),
-        const SmartContextMenuItemState(
-          isPressed: false,
-          isDisabled: false,
-          isDestructive: false,
-          foregroundColor: Color(0xFF000000),
-        ),
-      ),
-      same(child),
-    );
+    expect(item.child, same(child));
     expect(item.pagingMetadata, metadata);
   });
 }
-
-final class _FakeContext extends Fake implements BuildContext {}

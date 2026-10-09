@@ -340,7 +340,7 @@ CupertinoDynamicColor _deep(CupertinoDynamicColor color) {
   );
 }
 
-SmartContextMenuItem _action(
+SmartContextMenuSimpleItem _action(
   String title, {
   IconData? icon,
   bool isDestructive = false,

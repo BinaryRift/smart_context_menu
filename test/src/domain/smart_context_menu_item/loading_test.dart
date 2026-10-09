@@ -25,17 +25,14 @@ void main() {
     expect(item.childrenGap, 4);
   });
 
-  test('is loading and has no actions', () {
+  test('is a status item that is loading', () {
     // The declared type checks that the item is a loading item.
     final SmartContextMenuLoadingItem item = SmartContextMenuItem.loading();
 
     expect(item, isA<SmartContextMenuStatusItem>());
     expect(item.isLoading, isTrue);
     expect(item.title, isNull);
-    expect(item.closeOnTap, isFalse);
-    expect(item.onTap, isNull);
-    expect(item.isSeparator, isFalse);
-    expect(item.isInternalInteracted, isFalse);
+    expect(item.child, isNull);
   });
 
   test('is the only loading item', () {

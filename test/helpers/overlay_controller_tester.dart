@@ -24,5 +24,10 @@ SmartContextMenuOverlayController overlayController(
 }
 
 List<String?> itemTitles(List<SmartContextMenuItem> items) => [
-  for (final item in items) item.title,
+  for (final item in items)
+    switch (item) {
+      SmartContextMenuContentItem(:final title) => title,
+      SmartContextMenuStatusItem(:final title) => title,
+      _ => null,
+    },
 ];

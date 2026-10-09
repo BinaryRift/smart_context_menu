@@ -9,7 +9,7 @@ import '../../helpers/menu_tester.dart';
 
 void main() {
   testWidgets('shows the labels of the config', (tester) async {
-    final placeholder = Completer<SmartContextMenuItem>();
+    final placeholder = Completer<SmartContextMenuAsyncResult>();
     await tester.pumpMenu(
       config: const SmartContextMenuConfig(
         labels: SmartContextMenuLabels(

@@ -22,14 +22,16 @@ void main() {
           builder: SmartContextMenuItem.simple,
         ).id,
         SmartContextMenuItem.loading().id,
+        SmartContextMenuItem.error().id,
+        SmartContextMenuItem.empty().id,
         SmartContextMenuItem.separator().id,
       };
 
-      expect(ids, hasLength(9));
+      expect(ids, hasLength(11));
     });
 
     test('keeps the given value', () {
-      final items = [
+      final items = <SmartContextMenuItem>[
         SmartContextMenuItem.simple(id: 'a'),
         SmartContextMenuItem.submenu(id: 'a', children: []),
         SmartContextMenuItem.asyncSubmenu(
@@ -51,6 +53,8 @@ void main() {
           builder: SmartContextMenuItem.simple,
         ),
         SmartContextMenuItem.loading(id: 'a'),
+        SmartContextMenuItem.error(id: 'a'),
+        SmartContextMenuItem.empty(id: 'a'),
         SmartContextMenuItem.separator(id: 'a'),
       ];
 
@@ -63,7 +67,7 @@ void main() {
   group('padding', () {
     test('keeps the given value', () {
       const padding = EdgeInsets.all(2);
-      final items = [
+      final items = <SmartContextMenuContentItem>[
         SmartContextMenuItem.simple(padding: padding),
         SmartContextMenuItem.submenu(padding: padding, children: []),
         SmartContextMenuItem.asyncSubmenu(
@@ -75,10 +79,17 @@ void main() {
           asyncPagingChildren: (_) async => [],
           initialMetadata: const SmartContextMenuPagingMetadata(),
         ),
+      ];
+      final statusItems = <SmartContextMenuStatusItem>[
         SmartContextMenuItem.loading(padding: padding),
+        SmartContextMenuItem.error(padding: padding),
+        SmartContextMenuItem.empty(padding: padding),
       ];
 
       for (final item in items) {
+        expect(item.padding, padding);
+      }
+      for (final item in statusItems) {
         expect(item.padding, padding);
       }
     });

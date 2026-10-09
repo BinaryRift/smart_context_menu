@@ -9,11 +9,8 @@ void main() {
       children: children,
     );
 
+    expect(item.title, 'More');
     expect(item.children, same(children));
-    expect(item.asyncChildren, isNull);
-    expect(item.asyncPagingChildren, isNull);
-    expect(item.showTransitionIcon, isTrue);
-    expect(item.isInternalInteracted, isTrue);
   });
 
   test('asyncSubmenu keeps its loader and timeout', () {
@@ -24,12 +21,9 @@ void main() {
       timeout: const Duration(seconds: 3),
     );
 
+    expect(item.title, 'More');
     expect(item.asyncChildren, loader);
-    expect(item.loadingTimeout, const Duration(seconds: 3));
-    expect(item.children, isNull);
-    expect(item.asyncPagingChildren, isNull);
-    expect(item.showTransitionIcon, isTrue);
-    expect(item.isInternalInteracted, isTrue);
+    expect(item.timeout, const Duration(seconds: 3));
   });
 
   test('pagingSubmenu keeps its loader, timeout and first page metadata', () {
@@ -44,94 +38,66 @@ void main() {
       timeout: const Duration(seconds: 3),
     );
 
+    expect(item.title, 'Pages');
     expect(item.asyncPagingChildren, loader);
-    expect(item.loadingTimeout, const Duration(seconds: 3));
-    expect(item.pagingMetadata, metadata);
-    expect(item.children, isNull);
-    expect(item.asyncChildren, isNull);
-    expect(item.showTransitionIcon, isTrue);
-    expect(item.isInternalInteracted, isTrue);
+    expect(item.timeout, const Duration(seconds: 3));
+    expect(item.initialMetadata, metadata);
   });
 
-  test('async submenus use the default timeout', () {
-    final async = SmartContextMenuItem.asyncSubmenu(
-      asyncChildren: () async => [],
-    );
-    final paging = SmartContextMenuItem.pagingSubmenu(
-      asyncPagingChildren: (_) async => [],
-      initialMetadata: const SmartContextMenuPagingMetadata(),
-    );
-
-    expect(async.loadingTimeout, SmartContextMenuDefaults.loadingTimeout);
-    expect(paging.loadingTimeout, SmartContextMenuDefaults.loadingTimeout);
-  });
-
-  test('loading submenus keep their loading item', () {
-    final loading = SmartContextMenuItem.loading(title: 'Loading');
-    final async = SmartContextMenuItem.asyncSubmenu(
+  group('async submenus', () {
+    SmartContextMenuAsyncSubmenuItem async({
+      SmartContextMenuLoadingItem? loading,
+      SmartContextMenuErrorItem? error,
+      SmartContextMenuEmptyItem? empty,
+    }) => SmartContextMenuItem.asyncSubmenu(
       asyncChildren: () async => [],
       loading: loading,
-    );
-    final paging = SmartContextMenuItem.pagingSubmenu(
-      asyncPagingChildren: (_) async => [],
-      initialMetadata: const SmartContextMenuPagingMetadata(),
-      loading: loading,
-    );
-
-    expect(async.loadingItem, same(loading));
-    expect(paging.loadingItem, same(loading));
-    expect(SmartContextMenuItem.submenu(children: []).loadingItem, isNull);
-    expect(
-      SmartContextMenuItem.asyncSubmenu(
-        asyncChildren: () async => [],
-      ).loadingItem,
-      isNull,
-    );
-  });
-
-  test('loading submenus keep their error item', () {
-    final error = SmartContextMenuItem.error(title: 'Could not load');
-    final async = SmartContextMenuItem.asyncSubmenu(
-      asyncChildren: () async => [],
       error: error,
-    );
-    final paging = SmartContextMenuItem.pagingSubmenu(
-      asyncPagingChildren: (_) async => [],
-      initialMetadata: const SmartContextMenuPagingMetadata(),
-      error: error,
-    );
-
-    expect(async.errorItem, same(error));
-    expect(paging.errorItem, same(error));
-    expect(SmartContextMenuItem.submenu(children: []).errorItem, isNull);
-    expect(
-      SmartContextMenuItem.asyncSubmenu(
-        asyncChildren: () async => [],
-      ).errorItem,
-      isNull,
-    );
-  });
-
-  test('loading submenus keep their empty item', () {
-    final empty = SmartContextMenuItem.empty(title: 'No files');
-    final async = SmartContextMenuItem.asyncSubmenu(
-      asyncChildren: () async => [],
-      empty: empty,
-    );
-    final paging = SmartContextMenuItem.pagingSubmenu(
-      asyncPagingChildren: (_) async => [],
-      initialMetadata: const SmartContextMenuPagingMetadata(),
       empty: empty,
     );
 
-    expect(async.emptyItem, same(empty));
-    expect(paging.emptyItem, same(empty));
-    expect(SmartContextMenuItem.submenu(children: []).emptyItem, isNull);
-    expect(
-      SmartContextMenuItem.asyncSubmenu(
-        asyncChildren: () async => [],
-      ).emptyItem,
-      isNull,
+    SmartContextMenuPagingSubmenuItem paging({
+      SmartContextMenuLoadingItem? loading,
+      SmartContextMenuErrorItem? error,
+      SmartContextMenuEmptyItem? empty,
+    }) => SmartContextMenuItem.pagingSubmenu(
+      asyncPagingChildren: (_) async => [],
+      initialMetadata: const SmartContextMenuPagingMetadata(),
+      loading: loading,
+      error: error,
+      empty: empty,
     );
+
+    test('use the default timeout', () {
+      expect(async().timeout, SmartContextMenuDefaults.loadingTimeout);
+      expect(paging().timeout, SmartContextMenuDefaults.loadingTimeout);
+    });
+
+    // The submenu shows its default states when they are null.
+    test('have no loading, error and empty items by default', () {
+      for (final (loading, error, empty) in [
+        (async().loading, async().error, async().empty),
+        (paging().loading, paging().error, paging().empty),
+      ]) {
+        expect(loading, isNull);
+        expect(error, isNull);
+        expect(empty, isNull);
+      }
+    });
+
+    test('keep their loading, error and empty items', () {
+      final loading = SmartContextMenuItem.loading(title: 'Loading');
+      final error = SmartContextMenuItem.error(title: 'Could not load');
+      final empty = SmartContextMenuItem.empty(title: 'No files');
+      final asyncItem = async(loading: loading, error: error, empty: empty);
+      final pagingItem = paging(loading: loading, error: error, empty: empty);
+
+      expect(asyncItem.loading, same(loading));
+      expect(asyncItem.error, same(error));
+      expect(asyncItem.empty, same(empty));
+      expect(pagingItem.loading, same(loading));
+      expect(pagingItem.error, same(error));
+      expect(pagingItem.empty, same(empty));
+    });
   });
 }

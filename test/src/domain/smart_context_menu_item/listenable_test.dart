@@ -4,7 +4,7 @@ import 'package:smart_context_menu/smart_context_menu.dart';
 
 void main() {
   final listenable = ChangeNotifier();
-  SmartContextMenuItem builder() => SmartContextMenuItem.simple();
+  SmartContextMenuListenableResult builder() => SmartContextMenuItem.simple();
 
   tearDownAll(listenable.dispose);
 
@@ -15,22 +15,6 @@ void main() {
     );
 
     expect(item.listenable, same(listenable));
-    expect(item.listenableBuilder, builder);
-  });
-
-  test('leaves taps to the built item', () {
-    final item = SmartContextMenuItem.listenable(
-      listenable: listenable,
-      builder: builder,
-    );
-
-    expect(item.closeOnTap, isFalse);
-    expect(item.onTap, isNull);
-    expect(item.title, isNull);
-    expect(item.asyncItem, isNull);
-    expect(item.loadingTimeout, isNull);
-    expect(item.errorItem, isNull);
-    expect(item.showTransitionIcon, isFalse);
-    expect(item.isInternalInteracted, isFalse);
+    expect(item.builder, builder);
   });
 }

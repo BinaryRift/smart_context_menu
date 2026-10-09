@@ -41,9 +41,8 @@ void main() {
 
     expect(item.isDestructive, isFalse);
     expect(item.isDisabled, isFalse);
-    expect(item.isSeparator, isFalse);
     expect(item.closeOnTap, isTrue);
-    expect(item.showTransitionIcon, isFalse);
-    expect(item.isInternalInteracted, isFalse);
+    expect(item.onTap, isNull);
+    expect(item.pagingMetadata, isNull);
   });
 }

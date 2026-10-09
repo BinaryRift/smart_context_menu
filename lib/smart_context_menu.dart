@@ -38,7 +38,8 @@ export 'src/domain/smart_context_menu_activation_mode.dart';
 export 'src/domain/smart_context_menu_blur.dart';
 export 'src/domain/smart_context_menu_config.dart';
 export 'src/domain/smart_context_menu_header_details.dart';
-export 'src/domain/smart_context_menu_item.dart';
+export 'src/domain/smart_context_menu_item.dart'
+    hide SmartContextMenuItemFields;
 export 'src/domain/smart_context_menu_item_state.dart';
 export 'src/domain/smart_context_menu_labels.dart';
 export 'src/domain/smart_context_menu_paging_metadata.dart';
