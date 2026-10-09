@@ -22,7 +22,8 @@
 /// * [SmartContextMenuBlur] sets the strength of the blurs.
 /// * [SmartContextMenuPagingMetadata] describes a page of a paginated
 ///   submenu.
-/// * [SmartContextMenuLoadingItem] is the item created by
+/// * [SmartContextMenuStatusItem] is the base of the items that show
+///   a state, such as [SmartContextMenuLoadingItem], the item created by
 ///   [SmartContextMenuItem.loading].
 /// * [SmartContextMenuItemState] is passed to custom item builders.
 /// * [SmartContextMenuHeaderDetails] is passed to the builder of the

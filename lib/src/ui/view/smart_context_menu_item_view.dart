@@ -225,8 +225,10 @@ final class _SmartContextMenuItemViewState
   }
 
   Widget _buildContent(SmartContextMenuItemState state) {
-    if (_isLoading) return _buildLoadingBody();
     if (_error != null) return _buildErrorBody(state);
+    if (_item case final SmartContextMenuStatusItem item) {
+      return _buildStatusBody(item);
+    }
 
     return KeyedSubtree(
       key: ItemContentKey.content,
@@ -276,12 +278,17 @@ final class _SmartContextMenuItemViewState
     );
   }
 
-  Widget _buildLoadingBody() {
-    if (_item case SmartContextMenuLoadingItem(:final child?)) {
+  Widget _buildStatusBody(SmartContextMenuStatusItem item) {
+    final key = switch (item) {
+      SmartContextMenuLoadingItem() => ItemContentKey.loading,
+    };
+
+    final child = item.child;
+    if (child != null) {
       return KeyedSubtree(
-        key: ItemContentKey.loading,
+        key: key,
         child: DefaultTextStyle.merge(
-          style: (_item.titleStyle ?? _style.titleStyle).copyWith(
+          style: (item.titleStyle ?? _style.titleStyle).copyWith(
             color: _foregroundColor,
           ),
           child: IconTheme.merge(
@@ -292,14 +299,20 @@ final class _SmartContextMenuItemViewState
       );
     }
 
-    final loadingItem = SmartContextMenuItem.simple(
-      title: _item.title ?? _config.labels.loading,
-      titleStyle: _item.titleStyle,
-      leading: _item.leading,
-      childrenGap: _item.childrenGap,
-      trailing: CupertinoActivityIndicator(),
+    final (String title, Widget sign) = switch (item) {
+      SmartContextMenuLoadingItem() => (
+        _config.labels.loading,
+        const CupertinoActivityIndicator(),
+      ),
+    };
+    final row = SmartContextMenuItem.simple(
+      title: item.title ?? title,
+      titleStyle: item.titleStyle,
+      leading: item.leading,
+      trailing: item.trailing ?? sign,
+      childrenGap: item.childrenGap,
     );
-    return KeyedSubtree(key: ItemContentKey.loading, child: _body(loadingItem));
+    return KeyedSubtree(key: key, child: _body(row));
   }
 
   Widget _buildErrorBody(SmartContextMenuItemState state) {

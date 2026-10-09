@@ -595,8 +595,8 @@ final class SmartContextMenuItem {
   ///
   /// The item shows [title] (or [SmartContextMenuLabels.loading]) with
   /// [leading] and an activity indicator, and does not respond to taps.
-  /// Pass [child] to replace this content; text and icons in it take the
-  /// color of the item.
+  /// [trailing] replaces the activity indicator. Pass [child] to replace
+  /// this content; text and icons in it take the color of the item.
   ///
   /// ```dart
   /// SmartContextMenuItem.listenable(
@@ -616,6 +616,7 @@ final class SmartContextMenuItem {
     String? title,
     TextStyle? titleStyle,
     Widget? leading,
+    Widget? trailing,
     Widget? child,
     EdgeInsets? padding,
     double? childrenGap,
@@ -624,30 +625,51 @@ final class SmartContextMenuItem {
     title: title,
     titleStyle: titleStyle,
     leading: leading,
+    trailing: trailing,
     child: child,
     padding: padding,
     childrenGap: childrenGap,
   );
 }
 
-/// A [SmartContextMenuItem] that shows a loading state.
+/// A [SmartContextMenuItem] that shows a state, such as loading, instead
+/// of an action.
 ///
-/// Create it with [SmartContextMenuItem.loading].
-final class SmartContextMenuLoadingItem extends SmartContextMenuItem {
-  /// The content shown instead of [title], [leading] and the activity
-  /// indicator.
+/// It does not respond to taps and is not dimmed. A sign of the state is
+/// shown after [title] unless [trailing] is set.
+///
+/// See [SmartContextMenuLoadingItem].
+sealed class SmartContextMenuStatusItem extends SmartContextMenuItem {
+  /// The content shown instead of [title], [leading] and [trailing].
   ///
   /// The item [padding] is still applied. Text and icons in it take
   /// the color of the item.
   final Widget? child;
 
+  const SmartContextMenuStatusItem._({
+    required super.id,
+    super.title,
+    super.titleStyle,
+    super.leading,
+    super.trailing,
+    this.child,
+    super.padding,
+    super.childrenGap,
+  }) : super._(closeOnTap: false);
+}
+
+/// A [SmartContextMenuStatusItem] that shows a loading state.
+///
+/// Create it with [SmartContextMenuItem.loading].
+final class SmartContextMenuLoadingItem extends SmartContextMenuStatusItem {
   const SmartContextMenuLoadingItem._({
     required super.id,
     super.title,
     super.titleStyle,
     super.leading,
-    this.child,
+    super.trailing,
+    super.child,
     super.padding,
     super.childrenGap,
-  }) : super._(closeOnTap: false);
+  }) : super._();
 }

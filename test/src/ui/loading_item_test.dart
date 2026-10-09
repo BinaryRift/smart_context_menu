@@ -18,6 +18,24 @@ void main() {
     expect(find.byType(CupertinoActivityIndicator), findsOneWidget);
   });
 
+  testWidgets('shows its trailing instead of the activity indicator', (
+    tester,
+  ) async {
+    await tester.pumpMenu(
+      items: [
+        SmartContextMenuItem.loading(
+          title: 'Syncing',
+          trailing: const Icon(CupertinoIcons.clock),
+        ),
+      ],
+    );
+    await tester.openMenu();
+
+    expect(find.text('Syncing'), findsOneWidget);
+    expect(find.byIcon(CupertinoIcons.clock), findsOneWidget);
+    expect(find.byType(CupertinoActivityIndicator), findsNothing);
+  });
+
   testWidgets('is not highlighted under the finger', (tester) async {
     await tester.pumpMenu(
       items: [SmartContextMenuItem.loading(title: 'Syncing')],
