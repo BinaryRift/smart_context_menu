@@ -104,9 +104,12 @@ abstract final class SmartContextMenuDefaults {
       );
 
   /// The default of [SmartContextMenuStyle.destructiveColor].
+  ///
+  /// In the light theme, the high contrast red of iOS: the regular one
+  /// reads poorly on the light menu.
   static const CupertinoDynamicColor destructiveColor =
       CupertinoDynamicColor.withBrightness(
-        color: Color(0xFFFF3B30),
+        color: Color(0xFFD70015),
         darkColor: Color(0xFFF85032),
       );
 
@@ -133,10 +136,12 @@ abstract final class SmartContextMenuDefaults {
 
   /// The default of [SmartContextMenuStyle.separatorColor].
   ///
-  /// The colors of [dividerColor] at 40% opacity.
+  /// Black at 20% opacity in the light theme, so the band stands out from
+  /// the light menu; the dark color of [dividerColor] at 40% opacity in the
+  /// dark theme.
   static const CupertinoDynamicColor separatorColor =
       CupertinoDynamicColor.withBrightness(
-        color: Color(0x669E9E9E),
+        color: Color(0x33000000),
         darkColor: Color(0x66545458),
       );
 
