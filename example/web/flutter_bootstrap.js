@@ -11,5 +11,23 @@ _flutter.loader.load({
       hostElement: document.querySelector('#app'),
     });
     await appRunner.runApp();
+    hideSplash();
   },
 });
+
+// The splash stays at least this long since the page opened, so it is seen
+// even when the app loads at once.
+const splashMinimum = 2000;
+
+// Fades out the splash from index.html once the app draws its first frame.
+function hideSplash() {
+  const splash = document.querySelector('#splash');
+  if (!splash) return;
+  const wait = Math.max(0, splashMinimum - performance.now());
+  setTimeout(() => requestAnimationFrame(() => {
+    splash.classList.add('is-hidden');
+    splash.addEventListener('transitionend', () => splash.remove(), {
+      once: true,
+    });
+  }), wait);
+}

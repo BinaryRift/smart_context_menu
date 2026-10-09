@@ -17,6 +17,11 @@
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
+  <!-- The app runs in #app rather than on the whole page, so Flutter does
+       not add the viewport tag itself: without it, a phone shows the page
+       at a desktop width and everything is tiny. -->
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="Example app demonstrating the smart_context_menu package.">
 
@@ -64,6 +69,75 @@
 
     .about {
       display: none;
+    }
+
+    /* Shown while the app loads, in the colors of NothingWorks. */
+    #splash {
+      position: absolute;
+      inset: 0;
+      /* Above the view Flutter adds to #app once its engine starts, so the
+         splash stays until it fades out. */
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      font: 15px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      text-align: center;
+      color: #e7eef6;
+      background-color: #091824;
+      background-image:
+        radial-gradient(circle at 50% 30%, rgba(139, 92, 246, 0.18), transparent 60%);
+      transition: opacity 0.6s ease;
+    }
+
+    #splash.is-hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #splash h1 {
+      margin: 20px 0 8px;
+      font-size: 24px;
+    }
+
+    #splash p {
+      max-width: 300px;
+      margin: 0;
+      color: #92a6b8;
+    }
+
+    #splash .progress {
+      width: 120px;
+      height: 3px;
+      margin-top: 28px;
+      overflow: hidden;
+      border-radius: 2px;
+      background: rgba(231, 238, 246, 0.1);
+    }
+
+    #splash .progress::after {
+      content: "";
+      display: block;
+      width: 40%;
+      height: 100%;
+      border-radius: 2px;
+      background: #8b5cf6;
+      animation: splash-progress 1.2s ease-in-out infinite;
+    }
+
+    @keyframes splash-progress {
+      from { transform: translateX(-100%); }
+      to { transform: translateX(250%); }
+    }
+
+    #splash .brand {
+      position: absolute;
+      bottom: max(24px, env(safe-area-inset-bottom));
+      font-size: 13px;
+      color: #92a6b8;
     }
 
     /* On wide screens, the app runs in a tablet-sized frame. */
@@ -308,7 +382,15 @@
       </p>
     </div>
   </aside>
-  <div id="app"></div>
+  <div id="app">
+    <div id="splash">
+      <img src="favicon.svg" width="56" height="56" alt="">
+      <h1>smart_context_menu</h1>
+      <p>A powerful, fully customizable iOS-style context menu for Flutter.</p>
+      <div class="progress"></div>
+      <div class="brand">A NothingWorks project</div>
+    </div>
+  </div>
   <script>
     // Copies the command next to the button and shows a tick for a moment.
     for (const button of document.querySelectorAll('.copy')) {
