@@ -3,29 +3,12 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
 
-const _loadDelay = Duration(milliseconds: 800);
+import '../../../core/data/demo_loader.dart';
+
 const _pageCount = 5;
 const _pageSize = 20;
 const _downloadTick = Duration(milliseconds: 500);
 const _downloadStep = 10;
-
-/// Simulates network loads of the demo submenus.
-class DemoLoader {
-  /// Whether every other load fails, so the retry item can be checked.
-  bool failEveryOther = false;
-
-  int _attempt = 0;
-
-  Future<void> load(String what) async {
-    _attempt++;
-    debugPrint('$what: loading');
-    await Future<void>.delayed(_loadDelay);
-    if (failEveryOther && _attempt.isOdd) {
-      debugPrint('$what: failed');
-      throw Exception('$what: failed');
-    }
-  }
-}
 
 /// A favorite mark that is saved with a delay, like a network request.
 class DemoFavorite extends ChangeNotifier {
@@ -38,7 +21,7 @@ class DemoFavorite extends ChangeNotifier {
   Future<void> toggle() async {
     _isSaving = true;
     notifyListeners();
-    await Future<void>.delayed(_loadDelay);
+    await Future<void>.delayed(demoLoadDelay);
     _isFavorite = !_isFavorite;
     _isSaving = false;
     notifyListeners();
@@ -165,7 +148,7 @@ List<SmartContextMenuItem> statusItems() {
       title: 'Archive',
       leading: const Icon(CupertinoIcons.archivebox),
       asyncChildren: () async {
-        await Future<void>.delayed(_loadDelay);
+        await Future<void>.delayed(demoLoadDelay);
         return [];
       },
     ),

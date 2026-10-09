@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show ThemeMode;
 import 'package:smart_context_menu/smart_context_menu.dart';
 
-import 'pages/main/ui/submenu_demo_page.dart';
+import 'pages/lab/ui/lab_page.dart';
 
 void main() => runApp(const ExampleApp());
 
@@ -34,7 +34,7 @@ final class _ExampleAppState extends State<ExampleApp> {
       theme: CupertinoThemeData(brightness: _brightness),
       builder: (context, child) =>
           SmartContextMenuTheme(config: _menuConfig, child: child!),
-      home: SubmenuDemoPage(
+      home: LabPage(
         themeMode: _themeMode,
         onThemeModeChanged: (mode) => setState(() => _themeMode = mode),
       ),

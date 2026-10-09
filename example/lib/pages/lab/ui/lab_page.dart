@@ -3,30 +3,32 @@ import 'package:flutter/material.dart' show ThemeMode;
 import 'package:flutter/scheduler.dart' show timeDilation;
 import 'package:smart_context_menu/smart_context_menu.dart';
 
-import '../../../demo_items.dart';
-import 'widgets/demo_card.dart';
+import '../../../core/data/demo_loader.dart';
+import '../../../core/ui/demo_card.dart';
+import '../domain/lab_items.dart';
 import 'widgets/reactions_bar.dart';
 import 'widgets/tap_empty_area.dart';
 
 /// Content shown above the preview.
 enum _Header { none, short, tall }
 
-/// Menus for checking submenus and swiping back.
-final class SubmenuDemoPage extends StatefulWidget {
+/// Menus for checking edge cases: all item types, levels of different
+/// heights, tall widgets and a widget near the bottom edge.
+final class LabPage extends StatefulWidget {
   final ThemeMode themeMode;
   final ValueChanged<ThemeMode> onThemeModeChanged;
 
-  const SubmenuDemoPage({
+  const LabPage({
     super.key,
     required this.themeMode,
     required this.onThemeModeChanged,
   });
 
   @override
-  State<SubmenuDemoPage> createState() => _SubmenuDemoPageState();
+  State<LabPage> createState() => _LabPageState();
 }
 
-final class _SubmenuDemoPageState extends State<SubmenuDemoPage> {
+final class _LabPageState extends State<LabPage> {
   final _loader = DemoLoader();
   final _favorite = DemoFavorite();
   final _isMuted = ValueNotifier(false);
