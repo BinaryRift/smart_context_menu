@@ -16,7 +16,8 @@ drag-to-select and rich submenus.
   animated with the menu and optionally pinned to the top.
 - **Submenus**: static, loaded asynchronously or paginated, with a back item and swipe back.
 - **Lazy lists**: items are built only when they scroll into view, so long menus stay fast.
-- **Async items** that show a loading state and a retry item on failure, with optional custom views.
+- **Loading states**: async items and submenus show loading, error and empty items, retry
+  on failure, and keep one look across the menu that you can change in part or in full.
 - **Listenable items** that rebuild from the state of your app while the menu is open,
   such as toggles, counters or actions that are already running.
 - **Light and dark themes** out of the box.
@@ -185,6 +186,8 @@ Create items with the factory that matches what the item does:
 | `SmartContextMenuItem.async` | Shows a placeholder and replaces it with a loaded item. |
 | `SmartContextMenuItem.listenable` | Rebuilds from a `Listenable` while the menu is open. |
 | `SmartContextMenuItem.loading` | Shows a loading state of an async item, a submenu or a listenable item. |
+| `SmartContextMenuItem.error` | Shows a failed load; tapping it retries when it is the `error` of an async item or submenu. |
+| `SmartContextMenuItem.empty` | Shows a submenu without items. |
 | `SmartContextMenuItem.separator` | Separates groups of items. |
 
 #### Submenu
@@ -212,13 +215,15 @@ The items are loaded when the submenu opens and cached until the menu closes.
 While loading, the submenu shows an activity indicator in the middle; pass a
 [loading item](#loading-item) as `loading` to show a row with a title instead.
 If loading fails or takes longer than `timeout` (10 seconds by default), the submenu
-shows a retry item.
+shows an [error item](#error-item) that retries on tap; pass your own as `error`.
+If there are no items, it shows an [empty item](#empty-item); pass your own as `empty`.
 
 ```dart
 SmartContextMenuItem.asyncSubmenu(
   title: 'Recent files',
   leading: const Icon(CupertinoIcons.clock),
   loading: SmartContextMenuItem.loading(title: 'Loading files'),
+  empty: SmartContextMenuItem.empty(title: 'No recent files'),
   asyncChildren: () async {
     final files = await repository.recentFiles();
     return [
@@ -237,7 +242,9 @@ The first page is loaded with `initialMetadata`. The last item of each page carr
 the metadata of the next page in `pagingMetadata`; the next page is loaded when the
 user scrolls to the end. Leave it `null` on the last page. While a page loads, the submenu
 shows `loading` after the loaded items, as an async submenu does. If a page fails to load
-or takes longer than `timeout` (10 seconds by default), the submenu shows a retry item.
+or takes longer than `timeout` (10 seconds by default), the submenu shows `error` after
+the loaded items, and tapping it loads the page again. If the first page is empty, the submenu
+shows `empty`; an empty next page just ends the list.
 
 ```dart
 SmartContextMenuItem.pagingSubmenu(
@@ -265,12 +272,13 @@ SmartContextMenuItem.pagingSubmenu(
 
 The placeholder loads its item as soon as it appears. While loading, it shows `loading`,
 a `SmartContextMenuItem.loading` with the loading label by default. If loading fails or takes
-longer than `timeout` (10 seconds by default), it turns into a retry item. The error view
-can be replaced with `errorBuilder`; if it is not set, the default view is used.
+longer than `timeout` (10 seconds by default), it shows `error`, a `SmartContextMenuItem.error`,
+and tapping it loads the item again, see [error item](#error-item).
 
 ```dart
 SmartContextMenuItem.async(
   loading: SmartContextMenuItem.loading(title: 'Checking access'),
+  error: SmartContextMenuItem.error(title: 'Could not check access'),
   asyncItem: () async {
     final canEdit = await permissions.canEdit();
     return SmartContextMenuItem.simple(
@@ -279,12 +287,11 @@ SmartContextMenuItem.async(
       onTap: () => edit(),
     );
   },
-  errorBuilder: (context, state) => Text(
-    'Could not check access. Tap to retry',
-    style: TextStyle(color: state.foregroundColor),
-  ),
 )
 ```
+
+The loader decides what to show for its result: when there is nothing to show,
+it returns a `SmartContextMenuItem.empty` or any other item itself.
 
 #### Listenable item
 
@@ -312,8 +319,26 @@ SmartContextMenuItem.listenable(
 
 Unlike an async item, the state belongs to your app: the item is not loaded once but built
 again on every notification. The builder returns a `SmartContextMenuItem.simple`, whose
-`onTap` and `closeOnTap` are used, or a `SmartContextMenuItem.loading`. The menu does not
-dispose `listenable`.
+`onTap` and `closeOnTap` are used, or a `loading`, `error` or `empty` item, which ignore taps.
+To retry a failed load of your app from the item, return a `simple` item:
+
+```dart
+SmartContextMenuItem.listenable(
+  listenable: views,
+  builder: () => switch (views.state) {
+    ViewsState.loading => SmartContextMenuItem.loading(title: 'Views'),
+    ViewsState.failed => SmartContextMenuItem.simple(
+      title: 'Try again',
+      trailing: const Icon(SmartContextMenuDefaults.retryIcon),
+      closeOnTap: false,
+      onTap: views.reload,
+    ),
+    ViewsState.loaded => SmartContextMenuItem.simple(title: 'Views: ${views.count}'),
+  },
+)
+```
+
+The menu does not dispose `listenable`.
 
 Any `Listenable` works: a `ChangeNotifier`, a `ValueNotifier`, several of them combined
 with `Listenable.merge`, or a controller of a state management package that implements
@@ -343,10 +368,35 @@ Create the adapter next to the state it listens to and dispose it there as well.
 #### Loading item
 
 A loading item shows its `title` (the loading label by default) with `leading` and an activity
-indicator, and ignores taps. `child` replaces this content; text and icons in it take the color
-of the item. The menu replaces the item once loading finishes when it is the `loading` of an async
-item or an async or paginated submenu, or when a listenable item returns it. Anywhere else
-it stays until the menu closes.
+indicator, and ignores taps. `trailing` replaces the indicator, and `child` replaces the whole
+content; text and icons in it take the color of the item. The menu replaces the item once loading
+finishes when it is the `loading` of an async item or an async or paginated submenu, or when
+a listenable item returns it. Anywhere else it stays until the menu closes.
+
+Loading, error and empty items look alike: the title, a sign of the state after it,
+and `leading` free for your own icon. They do not respond to taps and are not dimmed.
+
+| Item | Title | After the title |
+| --- | --- | --- |
+| `loading` | loading label | activity indicator |
+| `error` | error label | error icon |
+| `error` of an async item or submenu | retry label | retry icon |
+| `empty` | empty label | empty icon |
+
+Your own `title`, `leading` and `trailing` replace the defaults, and `child` replaces the row.
+
+While a submenu loads, it shows an activity indicator in the middle by default. A `loading` item
+you pass is shown as a row; to center your own indicator, pass it in `child`:
+
+```dart
+SmartContextMenuItem.asyncSubmenu(
+  title: 'Recent files',
+  loading: SmartContextMenuItem.loading(
+    child: const Center(child: CircularProgressIndicator()),
+  ),
+  asyncChildren: () => loadRecentFiles(),
+)
+```
 
 ```dart
 SmartContextMenuItem.listenable(
@@ -356,6 +406,48 @@ SmartContextMenuItem.listenable(
     SyncState.syncing => SmartContextMenuItem.loading(title: 'Syncing'),
     SyncState.idle => SmartContextMenuItem.simple(title: 'Sync now', onTap: sync.start),
   },
+)
+```
+
+#### Error item
+
+An error item shows a failed load: its `title` (the error label by default) with the error icon.
+As the `error` of an async item, an async or a paginated submenu, it loads again on tap and shows
+the retry label and icon unless it has its own `title` and `trailing`. Anywhere else,
+for example from the builder of a listenable item, it ignores taps.
+
+A button in `child` handles its own taps, while the rest of the row still retries:
+
+```dart
+SmartContextMenuItem.async(
+  error: SmartContextMenuItem.error(
+    child: Row(
+      children: [
+        const Expanded(child: Text('Could not sync')),
+        CupertinoButton(onPressed: showSyncLog, child: const Text('Details')),
+      ],
+    ),
+  ),
+  asyncItem: () => loadSyncItem(),
+)
+```
+
+An error item is shown for a load that throws. For an error your loader recognizes,
+such as missing access, catch it and return an item yourself: an `error` item that ignores taps,
+or a `simple` item with its own action.
+
+#### Empty item
+
+An async or a paginated submenu without items shows an empty item: its `title` (the empty label
+by default) with the empty icon. Pass your own as `empty` and return no items from the loader.
+A paginated submenu shows it only when the first page is empty, and a static submenu without
+`children` shows the default one. A listenable item can return it too.
+
+```dart
+SmartContextMenuItem.asyncSubmenu(
+  title: 'Drafts',
+  empty: SmartContextMenuItem.empty(title: 'No drafts'),
+  asyncChildren: () => loadDrafts(),
 )
 ```
 
@@ -655,8 +747,8 @@ SmartContextMenuItem.simple(
 
 ### Localization
 
-The menu shows a few strings itself: the back item, the retry item and the title
-of a loading item without its own title. Override them with `SmartContextMenuLabels`,
+The menu shows a few strings itself: the back item, the retry label and the titles of loading,
+error and empty items without their own title. Override them with `SmartContextMenuLabels`,
 for example in the config of a [theme](#theme-and-config) to localize all menus at once:
 
 ```dart
@@ -665,6 +757,8 @@ SmartContextMenuConfig(
     back: l10n.back,
     retry: l10n.retry,
     loading: l10n.loading,
+    error: l10n.couldNotLoad,
+    empty: l10n.noItems,
   ),
 )
 ```

@@ -203,7 +203,7 @@ final class SmartContextMenuStyle {
   // Icons
 
   /// The size of the icons drawn by the menu itself: the submenu chevron,
-  /// the back icon and the error and retry icons.
+  /// the back icon and the error, retry and empty icons.
   ///
   /// Does not affect [SmartContextMenuItem.leading] and
   /// [SmartContextMenuItem.trailing].

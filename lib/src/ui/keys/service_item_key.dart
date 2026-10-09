@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart' show ValueKey;
 
-/// Key of a menu-owned row such as the back item, the retry item
+/// Key of a menu-owned row such as the back item, the retry row
 /// or a loader.
 ///
 /// Its own type keeps it from being equal to `ValueKey(item.id)`
