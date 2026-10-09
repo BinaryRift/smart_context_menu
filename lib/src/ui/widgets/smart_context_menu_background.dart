@@ -9,7 +9,10 @@ import '../../domain/smart_context_menu_blur.dart';
 
 /// The dimmed and blurred screen behind the open menu.
 ///
-/// Fades in and blurs with [animation].
+/// Fades in and blurs with [animation]. The blur grows by its strength and
+/// stays out of the fade: on the web, a backdrop filter under an opacity
+/// layer is not drawn until the layer is gone, so the blur would appear
+/// at once at the end.
 final class SmartContextMenuBackground extends StatefulWidget {
   final Animation<double> animation;
   final Color color;
@@ -59,23 +62,21 @@ final class _SmartContextMenuBackgroundState
       color: CupertinoDynamicColor.resolve(widget.color, context),
     );
 
-    return FadeTransition(
-      opacity: _opacity,
-      child: blur == null
-          ? background
-          : AnimatedBuilder(
-              animation: _curve,
-              builder: (context, child) {
-                return BackdropFilter(
-                  filter: ui.ImageFilter.blur(
-                    sigmaX: blur.sigmaX * _curve.value,
-                    sigmaY: blur.sigmaY * _curve.value,
-                  ),
-                  child: child,
-                );
-              },
-              child: background,
-            ),
+    final dimming = FadeTransition(opacity: _opacity, child: background);
+    if (blur == null) return dimming;
+
+    return AnimatedBuilder(
+      animation: _curve,
+      builder: (context, child) {
+        return BackdropFilter(
+          filter: ui.ImageFilter.blur(
+            sigmaX: blur.sigmaX * _curve.value,
+            sigmaY: blur.sigmaY * _curve.value,
+          ),
+          child: child,
+        );
+      },
+      child: dimming,
     );
   }
 }
