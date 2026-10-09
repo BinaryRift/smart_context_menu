@@ -3,6 +3,9 @@
 
 // Runs the app in the frame from index.html rather than on the whole page.
 _flutter.loader.load({
+  config: {
+    wasmAllowList: { webkit: true },
+  },
   onEntrypointLoaded: async (engineInitializer) => {
     const appRunner = await engineInitializer.initializeEngine({
       hostElement: document.querySelector('#app'),
