@@ -24,7 +24,7 @@ drag-to-select and rich submenus.
 - **Listenable items** that rebuild from the state of your app while the menu is open,
   such as toggles, counters or actions that are already running.
 - **Light and dark themes** out of the box, and your own styles for both: colors given
-  as `CupertinoDynamicColor`s follow the theme of the app (see [Style](#style)).
+  as `CupertinoDynamicColor`s follow the theme of the app (see [Item style](#item-style)).
 - **Customizable**: size, colors, text, icons, blur, decoration, labels, dividers
   and custom item content, set once for the whole app with a theme or for each menu.
 - **Programmatic control**: open and close the menu from code with `SmartContextMenuController`,
@@ -466,7 +466,7 @@ a listenable item returns it. Anywhere else it stays until the menu closes.
 
 Loading, error and empty items look alike: the title in the middle, a sign of the state
 after it, and `leading` free for your own icon. They do not respond to taps and are not dimmed.
-The [style](#style) sets their alignment, icons and loading indicator for all menus.
+The [style](#item-style) sets their alignment, icons and loading indicator for all menus.
 
 | Item | Title | After the title |
 | --- | --- | --- |
@@ -600,30 +600,31 @@ IconButton(
 The controller notifies its listeners when the menu opens or closes, see `isOpen`.
 Dispose it when it is no longer needed.
 
-### Customization
+### Configuration
 
-<img src="doc/gifs/appearance.png" width="600" alt="The Brand, Solid and Custom content menus of the example, in the light and dark themes">
-
-*Three styles from the example, in the light and dark themes: brand colors with only dimming
-behind the menu, an opaque menu, and items with their own content.*
-
-All settings live in `SmartContextMenuConfig`, and the appearance in its `style`.
-Every field has a default, so set only what you need.
+All settings live in `SmartContextMenuConfig`. Every field has a default, so set only what you need:
 
 ```dart
 const menuConfig = SmartContextMenuConfig(
   menuWidth: 250,
   enableHaptics: false,
-  style: SmartContextMenuStyle(
-    menuBlur: SmartContextMenuBlur.small,
-    backgroundBlur: SmartContextMenuBlur(10),
-    borderRadius: BorderRadius.all(Radius.circular(20)),
-    menuShadows: [BoxShadow(color: Color(0x33000000), blurRadius: 20)],
-  ),
+  style: menuStyle,
 );
 ```
 
-`menuShadows` replaces the default shadows under the menu; pass an empty list to remove them.
+| Field | What it sets | Default |
+| --- | --- | --- |
+| `activationMode` | Opens the menu on long press or only from code, see [Opening from code](#opening-from-code). | `longPress` |
+| `enableHaptics` | Plays haptic feedback when the menu opens on long press, an item is highlighted or tapped, the preview is tapped, and a submenu opens or closes. | `true` |
+| `barrierDismissible` | Closes the menu on a tap outside the menu, the widget and the [header slivers](#header-slivers). When `false`, the menu closes only from an item, the preview, the header slivers or the controller. | `true` |
+| `enableSwipeBack` | Returns from a submenu on a swipe right, see [Submenu](#submenu). | `true` |
+| `menuWidth` | The width of the menu. On a narrower screen, the menu gets narrower. | 280 |
+| `menuHeightFactor` | The maximum height of the menu as a part of the screen height, see [Positioning](#positioning). | 0.6 |
+| `screenPadding` | The distance to the screen edges, on top of the safe area. | 16 |
+| `menuGap` | The distance between the widget and the menu. | 12 |
+| `moveBackDown` | Moves the widget back down when the menu gets shorter. | `false` |
+| `labels` | The strings the menu shows itself, see [Localization](#localization). | English |
+| `style` | The look of the menu, see [Appearance](#appearance). | |
 
 #### Theme and config
 
@@ -727,13 +728,52 @@ SmartContextMenu(
 );
 ```
 
-#### Style
+#### Localization
+
+The menu shows a few strings itself: the back item, the retry label and the titles of loading,
+error and empty items without their own title. Override them with `SmartContextMenuLabels`,
+for example in the config of a [theme](#theme-and-config) to localize all menus at once:
+
+```dart
+SmartContextMenuConfig(
+  labels: SmartContextMenuLabels(
+    back: l10n.back,
+    retry: l10n.retry,
+    loading: l10n.loading,
+    error: l10n.couldNotLoad,
+    empty: l10n.noItems,
+  ),
+)
+```
+
+### Appearance
+
+<img src="doc/gifs/appearance.png" width="600" alt="The Brand, Solid and Custom content menus of the example, in the light and dark themes">
+
+*Three styles from the example, in the light and dark themes: brand colors with only dimming
+behind the menu, an opaque menu, and items with their own content.*
+
+The look of the menu is set by `SmartContextMenuStyle`, the `style` of the config.
+Its fields have defaults too:
+
+```dart
+const menuStyle = SmartContextMenuStyle(
+  menuBlur: SmartContextMenuBlur.small,
+  backgroundBlur: SmartContextMenuBlur(10),
+  borderRadius: BorderRadius.all(Radius.circular(20)),
+  menuShadows: [BoxShadow(color: Color(0x33000000), blurRadius: 20)],
+);
+```
+
+`menuShadows` replaces the default shadows under the menu; pass an empty list to remove them.
+
+#### Item style
 
 `SmartContextMenuStyle` also sets the text, colors, icons and spacing of items, so the menu
 can match the app theme:
 
 ```dart
-const menuStyle = SmartContextMenuStyle(
+const style = SmartContextMenuStyle(
   titleStyle: TextStyle(
     fontFamily: 'Montserrat',
     fontSize: 17,
@@ -854,24 +894,6 @@ SmartContextMenuItem.simple(
       const SizedBox(width: 12),
       Text('Reply', style: TextStyle(color: state.foregroundColor)),
     ],
-  ),
-)
-```
-
-### Localization
-
-The menu shows a few strings itself: the back item, the retry label and the titles of loading,
-error and empty items without their own title. Override them with `SmartContextMenuLabels`,
-for example in the config of a [theme](#theme-and-config) to localize all menus at once:
-
-```dart
-SmartContextMenuConfig(
-  labels: SmartContextMenuLabels(
-    back: l10n.back,
-    retry: l10n.retry,
-    loading: l10n.loading,
-    error: l10n.couldNotLoad,
-    empty: l10n.noItems,
   ),
 )
 ```

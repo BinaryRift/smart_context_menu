@@ -33,7 +33,8 @@ final class SmartContextMenuConfig {
   /// Whether to play haptic feedback.
   ///
   /// Feedback plays when the menu opens on long press, an item is
-  /// highlighted or tapped, and a submenu opens or closes.
+  /// highlighted or tapped, the preview is tapped, and a submenu opens
+  /// or closes.
   /// Defaults to true.
   final bool enableHaptics;
 
