@@ -27,6 +27,10 @@ final class TrickyTransition extends StatelessWidget {
         builder: (context, child) {
           final sizeFactor = math.max(animation.value, 0.0);
           return ClipRect(
+            // Clips only while the size animates, so a child that paints a
+            // little outside its box, such as the stroke of a
+            // CircularProgressIndicator, is not cut once it is shown.
+            clipBehavior: sizeFactor < 1 ? Clip.hardEdge : Clip.none,
             child: Align(
               alignment: switch (axis) {
                 Axis.horizontal => AlignmentDirectional(axisAlignment, -1),

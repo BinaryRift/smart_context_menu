@@ -199,5 +199,51 @@ void main() {
       completer.complete([]);
       await tester.settleMenu();
     });
+
+    // A CircularProgressIndicator paints its stroke a little outside its box.
+    testWidgets('does not clip it once shown', (tester) async {
+      await tester.pumpMenu(
+        items: [SmartContextMenuItem.loading(title: 'Syncing')],
+        config: config,
+      );
+      await tester.openMenu();
+
+      expect(
+        _clipsOf(find.byIcon(CupertinoIcons.hourglass)),
+        everyElement(Clip.none),
+      );
+    });
+
+    testWidgets('does not clip it in a loading submenu', (tester) async {
+      final completer = Completer<List<SmartContextMenuItem>>();
+      await tester.pumpMenu(
+        items: [
+          SmartContextMenuItem.asyncSubmenu(
+            title: 'More',
+            asyncChildren: () => completer.future,
+          ),
+        ],
+        config: config,
+      );
+      await tester.openMenu();
+      await tester.tap(find.text('More'));
+      await tester.settleMenu();
+
+      expect(
+        _clipsOf(find.byIcon(CupertinoIcons.hourglass)),
+        everyElement(Clip.none),
+      );
+
+      completer.complete([]);
+      await tester.settleMenu();
+    });
   });
+}
+
+/// The clip behaviors of the [ClipRect]s above [finder].
+List<Clip> _clipsOf(Finder finder) {
+  final clips = find.ancestor(of: finder, matching: find.byType(ClipRect));
+  return [
+    for (final clip in clips.evaluate()) (clip.widget as ClipRect).clipBehavior,
+  ];
 }
