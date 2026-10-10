@@ -76,9 +76,18 @@ final class _AppearancePageState extends State<AppearancePage> {
               items: sampleItems(_loader),
             ),
             _buildPreset(
+              title: 'Inset dividers',
+              subtitle: 'Lines between items, inset on both sides',
+              config: (app) => app.copyWith(style: insetDividersStyle),
+              items: sampleItems(_loader),
+            ),
+            _buildPreset(
               title: 'Custom content',
-              subtitle: 'A row of colors, two lines of text, tinted items',
-              config: (app) => app,
+              subtitle: 'Own rows, tinted items, dividers, a titled separator',
+              // Dividers on top of the style of the app, so its blur stays.
+              config: (app) => app.copyWith(
+                style: app.style.copyWith(dividersBetweenItems: true),
+              ),
               items: customContentItems(_tagColor),
             ),
             _buildPreset(

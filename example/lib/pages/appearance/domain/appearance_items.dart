@@ -30,11 +30,13 @@ List<SmartContextMenuItem> sampleItems(DemoLoader loader) => [
 ];
 
 /// Items with their own content: a row of buttons and two lines of text,
-/// and items tinted with their own colors.
+/// items tinted with their own colors and a separator with a title; the
+/// preset adds dividers between the items.
 List<SmartContextMenuItem> customContentItems(
   ValueNotifier<Color> tagColor,
 ) => [
   _action('Rename', CupertinoIcons.pencil),
+  _titledSeparator('Organize'),
   _action(
     'Favorite',
     CupertinoIcons.heart,
@@ -137,6 +139,49 @@ List<SmartContextMenuItem> statusItems(DemoLoader failingLoader) => [
     },
   ),
 ];
+
+/// A separator of a thin line with [title] in the middle.
+SmartContextMenuSeparatorItem _titledSeparator(String title) {
+  return SmartContextMenuItem.separator(
+    child: Builder(
+      builder: (context) {
+        final line = Expanded(
+          child: Container(
+            height: 1,
+            color: CupertinoDynamicColor.resolve(
+              SmartContextMenuDefaults.dividerColor,
+              context,
+            ),
+          ),
+        );
+        // The item above has its own padding, the tinted item below fills
+        // its padding with color: the space below evens them out.
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+          child: Row(
+            children: [
+              line,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: CupertinoDynamicColor.resolve(
+                      CupertinoColors.secondaryLabel,
+                      context,
+                    ),
+                  ),
+                ),
+              ),
+              line,
+            ],
+          ),
+        );
+      },
+    ),
+  );
+}
 
 SmartContextMenuSimpleItem _action(
   String title,

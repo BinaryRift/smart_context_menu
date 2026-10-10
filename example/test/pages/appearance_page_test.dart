@@ -23,7 +23,8 @@ void main() {
     ('Solid', 'Copy'),
     ('Compact', 'Copy'),
     ('Dividers', 'Copy'),
-    ('Custom content', 'Version history'),
+    ('Inset dividers', 'Copy'),
+    ('Custom content', 'Organize'),
     ('Localized', 'Копировать'),
     ('Status items', 'Syncing'),
   ]) {

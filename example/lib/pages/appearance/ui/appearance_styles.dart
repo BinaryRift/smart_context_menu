@@ -49,6 +49,13 @@ const dividersStyle = SmartContextMenuStyle(
   dividerIndent: 52,
 );
 
+/// Thin lines between items with the same space on both sides.
+const insetDividersStyle = SmartContextMenuStyle(
+  dividersBetweenItems: true,
+  dividerIndent: 16,
+  dividerEndIndent: 16,
+);
+
 /// Own signs of loading, error and empty items, with the titles at the
 /// start rather than in the middle: a Material progress indicator instead
 /// of the Cupertino one, and other icons.
