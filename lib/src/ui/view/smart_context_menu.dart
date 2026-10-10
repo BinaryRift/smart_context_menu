@@ -1,7 +1,8 @@
 import 'dart:async' show FutureOr;
 import 'dart:ui' as ui;
 
-import 'package:flutter/cupertino.dart' show CupertinoLocalizations;
+import 'package:flutter/cupertino.dart'
+    show CupertinoLocalizations, DefaultCupertinoLocalizations;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show RenderRepaintBoundary;
 import 'package:flutter/services.dart' show HapticFeedback;
@@ -254,9 +255,15 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
 
   Future<void> _runOpenSession(int sessionId) async {
     final navigator = Navigator.of(context, rootNavigator: true);
-    final barrierLabel = CupertinoLocalizations.of(
-      context,
-    ).modalBarrierDismissLabel;
+    // An app without Cupertino localizations, such as a bare WidgetsApp,
+    // gets the English label.
+    final localizations =
+        Localizations.of<CupertinoLocalizations>(
+          context,
+          CupertinoLocalizations,
+        ) ??
+        const DefaultCupertinoLocalizations();
+    final barrierLabel = localizations.modalBarrierDismissLabel;
 
     final image = await _captureSnapshot();
     if (!_session.canContinueOpening(sessionId, mounted: mounted) ||

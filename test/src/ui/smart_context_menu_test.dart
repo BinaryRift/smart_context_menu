@@ -277,4 +277,35 @@ void main() {
       );
     });
   });
+
+  testWidgets('opens in an app without Cupertino localizations', (
+    tester,
+  ) async {
+    var taps = 0;
+
+    await tester.pumpWidget(
+      WidgetsApp(
+        color: const Color(0xFF000000),
+        pageRouteBuilder: <T>(settings, builder) => PageRouteBuilder<T>(
+          pageBuilder: (context, _, _) => builder(context),
+        ),
+        home: Center(
+          child: SmartContextMenu(
+            items: [
+              SmartContextMenuItem.simple(title: 'Copy', onTap: () => taps++),
+            ],
+            child: const Text(menuTargetText),
+          ),
+        ),
+      ),
+    );
+    await tester.openMenu();
+    expect(find.text('Copy'), findsOneWidget);
+
+    await tester.tap(find.text('Copy'));
+    await tester.settleMenu();
+
+    expect(taps, 1);
+    expect(tester.takeException(), isNull);
+  });
 }
