@@ -261,15 +261,18 @@ returning from a submenu, and the submenu loads again when it opens again.
 <img src="doc/gifs/submenu.gif" width="300" alt="Share opens a submenu with an async submenu inside, the back item and a swipe right go back, in the dark theme">
 
 *In the dark theme: Share is a submenu, and Messages inside it loads when it opens. The back
-item and a swipe right go back.*
+item and a swipe right go back. [Code in the example](example/lib/pages/files/ui/files_page.dart).*
 
 ```dart
 SmartContextMenuItem.submenu(
-  title: 'Move to',
-  leading: const Icon(CupertinoIcons.folder),
+  title: 'Share',
+  leading: const Icon(CupertinoIcons.share),
   children: [
-    SmartContextMenuItem.simple(title: 'Documents', onTap: () => move('docs')),
-    SmartContextMenuItem.simple(title: 'Archive', onTap: () => move('archive')),
+    SmartContextMenuItem.simple(title: 'Copy link', onTap: () => copyLink(file)),
+    SmartContextMenuItem.asyncSubmenu(
+      title: 'Messages',
+      asyncChildren: () => loadContacts(file),
+    ),
   ],
 )
 ```
@@ -282,7 +285,7 @@ To turn the swipe off, set `enableSwipeBack: false` in `SmartContextMenuConfig`.
 
 <img src="doc/gifs/async_submenu.gif" width="300" alt="Move to shows an activity indicator, then the folders, with the folder of the file disabled">
 
-*Move to loads the folders when it opens; Work, the folder of the file, is disabled.*
+*Move to loads the folders when it opens; Work, the folder of the file, is disabled. [Code in the example](example/lib/pages/files/ui/files_page.dart).*
 
 The items are loaded when the submenu opens and cached until the menu closes.
 While loading, the submenu shows an activity indicator in the middle; pass a
@@ -293,15 +296,17 @@ If there are no items, it shows an [empty item](#empty-item); pass your own as `
 
 ```dart
 SmartContextMenuItem.asyncSubmenu(
-  title: 'Recent files',
-  leading: const Icon(CupertinoIcons.clock),
-  loading: SmartContextMenuItem.loading(title: 'Loading files'),
-  empty: SmartContextMenuItem.empty(title: 'No recent files'),
+  title: 'Move to',
+  leading: const Icon(CupertinoIcons.folder),
   asyncChildren: () async {
-    final files = await repository.recentFiles();
+    final folders = await repository.folders();
     return [
-      for (final file in files)
-        SmartContextMenuItem.simple(title: file.name, onTap: () => open(file)),
+      for (final folder in folders)
+        SmartContextMenuItem.simple(
+          title: folder.name,
+          isDisabled: folder == file.folder,
+          onTap: () => move(file, folder),
+        ),
     ];
   },
 )
@@ -312,7 +317,7 @@ SmartContextMenuItem.asyncSubmenu(
 <img src="doc/gifs/paginated_submenu.gif" width="300" alt="The Reactions submenu loads the first page of people, then the next page when it scrolls to the end">
 
 *Reactions loads the first page of people when it opens and the next page when it scrolls
-to the end.*
+to the end. [Code in the example](example/lib/pages/chat/ui/chat_page.dart).*
 
 The first page is loaded with `initialMetadata`. The last item of each page, a `simple` item or
 a separator, carries the metadata of the next page in `pagingMetadata`; the next page is loaded
@@ -324,14 +329,15 @@ shows `empty`; an empty next page just ends the list.
 
 ```dart
 SmartContextMenuItem.pagingSubmenu(
-  title: 'Contacts',
+  title: 'Reactions',
   initialMetadata: const SmartContextMenuPagingMetadata(limit: 20),
   asyncPagingChildren: (metadata) async {
-    final page = await api.contacts(page: metadata.page, limit: metadata.limit);
+    final page = await api.reactions(message.id, metadata.page, metadata.limit);
     return [
-      for (final (index, contact) in page.items.indexed)
+      for (final (index, reaction) in page.items.indexed)
         SmartContextMenuItem.simple(
-          title: contact.name,
+          title: reaction.person.name,
+          trailing: Text(reaction.emoji),
           pagingMetadata: index == page.items.length - 1 && page.hasMore
               ? metadata.copyWith(page: metadata.page + 1)
               : null,
@@ -346,14 +352,41 @@ SmartContextMenuItem.pagingSubmenu(
 
 #### Async item
 
-<img src="doc/gifs/async_item.gif" width="300" alt="Seen by loads in the open menu of a message and turns into a submenu with the people who saw it">
+<img src="doc/gifs/async_item.gif" width="300" alt="Seen by loads in the open menu of a message and turns into a regular submenu with the people who saw it">
 
-*Seen by loads as the menu opens and turns into a submenu; after going back, the loaded item stays.*
+*Seen by is an async item whose loader returns a regular submenu. Unlike an async submenu,
+it loads as the menu opens, before a tap, so the count is seen at once; after going back,
+the loaded item stays. [Code in the example](example/lib/pages/chat/ui/chat_page.dart).*
 
 The placeholder loads its item as soon as it appears. While loading, it shows `loading`,
 a `SmartContextMenuItem.loading` with the loading label by default. If loading fails or takes
 longer than `timeout` (10 seconds by default), it shows `error`, a `SmartContextMenuItem.error`,
 and tapping it loads the item again, see [error item](#error-item).
+
+The loader returns an item that runs an action or opens a submenu, or a `loading`, `error`
+or `empty` item, for example `SmartContextMenuItem.empty` when there is nothing to show.
+A loader that returns a regular submenu, as Seen by does, loads a value with the menu
+and shows the details on tap:
+
+```dart
+SmartContextMenuItem.async(
+  loading: SmartContextMenuItem.loading(title: 'Seen by'),
+  asyncItem: () async {
+    final readers = await api.readers(message.id);
+    // A regular submenu, loaded as the menu opens.
+    return SmartContextMenuItem.submenu(
+      title: 'Seen by',
+      trailing: Text('${readers.length}'),
+      children: [
+        for (final reader in readers)
+          SmartContextMenuItem.simple(title: reader.name),
+      ],
+    );
+  },
+)
+```
+
+A loader can also return a simple item, for example once it has checked access:
 
 ```dart
 SmartContextMenuItem.async(
@@ -370,37 +403,12 @@ SmartContextMenuItem.async(
 )
 ```
 
-The loader returns an item that runs an action or opens a submenu, or a `loading`, `error`
-or `empty` item, for example `SmartContextMenuItem.empty` when there is nothing to show.
-
-A loader that returns a submenu loads a value first and shows the details on tap.
-The loaded item stays until the menu closes, also after returning from its submenu:
-
-```dart
-SmartContextMenuItem.async(
-  asyncItem: () async {
-    final viewers = await api.viewers(post.id);
-    return SmartContextMenuItem.submenu(
-      title: 'Views: ${viewers.length}',
-      leading: const Icon(CupertinoIcons.eye),
-      children: [
-        for (final viewer in viewers)
-          SmartContextMenuItem.simple(
-            title: viewer.name,
-            onTap: () => openProfile(viewer),
-          ),
-      ],
-    );
-  },
-)
-```
-
 #### Listenable item
 
 <img src="doc/gifs/listenable_item.gif" width="300" alt="Download turns into a progress that grows in the open menu, then into Remove Download, in the dark theme">
 
 *In the dark theme: after a tap, Download shows its progress in the open menu and turns
-into Remove Download when it is done.*
+into Remove Download when it is done. [Code in the example](example/lib/pages/files/ui/files_page.dart).*
 
 Use it when the state of an item lives in your app and can change while the menu is open:
 a toggle that keeps the menu open, a counter, or an action that is already running.
@@ -410,16 +418,22 @@ an activity indicator, as an async item does, and ignores taps.
 
 ```dart
 SmartContextMenuItem.listenable(
-  listenable: favorites,
-  builder: () {
-    if (favorites.isLoading) return SmartContextMenuItem.loading(title: 'Checking');
-    final isFavorite = favorites.contains(post.id);
-    return SmartContextMenuItem.simple(
-      title: isFavorite ? 'Remove from Favorites' : 'Add to Favorites',
-      leading: Icon(isFavorite ? CupertinoIcons.heart_fill : CupertinoIcons.heart),
+  listenable: downloads,
+  builder: () => switch (downloads.stateOf(file)) {
+    DownloadState.running => SmartContextMenuItem.loading(
+      title: 'Downloading ${downloads.percentOf(file)}%',
+    ),
+    DownloadState.done => SmartContextMenuItem.simple(
+      title: 'Remove Download',
+      isDestructive: true,
       closeOnTap: false,
-      onTap: () => favorites.toggle(post.id),
-    );
+      onTap: () => downloads.remove(file),
+    ),
+    DownloadState.none => SmartContextMenuItem.simple(
+      title: 'Download',
+      closeOnTap: false,
+      onTap: () => downloads.start(file),
+    ),
   },
 )
 ```
@@ -524,7 +538,7 @@ SmartContextMenuItem.listenable(
 <img src="doc/gifs/error_and_empty.gif" width="300" alt="Shared files fails to load, a tap retries it and shows the files, and Archive shows its empty item, in the dark theme">
 
 *In the dark theme: Shared files fails to load, and a tap on the row loads it again; Archive
-has no items.*
+has no items. [Code in the example](example/lib/pages/lab/domain/lab_items.dart).*
 
 An error item shows a failed load: its `title` (the error label by default) with the error icon.
 As the `error` of an async item, an async or a paginated submenu, it loads again on tap and shows
@@ -534,16 +548,19 @@ for example from the builder of a listenable item, it ignores taps.
 A button in `child` handles its own taps, while the rest of the row still retries:
 
 ```dart
-SmartContextMenuItem.async(
+SmartContextMenuItem.asyncSubmenu(
+  title: 'Shared files',
   error: SmartContextMenuItem.error(
     child: Row(
       children: [
-        const Expanded(child: Text('Could not sync')),
-        CupertinoButton(onPressed: showSyncLog, child: const Text('Details')),
+        const Expanded(child: Text('Could not load files')),
+        CupertinoButton(onPressed: showDetails, child: const Text('Details')),
+        // The child replaces the whole row, so add the retry icon yourself.
+        const Icon(SmartContextMenuDefaults.retryIcon),
       ],
     ),
   ),
-  asyncItem: () => loadSyncItem(),
+  asyncChildren: () => loadSharedFiles(),
 )
 ```
 
@@ -560,9 +577,10 @@ A paginated submenu shows it only when the first page is empty, and a static sub
 
 ```dart
 SmartContextMenuItem.asyncSubmenu(
-  title: 'Drafts',
-  empty: SmartContextMenuItem.empty(title: 'No drafts'),
-  asyncChildren: () => loadDrafts(),
+  title: 'Archive',
+  // Without it, the submenu shows the empty label, "No items".
+  empty: SmartContextMenuItem.empty(title: 'Archive is empty'),
+  asyncChildren: () => loadArchive(),
 )
 ```
 
@@ -629,7 +647,7 @@ Dispose the controller when it is no longer needed.
 
 <img src="doc/gifs/header_slivers.gif" width="300" alt="A reactions bar above a photo in a chat, in the dark theme">
 
-*A reactions bar above the message, in the dark theme: a tap on a reaction closes the menu.*
+*A reactions bar above the message, in the dark theme: a tap on a reaction closes the menu. [Code in the example](example/lib/pages/chat/ui/chat_page.dart).*
 
 To show your own content above the widget while the menu is open, pass `headerSliversBuilder`.
 It returns a list of slivers, which fade in and out with the menu and move with the widget
@@ -720,7 +738,7 @@ SmartContextMenu(
 <img src="doc/gifs/hero.gif" width="300" alt="A tap on the preview opens the photo full screen with its own Hero">
 
 *A double tap next to the photo opens the menu from code; a tap on the preview opens the photo
-with its own `Hero`.*
+with its own `Hero`. [Code in the example](example/lib/pages/chat/ui/chat_page.dart).*
 
 The widget can have its own `Hero`, for example a photo in a chat that opens full screen.
 The menu flies the preview with a `Hero` too, but never puts it around your widget: it adds
