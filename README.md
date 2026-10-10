@@ -95,7 +95,10 @@ This package keeps that gesture and adds what apps often need on top of it:
 - drag-to-select across the items;
 - your own slivers above the widget, such as a reactions bar;
 - opening and closing from code;
-- a theme for all menus and a style for the colors, text, blur and content of items.
+- full control over the look: a theme for all menus, and a style for the colors, text, blur,
+  shadows and content of items;
+- full control over the behavior: the width and height of the menu, its distances to the widget
+  and the screen edges, haptics, closing on a tap outside and swipe back.
 
 ## Getting started
 
