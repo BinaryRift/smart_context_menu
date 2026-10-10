@@ -2,8 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show CircularProgressIndicator;
 import 'package:smart_context_menu/smart_context_menu.dart';
 
-/// Brand colors with white text and rounder corners, without blur.
+/// Brand colors with white text and rounder corners, without blur: the
+/// screen behind the menu is only dimmed with a dark shade of the brand
+/// color.
 const brandStyle = SmartContextMenuStyle(
+  backgroundColor: CupertinoDynamicColor.withBrightness(
+    color: Color(0x7314133D),
+    darkColor: Color(0x9914133D),
+  ),
+  backgroundBlur: null,
   menuColor: Color(0xFF3634A3),
   borderColor: Color(0x00000000),
   borderRadius: BorderRadius.all(Radius.circular(20)),
