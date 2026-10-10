@@ -29,6 +29,7 @@ migrate_working_dir/
 
 # VS Code
 launch.json
+tasks.json
 *.code-workspace
 
 # Flutter/Dart/Pub related
