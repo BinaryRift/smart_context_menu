@@ -14,29 +14,45 @@ above the widget.
 
 ## Features
 
-- **Long press to open** with a lifted preview of the pressed widget; tap the preview
-  to run the widget's main action.
-- **Works with your `Hero` widgets**: the menu never wraps the pressed widget in a `Hero`
-  of its own, so a photo that opens full screen keeps its `Hero`, and it flies from its place
-  when the preview is tapped.
-- **Smart positioning**: the pressed widget stays in place whenever there is room for the menu;
-  very tall widgets can be scrolled, and long menus scroll inside themselves.
+**Opening**
+
+- **Lifted preview**: the pressed widget lifts above a blurred background, and a tap
+  on it runs the widget's main action, such as opening a message.
+- **From code**: open and close the menu with `SmartContextMenuController`, for example
+  from a "⋯" button, or turn off the long press.
 - **Drag-to-select**: touch the open menu, slide a finger across the items and release
   on the one you want (not yet right after the long press, without lifting the finger).
-- **Custom slivers above the widget**, for example a reactions bar above a message,
-  animated with the menu and optionally pinned to the top.
+- **Works with your `Hero` widgets**: a photo that opens full screen keeps its own `Hero`
+  and flies from its place when the preview is tapped.
+
+**Positioning**
+
+- **The widget stays in place** whenever there is room for the menu, and moves only
+  as far as needed; very tall widgets scroll together with the menu.
+- **Long menus** scroll inside, up to a part of the screen you choose.
+
+**Content**
+
+- **Actions** with icons, destructive and tinted colors, disabled items, separators
+  and dividers.
+- **Custom items**: any widget as the content of an item, even with buttons of its own;
+  the highlight and taps keep working.
 - **Submenus**: static, loaded asynchronously or paginated, with a back item and swipe back.
-- **Lazy lists**: items are built only when they scroll into view, so long menus stay fast.
-- **Loading states**: async items and submenus show loading, error and empty items, retry
-  on failure, and keep one look across the menu that you can change in part or in full.
+- **Async items** with loading, error and empty states and retry on failure, in one look
+  across the menu.
+- **Lazy lists**: items are built only when they scroll into view, and async items start
+  loading only then, so long menus stay fast.
 - **Listenable items** that rebuild from the state of your app while the menu is open,
   such as toggles, counters or actions that are already running.
-- **Light and dark themes** out of the box, and your own styles for both: colors given
-  as `CupertinoDynamicColor`s follow the theme of the app (see [Item style](#item-style)).
-- **Customizable**: size, colors, text, icons, blur, decoration, labels, dividers
-  and custom item content, set once for the whole app with a theme or for each menu.
-- **Programmatic control**: open and close the menu from code with `SmartContextMenuController`,
-  or turn off the long press and open the menu only from code.
+- **Slivers above the widget**, such as a reactions bar, animated with the menu
+  and optionally pinned to the top.
+
+**Appearance**
+
+- **Light and dark themes** out of the box; colors given as `CupertinoDynamicColor`s follow
+  the theme of the app (see [Item style](#item-style)).
+- **Customizable**: size, colors, text, icons, blur, shadows and labels, set once
+  for the whole app with a theme or for each menu.
 
 The [example app](example/) shows
 every feature in a files app, a chat, a gallery of styles and a lab of edge cases.
