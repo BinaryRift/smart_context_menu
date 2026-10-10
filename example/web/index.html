@@ -197,6 +197,22 @@
         font-size: 17px;
       }
 
+      .about .features {
+        margin-top: 14px;
+        font-size: 14px;
+        color: #92a6b8;
+      }
+
+      .about .version {
+        margin-left: 6px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        vertical-align: middle;
+        font: 600 13px ui-monospace, SFMono-Regular, Menlo, monospace;
+        color: #8b5cf6;
+        background: rgba(139, 92, 246, 0.14);
+      }
+
       .about h2 {
         margin: 0 0 10px;
         font-size: 17px;
@@ -313,12 +329,19 @@
   <aside class="about about-left">
     <div class="about-content">
       <section>
-        <h1>smart_context_menu</h1>
+        <h1>smart_context_menu <span class="version">0.9.0</span></h1>
         <p class="lead">
           A powerful, fully customizable iOS-style context menu for Flutter:
           smart positioning, fluid animations, drag-to-select, rich submenus
           and your own content above the widget.
         </p>
+        <ul class="features">
+          <li>Async submenus, loaded when opened</li>
+          <li>Paginated submenus: the next page loads on scroll</li>
+          <li>Async items that turn into any item, even a submenu</li>
+          <li>Loading, error with retry and empty states</li>
+          <li>Listenable items that rebuild while the menu is open</li>
+        </ul>
       </section>
       <section>
         <h2>Add it to your app</h2>
@@ -365,6 +388,7 @@
       <h3>Files</h3>
       <ul>
         <li>The ⋯ button in a row opens the same menu.</li>
+        <li>Move to loads the folders when it opens.</li>
         <li>Tap Download: the progress shows in the open menu.</li>
       </ul>
 
