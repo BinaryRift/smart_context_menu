@@ -3,7 +3,7 @@
 An iOS-style context menu for Flutter with smart positioning, fluid animations,
 drag-to-select and rich submenus.
 
-<!-- GIF: long press opens the menu, an item is selected -->
+<img src="https://raw.githubusercontent.com/BinaryRift/smart_context_menu/main/doc/gifs/open_and_select.gif" width="300" alt="A long press opens the menu of a file, a finger slides across the items and selects one">
 
 ## Features
 
@@ -81,7 +81,9 @@ SmartContextMenu(
 
 ### Header slivers
 
-<!-- GIF: reactions bar above a message -->
+<img src="https://raw.githubusercontent.com/BinaryRift/smart_context_menu/main/doc/gifs/header_slivers.gif" width="300" alt="A reactions bar above a photo in a chat, in the dark theme">
+
+*A reactions bar above the message, in the dark theme: a tap on a reaction closes the menu.*
 
 To show your own content above the widget while the menu is open, pass `headerSliversBuilder`.
 It returns a list of slivers, which fade in and out with the menu and move with the widget
@@ -171,7 +173,10 @@ SmartContextMenu(
 
 ### Hero widgets
 
-<!-- GIF: tap on the preview opens the photo with its Hero -->
+<img src="https://raw.githubusercontent.com/BinaryRift/smart_context_menu/main/doc/gifs/hero.gif" width="300" alt="A tap on the preview opens the photo full screen with its own Hero">
+
+*A double tap next to the photo opens the menu from code; a tap on the preview opens the photo
+with its own `Hero`.*
 
 The widget can have its own `Hero`, for example a photo in a chat that opens full screen.
 The menu flies the preview with a `Hero` too, but never puts it around your widget: it adds
@@ -253,7 +258,10 @@ versions, so keep a `_` case when you switch on items.
 
 #### Submenu
 
-<!-- GIF: submenu, back item and swipe back -->
+<img src="https://raw.githubusercontent.com/BinaryRift/smart_context_menu/main/doc/gifs/submenu.gif" width="300" alt="Share opens a submenu with an async submenu inside, the back item and a swipe right go back, in the dark theme">
+
+*In the dark theme: Share is a submenu, and Messages inside it loads when it opens. The back
+item and a swipe right go back.*
 
 ```dart
 SmartContextMenuItem.submenu(
@@ -297,7 +305,10 @@ SmartContextMenuItem.asyncSubmenu(
 
 #### Paginated submenu
 
-<!-- GIF: paginated submenu loads the next page on scroll -->
+<img src="https://raw.githubusercontent.com/BinaryRift/smart_context_menu/main/doc/gifs/paginated_submenu.gif" width="300" alt="The Reactions submenu loads the first page of people, then the next page when it scrolls to the end">
+
+*Reactions loads the first page of people when it opens and the next page when it scrolls
+to the end.*
 
 The first page is loaded with `initialMetadata`. The last item of each page, a `simple` item
 or a separator, carries the metadata of the next page in `pagingMetadata`; the next page is loaded when the
@@ -358,6 +369,11 @@ an async item, a listenable item or a separator does not compile. A helper that 
 needs the type of its item, such as `SmartContextMenuSimpleItem`, not `SmartContextMenuItem`.
 
 #### Listenable item
+
+<img src="https://raw.githubusercontent.com/BinaryRift/smart_context_menu/main/doc/gifs/listenable_item.gif" width="300" alt="Download turns into a progress that grows in the open menu, then into Remove Download, in the dark theme">
+
+*In the dark theme: after a tap, Download shows its progress in the open menu and turns
+into Remove Download when it is done.*
 
 Use it when the state of an item lives in your app and can change while the menu is open:
 a toggle that keeps the menu open, a counter, or an action that is already running.
@@ -576,6 +592,11 @@ The controller notifies its listeners when the menu opens or closes, see `isOpen
 Dispose it when it is no longer needed.
 
 ### Customization
+
+<img src="https://raw.githubusercontent.com/BinaryRift/smart_context_menu/main/doc/gifs/appearance.png" width="600" alt="The Brand, Solid and Custom content menus of the example, in the light and dark themes">
+
+*Three styles from the example, in the light and dark themes: brand colors with only dimming
+behind the menu, an opaque menu, and items with their own content.*
 
 All settings live in `SmartContextMenuConfig`, and the appearance in its `style`.
 Every field has a default, so set only what you need.
