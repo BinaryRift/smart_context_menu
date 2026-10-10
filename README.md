@@ -360,11 +360,8 @@ SmartContextMenuItem.async(
 )
 ```
 
-The loader decides what to show for its result: an item that runs an action or opens a submenu,
-or a `loading`, `error` or `empty` item, for example `SmartContextMenuItem.empty` when there is
-nothing to show. Its return type, `SmartContextMenuAsyncResult`, allows only these: returning
-an async item, a listenable item or a separator does not compile. A helper that builds the result
-needs the type of its item, such as `SmartContextMenuSimpleItem`, not `SmartContextMenuItem`.
+The loader returns an item that runs an action or opens a submenu, or a `loading`, `error`
+or `empty` item, for example `SmartContextMenuItem.empty` when there is nothing to show.
 
 A loader that returns a submenu loads a value first and shows the details on tap.
 The loaded item stays until the menu closes, also after returning from its submenu:
@@ -420,8 +417,6 @@ SmartContextMenuItem.listenable(
 Unlike an async item, the state belongs to your app: the item is not loaded once but built
 again on every notification. The builder returns a `SmartContextMenuItem.simple`, whose
 `onTap` and `closeOnTap` are used, or a `loading`, `error` or `empty` item, which ignore taps.
-Its return type, `SmartContextMenuListenableResult`, allows only these, so returning a submenu
-or a separator does not compile; declare helpers with the type of their item, as for an async item.
 To retry a failed load of your app from the item, return a `simple` item:
 
 ```dart
@@ -688,10 +683,8 @@ headerSliversBuilder: (context, header) => [
 ],
 ```
 
-If the widget and the menu do not fit on the screen and the content scrolls as the menu
-opens, the slivers appear once the widget is nearly in place, and hide at once when the menu
-closes while the content is scrolled. The widget moves above everything as the menu opens
-and closes, so it would cover a pinned sliver otherwise.
+When the content scrolls as the menu opens, the slivers wait until the widget is nearly
+in place, so the moving widget does not cover a pinned sliver.
 
 To show the slivers later, set `headerSliversDelay`. It counts from the start of the opening,
 which takes 300 milliseconds: a shorter delay starts the slivers while the widget moves
@@ -795,22 +788,6 @@ SmartContextMenu(
 );
 ```
 
-A theme in the `builder` can also pick the config by the screen size, for example
-a shorter menu on tablets:
-
-```dart
-MaterialApp(
-  builder: (context, child) {
-    final isTablet = MediaQuery.sizeOf(context).shortestSide >= 600;
-    return SmartContextMenuTheme(
-      config: menuConfig.copyWith(menuHeightFactor: isTablet ? 0.45 : 0.6),
-      child: child!,
-    );
-  },
-  home: const HomePage(),
-);
-```
-
 **A part of the app.** Wrap a screen, a list or any other subtree with its own theme.
 The nearest theme wins and replaces the outer one as a whole, so start from the outer one
 to keep its settings:
@@ -851,26 +828,6 @@ SmartContextMenu(
 
 `SmartContextMenuTheme.of(context)` reads the theme above `context`. If the theme is created
 in the same `build` method, wrap the menu in a `Builder` to read it.
-
-**Without a theme.** Keep a shared config in a constant and pass it to the menus,
-with `copyWith` where a menu needs a change:
-
-```dart
-SmartContextMenu(
-  config: menuConfig,
-  items: items,
-  child: child,
-);
-
-SmartContextMenu(
-  config: menuConfig.copyWith(
-    activationMode: SmartContextMenuActivationMode.manual,
-  ),
-  controller: controller,
-  items: items,
-  child: child,
-);
-```
 
 #### Localization
 
@@ -935,30 +892,14 @@ const style = SmartContextMenuStyle(
 );
 ```
 
-The color of `titleStyle` is used for enabled items that are not destructive.
-Disabled and destructive items use `disabledForegroundColor` and `destructiveColor`.
-Disabled items have no background unless `disabledBackgroundColor` is set.
-A pressed item is highlighted with a translucent `titleStyle` color; `highlightColor`
-replaces it. Tinted and destructive items keep their own pressed tint.
-The back item of a submenu merges `backButtonTitleStyle` (bold by default) over
-`titleStyle`; `backButtonColor` sets the color of its title and icon.
-Titles take up to `titleMaxLines` lines (2 by default) and are truncated with an ellipsis.
-`itemPadding` and `itemChildrenGap` set the padding of items and the gap between
-their icons and title.
-Loading, error and empty items center their titles; `statusTitleAlign` changes this, and
-`errorIcon`, `retryIcon` and `emptyIcon` change their icons, also for the items the menu
-shows by itself, such as the empty item of a submenu without items. `loadingIndicator`
-replaces the activity indicator, both in loading items and in the middle of a loading submenu.
-It is used at its own size, so size it to fit an item row:
-
-```dart
-const style = SmartContextMenuStyle(
-  loadingIndicator: SizedBox.square(
-    dimension: 20,
-    child: CircularProgressIndicator(strokeWidth: 2),
-  ),
-);
-```
+The color of `titleStyle` is used for enabled items that are not destructive; disabled
+and destructive items use `disabledForegroundColor` and `destructiveColor`. A pressed item
+is highlighted with a translucent title color, or with `highlightColor` if it is set.
+The style also sets the back item of submenus, the number of title lines, and the icons,
+alignment and loading indicator of loading, error and empty items; `loadingIndicator` is used
+at its own size, so size it to fit an item row. See
+[`SmartContextMenuStyle`](https://pub.dev/documentation/smart_context_menu/latest/smart_context_menu/SmartContextMenuStyle-class.html)
+for all fields.
 
 **Settings of an item take precedence over the style.** The style sets the look of
 all items, and an item changes it only for itself:
