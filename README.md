@@ -36,7 +36,9 @@ every feature in a files app, a chat, a gallery of styles and a lab of edge case
 
 ## Getting started
 
-Requires Flutter 3.32 or later (Dart 3.8).
+Requires Flutter 3.32 or later (Dart 3.8). Works on all platforms, including the web.
+On desktop and the web, the menu opens with a long press of the mouse or from code,
+for example from a button (see [Opening from code](#opening-from-code)); haptics do nothing there.
 
 ```sh
 flutter pub add smart_context_menu
