@@ -14,7 +14,8 @@ drag-to-select and rich submenus.
   when the preview is tapped.
 - **Smart positioning**: the pressed widget stays in place whenever there is room for the menu;
   very tall widgets can be scrolled, and long menus scroll inside themselves.
-- **Drag-to-select**: slide a finger across the items and release on the one you want.
+- **Drag-to-select**: touch the open menu, slide a finger across the items and release
+  on the one you want (not yet right after the long press, without lifting the finger).
 - **Custom slivers above the widget**, for example a reactions bar above a message,
   animated with the menu and optionally pinned to the top.
 - **Submenus**: static, loaded asynchronously or paginated, with a back item and swipe back.
