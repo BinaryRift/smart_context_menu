@@ -34,6 +34,17 @@ drag-to-select and rich submenus.
 The [example app](example/) shows
 every feature in a files app, a chat, a gallery of styles and a lab of edge cases.
 
+## Why not `CupertinoContextMenu`?
+
+`CupertinoContextMenu` from Flutter opens a list of actions on a long press.
+This package keeps that gesture and adds what apps often need on top of it:
+
+- submenus, also loaded asynchronously or page by page;
+- drag-to-select across the items;
+- your own slivers above the widget, such as a reactions bar;
+- opening and closing from code;
+- a theme for all menus and a style for the colors, text, blur and content of items.
+
 ## Getting started
 
 Requires Flutter 3.32 or later (Dart 3.8). Works on all platforms, including the web.
