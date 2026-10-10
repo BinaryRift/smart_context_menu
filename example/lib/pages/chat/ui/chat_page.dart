@@ -14,6 +14,7 @@ import 'chat_colors.dart';
 import 'widgets/chat_input_bar.dart';
 import 'widgets/message_bubble.dart';
 import 'widgets/message_footer.dart';
+import 'widgets/person_avatar.dart';
 
 const _reactionsPageSize = 20;
 
@@ -261,6 +262,7 @@ final class _ChatPageState extends State<ChatPage> {
           for (var i = first; i < last; i++)
             SmartContextMenuItem.simple(
               title: personName(i),
+              leading: PersonAvatar(name: personName(i)),
               trailing: Text(reactionAt(message, i)),
               // The last item of a page asks for the next one.
               pagingMetadata: i == last - 1 && last < count
@@ -285,7 +287,14 @@ final class _ChatPageState extends State<ChatPage> {
           title: 'Seen by',
           trailing: _count(readers.length),
           leading: const Icon(CupertinoIcons.eye),
-          children: [for (final reader in readers) _action(reader, null)],
+          children: [
+            for (final reader in readers)
+              SmartContextMenuItem.simple(
+                title: reader,
+                leading: PersonAvatar(name: reader),
+                onTap: () => debugPrint('Tapped: $reader'),
+              ),
+          ],
         );
       },
     );
