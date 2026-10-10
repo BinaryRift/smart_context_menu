@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart' show CupertinoDynamicColor;
 import 'package:flutter/services.dart' show HapticFeedback;
 import 'package:flutter/widgets.dart';
@@ -62,6 +64,14 @@ final class SmartContextMenuItemView extends StatefulWidget {
 final class _SmartContextMenuItemViewState
     extends State<SmartContextMenuItemView> {
   bool _isHighlight = false;
+
+  /// Runs from the moment the item is highlighted: a tapped item stays
+  /// highlighted until it ends, so even a quick tap shows the highlight.
+  Timer? _minHighlightTimer;
+
+  /// Whether the item is tapped and keeps the highlight until
+  /// [_minHighlightTimer] ends.
+  bool _isTapHighlightHeld = false;
 
   /// The item loaded by an async item or built by a listenable item.
   SmartContextMenuAsyncResult? _resolvedItem;
@@ -160,6 +170,7 @@ final class _SmartContextMenuItemViewState
 
   @override
   void dispose() {
+    _minHighlightTimer?.cancel();
     widget.hoverController?.removeListener(_handleGlobalPointer);
     _listenableOf(widget.item)?.removeListener(_onListenableChanged);
     super.dispose();
@@ -305,7 +316,15 @@ final class _SmartContextMenuItemViewState
     final bool isMeHovered = activeKey == myKey;
     final bool shouldHighlight = isMeHovered && !_isDisabled;
 
+    if (_isTapHighlightHeld) {
+      if (!shouldHighlight) return;
+      // Pressed again before the highlight of the tap ended.
+      _isTapHighlightHeld = false;
+      _startMinHighlightTimer();
+    }
+
     if (shouldHighlight != _isHighlight) {
+      if (shouldHighlight) _startMinHighlightTimer();
       setState(() => _isHighlight = shouldHighlight);
       _generateFeedback(shouldHighlight);
     }
@@ -314,9 +333,28 @@ final class _SmartContextMenuItemViewState
       if (_isHighlight && !_isDisabled) {
         _handleTap();
       }
-      if (_isHighlight) setState(() => _isHighlight = false);
+      if (_isHighlight) _clearHighlightAfterTap();
       return;
     }
+  }
+
+  void _startMinHighlightTimer() {
+    _minHighlightTimer?.cancel();
+    _minHighlightTimer = Timer(MotionDurations.ultraFast, _onMinHighlightEnd);
+  }
+
+  void _clearHighlightAfterTap() {
+    if (_minHighlightTimer?.isActive ?? false) {
+      _isTapHighlightHeld = true;
+    } else {
+      setState(() => _isHighlight = false);
+    }
+  }
+
+  void _onMinHighlightEnd() {
+    if (!_isTapHighlightHeld || !mounted) return;
+    _isTapHighlightHeld = false;
+    setState(() => _isHighlight = false);
   }
 
   void _generateFeedback(bool shouldHighlight) {

@@ -64,6 +64,76 @@ void main() {
     });
   });
 
+  group('highlight', () {
+    const highlightColor = Color(0x33000001);
+    const transparent = Color(0x00000000);
+    const config = SmartContextMenuConfig(
+      style: SmartContextMenuStyle(highlightColor: highlightColor),
+    );
+
+    SmartContextMenuItem item(String title, VoidCallback onTap) =>
+        SmartContextMenuItem.simple(
+          title: title,
+          closeOnTap: false,
+          onTap: onTap,
+        );
+
+    testWidgets('stays a moment after a quick tap, which runs at once', (
+      tester,
+    ) async {
+      var taps = 0;
+      await tester.pumpMenu(
+        items: [item('Copy', () => taps++)],
+        config: config,
+      );
+      await tester.openMenu();
+
+      // Down and up in the same frame, as a tap on a touchpad.
+      final gesture = await tester.startGesture(
+        tester.getCenter(find.text('Copy')),
+      );
+      await gesture.up();
+      await tester.pump();
+
+      expect(taps, 1);
+      expect(tester.backgroundOf('Copy'), isSameColorAs(highlightColor));
+
+      await tester.pump(const Duration(milliseconds: 120));
+      expect(tester.backgroundOf('Copy'), isSameColorAs(transparent));
+    });
+
+    testWidgets('moves to the next item at once while dragging', (
+      tester,
+    ) async {
+      await tester.pumpMenu(
+        items: [item('Copy', () {}), item('Paste', () {})],
+        config: config,
+      );
+      await tester.openMenu();
+
+      final gesture = await tester.pressAt(find.text('Copy'));
+      await gesture.moveTo(tester.getCenter(find.text('Paste')));
+      await tester.pump();
+
+      expect(tester.backgroundOf('Copy'), isSameColorAs(transparent));
+      expect(tester.backgroundOf('Paste'), isSameColorAs(highlightColor));
+
+      await tester.releaseOutside(gesture);
+    });
+
+    testWidgets('is cleared at once after a long press', (tester) async {
+      await tester.pumpMenu(items: [item('Copy', () {})], config: config);
+      await tester.openMenu();
+
+      final gesture = await tester.pressAt(find.text('Copy'));
+      await tester.pump(const Duration(milliseconds: 200));
+      await gesture.up();
+      await tester.pump();
+
+      expect(tester.backgroundOf('Copy'), isSameColorAs(transparent));
+    });
+  });
+
   group('customBuilder', () {
     final states = <String, SmartContextMenuItemState>{};
 
