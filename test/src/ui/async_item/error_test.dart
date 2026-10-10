@@ -204,4 +204,36 @@ void main() {
       TextAlign.center,
     );
   });
+
+  testWidgets('loads again after returning from a submenu when it failed', (
+    tester,
+  ) async {
+    var calls = 0;
+
+    await tester.pumpMenu(
+      items: [
+        SmartContextMenuItem.async(
+          asyncItem: () async {
+            calls++;
+            if (calls == 1) throw Exception('Failed');
+            return loadedItem;
+          },
+        ),
+        SmartContextMenuItem.submenu(
+          title: 'More',
+          children: [SmartContextMenuItem.simple(title: 'Child')],
+        ),
+      ],
+    );
+    await tester.openMenu();
+    expect(find.text(const SmartContextMenuLabels().retry), findsOneWidget);
+
+    await tester.tap(find.text('More'));
+    await tester.settleMenu();
+    await tester.tap(find.text(const SmartContextMenuLabels().back).last);
+    await tester.settleMenu();
+
+    expect(calls, 2);
+    expect(find.text('Loaded'), findsOneWidget);
+  });
 }

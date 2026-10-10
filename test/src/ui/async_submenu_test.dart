@@ -152,6 +152,35 @@ void main() {
     expect(find.text('Loaded'), findsOneWidget);
   });
 
+  testWidgets('loads again when it opens again after an error', (tester) async {
+    var calls = 0;
+
+    await tester.pumpMenu(
+      items: [
+        SmartContextMenuItem.asyncSubmenu(
+          title: 'More',
+          asyncChildren: () async {
+            calls++;
+            if (calls == 1) throw Exception('Failed');
+            return _items(['Loaded']);
+          },
+        ),
+      ],
+    );
+    await tester.openMenu();
+    await tester.tap(find.text('More'));
+    await tester.settleMenu();
+    expect(find.text(_labels.retry), findsOneWidget);
+
+    await tester.tap(find.text(_labels.back).last);
+    await tester.settleMenu();
+    await tester.tap(find.text('More'));
+    await tester.settleMenu();
+
+    expect(calls, 2);
+    expect(find.text('Loaded'), findsOneWidget);
+  });
+
   testWidgets('shows the retry label with the retry icon by default', (
     tester,
   ) async {

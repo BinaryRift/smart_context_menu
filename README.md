@@ -253,6 +253,8 @@ buttons in `customBuilder`.
 
 Every item has an `id`, generated when none is given. Loaded submenus and items are cached
 by it until the menu closes, so ids you set must be unique across the menu and its submenus.
+A failed load is not cached: the item loads again when it shows up again, for example after
+returning from a submenu, and the submenu loads again when it opens again.
 
 #### Submenu
 
@@ -277,6 +279,10 @@ The submenu follows the finger and slides back in place if the swipe is short.
 To turn the swipe off, set `enableSwipeBack: false` in `SmartContextMenuConfig`.
 
 #### Async submenu
+
+<img src="doc/gifs/async_submenu.gif" width="300" alt="Move to shows an activity indicator, then the folders, with the folder of the file disabled">
+
+*Move to loads the folders when it opens; Work, the folder of the file, is disabled.*
 
 The items are loaded when the submenu opens and cached until the menu closes.
 While loading, the submenu shows an activity indicator in the middle; pass a
@@ -339,6 +345,10 @@ SmartContextMenuItem.pagingSubmenu(
 `extra` for custom parameters.
 
 #### Async item
+
+<img src="doc/gifs/async_item.gif" width="300" alt="Seen by loads in the open menu of a message and turns into a submenu with the people who saw it">
+
+*Seen by loads as the menu opens and turns into a submenu; after going back, the loaded item stays.*
 
 The placeholder loads its item as soon as it appears. While loading, it shows `loading`,
 a `SmartContextMenuItem.loading` with the loading label by default. If loading fails or takes
@@ -510,6 +520,11 @@ SmartContextMenuItem.listenable(
 ```
 
 #### Error item
+
+<img src="doc/gifs/error_and_empty.gif" width="300" alt="Shared files fails to load, a tap retries it and shows the files, and Archive shows its empty item, in the dark theme">
+
+*In the dark theme: Shared files fails to load, and a tap on the row loads it again; Archive
+has no items.*
 
 An error item shows a failed load: its `title` (the error label by default) with the error icon.
 As the `error` of an async item, an async or a paginated submenu, it loads again on tap and shows
