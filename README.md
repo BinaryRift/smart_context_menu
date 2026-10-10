@@ -6,8 +6,9 @@
 [![CI](https://github.com/BinaryRift/smart_context_menu/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/BinaryRift/smart_context_menu/actions/workflows/ci.yml)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-An iOS-style context menu for Flutter with smart positioning, fluid animations,
-drag-to-select and rich submenus.
+A powerful, fully customizable iOS-style context menu for Flutter: smart positioning,
+fluid animations, drag-to-select, rich submenus (async, paginated) and your own content
+above the widget.
 
 <img src="doc/gifs/open_and_select_themes.gif" width="600" alt="A long press opens the menu of a file, and a finger slides across the items to select one, in the light and dark themes">
 
@@ -1025,3 +1026,5 @@ Found a bug or have a feature request? Open an issue on
 [GitHub](https://github.com/BinaryRift/smart_context_menu/issues).
 
 Licensed under the [MIT License](LICENSE).
+
+Made by [The NothingWorks](https://thenothingworks.dev).
