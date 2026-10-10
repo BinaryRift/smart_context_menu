@@ -570,6 +570,8 @@ or a `simple` item with its own action.
 
 #### Empty item
 
+The GIF in [Error item](#error-item) ends with Archive, a submenu without items.
+
 An async or a paginated submenu without items shows an empty item: its `title` (the empty label
 by default) with the empty icon. Pass your own as `empty` and return no items from the loader.
 A paginated submenu shows it only when the first page is empty, and a static submenu without
@@ -585,6 +587,10 @@ SmartContextMenuItem.asyncSubmenu(
 ```
 
 #### Separator
+
+<img src="doc/gifs/separators.png" width="300" alt="A menu with a gray band between Pin and Share, and a thin line with the title Danger zone above Delete">
+
+*A band separates Pin from Share, and a separator with its own `child` titles the last group.*
 
 A separator splits the items into groups. It has no actions and no press highlight,
 and drag-to-select passes over it. By default it is a band set by `separatorHeight`
@@ -974,6 +980,11 @@ A plain `Color` is used as is in both themes. The default values are available
 in `SmartContextMenuDefaults`.
 
 #### Dividers
+
+<img src="doc/gifs/dividers.png" width="300" alt="A menu with thin lines between the items that start under the titles, in the dark theme">
+
+*In the dark theme: lines between items, with `dividerIndent: 52` to start under the titles,
+as in the example below.*
 
 Dividers are thin lines between items, as in iOS. They are off by default; set
 `dividersBetweenItems: true` in the style to draw a line between every two items.
