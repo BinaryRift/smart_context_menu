@@ -3,7 +3,7 @@
 An iOS-style context menu for Flutter with smart positioning, fluid animations,
 drag-to-select and rich submenus.
 
-<img src="https://raw.githubusercontent.com/BinaryRift/smart_context_menu/main/doc/gifs/open_and_select.gif" width="300" alt="A long press opens the menu of a file, a finger slides across the items and selects one">
+<img src="doc/gifs/open_and_select.gif" width="300" alt="A long press opens the menu of a file, a finger slides across the items and selects one">
 
 ## Features
 
@@ -30,7 +30,7 @@ drag-to-select and rich submenus.
 - **Programmatic control**: open and close the menu from code with `SmartContextMenuController`,
   or turn off the long press and open the menu only from code.
 
-The [example app](https://github.com/BinaryRift/smart_context_menu/tree/main/example) shows
+The [example app](example/) shows
 every feature in a files app, a chat, a gallery of styles and a lab of edge cases.
 
 ## Getting started
@@ -85,7 +85,7 @@ SmartContextMenu(
 
 ### Header slivers
 
-<img src="https://raw.githubusercontent.com/BinaryRift/smart_context_menu/main/doc/gifs/header_slivers.gif" width="300" alt="A reactions bar above a photo in a chat, in the dark theme">
+<img src="doc/gifs/header_slivers.gif" width="300" alt="A reactions bar above a photo in a chat, in the dark theme">
 
 *A reactions bar above the message, in the dark theme: a tap on a reaction closes the menu.*
 
@@ -177,7 +177,7 @@ SmartContextMenu(
 
 ### Hero widgets
 
-<img src="https://raw.githubusercontent.com/BinaryRift/smart_context_menu/main/doc/gifs/hero.gif" width="300" alt="A tap on the preview opens the photo full screen with its own Hero">
+<img src="doc/gifs/hero.gif" width="300" alt="A tap on the preview opens the photo full screen with its own Hero">
 
 *A double tap next to the photo opens the menu from code; a tap on the preview opens the photo
 with its own `Hero`.*
@@ -262,7 +262,7 @@ versions, so keep a `_` case when you switch on items.
 
 #### Submenu
 
-<img src="https://raw.githubusercontent.com/BinaryRift/smart_context_menu/main/doc/gifs/submenu.gif" width="300" alt="Share opens a submenu with an async submenu inside, the back item and a swipe right go back, in the dark theme">
+<img src="doc/gifs/submenu.gif" width="300" alt="Share opens a submenu with an async submenu inside, the back item and a swipe right go back, in the dark theme">
 
 *In the dark theme: Share is a submenu, and Messages inside it loads when it opens. The back
 item and a swipe right go back.*
@@ -309,7 +309,7 @@ SmartContextMenuItem.asyncSubmenu(
 
 #### Paginated submenu
 
-<img src="https://raw.githubusercontent.com/BinaryRift/smart_context_menu/main/doc/gifs/paginated_submenu.gif" width="300" alt="The Reactions submenu loads the first page of people, then the next page when it scrolls to the end">
+<img src="doc/gifs/paginated_submenu.gif" width="300" alt="The Reactions submenu loads the first page of people, then the next page when it scrolls to the end">
 
 *Reactions loads the first page of people when it opens and the next page when it scrolls
 to the end.*
@@ -374,7 +374,7 @@ needs the type of its item, such as `SmartContextMenuSimpleItem`, not `SmartCont
 
 #### Listenable item
 
-<img src="https://raw.githubusercontent.com/BinaryRift/smart_context_menu/main/doc/gifs/listenable_item.gif" width="300" alt="Download turns into a progress that grows in the open menu, then into Remove Download, in the dark theme">
+<img src="doc/gifs/listenable_item.gif" width="300" alt="Download turns into a progress that grows in the open menu, then into Remove Download, in the dark theme">
 
 *In the dark theme: after a tap, Download shows its progress in the open menu and turns
 into Remove Download when it is done.*
@@ -597,7 +597,7 @@ Dispose it when it is no longer needed.
 
 ### Customization
 
-<img src="https://raw.githubusercontent.com/BinaryRift/smart_context_menu/main/doc/gifs/appearance.png" width="600" alt="The Brand, Solid and Custom content menus of the example, in the light and dark themes">
+<img src="doc/gifs/appearance.png" width="600" alt="The Brand, Solid and Custom content menus of the example, in the light and dark themes">
 
 *Three styles from the example, in the light and dark themes: brand colors with only dimming
 behind the menu, an opaque menu, and items with their own content.*
