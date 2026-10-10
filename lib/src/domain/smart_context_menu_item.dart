@@ -380,6 +380,10 @@ sealed class SmartContextMenuItem {
   /// and tapping it retries loading. The loaded item is cached by [id] until
   /// the menu closes.
   ///
+  /// [asyncItem] may return a submenu, for example to load a count first and
+  /// show the details on tap. The cached item is shown again after returning
+  /// from the submenu.
+  ///
   /// [timeout] defaults to [SmartContextMenuDefaults.loadingTimeout].
   ///
   /// Without its own title and trailing, [error] shows

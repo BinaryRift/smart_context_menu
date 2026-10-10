@@ -403,6 +403,28 @@ nothing to show. Its return type, `SmartContextMenuAsyncResult`, allows only the
 an async item, a listenable item or a separator does not compile. A helper that builds the result
 needs the type of its item, such as `SmartContextMenuSimpleItem`, not `SmartContextMenuItem`.
 
+A loader that returns a submenu loads a value first and shows the details on tap.
+The loaded item stays until the menu closes, also after returning from its submenu:
+
+```dart
+SmartContextMenuItem.async(
+  asyncItem: () async {
+    final viewers = await api.viewers(post.id);
+    return SmartContextMenuItem.submenu(
+      title: 'Views: ${viewers.length}',
+      leading: const Icon(CupertinoIcons.eye),
+      children: [
+        for (final viewer in viewers)
+          SmartContextMenuItem.simple(
+            title: viewer.name,
+            onTap: () => openProfile(viewer),
+          ),
+      ],
+    );
+  },
+)
+```
+
 #### Listenable item
 
 <img src="doc/gifs/listenable_item.gif" width="300" alt="Download turns into a progress that grows in the open menu, then into Remove Download, in the dark theme">
