@@ -59,6 +59,10 @@ flutter pub add smart_context_menu
 import 'package:smart_context_menu/smart_context_menu.dart';
 ```
 
+In debug builds, the first openings of the menu and its transitions may stutter while
+the code is compiled; release builds are smooth from the start. The iOS Simulator runs only
+debug builds, so check smoothness on a device or in a release build on macOS.
+
 ## Usage
 
 Wrap a widget with `SmartContextMenu` and pass the items. The menu opens on long press.
@@ -642,7 +646,8 @@ For a thin line instead of a band, set a small `separatorHeight` and the
 ### Opening from code
 
 Pass a `SmartContextMenuController` to open and close the menu from code.
-To open the menu only from code, set the activation mode to `manual`.
+To open the menu only from code, set the activation mode to `manual`. In this mode
+the controller is required: without it, an assert fails in debug builds.
 
 ```dart
 final controller = SmartContextMenuController();
@@ -772,6 +777,9 @@ SmartContextMenu(
   child: child,
 )
 ```
+
+`SmartContextMenuTheme.of(context)` reads the theme above `context`. If the theme is created
+in the same `build` method, wrap the menu in a `Builder` to read it.
 
 **Without a theme.** Keep a shared config in a constant and pass it to the menus,
 with `copyWith` where a menu needs a change:
