@@ -1,5 +1,11 @@
 # smart_context_menu
 
+[![pub package](https://img.shields.io/pub/v/smart_context_menu.svg)](https://pub.dev/packages/smart_context_menu)
+[![pub points](https://img.shields.io/pub/points/smart_context_menu)](https://pub.dev/packages/smart_context_menu/score)
+[![likes](https://img.shields.io/pub/likes/smart_context_menu)](https://pub.dev/packages/smart_context_menu/score)
+[![CI](https://github.com/BinaryRift/smart_context_menu/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/BinaryRift/smart_context_menu/actions/workflows/ci.yml)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 An iOS-style context menu for Flutter with smart positioning, fluid animations,
 drag-to-select and rich submenus.
 
