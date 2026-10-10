@@ -210,6 +210,11 @@ Here `openPhoto` pushes a page with a `Hero` of the same tag.
 
 ### Positioning
 
+<img src="doc/gifs/positioning.png" width="600" alt="Menus lined up with the left edge, the center and the right edge of a file, and a file row moved up to fit its submenu, in the dark theme">
+
+*In the dark theme: the menu lines up with the left edge of the widget, its center or its right
+edge, and a widget low on the screen moves up just enough to fit the menu, here a submenu.*
+
 The menu opens right below the pressed widget, and the widget stays exactly where it was.
 It moves up only when the widget and the menu together do not fit below it, and only as far
 as needed. Horizontally, the menu lines up with the widget's left or right edge, or centers
