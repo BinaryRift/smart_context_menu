@@ -1,5 +1,7 @@
 # smart_context_menu
 
+**English** | [Русский](README.ru.md)
+
 [![pub package](https://img.shields.io/pub/v/smart_context_menu.svg)](https://pub.dev/packages/smart_context_menu)
 [![pub points](https://img.shields.io/pub/points/smart_context_menu)](https://pub.dev/packages/smart_context_menu/score)
 [![likes](https://img.shields.io/pub/likes/smart_context_menu)](https://pub.dev/packages/smart_context_menu/score)
@@ -20,8 +22,8 @@ above the widget.
   on it runs the widget's main action, such as opening a message.
 - **From code**: open and close the menu with `SmartContextMenuController`, for example
   from a "⋯" button, or turn off the long press.
-- **Drag-to-select**: touch the open menu, slide a finger across the items and release
-  on the one you want (not yet right after the long press, without lifting the finger).
+- **Drag-to-select**: after the long press, lift the finger, then slide it across the items
+  and release on the one you want.
 - **Works with your `Hero` widgets**: a photo that opens full screen keeps its own `Hero`
   and flies from its place when the preview is tapped.
 
@@ -261,7 +263,8 @@ returning from a submenu, and the submenu loads again when it opens again.
 <img src="doc/gifs/submenu.gif" width="300" alt="Share opens a submenu with an async submenu inside, the back item and a swipe right go back, in the dark theme">
 
 *In the dark theme: Share is a submenu, and Messages inside it loads when it opens. The back
-item and a swipe right go back. [Code in the example](example/lib/pages/files/ui/files_page.dart).*
+item and a swipe right go back. [Code in the
+example](example/lib/pages/files/ui/files_page.dart).*
 
 ```dart
 SmartContextMenuItem.submenu(
@@ -283,9 +286,10 @@ To turn the swipe off, set `enableSwipeBack: false` in `SmartContextMenuConfig`.
 
 #### Async submenu
 
-<img src="doc/gifs/async_submenu.gif" width="300" alt="Move to shows an activity indicator, then the folders, with the folder of the file disabled">
+<img src="doc/gifs/async_submenu.gif" width="300" alt="Move to shows an activity indicator, then the folders, with the folder of the file disabled, in the light theme">
 
-*Move to loads the folders when it opens; Work, the folder of the file, is disabled. [Code in the example](example/lib/pages/files/ui/files_page.dart).*
+*In the light theme: Move to loads the folders when it opens; Work, the folder of the file, is
+disabled. [Code in the example](example/lib/pages/files/ui/files_page.dart).*
 
 The items are loaded when the submenu opens and cached until the menu closes.
 While loading, the submenu shows an activity indicator in the middle; pass a
@@ -314,10 +318,10 @@ SmartContextMenuItem.asyncSubmenu(
 
 #### Paginated submenu
 
-<img src="doc/gifs/paginated_submenu.gif" width="300" alt="The Reactions submenu loads the first page of people, then the next page when it scrolls to the end">
+<img src="doc/gifs/paginated_submenu.gif" width="300" alt="The Reactions submenu loads the first page of people, then the next page when it scrolls to the end, in the light theme">
 
-*Reactions loads the first page of people when it opens and the next page when it scrolls
-to the end. [Code in the example](example/lib/pages/chat/ui/chat_page.dart).*
+*In the light theme: Reactions loads the first page of people when it opens and the next page
+when it scrolls to the end. [Code in the example](example/lib/pages/chat/ui/chat_page.dart).*
 
 The first page is loaded with `initialMetadata`. The last item of each page, a `simple` item or
 a separator, carries the metadata of the next page in `pagingMetadata`; the next page is loaded
@@ -352,11 +356,12 @@ SmartContextMenuItem.pagingSubmenu(
 
 #### Async item
 
-<img src="doc/gifs/async_item.gif" width="300" alt="Seen by loads in the open menu of a message and turns into a regular submenu with the people who saw it">
+<img src="doc/gifs/async_item.gif" width="300" alt="Seen by loads in the open menu of a message and turns into a regular submenu with the people who saw it, in the light theme">
 
-*Seen by is an async item whose loader returns a regular submenu. Unlike an async submenu,
-it loads as the menu opens, before a tap, so the count is seen at once; after going back,
-the loaded item stays. [Code in the example](example/lib/pages/chat/ui/chat_page.dart).*
+*In the light theme: Seen by is an async item whose loader returns a regular submenu. Unlike an
+async submenu, it loads as the menu opens, before a tap, so the count is seen at once; after
+going back, the loaded item stays. [Code in the
+example](example/lib/pages/chat/ui/chat_page.dart).*
 
 The placeholder loads its item as soon as it appears. While loading, it shows `loading`,
 a `SmartContextMenuItem.loading` with the loading label by default. If loading fails or takes
@@ -407,8 +412,9 @@ SmartContextMenuItem.async(
 
 <img src="doc/gifs/listenable_item.gif" width="300" alt="Download turns into a progress that grows in the open menu, then into Remove Download, in the dark theme">
 
-*In the dark theme: after a tap, Download shows its progress in the open menu and turns
-into Remove Download when it is done. [Code in the example](example/lib/pages/files/ui/files_page.dart).*
+*In the dark theme: after a tap, Download shows its progress in the open menu and turns into
+Remove Download when it is done. [Code in the
+example](example/lib/pages/files/ui/files_page.dart).*
 
 Use it when the state of an item lives in your app and can change while the menu is open:
 a toggle that keeps the menu open, a counter, or an action that is already running.
@@ -588,9 +594,10 @@ SmartContextMenuItem.asyncSubmenu(
 
 #### Separator
 
-<img src="doc/gifs/separators.png" width="300" alt="A menu with a gray band between Pin and Share, and a thin line with the title Danger zone above Delete">
+<img src="doc/gifs/separators.png" width="300" alt="A menu with a gray band between Pin and Share, and a thin line with the title Danger zone above Delete, in the light theme">
 
-*A band separates Pin from Share, and a separator with its own `child` titles the last group.*
+*In the light theme: a band separates Pin from Share, and a separator with its own `child`
+titles the last group.*
 
 A separator splits the items into groups. It has no actions and no press highlight,
 and drag-to-select passes over it. By default it is a band set by `separatorHeight`
@@ -653,7 +660,8 @@ Dispose the controller when it is no longer needed.
 
 <img src="doc/gifs/header_slivers.gif" width="300" alt="A reactions bar above a photo in a chat, in the dark theme">
 
-*A reactions bar above the message, in the dark theme: a tap on a reaction closes the menu. [Code in the example](example/lib/pages/chat/ui/chat_page.dart).*
+*In the dark theme: a reactions bar above the message; a tap on a reaction closes the menu.
+[Code in the example](example/lib/pages/chat/ui/chat_page.dart).*
 
 To show your own content above the widget while the menu is open, pass `headerSliversBuilder`.
 It returns a list of slivers, which fade in and out with the menu and move with the widget
@@ -741,10 +749,11 @@ SmartContextMenu(
 
 ### Hero widgets
 
-<img src="doc/gifs/hero.gif" width="300" alt="A tap on the preview opens the photo full screen with its own Hero">
+<img src="doc/gifs/hero.gif" width="300" alt="A tap on the preview opens the photo full screen with its own Hero, in the light theme">
 
-*A double tap next to the photo opens the menu from code; a tap on the preview opens the photo
-with its own `Hero`. [Code in the example](example/lib/pages/chat/ui/chat_page.dart).*
+*In the light theme: a double tap next to the photo opens the menu from code; a tap on the
+preview opens the photo with its own `Hero`. [Code in the
+example](example/lib/pages/chat/ui/chat_page.dart).*
 
 The widget can have its own `Hero`, for example a photo in a chat that opens full screen.
 The menu flies the preview with a `Hero` too, but never puts it around your widget: it adds
@@ -983,8 +992,8 @@ in `SmartContextMenuDefaults`.
 
 <img src="doc/gifs/dividers.png" width="300" alt="A menu with thin lines between the items that start under the titles, in the dark theme">
 
-*In the dark theme: lines between items, with `dividerIndent: 52` to start under the titles,
-as in the example below.*
+*In the dark theme: lines between items, with `dividerIndent: 52` to start under the titles, as
+in the example below.*
 
 Dividers are thin lines between items, as in iOS. They are off by default; set
 `dividersBetweenItems: true` in the style to draw a line between every two items.
