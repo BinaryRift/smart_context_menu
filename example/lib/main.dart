@@ -32,6 +32,8 @@ final class _ExampleAppState extends State<ExampleApp> {
         listenable: _settings,
         builder: (context, _) => CupertinoApp(
           title: 'smart_context_menu',
+          // The banner covers the settings button in the corner.
+          debugShowCheckedModeBanner: false,
           theme: CupertinoThemeData(brightness: _settings.brightness),
           // One config for all menus of the app.
           builder: (context, child) => SmartContextMenuTheme(
