@@ -946,6 +946,10 @@ SmartContextMenuItem.simple(
 
 ## Additional information
 
+See the [changelog](CHANGELOG.md) for the changes in each version and the
+[API reference](https://pub.dev/documentation/smart_context_menu/latest/) for all classes
+and their settings.
+
 Found a bug or have a feature request? Open an issue on
 [GitHub](https://github.com/BinaryRift/smart_context_menu/issues).
 
