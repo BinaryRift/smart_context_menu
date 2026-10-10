@@ -3,8 +3,7 @@
 An iOS-style context menu for Flutter with smart positioning, fluid animations,
 drag-to-select and rich submenus.
 
-<img src="doc/gifs/open_and_select.gif" width="260" alt="A long press opens the menu of a file, a finger slides across the items and selects one">
-<img src="doc/gifs/open_and_select_dark.gif" width="260" alt="The same in the dark theme">
+<img src="doc/gifs/open_and_select_themes.gif" width="600" alt="A long press opens the menu of a file, and a finger slides across the items to select one, in the light and dark themes">
 
 ## Features
 
