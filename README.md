@@ -156,6 +156,19 @@ SmartContextMenu(
 )
 ```
 
+`SmartContextMenu` takes:
+
+| Parameter | What it does |
+| --- | --- |
+| `child` | The widget that opens the menu on long press and is shown as the preview. |
+| `items` | The items of the menu, see [Item types](#item-types). |
+| `config` | The settings of this menu, see [Configuration](#configuration). |
+| `controller` | Opens and closes the menu from code, see [Opening from code](#opening-from-code). |
+| `onPreviewTap` | Runs the main action of the child once the menu has closed after a tap on the preview. |
+| `headerSliversBuilder` | Builds your slivers above the widget, see [Header slivers](#header-slivers). |
+| `fadeHeaderSlivers` | Whether the slivers fade in and out with the menu, `true` by default. |
+| `headerSliversDelay` | Shows the slivers later than the menu, no delay by default. |
+
 ### Positioning
 
 <img src="doc/gifs/positioning.png" width="600" alt="Menus lined up with the left edge, the center and the right edge of a file, and a file row moved up to fit its submenu, in the dark theme">
@@ -177,7 +190,6 @@ the slivers scroll out at the top.
   it stays where it is, so it stays under the finger: the parent menu starts where the back
   item was. Set `moveBackDown: true` in `SmartContextMenuConfig` to move the widget back down
   instead; it never goes below its place.
-
 - **Tall widgets.** If the widget and the menu do not fit on the screen even after moving,
   they can be scrolled together, so every part of the widget and the menu stays reachable.
 - **Long menus.** The menu is never taller than a part of the screen set by
@@ -204,8 +216,8 @@ Create items with the method that matches what the item does:
 | `SmartContextMenuItem.pagingSubmenu` | Opens a submenu and loads its items page by page. |
 | `SmartContextMenuItem.async` | Shows a placeholder and replaces it with a loaded item. |
 | `SmartContextMenuItem.listenable` | Rebuilds from a `Listenable` while the menu is open. |
-| `SmartContextMenuItem.loading` | Shows a loading state of an async item, a submenu or a listenable item. |
-| `SmartContextMenuItem.error` | Shows a failed load; tapping it retries when it is the `error` of an async item or submenu. |
+| `SmartContextMenuItem.loading` | Shows a loading state of an async item, an async or paginated submenu, or a listenable item. |
+| `SmartContextMenuItem.error` | Shows a failed load; tapping it retries when it is the `error` of an async item or an async or paginated submenu. |
 | `SmartContextMenuItem.empty` | Shows a submenu without items. |
 | `SmartContextMenuItem.separator` | Separates groups of items. |
 
@@ -296,11 +308,11 @@ SmartContextMenuItem.asyncSubmenu(
 *Reactions loads the first page of people when it opens and the next page when it scrolls
 to the end.*
 
-The first page is loaded with `initialMetadata`. The last item of each page, a `simple` item
-or a separator, carries the metadata of the next page in `pagingMetadata`; the next page is loaded when the
-user scrolls to the end. Leave it `null` on the last page. While a page loads, the submenu
-shows `loading` after the loaded items, as an async submenu does. If a page fails to load
-or takes longer than `timeout` (10 seconds by default), the submenu shows `error` after
+The first page is loaded with `initialMetadata`. The last item of each page, a `simple` item or
+a separator, carries the metadata of the next page in `pagingMetadata`; the next page is loaded
+when the user scrolls to the end. Leave it `null` on the last page. While a page loads, the
+submenu shows `loading` after the loaded items, as an async submenu does. If a page fails to
+load or takes longer than `timeout` (10 seconds by default), the submenu shows `error` after
 the loaded items, and tapping it loads the page again. If the first page is empty, the submenu
 shows `empty`; an empty next page just ends the list.
 
@@ -489,6 +501,8 @@ SmartContextMenuItem.asyncSubmenu(
 )
 ```
 
+A listenable item can show a loading item for each step of its own work:
+
 ```dart
 SmartContextMenuItem.listenable(
   listenable: sync,
@@ -598,7 +612,8 @@ IconButton(
 ```
 
 The controller notifies its listeners when the menu opens or closes, see `isOpen`.
-Dispose it when it is no longer needed.
+`open()` completes when the menu has closed, so `await controller.open()` waits for it.
+Dispose the controller when it is no longer needed.
 
 ### Header slivers
 
@@ -727,7 +742,8 @@ Here `openPhoto` pushes a page with a `Hero` of the same tag.
 
 ### Configuration
 
-All settings live in `SmartContextMenuConfig`. Every field has a default, so set only what you need:
+Settings shared by menus live in `SmartContextMenuConfig`. Every field has a default, so set only
+what you need:
 
 ```dart
 const menuConfig = SmartContextMenuConfig(
@@ -963,8 +979,7 @@ SmartContextMenuItem.simple(
 )
 ```
 
-The same goes for `childrenGap` over `itemChildrenGap`, and `tintColor` over
-`destructiveColor`.
+The same goes for `childrenGap` over `itemChildrenGap`.
 
 To give one item its own color, set its `tintColor`. The item is tinted like a destructive
 one: the title and icons take the color, and the background a translucent shade of it.
