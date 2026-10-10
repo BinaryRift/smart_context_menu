@@ -9,6 +9,9 @@ topics:
   - popup
   - overlay
   - cupertino
+screenshots:
+  - description: "A long press opens the menu of a file, and a finger slides across the items to select one."
+    path: doc/gifs/open_and_select.gif
 
 environment:
   sdk: ^3.8.0

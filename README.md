@@ -23,11 +23,15 @@ drag-to-select and rich submenus.
   on failure, and keep one look across the menu that you can change in part or in full.
 - **Listenable items** that rebuild from the state of your app while the menu is open,
   such as toggles, counters or actions that are already running.
-- **Light and dark themes** out of the box.
+- **Light and dark themes** out of the box, and your own styles for both: colors given
+  as `CupertinoDynamicColor`s follow the theme of the app (see [Style](#style)).
 - **Customizable**: size, colors, text, icons, blur, decoration, labels, dividers
   and custom item content, set once for the whole app with a theme or for each menu.
 - **Programmatic control**: open and close the menu from code with `SmartContextMenuController`,
   or turn off the long press and open the menu only from code.
+
+The [example app](https://github.com/BinaryRift/smart_context_menu/tree/main/example) shows
+every feature in a files app, a chat, a gallery of styles and a lab of edge cases.
 
 ## Getting started
 

@@ -1,0 +1,61 @@
+# With this file, pub no longer reads .gitignore in this directory, so its
+# rules are repeated below.
+
+# The media of the README, linked from GitHub, stay out of the package,
+# except the GIF listed in `screenshots` of pubspec.yaml.
+doc/gifs/*
+!doc/gifs/open_and_select.gif
+
+# Rules of .gitignore
+
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+Thumbs.db
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# VS Code
+launch.json
+*.code-workspace
+
+# Flutter/Dart/Pub related
+# Libraries should not include pubspec.lock, per https://dart.dev/guides/libraries/private-files#pubspeclock.
+pubspec.lock
+**/doc/api/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+
+# Coverage
+coverage/
+
+# dotenv environment variables file
+.env*
+
+# Local configuration and signing keys
+local.properties
+key.properties
+keystore.properties
+**/*.keystore
+**/*.jks
+
+# Local planning docs and their archive
+/0_docs/
+/0_old_docs/
