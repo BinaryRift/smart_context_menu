@@ -34,6 +34,35 @@ drag-to-select and rich submenus.
 The [example app](example/) shows
 every feature in a files app, a chat, a gallery of styles and a lab of edge cases.
 
+## Contents
+
+- [Why not `CupertinoContextMenu`?](#why-not-cupertinocontextmenu)
+- [Getting started](#getting-started)
+- [Usage](#usage)
+  - [Positioning](#positioning)
+  - [Item types](#item-types)
+    - [Submenu](#submenu)
+    - [Async submenu](#async-submenu)
+    - [Paginated submenu](#paginated-submenu)
+    - [Async item](#async-item)
+    - [Listenable item](#listenable-item)
+    - [Loading item](#loading-item)
+    - [Error item](#error-item)
+    - [Empty item](#empty-item)
+    - [Separator](#separator)
+  - [Opening from code](#opening-from-code)
+  - [Header slivers](#header-slivers)
+  - [Hero widgets](#hero-widgets)
+  - [Configuration](#configuration)
+    - [Theme and config](#theme-and-config)
+    - [Localization](#localization)
+  - [Appearance](#appearance)
+    - [Item style](#item-style)
+    - [Dividers](#dividers)
+    - [Custom item content](#custom-item-content)
+- [Coming soon](#coming-soon)
+- [Additional information](#additional-information)
+
 ## Why not `CupertinoContextMenu`?
 
 `CupertinoContextMenu` from Flutter opens a list of actions on a long press.
@@ -100,131 +129,6 @@ SmartContextMenu(
   child: MessageBubble(message),
 )
 ```
-
-### Header slivers
-
-<img src="doc/gifs/header_slivers.gif" width="300" alt="A reactions bar above a photo in a chat, in the dark theme">
-
-*A reactions bar above the message, in the dark theme: a tap on a reaction closes the menu.*
-
-To show your own content above the widget while the menu is open, pass `headerSliversBuilder`.
-It returns a list of slivers, which fade in and out with the menu and move with the widget
-when it is dragged or the menu is stretched. The builder gets `SmartContextMenuHeaderDetails`:
-
-- `alignment` tells how the widget and the menu are aligned horizontally. The slivers have
-  the same horizontal padding as the widget, so `Align(alignment: header.alignment)` puts
-  your content at the edge of the widget.
-- `animation` runs from 0 to 1 as the slivers appear and back as they hide, to animate
-  your content with the menu.
-- `close()` closes the menu. It completes three quarters through the closing, as an item
-  does, so the result of the action is seen as the menu closes.
-
-A tap on your widgets in the slivers keeps the menu open; a tap on empty space next to them
-closes it, as a tap anywhere outside the menu does.
-
-```dart
-SmartContextMenu(
-  headerSliversBuilder: (context, header) => [
-    SliverToBoxAdapter(
-      child: Align(
-        alignment: header.alignment,
-        child: ReactionsBar(
-          onSelected: (reaction) async {
-            await header.close();
-            react(message, reaction);
-          },
-        ),
-      ),
-    ),
-    const SliverToBoxAdapter(child: SizedBox(height: 8)),
-  ],
-  items: items,
-  child: MessageBubble(message),
-)
-```
-
-For example, to scale the bar in from the edge of the widget, wrap it with a transition
-driven by `header.animation`. Use `drive` rather than `CurvedAnimation`: the builder runs
-on every rebuild, and a `CurvedAnimation` created there is never disposed.
-
-```dart
-ScaleTransition(
-  scale: header.animation.drive(CurveTween(curve: Curves.easeOutBack)),
-  // Grows from the bottom edge, next to the widget.
-  alignment: Alignment(header.alignment.x, 1),
-  child: ReactionsBar(onSelected: react),
-)
-```
-
-The fade stays on top of your animation; set `fadeHeaderSlivers: false` to animate
-the slivers only your way.
-
-The slivers are direct children of the scroll view of the menu, so a `PinnedHeaderSliver`
-stays at the top, right below the status bar, while a tall widget and the menu scroll
-under it. It covers them there, so keep it small:
-
-```dart
-headerSliversBuilder: (context, header) => [
-  PinnedHeaderSliver(
-    child: Align(
-      alignment: header.alignment,
-      child: ReactionsBar(onSelected: react),
-    ),
-  ),
-],
-```
-
-If the widget and the menu do not fit on the screen and the content scrolls as the menu
-opens, the slivers appear once the widget is nearly in place, and hide at once when the menu
-closes while the content is scrolled. The widget moves above everything as the menu opens
-and closes, so it would cover a pinned sliver otherwise.
-
-To show the slivers later, set `headerSliversDelay`. It counts from the start of the opening,
-which takes 300 milliseconds: a shorter delay starts the slivers while the widget moves
-into place, a longer one after that.
-
-```dart
-SmartContextMenu(
-  headerSliversBuilder: (context, header) => [reactionsBar],
-  // The bar appears a moment after the menu.
-  headerSliversDelay: const Duration(milliseconds: 150),
-  items: items,
-  child: MessageBubble(message),
-)
-```
-
-### Hero widgets
-
-<img src="doc/gifs/hero.gif" width="300" alt="A tap on the preview opens the photo full screen with its own Hero">
-
-*A double tap next to the photo opens the menu from code; a tap on the preview opens the photo
-with its own `Hero`.*
-
-The widget can have its own `Hero`, for example a photo in a chat that opens full screen.
-The menu flies the preview with a `Hero` too, but never puts it around your widget: it adds
-it next to the widget, and only while the menu is open. So there is no `Hero` inside
-a `Hero`, and while the menu is open, your widget stays in its place, hidden, with its
-state kept.
-
-Open the page from `onPreviewTap`: it is called once the menu has closed and the preview
-is back in place, so your `Hero` flies from the place of the widget, as it does after a tap
-on the widget itself:
-
-```dart
-SmartContextMenu(
-  items: items,
-  onPreviewTap: () => openPhoto(photo),
-  child: GestureDetector(
-    onTap: () => openPhoto(photo),
-    child: Hero(
-      tag: photo.id,
-      child: Image.network(photo.url),
-    ),
-  ),
-)
-```
-
-Here `openPhoto` pushes a page with a `Hero` of the same tag.
 
 ### Positioning
 
@@ -669,6 +573,131 @@ IconButton(
 
 The controller notifies its listeners when the menu opens or closes, see `isOpen`.
 Dispose it when it is no longer needed.
+
+### Header slivers
+
+<img src="doc/gifs/header_slivers.gif" width="300" alt="A reactions bar above a photo in a chat, in the dark theme">
+
+*A reactions bar above the message, in the dark theme: a tap on a reaction closes the menu.*
+
+To show your own content above the widget while the menu is open, pass `headerSliversBuilder`.
+It returns a list of slivers, which fade in and out with the menu and move with the widget
+when it is dragged or the menu is stretched. The builder gets `SmartContextMenuHeaderDetails`:
+
+- `alignment` tells how the widget and the menu are aligned horizontally. The slivers have
+  the same horizontal padding as the widget, so `Align(alignment: header.alignment)` puts
+  your content at the edge of the widget.
+- `animation` runs from 0 to 1 as the slivers appear and back as they hide, to animate
+  your content with the menu.
+- `close()` closes the menu. It completes three quarters through the closing, as an item
+  does, so the result of the action is seen as the menu closes.
+
+A tap on your widgets in the slivers keeps the menu open; a tap on empty space next to them
+closes it, as a tap anywhere outside the menu does.
+
+```dart
+SmartContextMenu(
+  headerSliversBuilder: (context, header) => [
+    SliverToBoxAdapter(
+      child: Align(
+        alignment: header.alignment,
+        child: ReactionsBar(
+          onSelected: (reaction) async {
+            await header.close();
+            react(message, reaction);
+          },
+        ),
+      ),
+    ),
+    const SliverToBoxAdapter(child: SizedBox(height: 8)),
+  ],
+  items: items,
+  child: MessageBubble(message),
+)
+```
+
+For example, to scale the bar in from the edge of the widget, wrap it with a transition
+driven by `header.animation`. Use `drive` rather than `CurvedAnimation`: the builder runs
+on every rebuild, and a `CurvedAnimation` created there is never disposed.
+
+```dart
+ScaleTransition(
+  scale: header.animation.drive(CurveTween(curve: Curves.easeOutBack)),
+  // Grows from the bottom edge, next to the widget.
+  alignment: Alignment(header.alignment.x, 1),
+  child: ReactionsBar(onSelected: react),
+)
+```
+
+The fade stays on top of your animation; set `fadeHeaderSlivers: false` to animate
+the slivers only your way.
+
+The slivers are direct children of the scroll view of the menu, so a `PinnedHeaderSliver`
+stays at the top, right below the status bar, while a tall widget and the menu scroll
+under it. It covers them there, so keep it small:
+
+```dart
+headerSliversBuilder: (context, header) => [
+  PinnedHeaderSliver(
+    child: Align(
+      alignment: header.alignment,
+      child: ReactionsBar(onSelected: react),
+    ),
+  ),
+],
+```
+
+If the widget and the menu do not fit on the screen and the content scrolls as the menu
+opens, the slivers appear once the widget is nearly in place, and hide at once when the menu
+closes while the content is scrolled. The widget moves above everything as the menu opens
+and closes, so it would cover a pinned sliver otherwise.
+
+To show the slivers later, set `headerSliversDelay`. It counts from the start of the opening,
+which takes 300 milliseconds: a shorter delay starts the slivers while the widget moves
+into place, a longer one after that.
+
+```dart
+SmartContextMenu(
+  headerSliversBuilder: (context, header) => [reactionsBar],
+  // The bar appears a moment after the menu.
+  headerSliversDelay: const Duration(milliseconds: 150),
+  items: items,
+  child: MessageBubble(message),
+)
+```
+
+### Hero widgets
+
+<img src="doc/gifs/hero.gif" width="300" alt="A tap on the preview opens the photo full screen with its own Hero">
+
+*A double tap next to the photo opens the menu from code; a tap on the preview opens the photo
+with its own `Hero`.*
+
+The widget can have its own `Hero`, for example a photo in a chat that opens full screen.
+The menu flies the preview with a `Hero` too, but never puts it around your widget: it adds
+it next to the widget, and only while the menu is open. So there is no `Hero` inside
+a `Hero`, and while the menu is open, your widget stays in its place, hidden, with its
+state kept.
+
+Open the page from `onPreviewTap`: it is called once the menu has closed and the preview
+is back in place, so your `Hero` flies from the place of the widget, as it does after a tap
+on the widget itself:
+
+```dart
+SmartContextMenu(
+  items: items,
+  onPreviewTap: () => openPhoto(photo),
+  child: GestureDetector(
+    onTap: () => openPhoto(photo),
+    child: Hero(
+      tag: photo.id,
+      child: Image.network(photo.url),
+    ),
+  ),
+)
+```
+
+Here `openPhoto` pushes a page with a `Hero` of the same tag.
 
 ### Configuration
 
