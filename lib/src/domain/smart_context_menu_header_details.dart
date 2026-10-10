@@ -65,6 +65,7 @@ final class SmartContextMenuHeaderDetails {
 
   final Future<void> Function() _close;
 
+  /// Created by the menu for [SmartContextMenuHeaderBuilder].
   @internal
   const SmartContextMenuHeaderDetails({
     required this.alignment,
