@@ -12,6 +12,10 @@ topics:
 screenshots:
   - description: "A long press opens the menu of a file, and a finger slides across the items to select one."
     path: doc/gifs/open_and_select.gif
+  - description: "The menu lines up with the left edge, the center or the right edge of the widget, and a widget low on the screen moves up to fit the menu."
+    path: doc/gifs/positioning.png
+  - description: "Three styles of the menu in the light and dark themes: brand colors, an opaque menu and items with their own content."
+    path: doc/gifs/appearance.png
 
 environment:
   sdk: ^3.8.0

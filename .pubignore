@@ -2,9 +2,11 @@
 # rules are repeated below.
 
 # The media of the README, linked from GitHub, stay out of the package,
-# except the GIF listed in `screenshots` of pubspec.yaml.
+# except the files listed in `screenshots` of pubspec.yaml.
 doc/gifs/*
 !doc/gifs/open_and_select.gif
+!doc/gifs/positioning.png
+!doc/gifs/appearance.png
 
 # Rules of .gitignore
 
