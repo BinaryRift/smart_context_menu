@@ -275,6 +275,10 @@ Create items with the method that matches what the item does:
 | `SmartContextMenuItem.empty` | Shows a submenu without items. |
 | `SmartContextMenuItem.separator` | Separates groups of items. |
 
+Async items and async or paginated submenus load their data themselves: the menu calls
+the loader, shows the loading and error states, and keeps the result until it closes.
+A listenable item shows state that your app owns and updates, and rebuilds whenever it changes.
+
 Each method returns its own subtype of `SmartContextMenuItem`, such as `SmartContextMenuSimpleItem`,
 so you can `switch` on an item and read the fields of its type. New item types may be added in minor
 versions, so keep a `_` case when you switch on items.
