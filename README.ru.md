@@ -266,7 +266,7 @@ SmartContextMenu(
 
 *В тёмной теме: Share — подменю, а Messages внутри него подгружается при открытии. Вернуться
 можно пунктом «Назад» или свайпом вправо. [Код в
-примере](example/lib/pages/files/ui/files_page.dart).*
+примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.0/example/lib/pages/files/ui/files_page.dart#L171-L208).*
 
 ```dart
 SmartContextMenuItem.submenu(
@@ -291,7 +291,7 @@ SmartContextMenuItem.submenu(
 <img src="doc/gifs/async_submenu.gif" width="300" alt="Move to показывает индикатор загрузки, затем список папок, папка файла неактивна, в светлой теме">
 
 *В светлой теме: Move to загружает папки при открытии; Work — папка этого файла, поэтому она
-неактивна. [Код в примере](example/lib/pages/files/ui/files_page.dart).*
+неактивна. [Код в примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.0/example/lib/pages/files/ui/files_page.dart#L210-L228).*
 
 Пункты загружаются при открытии подменю и кешируются до закрытия меню. Во время загрузки
 посередине подменю крутится индикатор; чтобы вместо него была строка с текстом, передайте
@@ -323,7 +323,7 @@ SmartContextMenuItem.asyncSubmenu(
 <img src="doc/gifs/paginated_submenu.gif" width="300" alt="Подменю Reactions загружает первую страницу людей, а следующую — когда список докручен до конца, в светлой теме">
 
 *В светлой теме: Reactions загружает первую страницу людей при открытии, а следующую — когда
-список докрутили до конца. [Код в примере](example/lib/pages/chat/ui/chat_page.dart).*
+список докрутили до конца. [Код в примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.0/example/lib/pages/chat/ui/chat_page.dart#L246-L275).*
 
 Первая страница загружается с `initialMetadata`. Последний пункт каждой страницы — обычный
 пункт или разделитель — несёт в `pagingMetadata` метаданные следующей страницы, и она
@@ -364,7 +364,7 @@ SmartContextMenuItem.pagingSubmenu(
 *В светлой теме: Seen by — асинхронный пункт, загрузчик которого возвращает обычное подменю. В
 отличие от подменю с асинхронной загрузкой, он грузится сразу при открытии меню, ещё до тапа,
 поэтому счётчик виден сразу; после возврата загруженный пункт остаётся. [Код в
-примере](example/lib/pages/chat/ui/chat_page.dart).*
+примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.0/example/lib/pages/chat/ui/chat_page.dart#L277-L301).*
 
 Заглушка начинает загрузку, как только появляется на экране. Пока идёт загрузка, она
 показывает `loading` — по умолчанию `SmartContextMenuItem.loading` со стандартной подписью.
@@ -417,7 +417,7 @@ SmartContextMenuItem.async(
 
 *В тёмной теме: после тапа Download показывает прогресс прямо в открытом меню, а когда загрузка
 заканчивается, превращается в Remove Download. [Код в
-примере](example/lib/pages/files/ui/files_page.dart).*
+примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.0/example/lib/pages/files/ui/files_page.dart#L252-L280).*
 
 Подходит, когда состояние пункта хранится в приложении и может поменяться, пока меню
 открыто: переключатель, после которого меню не закрывается, счётчик или уже запущенное
@@ -546,7 +546,7 @@ SmartContextMenuItem.listenable(
 <img src="doc/gifs/error_and_empty.gif" width="300" alt="Shared files не загружается, тап повторяет загрузку и показывает файлы, а в Archive пусто, в тёмной теме">
 
 *В тёмной теме: Shared files не загрузился, и тап по строке загружает его заново; в Archive
-пусто. [Код в примере](example/lib/pages/lab/domain/lab_items.dart).*
+пусто. [Код в примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.0/example/lib/pages/lab/domain/lab_items.dart#L130-L185).*
 
 Пункт `error` показывает, что загрузка не удалась: `title` (по умолчанию стандартная подпись
 ошибки) со значком ошибки. Если это `error` асинхронного пункта или подменю, тап повторяет
@@ -665,7 +665,7 @@ IconButton(
 <img src="doc/gifs/header_slivers.gif" width="300" alt="Панель реакций над фото в чате, в тёмной теме">
 
 *В тёмной теме: панель реакций над сообщением; тап по реакции закрывает меню. [Код в
-примере](example/lib/pages/chat/ui/chat_page.dart).*
+примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.0/example/lib/pages/chat/ui/chat_page.dart#L176-L200).*
 
 Чтобы показать свой контент над виджетом, пока меню открыто, передайте `headerSliversBuilder`.
 Он возвращает список слайверов: они плавно появляются и исчезают вместе с меню и двигаются
@@ -757,7 +757,7 @@ SmartContextMenu(
 <img src="doc/gifs/hero.gif" width="300" alt="Тап по превью открывает фото на весь экран с его собственным Hero, в светлой теме">
 
 *В светлой теме: двойной тап рядом с фото открывает меню из кода, а тап по превью открывает
-фото с его собственным `Hero`. [Код в примере](example/lib/pages/chat/ui/chat_page.dart).*
+фото с его собственным `Hero`. [Код в примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.0/example/lib/pages/chat/ui/chat_page.dart#L156-L168).*
 
 У виджета может быть свой `Hero`, например у фото в чате, которое открывается на весь экран.
 Меню тоже анимирует превью через `Hero`, но не оборачивает в него ваш виджет: оно добавляет
