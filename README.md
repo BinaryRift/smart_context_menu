@@ -957,6 +957,17 @@ SmartContextMenuItem.simple(
 )
 ```
 
+## Coming soon
+
+Planned for the next minor version:
+
+- `SmartContextMenuItem.listenableSubmenu`: a submenu that rebuilds from the state of your app
+  while it is open, for example the people who liked a post, updated as new likes come in.
+- `SmartContextMenuItem.row`: several actions in one row of icons, as in the compact menus of iOS.
+
+Both are new item types, so keep a `_` case when you switch on items, see
+[Item types](#item-types).
+
 ## Additional information
 
 See the [changelog](CHANGELOG.md) for the changes in each version and the
