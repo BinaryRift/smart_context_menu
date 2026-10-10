@@ -266,6 +266,31 @@ Each method returns its own subtype of `SmartContextMenuItem`, such as `SmartCon
 so you can `switch` on an item and read the fields of its type. New item types may be added in minor
 versions, so keep a `_` case when you switch on items.
 
+Simple items and submenus share these settings:
+
+| Field | What it does |
+| --- | --- |
+| `title` | The text of the item, in up to `titleMaxLines` lines of the style. |
+| `leading` | A widget before the title, usually an icon. |
+| `trailing` | A widget after the title; a submenu shows it before its chevron. |
+| `isDestructive` | Tints the item with `destructiveColor` of the style. |
+| `tintColor` | Tints the item with its own color, see [Item style](#item-style). |
+| `isDisabled` | Dims the item; it ignores taps. |
+| `titleStyle`, `padding`, `childrenGap` | Replace the settings of the style for this item, see [Item style](#item-style). |
+| `customBuilder` | Replaces the content of the item, see [Custom item content](#custom-item-content). |
+| `closeOnTap` | Only for simple items: whether the menu closes on tap, `true` by default. |
+
+Icons in `leading` and `trailing` take the title color unless they set their own;
+text there takes the style and the color of the title, such as a count before the chevron.
+
+With `closeOnTap: false`, the menu stays open after `onTap`, for example for a toggle.
+A simple item without `onTap` only closes the menu; with `closeOnTap: false` as well,
+it does nothing: it is not highlighted and ignores taps, for example a row of your own
+buttons in `customBuilder`.
+
+Every item has an `id`, generated when none is given. Loaded submenus and items are cached
+by it until the menu closes, so ids you set must be unique across the menu and its submenus.
+
 #### Submenu
 
 <img src="doc/gifs/submenu.gif" width="300" alt="Share opens a submenu with an async submenu inside, the back item and a swipe right go back, in the dark theme">
@@ -797,8 +822,6 @@ Disabled and destructive items use `disabledForegroundColor` and `destructiveCol
 Disabled items have no background unless `disabledBackgroundColor` is set.
 A pressed item is highlighted with a translucent `titleStyle` color; `highlightColor`
 replaces it. Tinted and destructive items keep their own pressed tint.
-Icons in `leading` and `trailing` take the title color unless they set their own;
-text there takes the style and the color of the title, such as a count before the chevron.
 The back item of a submenu merges `backButtonTitleStyle` (bold by default) over
 `titleStyle`; `backButtonColor` sets the color of its title and icon.
 Titles take up to `titleMaxLines` lines (2 by default) and are truncated with an ellipsis.
