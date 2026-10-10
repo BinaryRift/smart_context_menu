@@ -3,6 +3,7 @@ import 'package:smart_context_menu/smart_context_menu.dart';
 
 import 'core/settings/example_settings.dart';
 import 'core/settings/settings_scope.dart';
+import 'core/ui/touch_indicator.dart';
 import 'pages/tabs/ui/tabs_page.dart';
 import 'resources/app_theme/menu_config.dart';
 
@@ -35,10 +36,13 @@ final class _ExampleAppState extends State<ExampleApp> {
           // The banner covers the settings button in the corner.
           debugShowCheckedModeBanner: false,
           theme: CupertinoThemeData(brightness: _settings.brightness),
-          // One config for all menus of the app.
-          builder: (context, child) => SmartContextMenuTheme(
-            config: _settings.menuConfig(appMenuConfig),
-            child: child!,
+          builder: (context, child) => TouchIndicator(
+            enabled: _settings.showTouches,
+            // One config for all menus of the app.
+            child: SmartContextMenuTheme(
+              config: _settings.menuConfig(appMenuConfig),
+              child: child!,
+            ),
           ),
           home: const TabsPage(),
         ),

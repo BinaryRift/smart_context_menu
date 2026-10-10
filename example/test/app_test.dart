@@ -70,6 +70,36 @@ void main() {
     expect(config().style.menuBlur, SmartContextMenuBlur.small);
   });
 
+  testWidgets('Show touches draws a circle under the finger', (tester) async {
+    await tester.pumpWidget(const ExampleApp());
+    final circle = find.byWidgetPredicate(
+      (widget) => widget.runtimeType.toString() == '_TouchCircle',
+    );
+
+    await openSettings(tester);
+    await tester.ensureVisible(switchOf('Show touches'));
+    await tester.tap(switchOf('Show touches'));
+    await tester.pumpAndSettle();
+    // The app below is not rebuilt: the settings stay open.
+    expect(find.text('Haptics'), findsOneWidget);
+
+    await tester.tap(find.text('Done'));
+    await tester.pumpAndSettle();
+
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.byType(FilesPage)),
+    );
+    await tester.pump();
+    expect(circle, findsOneWidget);
+
+    // Fades out after the finger is lifted.
+    await gesture.up();
+    await tester.pump();
+    expect(circle, findsOneWidget);
+    await tester.pumpAndSettle();
+    expect(circle, findsNothing);
+  });
+
   testWidgets('the theme setting changes the brightness', (tester) async {
     await tester.pumpWidget(const ExampleApp());
     Brightness brightness() =>

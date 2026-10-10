@@ -10,6 +10,7 @@ final class ExampleSettings extends ChangeNotifier {
   bool _enableSwipeBack = true;
   bool _moveBackDown = false;
   bool _slowAnimations = false;
+  bool _showTouches = false;
 
   ThemeMode get themeMode => _themeMode;
   set themeMode(ThemeMode value) => _update(() => _themeMode = value);
@@ -29,6 +30,10 @@ final class ExampleSettings extends ChangeNotifier {
     _slowAnimations = value;
     timeDilation = value ? 5 : 1;
   });
+
+  /// Whether a circle is shown under every finger, for screen recordings.
+  bool get showTouches => _showTouches;
+  set showTouches(bool value) => _update(() => _showTouches = value);
 
   /// The brightness of the app theme, `null` to follow the system.
   Brightness? get brightness => switch (_themeMode) {

@@ -85,6 +85,12 @@ final class SettingsSheet extends StatelessWidget {
                   value: settings.slowAnimations,
                   onChanged: (value) => settings.slowAnimations = value,
                 ),
+                _buildSwitch(
+                  title: 'Show touches',
+                  subtitle: 'A circle under the finger, for screen recordings',
+                  value: settings.showTouches,
+                  onChanged: (value) => settings.showTouches = value,
+                ),
               ],
             ),
           ],
