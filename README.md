@@ -7,12 +7,17 @@
 [![likes](https://img.shields.io/pub/likes/smart_context_menu)](https://pub.dev/packages/smart_context_menu/score)
 [![CI](https://github.com/BinaryRift/smart_context_menu/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/BinaryRift/smart_context_menu/actions/workflows/ci.yml)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![live demo](https://img.shields.io/badge/demo-live-8b5cf6)](https://thenothingworks.dev/demo/smart-context-menu/)
 
 A powerful, fully customizable iOS-style context menu for Flutter: smart positioning,
 fluid animations, drag-to-select, rich submenus (async, paginated) and your own content
 above the widget.
 
 <img src="doc/gifs/open_and_select_themes.gif" width="600" alt="A long press opens the menu of a file, and a finger slides across the items to select one, in the light and dark themes">
+
+<br>
+
+**[Try the live demo in your browser →](https://thenothingworks.dev/demo/smart-context-menu/)**
 
 ## Features
 
@@ -118,7 +123,7 @@ This package keeps that gesture and adds what apps often need on top of it:
 
 ## Getting started
 
-Requires Flutter 3.32 or later (Dart 3.8). Works on all platforms, including the web.
+Requires Flutter 3.32 or later (Dart 3.8). Works on all platforms, including [the web](https://thenothingworks.dev/demo/smart-context-menu/).
 On desktop and the web, the menu opens with a long press of the mouse or from code,
 for example from a button (see [Opening from code](#opening-from-code)); haptics do nothing there.
 
@@ -1106,6 +1111,8 @@ Both are new item types, so keep a `_` case when you switch on items, see
 [Item types](#item-types).
 
 ## Additional information
+
+**[Try the live demo in your browser →](https://thenothingworks.dev/demo/smart-context-menu/)**: every feature of the example app, built for the web.
 
 See the [changelog](CHANGELOG.md) for the changes in each version and the
 [API reference](https://pub.dev/documentation/smart_context_menu/latest/) for all classes

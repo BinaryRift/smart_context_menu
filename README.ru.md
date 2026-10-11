@@ -7,12 +7,17 @@
 [![likes](https://img.shields.io/pub/likes/smart_context_menu)](https://pub.dev/packages/smart_context_menu/score)
 [![CI](https://github.com/BinaryRift/smart_context_menu/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/BinaryRift/smart_context_menu/actions/workflows/ci.yml)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![live demo](https://img.shields.io/badge/demo-live-8b5cf6)](https://thenothingworks.dev/demo/smart-context-menu/)
 
 Контекстное меню в стиле iOS для Flutter, которое настраивается целиком: умное позиционирование,
 плавные анимации, drag-to-select, вложенные подменю с асинхронной загрузкой и пагинацией
 и свой контент над виджетом.
 
 <img src="doc/gifs/open_and_select_themes.gif" width="600" alt="Долгое нажатие открывает меню файла, палец ведёт по пунктам и выбирает нужный, в светлой и тёмной темах">
+
+<br>
+
+**[Попробовать демо в браузере →](https://thenothingworks.dev/demo/smart-context-menu/)**
 
 ## Возможности
 
@@ -120,7 +125,7 @@
 
 ## Начало работы
 
-Нужен Flutter 3.32 или новее (Dart 3.8). Пакет работает на всех платформах, включая web.
+Нужен Flutter 3.32 или новее (Dart 3.8). Пакет работает на всех платформах, включая [web](https://thenothingworks.dev/demo/smart-context-menu/).
 На desktop и в web меню открывается долгим нажатием мыши или из кода, например по кнопке
 (см. [Открытие из кода](#открытие-из-кода)); haptics там ничего не делают.
 
@@ -1109,6 +1114,8 @@ SmartContextMenuItem.simple(
 [Виды пунктов](#виды-пунктов).
 
 ## Дополнительно
+
+**[Попробовать демо в браузере →](https://thenothingworks.dev/demo/smart-context-menu/)** — все возможности приложения-примера, собранного для web.
 
 Что изменилось в каждой версии — в [CHANGELOG](CHANGELOG.md), все классы и настройки —
 в [документации API](https://pub.dev/documentation/smart_context_menu/latest/).
