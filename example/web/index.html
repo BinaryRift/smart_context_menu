@@ -179,10 +179,10 @@
         bottom: 0;
         width: calc((100% - 834px) / 2);
         display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0 32px;
+        padding: 24px;
         box-sizing: border-box;
+        /* Scrolls when the window is too low for the text. */
+        overflow-y: auto;
         font: 15px/1.5 system-ui, -apple-system, BlinkMacSystemFont,
           "Segoe UI", sans-serif;
         color: #e7eef6;
@@ -196,8 +196,14 @@
         right: 0;
       }
 
+      /* Centered with margins rather than by the panel, so the top stays
+         reachable when the panel scrolls. Lets the code blocks scroll
+         instead of widening the panel. */
       .about-content {
+        width: 100%;
+        min-width: 0;
         max-width: 340px;
+        margin: auto;
       }
 
       .about h1 {
@@ -272,31 +278,53 @@
         margin-bottom: 4px;
       }
 
+      /* The code and the copy button side by side, so a long command
+         scrolls next to the button rather than under it. */
       .about .command {
-        position: relative;
+        display: flex;
+        align-items: center;
+        padding-right: 6px;
+        border-radius: 8px;
+        border: 1px solid rgba(203, 224, 240, 0.14);
+        background: rgba(14, 32, 48, 0.72);
       }
 
-      .about code {
-        display: block;
-        padding: 10px 44px 10px 12px;
-        border-radius: 8px;
+      .about .command code {
+        flex: 1;
+        min-width: 0;
+        padding: 10px 8px 10px 12px;
         font: 13px ui-monospace, SFMono-Regular, Menlo, monospace;
         /* The command stays on one line, scrolling if it does not fit. */
         white-space: nowrap;
         overflow-x: auto;
-        border: 1px solid rgba(203, 224, 240, 0.14);
-        background: rgba(14, 32, 48, 0.72);
+      }
+
+      .about .command.multiline {
+        align-items: flex-start;
+      }
+
+      .about .command.multiline code {
+        white-space: pre;
       }
 
       .about a {
         color: #00a77b;
       }
 
+      .about .or {
+        margin: 10px 0 6px;
+        font-size: 14px;
+        color: #92a6b8;
+      }
+
+      .about code.inline {
+        font: 13px ui-monospace, SFMono-Regular, Menlo, monospace;
+        color: #e7eef6;
+      }
+
       .about .copy {
-        position: absolute;
-        top: 50%;
-        right: 6px;
         display: flex;
+        flex: none;
         width: 30px;
         height: 30px;
         align-items: center;
@@ -307,7 +335,11 @@
         color: #92a6b8;
         background: transparent;
         cursor: pointer;
-        transform: translateY(-50%);
+      }
+
+      /* Next to the first line of a multiline block. */
+      .about .multiline .copy {
+        margin-top: 6px;
       }
 
       .about .copy:hover {
@@ -349,19 +381,35 @@
           (async, paginated) and your own content above the widget.
         </p>
         <ul class="features">
-          <li>A liquid stretch under the finger, with the preview drifting after the menu</li>
-          <li>A preview that glides up to make room for a growing menu</li>
-          <li>Async submenus, loaded when opened</li>
-          <li>Paginated submenus: the next page loads on scroll</li>
-          <li>Async items that turn into any item, even a submenu</li>
+          <li>Liquid stretch under the finger</li>
+          <li>A preview that glides up to make room</li>
+          <li>Async and paginated submenus</li>
           <li>Loading, error with retry and empty states</li>
-          <li>Listenable items that rebuild while the menu is open</li>
+          <li>Listenable items that update in the open menu</li>
         </ul>
       </section>
       <section>
         <h2>Add it to your app</h2>
         <div class="command">
           <code>flutter pub add smart_context_menu</code>
+          <button class="copy" type="button" title="Copy" aria-label="Copy">
+            <svg class="idle" width="16" height="16" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="9" y="9" width="12" height="12" rx="2"></rect>
+              <path d="M5 15V5a2 2 0 0 1 2-2h10"></path>
+            </svg>
+            <svg class="done" width="16" height="16" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12l5 5L19 7"></path>
+            </svg>
+          </button>
+        </div>
+        <p class="or">or in <code class="inline">pubspec.yaml</code>:</p>
+        <div class="command multiline">
+          <code>dependencies:
+  smart_context_menu: ^1.0.0</code>
           <button class="copy" type="button" title="Copy" aria-label="Copy">
             <svg class="idle" width="16" height="16" viewBox="0 0 24 24"
               fill="none" stroke="currentColor" stroke-width="2"
@@ -400,7 +448,7 @@
         <li>Slide across the items and release on one.</li>
         <li>Slide slowly past the edges: the menu stretches towards the finger.</li>
         <li>Swipe right in a submenu to go back, as in iOS.</li>
-        <li>Tap the preview to open the file or the photo.</li>
+        <li>Tap the preview to open the file or the photo; photos fly there with their own Hero.</li>
       </ul>
 
       <h3>Files</h3>
@@ -415,7 +463,6 @@
         <li>Tap a reaction above a message.</li>
         <li>Open Reactions of the lake photo: people load as you scroll.</li>
         <li>Double tap next to a message to open its menu.</li>
-        <li>Photos fly to the photo page with their own Hero.</li>
       </ul>
 
       <p class="note">
