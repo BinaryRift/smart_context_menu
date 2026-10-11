@@ -1123,6 +1123,11 @@ SmartContextMenuItem.simple(
 Нашли баг или есть идея? Создайте issue на
 [GitHub](https://github.com/BinaryRift/smart_context_menu/issues).
 
+❤️ Если пакет вам пригодился, поставьте 👍 лайк на pub.dev и ⭐ звезду на GitHub — так его проще найти другим:
+
+[![Лайк на pub.dev](https://img.shields.io/badge/%D0%9B%D0%B0%D0%B9%D0%BA_%D0%BD%D0%B0-pub.dev-0175C2?logo=dart&logoColor=white)](https://pub.dev/packages/smart_context_menu)
+[![Звезда на GitHub](https://img.shields.io/badge/%D0%97%D0%B2%D0%B5%D0%B7%D0%B4%D0%B0_%D0%BD%D0%B0-GitHub-181717?logo=github&logoColor=white)](https://github.com/BinaryRift/smart_context_menu)
+
 Лицензия — [MIT](LICENSE).
 
 Сделано в [The NothingWorks](https://thenothingworks.dev).

@@ -1121,6 +1121,11 @@ and their settings.
 Found a bug or have a feature request? Open an issue on
 [GitHub](https://github.com/BinaryRift/smart_context_menu/issues).
 
+❤️ If the package helps you, a 👍 like on pub.dev and a ⭐ star on GitHub help others find it:
+
+[![Like on pub.dev](https://img.shields.io/badge/Like_on-pub.dev-0175C2?logo=dart&logoColor=white)](https://pub.dev/packages/smart_context_menu)
+[![Star on GitHub](https://img.shields.io/badge/Star_on-GitHub-181717?logo=github&logoColor=white)](https://github.com/BinaryRift/smart_context_menu)
+
 Licensed under the [MIT License](LICENSE).
 
 Made by [The NothingWorks](https://thenothingworks.dev).
