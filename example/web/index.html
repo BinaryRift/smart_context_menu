@@ -23,19 +23,32 @@
   <meta name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="Example app demonstrating the smart_context_menu package.">
+  <meta name="description" content="A powerful, fully customizable iOS-style context menu for Flutter: smart positioning, fluid animations, drag-to-select, rich submenus (async, paginated) and your own content above the widget.">
+  <meta name="theme-color" content="#091824">
+
+  <!-- Link previews -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="NothingWorks">
+  <meta property="og:title" content="smart_context_menu — live demo">
+  <meta property="og:description" content="A powerful, fully customizable iOS-style context menu for Flutter: smart positioning, fluid animations, drag-to-select, rich submenus (async, paginated) and your own content above the widget.">
+  <meta property="og:url" content="https://thenothingworks.dev/demo/smart-context-menu/">
+  <meta property="og:image" content="https://thenothingworks.dev/demo/smart-context-menu/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="750">
+  <meta property="og:image:alt" content="The menu of a file in the light theme and the menu of a photo with reactions in the dark theme">
+  <meta name="twitter:card" content="summary_large_image">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="smart_context_menu_example">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <meta name="apple-mobile-web-app-title" content="Menu demo">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <title>smart_context_menu_example</title>
+  <title>smart_context_menu — live demo</title>
   <link rel="manifest" href="manifest.json">
 
   <style>
@@ -329,13 +342,15 @@
   <aside class="about about-left">
     <div class="about-content">
       <section>
-        <h1>smart_context_menu <span class="version">0.9.0</span></h1>
+        <h1>smart_context_menu <span class="version">1.0.0</span></h1>
         <p class="lead">
           A powerful, fully customizable iOS-style context menu for Flutter:
           smart positioning, fluid animations, drag-to-select, rich submenus
           (async, paginated) and your own content above the widget.
         </p>
         <ul class="features">
+          <li>A liquid stretch under the finger, with the preview drifting after the menu</li>
+          <li>A preview that glides up to make room for a growing menu</li>
           <li>Async submenus, loaded when opened</li>
           <li>Paginated submenus: the next page loads on scroll</li>
           <li>Async items that turn into any item, even a submenu</li>
@@ -362,6 +377,8 @@
           </button>
         </div>
         <p>
+          <a href="https://pub.dev/packages/smart_context_menu">Package on pub.dev</a>
+          ·
           <a href="https://github.com/BinaryRift/smart_context_menu">Source on GitHub</a>
         </p>
       </section>
@@ -381,6 +398,7 @@
       <ul>
         <li>Long press any file, message or card to open its menu.</li>
         <li>Slide across the items and release on one.</li>
+        <li>Slide slowly past the edges: the menu stretches towards the finger.</li>
         <li>Swipe right in a submenu to go back, as in iOS.</li>
         <li>Tap the preview to open the file or the photo.</li>
       </ul>

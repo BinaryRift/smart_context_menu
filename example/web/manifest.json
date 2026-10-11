@@ -1,11 +1,11 @@
 {
-    "name": "smart_context_menu_example",
-    "short_name": "smart_context_menu_example",
+    "name": "smart_context_menu — live demo",
+    "short_name": "Menu demo",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "Example app demonstrating the smart_context_menu package.",
+    "background_color": "#091824",
+    "theme_color": "#091824",
+    "description": "A powerful, fully customizable iOS-style context menu for Flutter: smart positioning, fluid animations, drag-to-select, rich submenus (async, paginated) and your own content above the widget.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
