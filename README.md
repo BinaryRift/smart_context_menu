@@ -33,6 +33,17 @@ above the widget.
   as far as needed; very tall widgets scroll together with the menu.
 - **Long menus** scroll inside, up to a part of the screen you choose.
 
+**Motion**
+
+- **Alive under the finger**: as the finger slides over the items, the menu stretches
+  towards it like liquid and the preview drifts after it, then both settle back on release.
+- **No jumps**: the menu smoothly changes its height as a submenu opens or items load,
+  and when it no longer fits, the preview and the menu glide up together to make room.
+- **Swipe back** drags a submenu right under the finger, and the menu smoothly resizes
+  to the parent menu as it is revealed.
+
+See every effect in [Animations](#animations).
+
 **Content**
 
 - **Actions** with icons, destructive and tinted colors, disabled items, separators
@@ -85,6 +96,7 @@ every feature in a files app, a chat, a gallery of styles and a lab of edge case
     - [Item style](#item-style)
     - [Dividers](#dividers)
     - [Custom item content](#custom-item-content)
+- [Animations](#animations)
 - [Coming soon](#coming-soon)
 - [Additional information](#additional-information)
 
@@ -95,6 +107,8 @@ This package keeps that gesture and adds what apps often need on top of it:
 
 - submenus, also loaded asynchronously or page by page;
 - drag-to-select across the items;
+- a menu and a preview that move as one: a liquid stretch under the finger, smooth changes
+  of height and a preview that glides up to make room for the menu;
 - your own slivers above the widget, such as a reactions bar;
 - opening and closing from code;
 - full control over the look: a theme for all menus, and a style for the colors, text, blur,
@@ -110,6 +124,13 @@ for example from a button (see [Opening from code](#opening-from-code)); haptics
 
 ```sh
 flutter pub add smart_context_menu
+```
+
+Or add it to `pubspec.yaml`:
+
+```yaml
+dependencies:
+  smart_context_menu: ^1.0.0
 ```
 
 ```dart
@@ -1032,6 +1053,30 @@ SmartContextMenuItem.simple(
   ),
 )
 ```
+
+## Animations
+
+The menu and the preview move as one. Nothing appears, resizes or moves without an animation,
+and while a finger is on the menu, both respond to every movement of it.
+
+- **Lift.** On a long press, the background blurs and dims, the preview lifts above it,
+  and the menu scales in; on closing, everything plays back.
+- **Liquid stretch.** Slide a finger over the items, and the menu stretches towards it like
+  liquid while the preview and the [header slivers](#header-slivers) drift after it. Release,
+  and everything settles back. With a mouse, it works while the button is held.
+- **Smooth height.** Submenus, loading, errors and listenable items change the height
+  of the menu, and it always animates instead of jumping.
+- **A preview that makes room.** When the menu grows past the bottom of the screen,
+  the preview and the menu glide up together, only as far as needed; with `moveBackDown`,
+  they glide back down as the menu gets shorter (see [Positioning](#positioning)).
+- **Layered submenus.** A submenu slides in over the menu while the menu moves half its width
+  aside and fades; the back item plays it in reverse.
+- **Swipe back.** Drag a submenu to the right, and it follows the finger, revealing the parent
+  menu under it. The height of the menu flows from the submenu to the parent with every step
+  of the finger, so there is no jump at the end. Let go past the middle or with a flick,
+  and the swipe finishes smoothly from where it is; let go early, and it slides back in place.
+
+The submenu transitions and the swipe back are shown in the GIF of [Submenu](#submenu).
 
 ## Coming soon
 
