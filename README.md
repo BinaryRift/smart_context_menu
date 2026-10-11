@@ -1056,6 +1056,12 @@ SmartContextMenuItem.simple(
 
 ## Animations
 
+<img src="doc/gifs/liquid_stretch.gif" width="400" alt="Close-up of the menu of a chat message that stretches towards the finger while the message and the reactions bar drift after it, in the light theme">
+
+*In the light theme, close up: as the finger slides over the items and past the edges,
+the menu stretches towards it, and the message and the reactions bar drift after it. [Code
+in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.0/example/lib/pages/chat/ui/chat_page.dart#L156-L168).*
+
 The menu and the preview move as one. Nothing appears, resizes or moves without an animation,
 and while a finger is on the menu, both respond to every movement of it.
 
@@ -1076,7 +1082,17 @@ and while a finger is on the menu, both respond to every movement of it.
   of the finger, so there is no jump at the end. Let go past the middle or with a flick,
   and the swipe finishes smoothly from where it is; let go early, and it slides back in place.
 
-The submenu transitions and the swipe back are shown in the GIF of [Submenu](#submenu).
+<img src="doc/gifs/make_room.gif" width="300" alt="A file low on the screen glides up with its menu to make room, then a submenu and the back item resize the menu smoothly, in the dark theme">
+
+*In the dark theme: Backup.zip is low on the screen, so it glides up together with the menu
+just enough to fit it; Share and the back item change the height of the menu smoothly. [Code
+in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.0/example/lib/pages/files/ui/files_page.dart#L136-L142).*
+
+<img src="doc/gifs/swipe_back.gif" width="300" alt="The Messages submenu follows a swipe right while the height of the menu flows towards Share, in the light theme">
+
+*In the light theme: a slow swipe right from Messages drags it after the finger while
+the height of the menu flows towards Share; after a short swipe, Messages slides back,
+and a long one finishes on its own. [Code in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.0/example/lib/pages/files/ui/files_page.dart#L171-L208).*
 
 ## Coming soon
 
