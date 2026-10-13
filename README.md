@@ -23,57 +23,63 @@ above the widget.
 
 **Opening**
 
-- **Lifted preview**: the pressed widget lifts above a blurred background, and a tap
-  on it runs the widget's main action, such as opening a message.
-- **From code**: open and close the menu with `SmartContextMenuController`, for example
-  from a "⋯" button, or turn off the long press.
-- **Drag-to-select**: after the long press, lift the finger, then slide it across the items
-  and release on the one you want.
-- **Works with your `Hero` widgets**: a photo that opens full screen keeps its own `Hero`
-  and flies from its place when the preview is tapped.
+- **Lifted preview**: Preview lifted over a blurred background. Tap it to trigger 
+  the main action of the widget (eg. open a message).
+- **From code**: Use `SmartContextMenuController` to open and close the menu 
+  (eg. on a "⋯" button). You can also disable the long press gesture in config, 
+  if you need.
+- **Drag-to-select**: Long press to start. Then, once you've slided your finger, 
+  drag over the menu items. Release to select on the item you want.
+- **`Hero` support**: If the widget has a `Hero` (eg. a photo), the `Hero` remains 
+  active on tap of the preview, transitioning smoothly from its position to full screen.
 
 **Positioning**
 
-- **The widget stays in place** whenever there is room for the menu, and moves only
-  as far as needed; very tall widgets scroll together with the menu.
-- **Long menus** scroll inside, up to a part of the screen you choose.
+- **The widget stays in place**: In presence of enough space, the preview stays put 
+  and moves only as needed. A widget that is too tall scrolls with the menu.
+- **Long menus** scroll internally, up to a specific part of the screen you choose.
 
 **Motion**
 
-- **Alive under the finger**: as the finger slides over the items, the menu stretches
-  towards it like liquid and the preview drifts after it, then both settle back on release.
-- **No jumps**: the menu smoothly changes its height as a submenu opens or items load,
-  and when it no longer fits, the preview and the menu glide up together to make room.
-- **Swipe back** drags a submenu right under the finger, and the menu smoothly resizes
-  to the parent menu as it is revealed.
+- **Alive under the finger**: as you slides over menu items, the menu stretches towards
+  your finger and the preview follows. Both return to their original position when 
+  you release.
+- **No jumps**: the menu smoothly transitions in height as a submenu opens or when
+  items are being fetched. If there's not enough space, the preview and menu both
+  smoothly glide upwards, leaving space in the process.
 
-See every effect in [Animations](#animations).
+- **The swipe back** gesture drags a submenu to the right, underneath your finger. 
+  As it becomes visible, the menu smoothly resizes towards to the original parent menu.
+
+You can find all these effects in [Animations](#animations).
 
 **Content**
 
 - **Actions** with icons, destructive and tinted colors, disabled items, separators
   and dividers.
-- **Custom items**: any widget as the content of an item, even with buttons of its own;
-  the highlight and taps keep working.
-- **Submenus**: static, loaded asynchronously or paginated, with a back item and swipe back.
-- **Async items** with loading, error and empty states and retry on failure, in one look
-  across the menu.
-- **Lazy lists**: items are built only when they scroll into view, and async items start
-  loading only then, so long menus stay fast.
-- **Listenable items** that rebuild from the state of your app while the menu is open,
-  such as toggles, counters or actions that are already running.
-- **Slivers above the widget**, such as a reactions bar, animated with the menu
-  and optionally pinned to the top.
+- **Custom items**:  use any widget as an item's content. This widget can have its own
+  buttons, while still get highlighted and tapped correctly.
+- **Submenus** can be static, or loaded asynchronously or paginated. They have a back
+  navigation item, and support swipe back.
+- **Async items** can have loading, error and empty states, and can be retried on
+  failure. All these elements have the same appearance throughout the menu.
+- **Lazy lists**: items are only built as they appear on scroll. Async items only start
+  loading in the moment. This ensures long menus perform well.
+- **Listenable items** can rebuild based on app state while the menu is open. Such as
+  toggles, counters and actions in progress (eg. download progress).
+- **Custom widgets above the preview**. Place Slivers (eg. reactions bar) above the
+  preview, animated along with the menu. These can be pinned to the top, optionally.
 
 **Appearance**
 
-- **Light and dark themes** out of the box; colors given as `CupertinoDynamicColor`s follow
-  the theme of the app (see [Item style](#item-style)).
-- **Customizable**: size, colors, text, icons, blur, shadows and labels, set once
-  for the whole app with a theme or for each menu.
+- **Light and dark themes** out of the box. Colors given as `CupertinoDynamicColor`s
+  adopt to the theme of the app (see [Item style](#item-style)).
+- **Customizable**: size, colors, text, icons, blur, shadows and labels7 All of these
+  and more can be set once for the whole app with a global theme or in each individual
+  menu. Also you can customize individual items in the menu.
 
-The [example app](example/) shows
-every feature in a files app, a chat, a gallery of styles and a lab of edge cases.
+The [example app](example/) shows every feature of all of the above. It includes a files
+app, a chat, a gallery of styles and a lab of edge cases. 
 
 ## Contents
 
