@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <!--
     If you are serving your web app in a path other than the root, change the
@@ -51,6 +51,16 @@
   <title>smart_context_menu — live demo</title>
   <link rel="manifest" href="manifest.json">
 
+  <script>
+    // Keep English visible if scripts are disabled or translation fails.
+    if (new URLSearchParams(location.search).get('lang') === 'ru') {
+      document.documentElement.classList.add('i18n-pending');
+      document.addEventListener('DOMContentLoaded', () => {
+        document.documentElement.classList.remove('i18n-pending');
+      }, { once: true });
+    }
+  </script>
+
   <style>
     /* The page is dark in the colors of NothingWorks, the site the demo is
        shown on; the app has its own theme, set with the gear. */
@@ -82,6 +92,12 @@
 
     .about {
       display: none;
+    }
+
+    /* Hide the English shell until its Russian text is in place. */
+    html.i18n-pending .about,
+    html.i18n-pending #splash {
+      visibility: hidden;
     }
 
     /* Shown while the app loads, in the colors of NothingWorks. */
@@ -375,24 +391,24 @@
     <div class="about-content">
       <section>
         <h1>smart_context_menu <span class="version">1.0.0</span></h1>
-        <p class="lead">
+        <p class="lead" data-i18n="lead">
           A powerful, fully customizable iOS-style context menu for Flutter:
           smart positioning, fluid animations, drag-to-select, rich submenus
           (async, paginated) and your own content above the widget.
         </p>
         <ul class="features">
-          <li>Liquid stretch under the finger</li>
-          <li>A preview that glides up to make room</li>
-          <li>Async and paginated submenus</li>
-          <li>Loading, error with retry and empty states</li>
-          <li>Listenable items that update in the open menu</li>
+          <li data-i18n="featureStretch">Liquid stretch under the finger</li>
+          <li data-i18n="featurePreview">A preview that glides up to make room</li>
+          <li data-i18n="featureSubmenus">Async and paginated submenus</li>
+          <li data-i18n="featureStates">Loading, error with retry and empty states</li>
+          <li data-i18n="featureListenable">Listenable items that update in the open menu</li>
         </ul>
       </section>
       <section>
-        <h2>Add it to your app</h2>
+        <h2 data-i18n="addToApp">Add it to your app</h2>
         <div class="command">
           <code>flutter pub add smart_context_menu</code>
-          <button class="copy" type="button" title="Copy" aria-label="Copy">
+          <button class="copy" type="button" title="Copy" aria-label="Copy" data-i18n-title="copy">
             <svg class="idle" width="16" height="16" viewBox="0 0 24 24"
               fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -406,11 +422,11 @@
             </svg>
           </button>
         </div>
-        <p class="or">or in <code class="inline">pubspec.yaml</code>:</p>
+        <p class="or"><span data-i18n="orIn">or in</span> <code class="inline">pubspec.yaml</code>:</p>
         <div class="command multiline">
           <code>dependencies:
   smart_context_menu: ^1.0.0</code>
-          <button class="copy" type="button" title="Copy" aria-label="Copy">
+          <button class="copy" type="button" title="Copy" aria-label="Copy" data-i18n-title="copy">
             <svg class="idle" width="16" height="16" viewBox="0 0 24 24"
               fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -425,47 +441,47 @@
           </button>
         </div>
         <p>
-          <a href="https://pub.dev/packages/smart_context_menu">Package on pub.dev</a>
+          <a href="https://pub.dev/packages/smart_context_menu" data-i18n="packageLink">Package on pub.dev</a>
           ·
-          <a href="https://github.com/BinaryRift/smart_context_menu">Source on GitHub</a>
+          <a href="https://github.com/BinaryRift/smart_context_menu" data-i18n="sourceLink">Source on GitHub</a>
         </p>
       </section>
       <section>
         <a class="brand" href="https://thenothingworks.dev/">
           <img src="favicon.svg" width="24" height="24" alt="">
-          The NothingWorks project
+          <span data-i18n="brand">The NothingWorks project</span>
         </a>
       </section>
     </div>
   </aside>
   <aside class="about about-right">
     <div class="about-content">
-      <h2>Try it</h2>
+      <h2 data-i18n="tryIt">Try it</h2>
 
-      <h3>Everywhere</h3>
+      <h3 data-i18n="everywhere">Everywhere</h3>
       <ul>
-        <li>Long press any file, message or card to open its menu.</li>
-        <li>Slide across the items and release on one.</li>
-        <li>Slide slowly past the edges: the menu stretches towards the finger.</li>
-        <li>Swipe right in a submenu to go back, as in iOS.</li>
-        <li>Tap the preview to open the file or the photo; photos fly there with their own Hero.</li>
+        <li data-i18n="hintLongPress">Long press any file, message or card to open its menu.</li>
+        <li data-i18n="hintSelect">Slide across the items and release on one.</li>
+        <li data-i18n="hintStretch">Slide slowly past the edges: the menu stretches towards the finger.</li>
+        <li data-i18n="hintSwipe">Swipe right in a submenu to go back, as in iOS.</li>
+        <li data-i18n="hintPreview">Tap the preview to open the file or the photo; photos fly there with their own Hero.</li>
       </ul>
 
       <h3>Files</h3>
       <ul>
-        <li>The ⋯ button in a row opens the same menu.</li>
-        <li>Move to loads the folders when it opens.</li>
-        <li>Tap Download: the progress shows in the open menu.</li>
+        <li data-i18n="hintFilesButton">The ⋯ button in a row opens the same menu.</li>
+        <li data-i18n="hintMoveTo">Move to loads the folders when it opens.</li>
+        <li data-i18n="hintDownload">Tap Download: the progress shows in the open menu.</li>
       </ul>
 
       <h3>Chat</h3>
       <ul>
-        <li>Tap a reaction above a message.</li>
-        <li>Open Reactions of the lake photo: people load as you scroll.</li>
-        <li>Double tap next to a message to open its menu.</li>
+        <li data-i18n="hintReaction">Tap a reaction above a message.</li>
+        <li data-i18n="hintReactions">Open Reactions of the lake photo: people load as you scroll.</li>
+        <li data-i18n="hintDoubleTap">Double tap next to a message to open its menu.</li>
       </ul>
 
-      <p class="note">
+      <p class="note" data-i18n="note">
         Appearance shows the menu in other styles. The gear sets the theme,
         haptics and slow animations.
       </p>
@@ -475,22 +491,73 @@
     <div id="splash">
       <img src="favicon.svg" width="56" height="56" alt="">
       <h1>smart_context_menu</h1>
-      <p>A powerful, fully customizable iOS-style context menu for Flutter.</p>
+      <p data-i18n="splashDescription">A powerful, fully customizable iOS-style context menu for Flutter.</p>
       <div class="progress"></div>
-      <div class="brand">The NothingWorks project</div>
+      <div class="brand" data-i18n="brand">The NothingWorks project</div>
     </div>
   </div>
   <script>
+    const ru = {
+      lead: 'Контекстное меню в стиле iOS для Flutter: умное позиционирование, плавные анимации, drag-to-select, асинхронные и постраничные подменю и свой контент над виджетом.',
+      featureStretch: 'Меню тянется за пальцем',
+      featurePreview: 'Превью плавно поднимается, освобождая место',
+      featureSubmenus: 'Асинхронные подменю и пагинация',
+      featureStates: 'Загрузка, ошибки с повтором и пустые состояния',
+      featureListenable: 'Пункты обновляются прямо в открытом меню',
+      addToApp: 'Добавьте в приложение',
+      orIn: 'или в',
+      packageLink: 'Пакет на pub.dev',
+      sourceLink: 'Исходный код на GitHub',
+      brand: 'Проект The NothingWorks',
+      tryIt: 'Попробуйте',
+      everywhere: 'Везде',
+      hintLongPress: 'Удерживайте файл, сообщение или карточку, чтобы открыть меню.',
+      hintSelect: 'Проведите по пунктам и отпустите палец на нужном.',
+      hintStretch: 'Медленно проведите за край меню: оно потянется за пальцем.',
+      hintSwipe: 'Свайпните вправо в подменю, чтобы вернуться назад, как в iOS.',
+      hintPreview: 'Нажмите превью, чтобы открыть файл или фото. Фото перейдёт на экран со своим Hero.',
+      hintFilesButton: 'Кнопка ⋯ в строке открывает то же меню.',
+      hintMoveTo: 'Пункт Move to загружает папки при открытии.',
+      hintDownload: 'Нажмите Download: прогресс появится прямо в открытом меню.',
+      hintReaction: 'Нажмите реакцию над сообщением.',
+      hintReactions: 'Откройте Reactions у фото озера: люди подгружаются при прокрутке.',
+      hintDoubleTap: 'Дважды нажмите рядом с сообщением, чтобы открыть его меню.',
+      note: 'На вкладке Appearance меню показано в других стилях. Шестерёнка меняет тему, тактильный отклик и скорость анимаций.',
+      splashDescription: 'Гибко настраиваемое контекстное меню в стиле iOS для Flutter.',
+      copy: 'Копировать',
+      copied: 'Скопировано',
+    };
+
+    if (document.documentElement.classList.contains('i18n-pending')) {
+      for (const element of document.querySelectorAll('[data-i18n]')) {
+        element.textContent = ru[element.dataset.i18n] ?? element.textContent;
+      }
+      for (const button of document.querySelectorAll('[data-i18n-title]')) {
+        const label = ru[button.dataset.i18nTitle];
+        button.title = label;
+        button.setAttribute('aria-label', label);
+      }
+      document.querySelector('.about-left .brand').href = 'https://thenothingworks.dev/ru/';
+      document.documentElement.lang = 'ru';
+      document.documentElement.classList.remove('i18n-pending');
+    }
+
+    const copyLabels = document.documentElement.lang === 'ru'
+      ? { copy: ru.copy, copied: ru.copied }
+      : { copy: 'Copy', copied: 'Copied' };
+
     // Copies the command next to the button and shows a tick for a moment.
     for (const button of document.querySelectorAll('.copy')) {
       button.addEventListener('click', async () => {
         const command = button.parentElement.querySelector('code').textContent;
         await navigator.clipboard.writeText(command);
         button.classList.add('is-copied');
-        button.title = 'Copied';
+        button.title = copyLabels.copied;
+        button.setAttribute('aria-label', copyLabels.copied);
         setTimeout(() => {
           button.classList.remove('is-copied');
-          button.title = 'Copy';
+          button.title = copyLabels.copy;
+          button.setAttribute('aria-label', copyLabels.copy);
         }, 1500);
       });
     }
