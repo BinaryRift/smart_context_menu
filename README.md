@@ -212,36 +212,35 @@ SmartContextMenu(
 
 <img src="doc/gifs/positioning.png" width="600" alt="Menus lined up with the left edge, the center and the right edge of a file, and a file row moved up to fit its submenu, in the dark theme">
 
-*In the dark theme: the menu lines up with the left edge of the widget, its center or its right
-edge, and a widget low on the screen moves up just enough to fit the menu, here a submenu.*
+*In the dark theme: the menu is positioned to the left, center or right of the widget. If the widget is low on the screen, it will be moved up only as much as needed to fit the menu and the submenu.*
 
-The menu opens right below the pressed widget, and the widget stays exactly where it was.
-It moves up only when the widget and the menu together do not fit below it, and only as far
-as needed. Horizontally, the menu lines up with the widget's left or right edge, or centers
-under it, depending on where the widget is on the screen. If there is no room for the menu
-at the widget's edge, it moves towards the middle of the screen; on a screen narrower than
-the menu, it gets narrower. [Header slivers](#header-slivers)
-are shown right above the widget; if there is no room for them, the widget and the menu
-move down. If they do not fit on the screen together, the widget and the menu take priority:
-the slivers scroll out at the top.
+The menu will be shown directly below the pressed widget, which stays in place.
+The widget moves up only if the menu and the widget together take up too much space. The widget is moved up by the smallest distance required to fit the menu. 
+In the horizontal direction, the menu will be positioned to the left or right edge of the widget, or centered below the widget, depending on where the widget is on the screen. If there is no room for the menu to the left or right edge of the widget, the menu will be moved towards the middle of the screen.
+If the screen is not wide enough to show the full menu, the menu will be made narrower. [Header slivers](#header-slivers) will be positioned directly above the widget preview. If there is no room for them, the widget (and its menu) is moved down. If the widget, the menu and the slivers together take up too much space, the widget and the menu have priority and the slivers scroll away at the top of the screen.
 
-- **Shorter menus.** When the menu gets shorter, for example after returning from a submenu,
-  it stays where it is, so it stays under the finger: the parent menu starts where the back
-  item was. Set `moveBackDown: true` in `SmartContextMenuConfig` to move the widget back down
-  instead; it never goes below its place.
-- **Tall widgets.** If the widget and the menu do not fit on the screen even after moving,
-  they can be scrolled together, so every part of the widget and the menu stays reachable.
-- **Long menus.** The menu is never taller than a part of the screen set by
-  `SmartContextMenuConfig.menuHeightFactor` (60% by default); items that do not fit scroll
-  inside the menu and are built only when they scroll into view.
 
-`screenPadding` in `SmartContextMenuConfig` sets the distance to the screen edges, on top
-of the safe area such as the status bar or the notch in landscape. `menuGap` sets the distance
-between the widget and the menu.
+- **Shorter menus.** If the menu is shorter than before (for instance when leaving a
+  submenu), it won't be moved upward but it will stay under the finger, with the parent
+  menu starting where the back item was before. You can configure the menu to move back
+  down, but not below the original position of the widget using `moveBackDown: true` in
+  the [configuration](#configuration) `SmartContextMenuConfig`.
 
-The place of the widget and its snapshot are taken when the menu opens. If the screen size
-changes while it is open, for example when the device turns or a window is resized, the menu
-closes without an action, as the system menu of iOS does.
+- **Tall widgets.** If the widget and the menu together, even after being moved, are 
+  still too tall to fit on the screen, it is possible to scroll both of them together.
+  That way, the full content of both the widget and the menu is always reachable.
+
+- **Long menus.** The height of the menu is restricted to a certain fraction of the
+  screen (`SmartContextMenuConfig.menuHeightFactor`, default value: 60%), look at [configuration](#configuration).
+  The rest of the menu items that do not fit on the screen are scrolled inside the menu.
+  Menu items are lazily created when they appear in the visible area.
+
+The menu [configuration](#configuration) also takes two parameters specifying spacing:
+- `screenPadding` specifies the distance to the edges of the screen. This adds to the
+  safe area (like the status bar or landscape notch)
+- `menuGap` specifies the distance between the widget and the menu.
+
+When the menu is opened, the positions of the widget and the snapshot are stored. If the screen size changes while the menu is open (for instance because the phone is turned or the window is resized), the menu will close, without triggering an action. This is consistent with how the system menu in iOS works.
 
 ### Item types
 
