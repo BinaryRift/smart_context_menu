@@ -17,7 +17,8 @@ above the widget.
 
 <br>
 
-**[Try the live demo in your browser →](https://thenothingworks.dev/demo/smart-context-menu/)**
+**[Try the live demo in your browser →](https://thenothingworks.dev/demo/smart-context-menu/)** 
+**[Watch the 56-second overview →](https://www.youtube.com/shorts/l2BbYMxLQy0?feature=share)**
 
 ## Features
 
