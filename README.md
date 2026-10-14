@@ -667,7 +667,8 @@ For a thin line instead of a band, set a small `separatorHeight` and the
 
 ### Opening from code
 
-Pass a `SmartContextMenuController` to open and close the menu from code.
+Create a `SmartContextMenuController()` and pass it to the menu to open and close
+it from code.
 To open the menu only from code, set the activation mode to `manual`. In this mode
 the controller is required: without it, an assert fails in debug builds.
 

@@ -17,6 +17,12 @@ final class SmartContextMenuController extends ChangeNotifier {
   _SmartContextMenuBinding? _binding;
   bool _isOpen = false;
 
+  /// Creates a controller for opening and closing one [SmartContextMenu].
+  ///
+  /// [isOpen] is initially false. Dispose the controller when it is no longer
+  /// needed.
+  SmartContextMenuController();
+
   /// Whether the menu is currently open.
   bool get isOpen => _isOpen;
 
