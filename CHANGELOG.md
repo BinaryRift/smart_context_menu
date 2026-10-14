@@ -1,3 +1,8 @@
+## 1.0.1
+
+* The default menu width is now 250 instead of 280, matching the iOS context menu on iPhone.
+  Set `menuWidth: 280` to keep the previous width.
+
 ## 1.0.0
 
 * Initial release: an iOS-style context menu for Flutter.

@@ -11,7 +11,7 @@ void main() {
     expect(config.enableSwipeBack, isTrue);
     expect(config.barrierDismissible, isTrue);
     expect(config.activationMode, SmartContextMenuActivationMode.longPress);
-    expect(config.menuWidth, 280);
+    expect(config.menuWidth, 250);
     expect(config.menuHeightFactor, 0.6);
     expect(config.screenPadding, SmartContextMenuDefaults.screenPadding);
     expect(config.menuGap, SmartContextMenuDefaults.menuGap);

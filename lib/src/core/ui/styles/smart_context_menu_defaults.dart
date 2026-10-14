@@ -15,7 +15,7 @@ abstract final class SmartContextMenuDefaults {
   // Layout
 
   /// The default of [SmartContextMenuConfig.menuWidth].
-  static const double menuWidth = 280;
+  static const double menuWidth = 250;
 
   /// The default of [SmartContextMenuConfig.menuHeightFactor].
   static const double menuHeightFactor = 0.6;

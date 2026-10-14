@@ -826,7 +826,7 @@ what you need:
 
 ```dart
 const menuConfig = SmartContextMenuConfig(
-  menuWidth: 250,
+  menuWidth: 220,
   enableHaptics: false,
   style: menuStyle,
 );
@@ -838,7 +838,7 @@ const menuConfig = SmartContextMenuConfig(
 | `enableHaptics` | Plays haptic feedback when the menu opens on long press, an item is highlighted or tapped, the preview is tapped, and a submenu opens or closes. | `true` |
 | `barrierDismissible` | Closes the menu on a tap outside the menu, the widget and the [header slivers](#header-slivers). When `false`, the menu closes only from an item, the preview, the header slivers or the controller. | `true` |
 | `enableSwipeBack` | Returns from a submenu on a swipe right, see [Submenu](#submenu). | `true` |
-| `menuWidth` | The width of the menu. On a narrower screen, the menu gets narrower. | 280 |
+| `menuWidth` | The width of the menu. On a narrower screen, the menu gets narrower. | 250 |
 | `menuHeightFactor` | The maximum height of the menu as a part of the screen height, see [Positioning](#positioning). | 0.6 |
 | `screenPadding` | The distance to the screen edges, on top of the safe area. | 16 |
 | `menuGap` | The distance between the widget and the menu. | 12 |

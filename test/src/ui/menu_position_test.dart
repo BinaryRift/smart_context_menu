@@ -149,7 +149,7 @@ void main() {
       return tester.getRect(find.byType(SmartContextMenuView));
     }
 
-    const menuWidth = 280.0;
+    const menuWidth = 250.0;
     const padding = 16.0;
 
     testWidgets('lines up with the widget edge when the menu fits', (
@@ -180,10 +180,10 @@ void main() {
     testWidgets('gets narrower on a screen narrower than the menu', (
       tester,
     ) async {
-      final menu = await openMenuAt(tester, left: 40, screenWidth: 280);
+      final menu = await openMenuAt(tester, left: 40, screenWidth: 240);
 
       expect(menu.left, padding);
-      expect(menu.right, 280 - padding);
+      expect(menu.right, 240 - padding);
     });
 
     const notch = FakeViewPadding(left: 47, right: 47);

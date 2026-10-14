@@ -817,7 +817,7 @@ SmartContextMenu(
 
 ```dart
 const menuConfig = SmartContextMenuConfig(
-  menuWidth: 250,
+  menuWidth: 220,
   enableHaptics: false,
   style: menuStyle,
 );
@@ -829,7 +829,7 @@ const menuConfig = SmartContextMenuConfig(
 | `enableHaptics` | Haptics при открытии меню долгим нажатием, подсветке и тапе по пункту, тапе по превью, открытии и закрытии подменю. | `true` |
 | `barrierDismissible` | Закрывать ли меню по тапу вне меню, виджета и [контента над ним](#контент-над-виджетом). С `false` меню закрывается только пунктом, превью, контентом над виджетом или контроллером. | `true` |
 | `enableSwipeBack` | Возврат из подменю свайпом вправо, см. [Подменю](#подменю). | `true` |
-| `menuWidth` | Ширина меню. На экране уже меню оно сужается. | 280 |
+| `menuWidth` | Ширина меню. На экране уже меню оно сужается. | 250 |
 | `menuHeightFactor` | Максимальная высота меню как доля высоты экрана, см. [Позиционирование](#позиционирование). | 0.6 |
 | `screenPadding` | Отступ от краёв экрана поверх safe area. | 16 |
 | `menuGap` | Расстояние между виджетом и меню. | 12 |

@@ -40,7 +40,7 @@ const compactStyle = SmartContextMenuStyle(
   defaultIconSize: 16,
 );
 
-const compactMenuWidth = 220.0;
+const compactMenuWidth = 200.0;
 
 /// Thin lines between items that start under the titles, as in the lists
 /// of iOS: the item padding of 16, the icon of 24 and the gap of 12.
