@@ -114,18 +114,23 @@ app, a chat, a gallery of styles and a lab of edge cases.
 ## Why not `CupertinoContextMenu`?
 
 `CupertinoContextMenu` from Flutter opens a list of actions on a long press.
-This package keeps that gesture and adds what apps often need on top of it:
+This package keeps the long-press gesture and introduces features commonly 
+required by apps:
 
-- submenus, also loaded asynchronously or page by page;
-- drag-to-select across the items;
-- a menu and a preview that move as one: a liquid stretch under the finger, smooth changes
-  of height and a preview that glides up to make room for the menu;
-- your own slivers above the widget, such as a reactions bar;
-- opening and closing from code;
-- full control over the look: a theme for all menus, and a style for the colors, text, blur,
-  shadows and content of items;
-- full control over the behavior: the width and height of the menu, its distances to the widget
-  and the screen edges, haptics, closing on a tap outside and swipe back.
+- Submenus (either asynchronous or paginated).
+- Drag-to-select across the items.
+- Visual connection between the menu and the preview with a liquid stretching effect 
+  under the user's finger.
+- A smooth height animation and a smooth upward gliding animation for the preview as 
+  the menu is opened.
+- Ability to place **custom slivers** above the widget (e.g. a reactions bar).
+- Ability to open and close the widget programmatically.
+- Full control over the appearance: a unified theme for all menus (also for specific
+  menus) and a style for the colors, text, blur, shadows. Defining styles for items. 
+  And custom item content.
+- Full control over the interaction with the menu with control of the menu's width and
+  height, distance to the widget and screen edges, haptic feedback and opening or
+  closing on tap outside or a swipe back gesture.
 
 ## Getting started
 
