@@ -8,7 +8,7 @@ topics:
   - menu
   - popup
   - overlay
-  - cupertino
+  - chat-context-menu
 screenshots:
   - description: "A long press opens the menu of a file, and a finger slides across the items to select one."
     path: doc/gifs/open_and_select.gif
