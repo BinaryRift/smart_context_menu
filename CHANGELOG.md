@@ -3,6 +3,7 @@
 * The default menu width is now 250 instead of 280, matching the iOS context menu on iPhone.
   Set `menuWidth: 280` to keep the previous width.
 * The web demo now shows Russian instructions and a Russian loading screen with `?lang=ru`.
+* Improved the READMEs and API documentation, and added a minimal pub.dev example.
 
 ## 1.0.0
 
