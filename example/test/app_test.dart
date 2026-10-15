@@ -113,6 +113,29 @@ void main() {
     expect(brightness(), Brightness.dark);
   });
 
+  testWidgets('the RTL setting applies to the app and menu route', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const ExampleApp());
+    await openSettings(tester);
+
+    await tester.tap(switchOf('RTL layout'));
+    await tester.pumpAndSettle();
+    expect(find.text('Swipe left in a submenu to go back'), findsOneWidget);
+    expect(
+      Directionality.of(tester.element(find.byType(FilesPage))),
+      TextDirection.rtl,
+    );
+
+    await tester.tap(find.text('Done'));
+    await tester.pumpAndSettle();
+    await tester.openMenu(find.text('Contract.pdf').first);
+    expect(
+      Directionality.of(tester.element(find.text('Share'))),
+      TextDirection.rtl,
+    );
+  });
+
   testWidgets('a Lab card opens its menu', (tester) async {
     await tester.pumpWidget(const ExampleApp());
     await tester.tap(find.text('Lab'));

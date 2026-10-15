@@ -5,7 +5,7 @@
 * The web demo now shows Russian instructions and a Russian loading screen with `?lang=ru`.
 * Improved the READMEs and API documentation, and added a minimal pub.dev example.
 * In RTL, submenus now enter from the left, swipe back moves left, and the default navigation
-  chevrons point in the matching direction.
+  chevrons point in the matching direction. The example app has an RTL layout switch.
 
 ## 1.0.0
 

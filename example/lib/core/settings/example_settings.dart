@@ -11,6 +11,7 @@ final class ExampleSettings extends ChangeNotifier {
   bool _moveBackDown = false;
   bool _slowAnimations = false;
   bool _showTouches = false;
+  bool _useRtl = false;
 
   ThemeMode get themeMode => _themeMode;
   set themeMode(ThemeMode value) => _update(() => _themeMode = value);
@@ -34,6 +35,10 @@ final class ExampleSettings extends ChangeNotifier {
   /// Whether a circle is shown under every finger, for screen recordings.
   bool get showTouches => _showTouches;
   set showTouches(bool value) => _update(() => _showTouches = value);
+
+  /// Whether the example app uses right-to-left layout.
+  bool get useRtl => _useRtl;
+  set useRtl(bool value) => _update(() => _useRtl = value);
 
   /// The brightness of the app theme, `null` to follow the system.
   Brightness? get brightness => switch (_themeMode) {

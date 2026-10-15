@@ -70,9 +70,17 @@ final class SettingsSheet extends StatelessWidget {
                 ),
                 _buildSwitch(
                   title: 'Swipe back',
-                  subtitle: 'Swipe right in a submenu to go back',
+                  subtitle: settings.useRtl
+                      ? 'Swipe left in a submenu to go back'
+                      : 'Swipe right in a submenu to go back',
                   value: settings.enableSwipeBack,
                   onChanged: (value) => settings.enableSwipeBack = value,
+                ),
+                _buildSwitch(
+                  title: 'RTL layout',
+                  subtitle: 'Preview the app in right-to-left layout',
+                  value: settings.useRtl,
+                  onChanged: (value) => settings.useRtl = value,
                 ),
                 _buildSwitch(
                   title: 'Move back down',

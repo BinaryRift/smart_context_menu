@@ -62,7 +62,7 @@ You can find all these effects in [Animations](#animations).
 - **Submenus** can be static, or loaded asynchronously or paginated. They have a back
   navigation item, and support swipe back.
 - **RTL submenus**: transitions, swipe back and the default navigation chevrons follow
-  the reading direction.
+  the reading direction. The example app has an RTL layout switch to try them.
 - **Async items** can have loading, error and empty states, and can be retried on
   failure. All these elements have the same appearance throughout the menu.
 - **Lazy lists**: items are only built as they appear on scroll. Async items only start
