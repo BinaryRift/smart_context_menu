@@ -7,12 +7,12 @@ import 'package:smart_context_menu/smart_context_menu.dart';
 import '../../helpers/menu_tester.dart';
 
 extension on WidgetTester {
-  /// Drags [target] right by [distance] slowly, so the release has no speed.
+  /// Drags [target] by [distance] slowly (negative is left), with no release speed.
   Future<void> slowSwipe(Finder target, double distance) async {
     final gesture = await startGesture(getCenter(target));
-    const step = 25.0;
-    for (var moved = 0.0; moved < distance; moved += step) {
-      await gesture.moveBy(const Offset(step, 0));
+    final step = 25.0 * distance.sign;
+    for (var moved = 0.0; moved < distance.abs(); moved += step.abs()) {
+      await gesture.moveBy(Offset(step, 0));
       await pump(const Duration(milliseconds: 50));
     }
     await pump(const Duration(milliseconds: 300));
@@ -43,8 +43,13 @@ void main() {
   Future<void> openSubmenu(
     WidgetTester tester, {
     SmartContextMenuConfig config = const SmartContextMenuConfig(),
+    TextDirection textDirection = TextDirection.ltr,
   }) async {
-    await tester.pumpMenu(items: submenu(), config: config);
+    await tester.pumpMenu(
+      items: submenu(),
+      config: config,
+      textDirection: textDirection,
+    );
     await tester.openMenu();
     await tester.tap(find.text('More'));
     await tester.settleMenu();
@@ -61,6 +66,19 @@ void main() {
     expect(find.text('Child'), findsNothing);
     expect(find.text('More'), findsOneWidget);
     expect(taps, isEmpty);
+  });
+
+  testWidgets('in RTL a left swipe returns and a right swipe does not', (
+    tester,
+  ) async {
+    await openSubmenu(tester, textDirection: TextDirection.rtl);
+
+    await tester.slowSwipe(find.text('Child'), 200);
+    expect(find.text('Child'), findsOneWidget);
+
+    await tester.slowSwipe(find.text('Child'), -200);
+    expect(find.text('Child'), findsNothing);
+    expect(find.text('More'), findsOneWidget);
   });
 
   testWidgets('a short swipe stays in the submenu', (tester) async {

@@ -16,6 +16,38 @@ void main() {
     expect(tester.slideOf('Root'), lessThan(0));
   });
 
+  testWidgets(
+    'in RTL a submenu enters from the left and the parent moves right',
+    (tester) async {
+      await tester.pumpWidget(
+        levelSwitcher(
+          'Root',
+          isForward: true,
+          textDirection: TextDirection.rtl,
+        ),
+      );
+      await tester.pumpWidget(
+        levelSwitcher(
+          'Submenu',
+          isForward: true,
+          textDirection: TextDirection.rtl,
+        ),
+      );
+      await tester.pumpHalfway();
+
+      expect(tester.slideOf('Submenu'), lessThan(0));
+      expect(tester.slideOf('Root'), greaterThan(0));
+
+      final clip = tester.clipOf('Root');
+      final width = tester
+          .getSize(find.byType(SmartContextMenuLevelSwitcher))
+          .width;
+      final rect = clip.clipper!.getClip(clip.size);
+      expect(rect.width, moreOrLessEquals(-tester.slideOf('Submenu') * width));
+      expect(rect.right, width);
+    },
+  );
+
   testWidgets('a nested submenu pushes its parent to the left', (tester) async {
     await tester.pumpWidget(levelSwitcher('Root', isForward: true));
     await tester.pumpWidget(levelSwitcher('Submenu', isForward: true));
@@ -44,6 +76,39 @@ void main() {
     expect(find.text('Submenu'), findsNothing);
     expect(tester.slideOf('Root'), 0);
   });
+
+  testWidgets(
+    'in RTL going back moves the submenu left and parent in from right',
+    (tester) async {
+      await tester.pumpWidget(
+        levelSwitcher(
+          'Root',
+          isForward: true,
+          textDirection: TextDirection.rtl,
+        ),
+      );
+      await tester.pumpWidget(
+        levelSwitcher(
+          'Submenu',
+          isForward: true,
+          textDirection: TextDirection.rtl,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.pumpWidget(
+        levelSwitcher(
+          'Root',
+          isForward: false,
+          textDirection: TextDirection.rtl,
+        ),
+      );
+      await tester.pumpHalfway();
+
+      expect(tester.slideOf('Submenu'), lessThan(0));
+      expect(tester.slideOf('Root'), greaterThan(0));
+    },
+  );
 
   testWidgets('a submenu covers its parent: the parent shows only to its '
       'left, and the submenu does not fade', (tester) async {

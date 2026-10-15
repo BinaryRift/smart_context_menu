@@ -93,8 +93,8 @@ sealed class SmartContextMenuListenableResult
 /// you switch on items.
 ///
 /// A submenu replaces the current menu and shows a back item at the top.
-/// Tapping the back item or swiping right returns to the parent menu,
-/// see [SmartContextMenuConfig.enableSwipeBack].
+/// Tapping the back item or swiping right in LTR (left in RTL) returns to the
+/// parent menu; see [SmartContextMenuConfig.enableSwipeBack].
 ///
 /// ```dart
 /// SmartContextMenuItem.submenu(

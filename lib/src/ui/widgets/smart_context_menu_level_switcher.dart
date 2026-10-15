@@ -9,15 +9,15 @@ import '../../core/ui/motion/transitions/fade_slide_transition.dart';
 import '../state/smart_context_menu_level_entry.dart';
 import 'smart_context_menu_level_stack.dart';
 
-/// Switches menu levels: a submenu slides in from the right over the
-/// current level, which moves to the left; going back, the submenu slides
-/// away to the right and the parent comes out from under it. The submenu
-/// stays opaque and the level under it shows only to its left, as in
-/// a swipe back.
+/// Switches menu levels: a submenu slides in from the trailing side over the
+/// current level, which moves towards the leading side. Going back reverses
+/// the movement. The submenu stays opaque and the level under it shows only
+/// on the leading side, as in a swipe back.
 ///
-/// With [enableSwipeBack] and a [previous] level, swiping right drags
-/// the current level away and reveals [previous]. If the swipe goes far
-/// or fast enough, [onSwipeBack] is called once released.
+/// With [enableSwipeBack] and a [previous] level, swiping towards the trailing
+/// side (right in LTR, left in RTL) drags the current level away and reveals
+/// [previous]. If the swipe goes far or fast enough, [onSwipeBack] is called
+/// once released.
 ///
 /// The height follows the transitions: it moves from the height of one
 /// level to the other along with the levels. A change of height inside
@@ -67,8 +67,8 @@ final class _SmartContextMenuLevelSwitcherState
   /// The parent level revealed by a swipe back.
   SmartContextMenuLevelEntry? _swipeParent;
 
-  /// While the levels move, [_revealed] is visible only to the left of
-  /// [_cover], as if [_cover] were opaque.
+  /// While the levels move, [_revealed] is visible only beside [_cover],
+  /// as if [_cover] were opaque.
   SmartContextMenuLevelEntry? _revealed;
   SmartContextMenuLevelEntry? _cover;
   bool _isTracking = false;
@@ -78,13 +78,16 @@ final class _SmartContextMenuLevelSwitcherState
 
   bool get _canSwipe => widget.enableSwipeBack && widget.previous != null;
 
+  int get _direction =>
+      Directionality.of(context) == TextDirection.rtl ? -1 : 1;
+
+  Offset _directed(Offset offset) => Offset(offset.dx * _direction, offset.dy);
+
   @override
   void initState() {
     super.initState();
-    _current = _createEntry(
-      widget.child,
-      enterFrom: MotionSlide.rightHalf.offset,
-    )..controller.value = 1;
+    _current = _createEntry(widget.child, enterFrom: MotionSlide.none.offset)
+      ..controller.value = 1;
   }
 
   @override
@@ -113,21 +116,22 @@ final class _SmartContextMenuLevelSwitcherState
 
   /// Replaces the current level with [child]: a submenu slides in over
   /// the current level without fading, and the current level moves aside
-  /// by half and fades; going back, the other way round, as in a swipe
-  /// back.
+  /// by half and fades; going back reverses the movement.
   void _switchTo(Widget child, {required bool isForward}) {
     final leaving = _current;
     final hidden = leaving.leave(
-      isForward ? MotionSlide.leftHalf.offset : MotionSlide.right.offset,
+      _directed(
+        isForward ? MotionSlide.leftHalf.offset : MotionSlide.right.offset,
+      ),
       fades: isForward,
     );
     _removeWhenHidden(leaving, hidden);
 
     final entering = _createEntry(
       child,
-      enterFrom: isForward
-          ? MotionSlide.right.offset
-          : MotionSlide.leftHalf.offset,
+      enterFrom: _directed(
+        isForward ? MotionSlide.right.offset : MotionSlide.leftHalf.offset,
+      ),
       fades: !isForward,
     );
     final shown = entering.controller.forward();
@@ -140,7 +144,7 @@ final class _SmartContextMenuLevelSwitcherState
     }
   }
 
-  /// Shows [revealed] only to the left of [cover] until [done] completes,
+  /// Shows [revealed] only beside [cover] until [done] completes,
   /// unless another level covers before that.
   void _coverUntil(
     TickerFuture done, {
@@ -273,9 +277,12 @@ final class _SmartContextMenuLevelSwitcherState
 
     final parent = _createEntry(
       previous,
-      enterFrom: MotionSlide.leftHalf.offset,
-    )..track(hiddenOffset: MotionSlide.leftHalf.offset, fades: true);
-    _current.track(hiddenOffset: MotionSlide.right.offset, fades: false);
+      enterFrom: _directed(MotionSlide.leftHalf.offset),
+    )..track(hiddenOffset: _directed(MotionSlide.leftHalf.offset), fades: true);
+    _current.track(
+      hiddenOffset: _directed(MotionSlide.right.offset),
+      fades: false,
+    );
 
     setState(() {
       _swipeParent = parent;
@@ -292,7 +299,7 @@ final class _SmartContextMenuLevelSwitcherState
     final parent = _swipeParent;
     if (!_isTracking || parent == null) return;
 
-    final delta = (details.primaryDelta ?? 0) / _swipeWidth;
+    final delta = (details.primaryDelta ?? 0) * _direction / _swipeWidth;
     _swipeProgress = (_swipeProgress + delta).clamp(0.0, 1.0);
     _current.controller.value = 1 - _swipeProgress;
     parent.controller.value = _swipeProgress;
@@ -301,7 +308,7 @@ final class _SmartContextMenuLevelSwitcherState
   void _onSwipeEnd(DragEndDetails details) {
     if (!_isTracking) return;
 
-    final velocity = (details.primaryVelocity ?? 0) / _swipeWidth;
+    final velocity = (details.primaryVelocity ?? 0) * _direction / _swipeWidth;
     const threshold = GestureThresholds.swipeBackVelocity;
     final goBack =
         velocity >= threshold ||
@@ -356,8 +363,8 @@ final class _SmartContextMenuLevelSwitcherState
   }
 }
 
-/// Clips to the part of the level stack left of a covering level that
-/// slides right by [cover], a fraction of its width.
+/// Clips to the part of the level stack exposed by a covering level that
+/// slides horizontally by [cover], a fraction of its width.
 final class _UncoveredClipper extends CustomClipper<Rect> {
   final Animation<Offset> cover;
 
@@ -365,8 +372,14 @@ final class _UncoveredClipper extends CustomClipper<Rect> {
 
   @override
   Rect getClip(Size size) {
-    final visible = cover.value.dx.clamp(0.0, 1.0);
-    return Rect.fromLTWH(0, 0, size.width * visible, size.height);
+    final shift = cover.value.dx.clamp(-1.0, 1.0);
+    final visible = size.width * shift.abs();
+    return Rect.fromLTWH(
+      shift < 0 ? size.width - visible : 0,
+      0,
+      visible,
+      size.height,
+    );
   }
 
   @override

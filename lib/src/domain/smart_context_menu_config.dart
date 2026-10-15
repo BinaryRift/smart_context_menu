@@ -38,7 +38,8 @@ final class SmartContextMenuConfig {
   /// Defaults to true.
   final bool enableHaptics;
 
-  /// Whether swiping right on a submenu returns to the parent level.
+  /// Whether swiping right in LTR or left in RTL on a submenu returns to
+  /// the parent level.
   ///
   /// The submenu follows the finger and slides back in place if the swipe
   /// is short and slow. The back item works either way. Defaults to true.

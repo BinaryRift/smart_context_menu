@@ -1,6 +1,8 @@
-import 'package:flutter/cupertino.dart' show CupertinoDynamicColor;
+import 'package:flutter/cupertino.dart'
+    show CupertinoDynamicColor, CupertinoIcons;
 import 'package:flutter/widgets.dart';
 
+import '../../../core/ui/styles/smart_context_menu_defaults.dart';
 import '../../../domain/smart_context_menu_item.dart';
 import '../../../domain/smart_context_menu_style.dart';
 
@@ -82,7 +84,10 @@ final class SmartContextMenuItemRow extends StatelessWidget {
             if (hasSubmenu) ...[
               gap,
               Icon(
-                style.submenuIcon,
+                style.submenuIcon == SmartContextMenuDefaults.submenuIcon &&
+                        Directionality.of(context) == TextDirection.rtl
+                    ? CupertinoIcons.chevron_back
+                    : style.submenuIcon,
                 size: style.defaultIconSize,
                 color: isDisabled
                     ? CupertinoDynamicColor.resolve(

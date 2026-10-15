@@ -14,10 +14,13 @@ extension MenuTester on WidgetTester {
     SmartContextMenuController? controller,
     Brightness? brightness,
     VoidCallback? onPreviewTap,
+    TextDirection textDirection = TextDirection.ltr,
   }) {
     return pumpWidget(
       CupertinoApp(
         theme: CupertinoThemeData(brightness: brightness),
+        builder: (context, child) =>
+            Directionality(textDirection: textDirection, child: child!),
         home: Center(
           child: SmartContextMenu(
             items: items,

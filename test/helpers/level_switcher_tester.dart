@@ -5,9 +5,13 @@ import 'package:smart_context_menu/src/core/ui/motion/tokens/motion_durations.da
 import 'package:smart_context_menu/src/ui/widgets/smart_context_menu_level_switcher.dart';
 
 /// A switcher showing [level]; pump it again with another level to switch.
-Widget levelSwitcher(String level, {required bool isForward}) {
+Widget levelSwitcher(
+  String level, {
+  required bool isForward,
+  TextDirection textDirection = TextDirection.ltr,
+}) {
   return Directionality(
-    textDirection: TextDirection.ltr,
+    textDirection: textDirection,
     child: SmartContextMenuLevelSwitcher(
       isForward: isForward,
       onSwipeBack: () {},
@@ -17,9 +21,13 @@ Widget levelSwitcher(String level, {required bool isForward}) {
 }
 
 /// Levels named by their depth; a swipe back goes one level up.
-Widget swipeableSwitcher({int depth = 2, bool enableSwipeBack = true}) {
+Widget swipeableSwitcher({
+  int depth = 2,
+  bool enableSwipeBack = true,
+  TextDirection textDirection = TextDirection.ltr,
+}) {
   return Directionality(
-    textDirection: TextDirection.ltr,
+    textDirection: textDirection,
     child: StatefulBuilder(
       builder: (context, setState) => SmartContextMenuLevelSwitcher(
         isForward: false,
@@ -98,12 +106,12 @@ extension LevelSwitcherTester on WidgetTester {
     find.ancestor(of: find.text(level), matching: find.byType(FadeTransition)),
   ).opacity.value;
 
-  /// Drags [level] right by [distance] slowly, so the release has no speed.
+  /// Drags [level] by [distance] slowly (negative is left), with no release speed.
   Future<void> slowSwipe(String level, double distance) async {
     final gesture = await startGesture(getCenter(find.text(level)));
-    const step = 50.0;
-    for (var moved = 0.0; moved < distance; moved += step) {
-      await gesture.moveBy(const Offset(step, 0));
+    final step = 50.0 * distance.sign;
+    for (var moved = 0.0; moved < distance.abs(); moved += step.abs()) {
+      await gesture.moveBy(Offset(step, 0));
       await pump(const Duration(milliseconds: 50));
     }
     await pump(const Duration(milliseconds: 300));

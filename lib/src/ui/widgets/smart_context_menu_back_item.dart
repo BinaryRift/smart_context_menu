@@ -1,6 +1,8 @@
-import 'package:flutter/cupertino.dart' show CupertinoDynamicColor;
+import 'package:flutter/cupertino.dart'
+    show CupertinoDynamicColor, CupertinoIcons;
 import 'package:flutter/widgets.dart';
 
+import '../../core/ui/styles/smart_context_menu_defaults.dart';
 import '../../domain/smart_context_menu_config.dart';
 import '../../domain/smart_context_menu_item.dart';
 import '../keys/service_item_key.dart';
@@ -54,7 +56,10 @@ final class SmartContextMenuBackItem extends StatelessWidget {
             .merge(style.backButtonTitleStyle)
             .copyWith(color: style.backButtonColor),
         leading: Icon(
-          style.backIcon,
+          style.backIcon == SmartContextMenuDefaults.backIcon &&
+                  Directionality.of(context) == TextDirection.rtl
+              ? CupertinoIcons.chevron_forward
+              : style.backIcon,
           size: style.defaultIconSize,
           color: CupertinoDynamicColor.maybeResolve(
             style.backButtonColor ?? style.defaultIconColor,

@@ -17,6 +17,21 @@ void main() {
     expect(find.byIcon(SmartContextMenuDefaults.backIcon), findsWidgets);
   });
 
+  testWidgets('reverses the default navigation chevrons in RTL', (
+    tester,
+  ) async {
+    await tester.pumpMenu(
+      items: submenuItems(),
+      textDirection: TextDirection.rtl,
+    );
+    await tester.openMenu();
+    expect(find.byIcon(CupertinoIcons.chevron_back), findsOneWidget);
+
+    await tester.tap(find.text('More'));
+    await tester.settleMenu();
+    expect(find.byIcon(CupertinoIcons.chevron_forward), findsWidgets);
+  });
+
   testWidgets('applies the submenu and back icons', (tester) async {
     await tester.pumpMenu(
       items: submenuItems(),

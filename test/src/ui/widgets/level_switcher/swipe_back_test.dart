@@ -65,6 +65,45 @@ void main() {
     expect(tester.slideOf('Level 1'), 0);
   });
 
+  testWidgets(
+    'in RTL a left swipe reveals the parent on the right and returns',
+    (tester) async {
+      await tester.pumpWidget(
+        swipeableSwitcher(textDirection: TextDirection.rtl),
+      );
+      final gesture = await tester.startGesture(
+        tester.getCenter(find.text('Level 2')),
+      );
+      await gesture.moveBy(const Offset(-30, 0));
+      await gesture.moveBy(const Offset(-120, 0));
+      await tester.pump();
+
+      expect(tester.slideOf('Level 2'), lessThan(0));
+      final clip = tester.clipOf('Level 1');
+      final rect = clip.clipper!.getClip(clip.size);
+      expect(rect.width, greaterThan(0));
+      expect(rect.right, clip.size.width);
+
+      await gesture.up();
+      await tester.pumpAndSettle();
+      await tester.slowSwipe('Level 2', -500);
+      expect(find.text('Level 2'), findsNothing);
+      expect(tester.slideOf('Level 1'), 0);
+    },
+  );
+
+  testWidgets('in RTL a right swipe does not return to the parent', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      swipeableSwitcher(textDirection: TextDirection.rtl),
+    );
+    await tester.slowSwipe('Level 2', 500);
+
+    expect(find.text('Level 1'), findsNothing);
+    expect(tester.slideOf('Level 2'), 0);
+  });
+
   testWidgets('a short swipe returns the level in place', (tester) async {
     await tester.pumpWidget(swipeableSwitcher());
     await tester.slowSwipe('Level 2', 200);

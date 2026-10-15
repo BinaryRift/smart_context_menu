@@ -48,9 +48,8 @@ above the widget.
 - **No jumps**: the menu smoothly transitions in height as a submenu opens or when
   items are being fetched. If there's not enough space, the preview and menu both
   smoothly glide upwards, leaving space in the process.
-
-- **The swipe back** gesture drags a submenu to the right, underneath your finger. 
-  As it becomes visible, the menu smoothly resizes towards to the original parent menu.
+- **Swipe back** drags the submenu with your finger while the menu smoothly adjusts its
+  height to the parent menu being revealed.
 
 You can find all these effects in [Animations](#animations).
 
@@ -62,6 +61,8 @@ You can find all these effects in [Animations](#animations).
   buttons, while still get highlighted and tapped correctly.
 - **Submenus** can be static, or loaded asynchronously or paginated. They have a back
   navigation item, and support swipe back.
+- **RTL submenus**: transitions, swipe back and the default navigation chevrons follow
+  the reading direction.
 - **Async items** can have loading, error and empty states, and can be retried on
   failure. All these elements have the same appearance throughout the menu.
 - **Lazy lists**: items are only built as they appear on scroll. Async items only start
@@ -317,7 +318,8 @@ SmartContextMenuItem.submenu(
 )
 ```
 
-Tap the back item at the top of the submenu or swipe right to return to the parent menu.
+Tap the back item at the top of the submenu or swipe right in LTR (left in RTL) to return
+to the parent menu.
 The submenu follows the finger and slides back in place if the swipe is short.
 To turn the swipe off, set `enableSwipeBack: false` in `SmartContextMenuConfig`.
 
@@ -837,7 +839,7 @@ const menuConfig = SmartContextMenuConfig(
 | `activationMode` | Opens the menu on long press or only from code, see [Opening from code](#opening-from-code). | `longPress` |
 | `enableHaptics` | Plays haptic feedback when the menu opens on long press, an item is highlighted or tapped, the preview is tapped, and a submenu opens or closes. | `true` |
 | `barrierDismissible` | Closes the menu on a tap outside the menu, the widget and the [header slivers](#header-slivers). When `false`, the menu closes only from an item, the preview, the header slivers or the controller. | `true` |
-| `enableSwipeBack` | Returns from a submenu on a swipe right, see [Submenu](#submenu). | `true` |
+| `enableSwipeBack` | Returns from a submenu on a swipe right in LTR or left in RTL, see [Submenu](#submenu). | `true` |
 | `menuWidth` | The width of the menu. On a narrower screen, the menu gets narrower. | 250 |
 | `menuHeightFactor` | The maximum height of the menu as a part of the screen height, see [Positioning](#positioning). | 0.6 |
 | `screenPadding` | The distance to the screen edges, on top of the safe area. | 16 |
