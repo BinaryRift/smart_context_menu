@@ -946,6 +946,28 @@ const menuStyle = SmartContextMenuStyle(
 
 `menuShadows` заменяет стандартные тени под меню; чтобы убрать тени, передайте пустой список.
 
+`menuDecoration` заменяет стандартный фон и рамку меню. В подменю закреплённый пункт «Назад»
+накладывает `menuColor` и `backButtonBlur` поверх прокручиваемых пунктов. Если фон градиентный,
+полупрозрачный вариант его верхнего цвета позволит градиенту просвечивать сквозь шапку и
+сделает границу менее заметной:
+
+```dart
+const style = SmartContextMenuStyle(
+  menuColor: Color(0xB33634A3),
+  menuDecoration: BoxDecoration(
+    borderRadius: BorderRadius.all(Radius.circular(16)),
+    gradient: LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [Color(0xFF3634A3), Color(0xFF18165F)],
+    ),
+  ),
+);
+```
+
+Градиент на пункт «Назад» сам по себе не продолжается. Сквозь полупрозрачный `menuColor`
+могут слегка проступать прокручиваемые пункты; при необходимости подберите прозрачность.
+
 #### Стиль пунктов
 
 Ещё `SmartContextMenuStyle` задаёт текст, цвета, значки и отступы пунктов, так что меню

@@ -954,6 +954,28 @@ const menuStyle = SmartContextMenuStyle(
 
 `menuShadows` replaces the default shadows under the menu; pass an empty list to remove them.
 
+`menuDecoration` replaces the menu's default background and border. In a submenu, the pinned
+Back item uses `menuColor` and `backButtonBlur` over the scrolling items. With a gradient,
+a partially transparent version of its top color lets the gradient show through the Back
+item and can make the boundary less noticeable:
+
+```dart
+const style = SmartContextMenuStyle(
+  menuColor: Color(0xB33634A3),
+  menuDecoration: BoxDecoration(
+    borderRadius: BorderRadius.all(Radius.circular(16)),
+    gradient: LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [Color(0xFF3634A3), Color(0xFF18165F)],
+    ),
+  ),
+);
+```
+
+The Back item does not continue the gradient itself. Scrolled items may be faintly visible
+through a translucent `menuColor`; adjust its opacity if needed.
+
 #### Item style
 
 `SmartContextMenuStyle` also sets the text, colors, icons and spacing of items, so the menu

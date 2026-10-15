@@ -36,6 +36,9 @@ final class SmartContextMenuStyle {
   /// The background color of the menu and the back item of submenus.
   ///
   /// Ignored for the menu itself when [menuDecoration] is set.
+  /// For a gradient menu, a partially transparent version of its top color
+  /// can let the gradient show through the back item. The back item does not
+  /// inherit the gradient directly.
   /// Defaults to [SmartContextMenuDefaults.menuColor].
   final Color menuColor;
 
@@ -54,8 +57,9 @@ final class SmartContextMenuStyle {
   /// The decoration of the menu.
   ///
   /// Replaces the default decoration built from [menuColor], [borderColor]
-  /// and [borderRadius]. [menuColor] is still used for the back item of
-  /// submenus.
+  /// and [borderRadius]. The pinned back item of a submenu is painted
+  /// separately with [menuColor] and [backButtonBlur] to obscure scrolling
+  /// items beneath it. It does not inherit this decoration.
   final Decoration? menuDecoration;
 
   /// The blur behind the menu.
