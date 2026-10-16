@@ -84,6 +84,24 @@ void main() {
     await tester.pump(demoLoadDelay);
     await tester.settleMenu();
     expect(find.text('Remove from Favorites'), findsOneWidget);
+    expect(find.text('Added Contract.pdf to Favorites'), findsOneWidget);
+  });
+
+  testWidgets('demo-only actions show feedback without changing the file', (
+    tester,
+  ) async {
+    await tester.pumpPhoneApp();
+    await tester.openMenu(contract);
+
+    await tester.tap(find.text('Delete'));
+    await tester.settleMenu();
+
+    expect(find.text('Delete Contract.pdf (demo only)'), findsOneWidget);
+    expect(find.text('Contract.pdf'), findsWidgets);
+
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
+    expect(find.text('Delete Contract.pdf (demo only)'), findsNothing);
   });
 
   testWidgets('Rename is disabled in a read-only file', (tester) async {

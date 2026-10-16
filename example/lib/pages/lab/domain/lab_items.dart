@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
 
 import '../../../core/data/demo_loader.dart';
+import '../../../core/ui/demo_notice.dart';
 import '../../../resources/app_theme/tint_colors.dart';
 
 const _pageCount = 5;
@@ -84,7 +85,14 @@ List<SmartContextMenuItem> listenableItems({
               : CupertinoIcons.heart,
         ),
         closeOnTap: false,
-        onTap: favorite.toggle,
+        onTap: () async {
+          await favorite.toggle();
+          DemoNotice.show(
+            favorite.isFavorite
+                ? 'Added to Favorites'
+                : 'Removed from Favorites',
+          );
+        },
       );
     },
   ),
@@ -96,7 +104,10 @@ List<SmartContextMenuItem> listenableItems({
         isMuted.value ? CupertinoIcons.bell_slash : CupertinoIcons.bell,
       ),
       closeOnTap: false,
-      onTap: () => isMuted.value = !isMuted.value,
+      onTap: () {
+        isMuted.value = !isMuted.value;
+        DemoNotice.show(isMuted.value ? 'Muted' : 'Unmuted');
+      },
     ),
   ),
   SmartContextMenuItem.separator(),
@@ -114,14 +125,20 @@ List<SmartContextMenuItem> listenableItems({
           leading: const Icon(CupertinoIcons.delete),
           isDestructive: true,
           closeOnTap: false,
-          onTap: download.remove,
+          onTap: () {
+            download.remove();
+            DemoNotice.show('Download removed');
+          },
         );
       }
       return SmartContextMenuItem.simple(
         title: 'Download',
         leading: const Icon(CupertinoIcons.cloud_download),
         closeOnTap: false,
-        onTap: download.start,
+        onTap: () {
+          download.start();
+          DemoNotice.show('Download started');
+        },
       );
     },
   ),
@@ -162,7 +179,7 @@ List<SmartContextMenuItem> statusItems() {
           children: [
             const Expanded(child: Text('Could not load files')),
             GestureDetector(
-              onTap: () => debugPrint('Tapped: Details'),
+              onTap: () => DemoNotice.show('Details (demo only)'),
               child: const Text(
                 'Details',
                 style: TextStyle(color: CupertinoColors.activeBlue),
@@ -331,6 +348,6 @@ SmartContextMenuSimpleItem _action(
     isDisabled: isDisabled,
     tintColor: tintColor,
     pagingMetadata: pagingMetadata,
-    onTap: () => debugPrint('Tapped: $title'),
+    onTap: () => DemoNotice.show('$title (demo only)'),
   );
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
+import '../../../../core/ui/demo_notice.dart';
+
 const _colors = [
   CupertinoColors.systemRed,
   CupertinoColors.systemOrange,
@@ -37,7 +39,10 @@ final class TagColorRow extends StatelessWidget {
             children: [
               for (final color in _colors)
                 GestureDetector(
-                  onTap: () => selected.value = color,
+                  onTap: () {
+                    selected.value = color;
+                    DemoNotice.show('Tag color changed');
+                  },
                   child: Container(
                     key: ValueKey(color),
                     width: 26,

@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart' show SliverConstraints;
 import 'package:smart_context_menu/smart_context_menu.dart';
 
 import '../../../core/data/demo_loader.dart';
+import '../../../core/ui/demo_notice.dart';
 import '../../detail/ui/detail_page.dart';
 import '../../settings/ui/widgets/settings_button.dart';
 import '../domain/demo_file.dart';
@@ -157,14 +158,14 @@ final class _FilesPageState extends State<FilesPage> {
       title: 'Rename',
       leading: const Icon(CupertinoIcons.pencil),
       isDisabled: file.isReadOnly,
-      onTap: () => debugPrint('Rename: ${file.name}'),
+      onTap: () => _notice('Rename ${file.name} (demo only)'),
     ),
     SmartContextMenuItem.separator(),
     SmartContextMenuItem.simple(
       title: 'Delete',
       leading: const Icon(CupertinoIcons.delete),
       isDestructive: true,
-      onTap: () => debugPrint('Delete: ${file.name}'),
+      onTap: () => _notice('Delete ${file.name} (demo only)'),
     ),
   ];
 
@@ -177,7 +178,7 @@ final class _FilesPageState extends State<FilesPage> {
         SmartContextMenuItem.simple(
           title: 'Copy link',
           leading: const Icon(CupertinoIcons.link),
-          onTap: () => debugPrint('Copy link: ${file.name}'),
+          onTap: () => _notice('Copy link to ${file.name} (demo only)'),
         ),
         SmartContextMenuItem.asyncSubmenu(
           title: 'Messages',
@@ -188,7 +189,8 @@ final class _FilesPageState extends State<FilesPage> {
               for (final contact in contacts)
                 SmartContextMenuItem.simple(
                   title: contact,
-                  onTap: () => debugPrint('Send ${file.name} to $contact'),
+                  onTap: () =>
+                      _notice('Send ${file.name} to $contact (demo only)'),
                 ),
             ];
           },
@@ -196,12 +198,12 @@ final class _FilesPageState extends State<FilesPage> {
         SmartContextMenuItem.simple(
           title: 'Mail',
           leading: const Icon(CupertinoIcons.mail),
-          onTap: () => debugPrint('Mail: ${file.name}'),
+          onTap: () => _notice('Mail ${file.name} (demo only)'),
         ),
         SmartContextMenuItem.simple(
           title: 'AirDrop',
           leading: const Icon(CupertinoIcons.antenna_radiowaves_left_right),
-          onTap: () => debugPrint('AirDrop: ${file.name}'),
+          onTap: () => _notice('AirDrop ${file.name} (demo only)'),
         ),
       ],
     );
@@ -220,7 +222,7 @@ final class _FilesPageState extends State<FilesPage> {
               title: folder,
               leading: const Icon(CupertinoIcons.folder),
               isDisabled: folder == file.folder,
-              onTap: () => debugPrint('Move ${file.name} to $folder'),
+              onTap: () => _notice('Move ${file.name} to $folder (demo only)'),
             ),
         ];
       },
@@ -243,7 +245,16 @@ final class _FilesPageState extends State<FilesPage> {
             isFavorite ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
           ),
           closeOnTap: false,
-          onTap: () => _favorites.toggle(file),
+          onTap: () async {
+            await _favorites.toggle(file);
+            if (mounted) {
+              _notice(
+                isFavorite
+                    ? 'Removed ${file.name} from Favorites'
+                    : 'Added ${file.name} to Favorites',
+              );
+            }
+          },
         );
       },
     );
@@ -266,14 +277,20 @@ final class _FilesPageState extends State<FilesPage> {
             leading: const Icon(CupertinoIcons.delete),
             isDestructive: true,
             closeOnTap: false,
-            onTap: () => _downloads.remove(file),
+            onTap: () {
+              _downloads.remove(file);
+              _notice('Removed ${file.name} download');
+            },
           );
         }
         return SmartContextMenuItem.simple(
           title: 'Download',
           leading: const Icon(CupertinoIcons.cloud_download),
           closeOnTap: false,
-          onTap: () => _downloads.start(file),
+          onTap: () {
+            _downloads.start(file);
+            _notice('Downloading ${file.name}');
+          },
         );
       },
     );
@@ -289,4 +306,6 @@ final class _FilesPageState extends State<FilesPage> {
       ),
     );
   }
+
+  void _notice(String message) => DemoNotice.show(message);
 }

@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
 
 import '../../../core/data/demo_loader.dart';
+import '../../../core/ui/demo_notice.dart';
 import '../../../core/ui/reactions_bar.dart';
 import '../../detail/ui/detail_page.dart';
 import '../../settings/ui/widgets/settings_button.dart';
@@ -190,6 +191,7 @@ final class _ChatPageState extends State<ChatPage> {
               onSelected: (reaction) async {
                 await header.close();
                 _chat.react(message, reaction);
+                if (mounted) _notice('Reacted with $reaction');
               },
             ),
           ),
@@ -220,7 +222,10 @@ final class _ChatPageState extends State<ChatPage> {
       leading: const Icon(CupertinoIcons.arrowshape_turn_up_right),
       asyncChildren: () async {
         await _loader.load('Chats');
-        return [for (final chat in chats) _action(chat, null)];
+        return [
+          for (final chat in chats)
+            _action(chat, null, notice: 'Forward to $chat (demo only)'),
+        ];
       },
     );
   }
@@ -237,7 +242,10 @@ final class _ChatPageState extends State<ChatPage> {
             isPinned ? CupertinoIcons.pin_slash : CupertinoIcons.pin,
           ),
           closeOnTap: false,
-          onTap: () => _chat.togglePin(message),
+          onTap: () {
+            _chat.togglePin(message);
+            _notice(isPinned ? 'Message unpinned' : 'Message pinned');
+          },
         );
       },
     );
@@ -292,7 +300,7 @@ final class _ChatPageState extends State<ChatPage> {
               SmartContextMenuItem.simple(
                 title: reader,
                 leading: PersonAvatar(name: reader),
-                onTap: () => debugPrint('Tapped: $reader'),
+                onTap: () => _notice('Selected $reader (demo only)'),
               ),
           ],
         );
@@ -318,12 +326,13 @@ final class _ChatPageState extends State<ChatPage> {
     String title,
     IconData? icon, {
     bool isDestructive = false,
+    String? notice,
   }) {
     return SmartContextMenuItem.simple(
       title: title,
       leading: icon == null ? null : Icon(icon),
       isDestructive: isDestructive,
-      onTap: () => debugPrint('Tapped: $title'),
+      onTap: () => _notice(notice ?? '$title (demo only)'),
     );
   }
 
@@ -368,4 +377,6 @@ final class _ChatPageState extends State<ChatPage> {
       ),
     );
   }
+
+  void _notice(String message) => DemoNotice.show(message);
 }
