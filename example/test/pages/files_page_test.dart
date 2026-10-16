@@ -104,6 +104,26 @@ void main() {
     expect(find.text('Delete Contract.pdf (demo only)'), findsNothing);
   });
 
+  testWidgets('tapping a notice dismisses it', (tester) async {
+    await tester.pumpPhoneApp();
+    await tester.openMenu(contract);
+
+    await tester.tap(find.text('Delete'));
+    await tester.settleMenu();
+
+    final notice = find.text('Delete Contract.pdf (demo only)');
+    expect(notice, findsOneWidget);
+    await tester.tap(find.text('Chat'));
+    await tester.pumpAndSettle();
+    expect(find.text('Hiking club'), findsOneWidget);
+    expect(notice, findsOneWidget);
+
+    await tester.tap(notice);
+    await tester.pumpAndSettle();
+
+    expect(notice, findsNothing);
+  });
+
   testWidgets('Rename is disabled in a read-only file', (tester) async {
     await tester.pumpPhoneApp();
     await tester.openMenu(find.text('Invoice.pdf').first);

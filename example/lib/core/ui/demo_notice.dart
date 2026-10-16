@@ -38,6 +38,7 @@ final class _DemoNoticeState extends State<DemoNotice> {
       child: SafeArea(
         minimum: const EdgeInsets.only(bottom: 88),
         child: IgnorePointer(
+          ignoring: _message == null,
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
             reverseDuration: const Duration(milliseconds: 180),
@@ -69,30 +70,34 @@ final class _DemoNoticeState extends State<DemoNotice> {
 
     return Center(
       key: ValueKey(_generation),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 420),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: const Color(0xFF3634A3),
-            borderRadius: BorderRadius.circular(14),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x33000000),
-                blurRadius: 16,
-                offset: Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Semantics(
-              liveRegion: true,
-              child: Text(
-                message,
-                textAlign: TextAlign.center,
-                style: CupertinoTheme.of(
-                  context,
-                ).textTheme.textStyle.copyWith(color: CupertinoColors.white),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: _dismiss,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 420),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: const Color(0xFF3634A3),
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x33000000),
+                  blurRadius: 16,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Semantics(
+                liveRegion: true,
+                child: Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: CupertinoTheme.of(
+                    context,
+                  ).textTheme.textStyle.copyWith(color: CupertinoColors.white),
+                ),
               ),
             ),
           ),
@@ -107,8 +112,13 @@ final class _DemoNoticeState extends State<DemoNotice> {
       _message = message;
       _generation++;
     });
-    _timer = Timer(const Duration(seconds: 3), () {
-      if (mounted) setState(() => _message = null);
-    });
+    _timer = Timer(const Duration(seconds: 3), _dismiss);
+  }
+
+  void _dismiss() {
+    if (_message == null) return;
+    _timer?.cancel();
+    _timer = null;
+    setState(() => _message = null);
   }
 }
