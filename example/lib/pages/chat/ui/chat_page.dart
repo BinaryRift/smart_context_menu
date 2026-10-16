@@ -242,10 +242,7 @@ final class _ChatPageState extends State<ChatPage> {
             isPinned ? CupertinoIcons.pin_slash : CupertinoIcons.pin,
           ),
           closeOnTap: false,
-          onTap: () {
-            _chat.togglePin(message);
-            _notice(isPinned ? 'Message unpinned' : 'Message pinned');
-          },
+          onTap: () => _chat.togglePin(message),
         );
       },
     );

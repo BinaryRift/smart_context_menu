@@ -85,14 +85,7 @@ List<SmartContextMenuItem> listenableItems({
               : CupertinoIcons.heart,
         ),
         closeOnTap: false,
-        onTap: () async {
-          await favorite.toggle();
-          DemoNotice.show(
-            favorite.isFavorite
-                ? 'Added to Favorites'
-                : 'Removed from Favorites',
-          );
-        },
+        onTap: favorite.toggle,
       );
     },
   ),
@@ -104,10 +97,7 @@ List<SmartContextMenuItem> listenableItems({
         isMuted.value ? CupertinoIcons.bell_slash : CupertinoIcons.bell,
       ),
       closeOnTap: false,
-      onTap: () {
-        isMuted.value = !isMuted.value;
-        DemoNotice.show(isMuted.value ? 'Muted' : 'Unmuted');
-      },
+      onTap: () => isMuted.value = !isMuted.value,
     ),
   ),
   SmartContextMenuItem.separator(),
@@ -125,20 +115,14 @@ List<SmartContextMenuItem> listenableItems({
           leading: const Icon(CupertinoIcons.delete),
           isDestructive: true,
           closeOnTap: false,
-          onTap: () {
-            download.remove();
-            DemoNotice.show('Download removed');
-          },
+          onTap: download.remove,
         );
       }
       return SmartContextMenuItem.simple(
         title: 'Download',
         leading: const Icon(CupertinoIcons.cloud_download),
         closeOnTap: false,
-        onTap: () {
-          download.start();
-          DemoNotice.show('Download started');
-        },
+        onTap: download.start,
       );
     },
   ),

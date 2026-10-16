@@ -84,7 +84,6 @@ void main() {
     await tester.pump(demoLoadDelay);
     await tester.settleMenu();
     expect(find.text('Remove from Favorites'), findsOneWidget);
-    expect(find.text('Added Contract.pdf to Favorites'), findsOneWidget);
   });
 
   testWidgets('demo-only actions show feedback without changing the file', (

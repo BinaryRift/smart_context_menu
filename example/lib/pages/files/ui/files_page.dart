@@ -245,16 +245,7 @@ final class _FilesPageState extends State<FilesPage> {
             isFavorite ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
           ),
           closeOnTap: false,
-          onTap: () async {
-            await _favorites.toggle(file);
-            if (mounted) {
-              _notice(
-                isFavorite
-                    ? 'Removed ${file.name} from Favorites'
-                    : 'Added ${file.name} to Favorites',
-              );
-            }
-          },
+          onTap: () => _favorites.toggle(file),
         );
       },
     );
@@ -277,20 +268,14 @@ final class _FilesPageState extends State<FilesPage> {
             leading: const Icon(CupertinoIcons.delete),
             isDestructive: true,
             closeOnTap: false,
-            onTap: () {
-              _downloads.remove(file);
-              _notice('Removed ${file.name} download');
-            },
+            onTap: () => _downloads.remove(file),
           );
         }
         return SmartContextMenuItem.simple(
           title: 'Download',
           leading: const Icon(CupertinoIcons.cloud_download),
           closeOnTap: false,
-          onTap: () {
-            _downloads.start(file);
-            _notice('Downloading ${file.name}');
-          },
+          onTap: () => _downloads.start(file),
         );
       },
     );
