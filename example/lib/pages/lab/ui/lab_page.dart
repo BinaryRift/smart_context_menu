@@ -278,8 +278,8 @@ final class _LabPageState extends State<LabPage> {
           alignment: Alignment(header.alignment.x, 1),
           child: ReactionsBar(
             onSelected: (reaction) async {
-              await header.close();
               DemoNotice.show('Reaction $reaction on $title (demo only)');
+              await header.close();
             },
           ),
         ),

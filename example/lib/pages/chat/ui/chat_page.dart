@@ -189,9 +189,9 @@ final class _ChatPageState extends State<ChatPage> {
             alignment: Alignment(header.alignment.x, 1),
             child: ReactionsBar(
               onSelected: (reaction) async {
+                _notice('Selected reaction $reaction');
                 await header.close();
                 _chat.react(message, reaction);
-                if (mounted) _notice('Reacted with $reaction');
               },
             ),
           ),
@@ -272,6 +272,8 @@ final class _ChatPageState extends State<ChatPage> {
               title: personName(i),
               leading: PersonAvatar(name: personName(i)),
               trailing: Text(reactionAt(message, i)),
+              onTap: () =>
+                  _notice('${personName(i)} reacted ${reactionAt(message, i)}'),
               // The last item of a page asks for the next one.
               pagingMetadata: i == last - 1 && last < count
                   ? metadata.copyWith(page: metadata.page + 1)

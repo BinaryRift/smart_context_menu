@@ -80,10 +80,17 @@ void main() {
     await tester.openMenu(myMessage);
 
     await tester.tap(find.text('❤️'));
+    await tester.pump();
+    expect(find.text('Selected reaction ❤️'), findsOneWidget);
     await tester.settleMenu();
 
     expect(find.byType(ReactionsBar), findsNothing);
     expect(find.text('❤️ 1'), findsOneWidget);
+    final notice = tester.getRect(find.text('Selected reaction ❤️'));
+    final screenHeight =
+        tester.view.physicalSize.height / tester.view.devicePixelRatio;
+    expect(notice.bottom, greaterThan(screenHeight * 0.7));
+    expect(notice.bottom, lessThan(screenHeight - 80));
   });
 
   testWidgets('Seen by turns into a submenu once loaded', (tester) async {
@@ -131,6 +138,9 @@ void main() {
     await tester.settleMenu();
 
     expect(find.text(personName(0)), findsOneWidget);
+    await tester.tap(find.text(personName(0)));
+    await tester.settleMenu();
+    expect(find.text('${personName(0)} reacted 👍'), findsOneWidget);
   });
 
   testWidgets('a tap on a photo opens it', (tester) async {
