@@ -14,4 +14,10 @@ abstract final class ChatColors {
   );
 
   static const myBubble = CupertinoColors.activeBlue;
+
+  /// A faint fill for the centered menu hint.
+  static const menuHint = CupertinoDynamicColor.withBrightness(
+    color: Color.fromARGB(20, 116, 116, 128),
+    darkColor: Color.fromARGB(16, 118, 118, 128),
+  );
 }

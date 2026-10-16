@@ -63,12 +63,18 @@ final class _FilesPageState extends State<FilesPage> {
       child: SafeArea(
         child: CustomScrollView(
           slivers: [
-            _buildHeader('Recent'),
+            _buildHeader(
+              'Recent',
+              hint: 'Press and hold a file to open its menu',
+            ),
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               sliver: SliverLayoutBuilder(builder: _buildRecentFiles),
             ),
-            _buildHeader('Documents'),
+            _buildHeader(
+              'Documents',
+              hint: 'Or use ⋯ on a file to open its menu',
+            ),
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               sliver: SliverList.separated(
@@ -115,13 +121,29 @@ final class _FilesPageState extends State<FilesPage> {
     );
   }
 
-  Widget _buildHeader(String title) {
+  Widget _buildHeader(String title, {required String hint}) {
     return SliverPadding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
       sliver: SliverToBoxAdapter(
-        child: Text(
-          title,
-          style: CupertinoTheme.of(context).textTheme.navTitleTextStyle,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: CupertinoTheme.of(context).textTheme.navTitleTextStyle,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              hint,
+              style: CupertinoTheme.of(context).textTheme.textStyle.copyWith(
+                fontSize: 13,
+                color: CupertinoDynamicColor.resolve(
+                  CupertinoColors.secondaryLabel,
+                  context,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

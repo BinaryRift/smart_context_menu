@@ -95,16 +95,54 @@ final class _ChatPageState extends State<ChatPage> {
               // Starts at the newest message, at the bottom.
               reverse: true,
               padding: const EdgeInsets.all(12),
-              itemCount: _chat.messages.length,
+              itemCount: _chat.messages.length + 1,
               itemBuilder: (context, index) {
+                if (index == 1) return _buildMenuHint();
                 final messages = _chat.messages;
-                return _buildMessage(messages[messages.length - 1 - index]);
+                final messageIndex = index > 1 ? index - 1 : index;
+                return _buildMessage(
+                  messages[messages.length - 1 - messageIndex],
+                );
               },
             ),
           ),
         ),
         const ChatInputBar(),
       ],
+    );
+  }
+
+  Widget _buildMenuHint() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 320),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: CupertinoDynamicColor.resolve(
+                ChatColors.menuHint,
+                context,
+              ),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+              child: Text(
+                'Long press a message or double tap the space beside it to open its menu',
+                textAlign: TextAlign.center,
+                style: CupertinoTheme.of(context).textTheme.textStyle.copyWith(
+                  fontSize: 12,
+                  color: CupertinoDynamicColor.resolve(
+                    CupertinoColors.secondaryLabel,
+                    context,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
