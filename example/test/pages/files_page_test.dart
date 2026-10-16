@@ -23,6 +23,27 @@ void main() {
     expect(find.text('Add to Favorites'), findsOneWidget);
   });
 
+  testWidgets('a tap on a file tile opens the file', (tester) async {
+    await tester.pumpPhoneApp();
+
+    await tester.tap(contract);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(DetailPage), findsOneWidget);
+  });
+
+  testWidgets('a tap on a file row opens the file', (tester) async {
+    await tester.pumpPhoneApp();
+
+    final row = find.text('Contract.pdf').last;
+    await tester.ensureVisible(row);
+    await tester.pumpAndSettle();
+    await tester.tap(row);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(DetailPage), findsOneWidget);
+  });
+
   testWidgets('Open opens the file', (tester) async {
     await tester.pumpPhoneApp();
     await tester.openMenu(contract);
@@ -55,6 +76,7 @@ void main() {
     await tester.settleMenu();
 
     expect(find.text('Open'), findsOneWidget);
+    expect(find.byType(DetailPage), findsNothing);
   });
 
   testWidgets('Share opens a submenu that loads the contacts', (tester) async {

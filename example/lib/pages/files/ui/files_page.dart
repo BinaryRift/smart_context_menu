@@ -149,8 +149,7 @@ final class _FilesPageState extends State<FilesPage> {
     );
   }
 
-  /// Opens the menu of [file] on a long press of [child],
-  /// or from code with [controller].
+  /// A tap on [child] opens [file]; a long press or [controller] opens its menu.
   Widget _buildMenu(
     DemoFile file, {
     required Widget child,
@@ -161,7 +160,11 @@ final class _FilesPageState extends State<FilesPage> {
       items: _menuItems(file),
       // A tap on the lifted file opens it, like a tap on the file itself.
       onPreviewTap: () => _open(file),
-      child: child,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => _open(file),
+        child: child,
+      ),
     );
   }
 
