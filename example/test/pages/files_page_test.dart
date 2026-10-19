@@ -23,6 +23,27 @@ void main() {
     expect(find.text('Add to Favorites'), findsOneWidget);
   });
 
+  testWidgets('a tap on a file tile opens the file', (tester) async {
+    await tester.pumpPhoneApp();
+
+    await tester.tap(contract);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(DetailPage), findsOneWidget);
+  });
+
+  testWidgets('a tap on a file row opens the file', (tester) async {
+    await tester.pumpPhoneApp();
+
+    final row = find.text('Contract.pdf').last;
+    await tester.ensureVisible(row);
+    await tester.pumpAndSettle();
+    await tester.tap(row);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(DetailPage), findsOneWidget);
+  });
+
   testWidgets('Open opens the file', (tester) async {
     await tester.pumpPhoneApp();
     await tester.openMenu(contract);
@@ -55,6 +76,7 @@ void main() {
     await tester.settleMenu();
 
     expect(find.text('Open'), findsOneWidget);
+    expect(find.byType(DetailPage), findsNothing);
   });
 
   testWidgets('Share opens a submenu that loads the contacts', (tester) async {
@@ -84,6 +106,43 @@ void main() {
     await tester.pump(demoLoadDelay);
     await tester.settleMenu();
     expect(find.text('Remove from Favorites'), findsOneWidget);
+  });
+
+  testWidgets('demo-only actions show feedback without changing the file', (
+    tester,
+  ) async {
+    await tester.pumpPhoneApp();
+    await tester.openMenu(contract);
+
+    await tester.tap(find.text('Delete'));
+    await tester.settleMenu();
+
+    expect(find.text('Delete Contract.pdf (demo only)'), findsOneWidget);
+    expect(find.text('Contract.pdf'), findsWidgets);
+
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
+    expect(find.text('Delete Contract.pdf (demo only)'), findsNothing);
+  });
+
+  testWidgets('tapping a notice dismisses it', (tester) async {
+    await tester.pumpPhoneApp();
+    await tester.openMenu(contract);
+
+    await tester.tap(find.text('Delete'));
+    await tester.settleMenu();
+
+    final notice = find.text('Delete Contract.pdf (demo only)');
+    expect(notice, findsOneWidget);
+    await tester.tap(find.text('Chat'));
+    await tester.pumpAndSettle();
+    expect(find.text('Hiking club'), findsOneWidget);
+    expect(notice, findsOneWidget);
+
+    await tester.tap(notice);
+    await tester.pumpAndSettle();
+
+    expect(notice, findsNothing);
   });
 
   testWidgets('Rename is disabled in a read-only file', (tester) async {

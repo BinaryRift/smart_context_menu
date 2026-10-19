@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
 
 import '../../../core/data/demo_loader.dart';
+import '../../../core/ui/demo_notice.dart';
 import '../../../core/ui/reactions_bar.dart';
 import '../../detail/ui/detail_page.dart';
 import '../../settings/ui/widgets/settings_button.dart';
@@ -94,16 +95,54 @@ final class _ChatPageState extends State<ChatPage> {
               // Starts at the newest message, at the bottom.
               reverse: true,
               padding: const EdgeInsets.all(12),
-              itemCount: _chat.messages.length,
+              itemCount: _chat.messages.length + 1,
               itemBuilder: (context, index) {
+                if (index == 1) return _buildMenuHint();
                 final messages = _chat.messages;
-                return _buildMessage(messages[messages.length - 1 - index]);
+                final messageIndex = index > 1 ? index - 1 : index;
+                return _buildMessage(
+                  messages[messages.length - 1 - messageIndex],
+                );
               },
             ),
           ),
         ),
         const ChatInputBar(),
       ],
+    );
+  }
+
+  Widget _buildMenuHint() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 320),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: CupertinoDynamicColor.resolve(
+                ChatColors.menuHint,
+                context,
+              ),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+              child: Text(
+                'Long press a message or double tap the space beside it to open its menu',
+                textAlign: TextAlign.center,
+                style: CupertinoTheme.of(context).textTheme.textStyle.copyWith(
+                  fontSize: 12,
+                  color: CupertinoDynamicColor.resolve(
+                    CupertinoColors.secondaryLabel,
+                    context,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -188,6 +227,7 @@ final class _ChatPageState extends State<ChatPage> {
             alignment: Alignment(header.alignment.x, 1),
             child: ReactionsBar(
               onSelected: (reaction) async {
+                _notice('Selected reaction $reaction');
                 await header.close();
                 _chat.react(message, reaction);
               },
@@ -220,7 +260,10 @@ final class _ChatPageState extends State<ChatPage> {
       leading: const Icon(CupertinoIcons.arrowshape_turn_up_right),
       asyncChildren: () async {
         await _loader.load('Chats');
-        return [for (final chat in chats) _action(chat, null)];
+        return [
+          for (final chat in chats)
+            _action(chat, null, notice: 'Forward to $chat (demo only)'),
+        ];
       },
     );
   }
@@ -264,6 +307,8 @@ final class _ChatPageState extends State<ChatPage> {
               title: personName(i),
               leading: PersonAvatar(name: personName(i)),
               trailing: Text(reactionAt(message, i)),
+              onTap: () =>
+                  _notice('${personName(i)} reacted ${reactionAt(message, i)}'),
               // The last item of a page asks for the next one.
               pagingMetadata: i == last - 1 && last < count
                   ? metadata.copyWith(page: metadata.page + 1)
@@ -292,7 +337,7 @@ final class _ChatPageState extends State<ChatPage> {
               SmartContextMenuItem.simple(
                 title: reader,
                 leading: PersonAvatar(name: reader),
-                onTap: () => debugPrint('Tapped: $reader'),
+                onTap: () => _notice('Selected $reader (demo only)'),
               ),
           ],
         );
@@ -318,12 +363,13 @@ final class _ChatPageState extends State<ChatPage> {
     String title,
     IconData? icon, {
     bool isDestructive = false,
+    String? notice,
   }) {
     return SmartContextMenuItem.simple(
       title: title,
       leading: icon == null ? null : Icon(icon),
       isDestructive: isDestructive,
-      onTap: () => debugPrint('Tapped: $title'),
+      onTap: () => _notice(notice ?? '$title (demo only)'),
     );
   }
 
@@ -368,4 +414,6 @@ final class _ChatPageState extends State<ChatPage> {
       ),
     );
   }
+
+  void _notice(String message) => DemoNotice.show(message);
 }
