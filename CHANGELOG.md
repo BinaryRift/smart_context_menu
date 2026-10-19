@@ -1,3 +1,11 @@
+## 1.0.2
+
+* Improved the example app with hints for opening menus, tap-to-open files, and visible feedback
+  for demo actions and chat reactions.
+* Refreshed the pub.dev screenshots and package description to show the light and dark themes,
+  drag-to-select, and a reactions bar above a chat message.
+* Raised the example app's minimum deployment targets to iOS 15 and macOS 12.
+
 ## 1.0.1
 
 * The default menu width is now 250 instead of 280, matching the iOS context menu on iPhone.
