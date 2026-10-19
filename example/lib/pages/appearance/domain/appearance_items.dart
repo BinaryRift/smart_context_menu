@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
 
 import '../../../core/data/demo_loader.dart';
+import '../../../core/ui/demo_notice.dart';
 import '../../../resources/app_theme/tint_colors.dart';
 import '../ui/widgets/tag_color_row.dart';
 
@@ -56,7 +57,7 @@ List<SmartContextMenuItem> customContentItems(
         TagColorRow(selected: tagColor, foregroundColor: state.foregroundColor),
   ),
   SmartContextMenuItem.simple(
-    onTap: () => debugPrint('Tapped: Version history'),
+    onTap: () => DemoNotice.show('Version history (demo only)'),
     customBuilder: (context, state) => Row(
       children: [
         Icon(CupertinoIcons.clock, color: state.foregroundColor),
@@ -91,19 +92,19 @@ List<SmartContextMenuItem> customContentItems(
 /// [failingLoader] fails every other time, so the first load shows the error
 /// and the retry; the archive is an empty submenu with the back item.
 List<SmartContextMenuItem> russianItems(DemoLoader failingLoader) => [
-  _action('Копировать', CupertinoIcons.doc_on_doc),
+  _russianAction('Копировать', CupertinoIcons.doc_on_doc),
   SmartContextMenuItem.submenu(
     title: 'Поделиться',
     leading: const Icon(CupertinoIcons.share),
     children: [
-      _action('Сообщения', CupertinoIcons.chat_bubble),
-      _action('Почта', CupertinoIcons.mail),
+      _russianAction('Сообщения', CupertinoIcons.chat_bubble),
+      _russianAction('Почта', CupertinoIcons.mail),
     ],
   ),
   SmartContextMenuItem.async(
     asyncItem: () async {
       await failingLoader.load('Закрепить');
-      return _action('Закрепить', CupertinoIcons.pin);
+      return _russianAction('Закрепить', CupertinoIcons.pin);
     },
   ),
   SmartContextMenuItem.asyncSubmenu(
@@ -115,7 +116,7 @@ List<SmartContextMenuItem> russianItems(DemoLoader failingLoader) => [
     },
   ),
   SmartContextMenuItem.separator(),
-  _action('Удалить', CupertinoIcons.delete, isDestructive: true),
+  _russianAction('Удалить', CupertinoIcons.delete, isDestructive: true),
 ];
 
 /// Loading, error and empty items with the icons of the preset.
@@ -189,6 +190,7 @@ SmartContextMenuSimpleItem _action(
   bool isDestructive = false,
   bool isDisabled = false,
   Color? tintColor,
+  String? notice,
 }) {
   return SmartContextMenuItem.simple(
     title: title,
@@ -196,6 +198,17 @@ SmartContextMenuSimpleItem _action(
     isDestructive: isDestructive,
     isDisabled: isDisabled,
     tintColor: tintColor,
-    onTap: () => debugPrint('Tapped: $title'),
+    onTap: () => DemoNotice.show(notice ?? '$title (demo only)'),
   );
 }
+
+SmartContextMenuSimpleItem _russianAction(
+  String title,
+  IconData icon, {
+  bool isDestructive = false,
+}) => _action(
+  title,
+  icon,
+  isDestructive: isDestructive,
+  notice: '$title (только демонстрация)',
+);

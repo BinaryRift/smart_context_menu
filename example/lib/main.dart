@@ -3,6 +3,7 @@ import 'package:smart_context_menu/smart_context_menu.dart';
 
 import 'core/settings/example_settings.dart';
 import 'core/settings/settings_scope.dart';
+import 'core/ui/demo_notice.dart';
 import 'core/ui/touch_indicator.dart';
 import 'pages/tabs/ui/tabs_page.dart';
 import 'resources/app_theme/menu_config.dart';
@@ -44,7 +45,7 @@ final class _ExampleAppState extends State<ExampleApp> {
               // One config for all menus of the app.
               child: SmartContextMenuTheme(
                 config: _settings.menuConfig(appMenuConfig),
-                child: child!,
+                child: DemoNotice(child: child!),
               ),
             ),
           ),

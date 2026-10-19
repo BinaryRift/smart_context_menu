@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
 
 import '../../../core/data/demo_loader.dart';
+import '../../../core/ui/demo_notice.dart';
 import '../../../resources/app_theme/tint_colors.dart';
 
 const _pageCount = 5;
@@ -162,7 +163,7 @@ List<SmartContextMenuItem> statusItems() {
           children: [
             const Expanded(child: Text('Could not load files')),
             GestureDetector(
-              onTap: () => debugPrint('Tapped: Details'),
+              onTap: () => DemoNotice.show('Details (demo only)'),
               child: const Text(
                 'Details',
                 style: TextStyle(color: CupertinoColors.activeBlue),
@@ -331,6 +332,6 @@ SmartContextMenuSimpleItem _action(
     isDisabled: isDisabled,
     tintColor: tintColor,
     pagingMetadata: pagingMetadata,
-    onTap: () => debugPrint('Tapped: $title'),
+    onTap: () => DemoNotice.show('$title (demo only)'),
   );
 }

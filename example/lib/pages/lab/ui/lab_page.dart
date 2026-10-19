@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
 
 import '../../../core/data/demo_loader.dart';
+import '../../../core/ui/demo_notice.dart';
 import '../../../core/ui/demo_card.dart';
 import '../../../core/ui/reactions_bar.dart';
 import '../../settings/ui/widgets/settings_button.dart';
@@ -253,7 +254,7 @@ final class _LabPageState extends State<LabPage> {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       child: SmartContextMenu(
         items: items,
-        onPreviewTap: () => debugPrint('Preview tapped: $title'),
+        onPreviewTap: () => DemoNotice.show('$title preview tapped'),
         headerSliversBuilder: _headerBuilder(title),
         headerSliversDelay: _delayHeader ? _headerDelay : Duration.zero,
         child: DemoCard(title: title, subtitle: subtitle, height: height),
@@ -277,8 +278,8 @@ final class _LabPageState extends State<LabPage> {
           alignment: Alignment(header.alignment.x, 1),
           child: ReactionsBar(
             onSelected: (reaction) async {
+              DemoNotice.show('Reaction $reaction on $title (demo only)');
               await header.close();
-              debugPrint('Reaction $reaction: $title');
             },
           ),
         ),

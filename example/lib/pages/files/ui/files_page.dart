@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart' show SliverConstraints;
 import 'package:smart_context_menu/smart_context_menu.dart';
 
 import '../../../core/data/demo_loader.dart';
+import '../../../core/ui/demo_notice.dart';
 import '../../detail/ui/detail_page.dart';
 import '../../settings/ui/widgets/settings_button.dart';
 import '../domain/demo_file.dart';
@@ -62,12 +63,18 @@ final class _FilesPageState extends State<FilesPage> {
       child: SafeArea(
         child: CustomScrollView(
           slivers: [
-            _buildHeader('Recent'),
+            _buildHeader(
+              'Recent',
+              hint: 'Press and hold a file to open its menu',
+            ),
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               sliver: SliverLayoutBuilder(builder: _buildRecentFiles),
             ),
-            _buildHeader('Documents'),
+            _buildHeader(
+              'Documents',
+              hint: 'Or use ⋯ on a file to open its menu',
+            ),
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               sliver: SliverList.separated(
@@ -114,20 +121,35 @@ final class _FilesPageState extends State<FilesPage> {
     );
   }
 
-  Widget _buildHeader(String title) {
+  Widget _buildHeader(String title, {required String hint}) {
     return SliverPadding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
       sliver: SliverToBoxAdapter(
-        child: Text(
-          title,
-          style: CupertinoTheme.of(context).textTheme.navTitleTextStyle,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: CupertinoTheme.of(context).textTheme.navTitleTextStyle,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              hint,
+              style: CupertinoTheme.of(context).textTheme.textStyle.copyWith(
+                fontSize: 13,
+                color: CupertinoDynamicColor.resolve(
+                  CupertinoColors.secondaryLabel,
+                  context,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  /// Opens the menu of [file] on a long press of [child],
-  /// or from code with [controller].
+  /// A tap on [child] opens [file]; a long press or [controller] opens its menu.
   Widget _buildMenu(
     DemoFile file, {
     required Widget child,
@@ -138,7 +160,11 @@ final class _FilesPageState extends State<FilesPage> {
       items: _menuItems(file),
       // A tap on the lifted file opens it, like a tap on the file itself.
       onPreviewTap: () => _open(file),
-      child: child,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => _open(file),
+        child: child,
+      ),
     );
   }
 
@@ -157,14 +183,14 @@ final class _FilesPageState extends State<FilesPage> {
       title: 'Rename',
       leading: const Icon(CupertinoIcons.pencil),
       isDisabled: file.isReadOnly,
-      onTap: () => debugPrint('Rename: ${file.name}'),
+      onTap: () => _notice('Rename ${file.name} (demo only)'),
     ),
     SmartContextMenuItem.separator(),
     SmartContextMenuItem.simple(
       title: 'Delete',
       leading: const Icon(CupertinoIcons.delete),
       isDestructive: true,
-      onTap: () => debugPrint('Delete: ${file.name}'),
+      onTap: () => _notice('Delete ${file.name} (demo only)'),
     ),
   ];
 
@@ -177,7 +203,7 @@ final class _FilesPageState extends State<FilesPage> {
         SmartContextMenuItem.simple(
           title: 'Copy link',
           leading: const Icon(CupertinoIcons.link),
-          onTap: () => debugPrint('Copy link: ${file.name}'),
+          onTap: () => _notice('Copy link to ${file.name} (demo only)'),
         ),
         SmartContextMenuItem.asyncSubmenu(
           title: 'Messages',
@@ -188,7 +214,8 @@ final class _FilesPageState extends State<FilesPage> {
               for (final contact in contacts)
                 SmartContextMenuItem.simple(
                   title: contact,
-                  onTap: () => debugPrint('Send ${file.name} to $contact'),
+                  onTap: () =>
+                      _notice('Send ${file.name} to $contact (demo only)'),
                 ),
             ];
           },
@@ -196,12 +223,12 @@ final class _FilesPageState extends State<FilesPage> {
         SmartContextMenuItem.simple(
           title: 'Mail',
           leading: const Icon(CupertinoIcons.mail),
-          onTap: () => debugPrint('Mail: ${file.name}'),
+          onTap: () => _notice('Mail ${file.name} (demo only)'),
         ),
         SmartContextMenuItem.simple(
           title: 'AirDrop',
           leading: const Icon(CupertinoIcons.antenna_radiowaves_left_right),
-          onTap: () => debugPrint('AirDrop: ${file.name}'),
+          onTap: () => _notice('AirDrop ${file.name} (demo only)'),
         ),
       ],
     );
@@ -220,7 +247,7 @@ final class _FilesPageState extends State<FilesPage> {
               title: folder,
               leading: const Icon(CupertinoIcons.folder),
               isDisabled: folder == file.folder,
-              onTap: () => debugPrint('Move ${file.name} to $folder'),
+              onTap: () => _notice('Move ${file.name} to $folder (demo only)'),
             ),
         ];
       },
@@ -289,4 +316,6 @@ final class _FilesPageState extends State<FilesPage> {
       ),
     );
   }
+
+  void _notice(String message) => DemoNotice.show(message);
 }
