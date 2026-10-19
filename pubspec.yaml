@@ -1,5 +1,5 @@
 name: smart_context_menu
-description: "A powerful, fully customizable iOS-style context menu: smart positioning, fluid animations, drag-to-select, rich submenus (async, paginated) and your own content above the widget."
+description: "A powerful, customizable iOS-style context menu: smart positioning, fluid animations, drag-to-select, rich submenus (async, paginated) and widgets above the preview (e.g. a reactions bar)"
 version: 1.0.1
 repository: https://github.com/BinaryRift/smart_context_menu
 issue_tracker: https://github.com/BinaryRift/smart_context_menu/issues
