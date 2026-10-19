@@ -14,7 +14,7 @@ screenshots:
     path: doc/gifs/carousel_cover.png
   - description: "Three styles of the menu in the light and dark themes: brand colors, an opaque menu and items with their own content."
     path: doc/gifs/appearance.png
-  - description: "A long press opens the menu of a file, and a finger slides across the items to select one in the light and dark themes."
+  - description: "File and chat menus in light and dark themes show drag-to-select, with a reactions bar above the chat message."
     path: doc/gifs/open_and_select_themes.gif
 
 environment:

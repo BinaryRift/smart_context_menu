@@ -13,7 +13,7 @@ A powerful, fully customizable iOS-style context menu for Flutter: smart positio
 fluid animations, drag-to-select, rich submenus (async, paginated) and your own content
 above the widget.
 
-<img src="doc/gifs/open_and_select_themes.gif" width="600" alt="A long press opens the menu of a file, and a finger slides across the items to select one, in the light and dark themes">
+<img src="doc/gifs/open_and_select_themes.gif" width="600" alt="File and chat menus open in light and dark themes; a finger drags across their items, with a reactions bar above the chat message">
 
 <br>
 
