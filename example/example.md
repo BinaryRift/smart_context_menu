@@ -63,5 +63,5 @@ class MessagePage extends StatelessWidget {
 ```
 
 The example app has four tabs: Files, Chat, Appearance, and Lab. Run it with
-`flutter run` from the `example` directory. Read [the example app README](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.1/example/README.md)
+`flutter run` from the `example` directory. Read [the example app README](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/README.md)
 for details, or [try the live demo](https://thenothingworks.dev/demo/smart-context-menu/).

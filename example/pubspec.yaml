@@ -2,7 +2,7 @@ name: smart_context_menu_example
 description: "Example app demonstrating the smart_context_menu package."
 publish_to: 'none'
 
-version: 1.0.1+2
+version: 1.0.2+3
 
 environment:
   sdk: ^3.8.0
