@@ -146,6 +146,7 @@ final class _ChatPageState extends State<ChatPage> {
     );
   }
 
+  /// Builds a message with a double-tap target beside its context menu.
   Widget _buildMessage(ChatMessage message) {
     final menu = _messageMenus[message]!;
 
