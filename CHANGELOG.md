@@ -1,3 +1,8 @@
+## 1.0.3
+
+* Shortened the package description to fit pub.dev's recommended length and updated
+  the displayed package version in the web demo.
+
 ## 1.0.2
 
 * Improved the example app with hints for opening menus, tap-to-open files, and visible feedback
