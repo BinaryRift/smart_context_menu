@@ -148,7 +148,7 @@ Or add it to `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  smart_context_menu: ^1.0.2
+  smart_context_menu: ^1.0.3
 ```
 
 ```dart
