@@ -65,7 +65,7 @@ final class _FilesPageState extends State<FilesPage> {
           slivers: [
             _buildHeader(
               'Recent',
-              hint: 'Press and hold a file to open its menu',
+              hint: 'Long press or right-click a file to open its menu',
             ),
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -149,7 +149,8 @@ final class _FilesPageState extends State<FilesPage> {
     );
   }
 
-  /// A tap on [child] opens [file]; a long press or [controller] opens its menu.
+  /// A tap on [child] opens [file]; a long press, secondary click or
+  /// [controller] opens its menu.
   Widget _buildMenu(
     DemoFile file, {
     required Widget child,

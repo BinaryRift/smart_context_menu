@@ -25,7 +25,8 @@ const _maxChatWidth = 640.0;
 /// A group chat with messages of different sizes on both sides.
 ///
 /// Each message has a reactions bar above it and a menu below it; the menu
-/// opens on a long press of the message or a double tap next to it.
+/// opens on a long press or secondary click of the message, or a double tap
+/// next to it.
 /// A tall photo and its menu do not fit on the screen and scroll together;
 /// the last message is near the bottom edge, so the menu moves it up.
 final class ChatPage extends StatefulWidget {
@@ -129,7 +130,7 @@ final class _ChatPageState extends State<ChatPage> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
               child: Text(
-                'Long press a message or double tap the space beside it to open its menu',
+                'Long press or right-click a message, or double tap the space beside it to open its menu',
                 textAlign: TextAlign.center,
                 style: CupertinoTheme.of(context).textTheme.textStyle.copyWith(
                   fontSize: 12,
