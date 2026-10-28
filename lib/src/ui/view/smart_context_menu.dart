@@ -1,4 +1,4 @@
-import 'dart:async' show FutureOr;
+import 'dart:async' show FutureOr, unawaited;
 import 'dart:ui' as ui;
 
 import 'package:flutter/cupertino.dart'
@@ -18,18 +18,21 @@ import '../theme/smart_context_menu_theme.dart';
 import '../widgets/smart_context_menu_anchor.dart';
 import '../widgets/smart_context_menu_press_detector.dart';
 
-/// Shows an iOS-style context menu for [child] on long press.
+/// Shows an iOS-style context menu for [child] on long press or secondary click.
 ///
-/// While pressed, [child] shrinks slightly. When the menu opens, [child]
+/// During a long press, [child] shrinks slightly. When the menu opens, [child]
 /// is lifted above the blurred screen and the menu with [items] appears
 /// next to it. The preview is a snapshot of [child] taken at the moment
 /// of opening, so it does not update while the menu is open. If the screen
 /// size changes, for example when the device turns, the menu closes without
 /// an action, as the system menu of iOS does.
 ///
-/// To open the menu from code, pass a [controller]. To turn off the long
-/// press, set [SmartContextMenuConfig.activationMode] to
+/// To open the menu from code, pass a [controller]. To turn off gesture
+/// activation, set [SmartContextMenuConfig.activationMode] to
 /// [SmartContextMenuActivationMode.manual].
+/// On web, the app can call `BrowserContextMenu.disableContextMenu()` to
+/// prevent the browser's menu from appearing on a secondary click. This
+/// affects the whole page, including text fields.
 ///
 /// To set the config of all menus in the app or in a part of the tree, wrap
 /// it with a [SmartContextMenuTheme].
@@ -58,13 +61,13 @@ import '../widgets/smart_context_menu_press_detector.dart';
 final class SmartContextMenu extends StatefulWidget {
   /// The widget the menu is attached to.
   ///
-  /// It receives the long press and is shown as the preview above the menu.
+  /// It receives the long press or secondary click and is shown as the
+  /// preview above the menu.
   final Widget child;
 
   /// The items of the root menu.
   ///
-  /// If empty, the menu does not open, neither on long press nor via
-  /// [controller].
+  /// If empty, the menu does not open by gesture or via [controller].
   final List<SmartContextMenuItem> items;
 
   /// The behavior and appearance of the menu.
@@ -202,6 +205,7 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
       enabled: _hasInternalActivation && _items.isNotEmpty,
       isMenuActive: _session.hasActiveSession,
       onLongPress: _handleLongPress,
+      onSecondaryClick: _handleSecondaryClick,
       child: SmartContextMenuAnchor(
         previewKey: _previewKey,
         contentKey: _persistentKey,
@@ -238,6 +242,10 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
     if (mounted) {
       await _openMenu();
     }
+  }
+
+  void _handleSecondaryClick() {
+    unawaited(_openMenu());
   }
 
   Future<void> _openMenu() {

@@ -1,4 +1,7 @@
+import 'dart:ui' show PointerDeviceKind;
+
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart' show kSecondaryButton;
 import 'package:flutter/material.dart' show Divider;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
@@ -122,6 +125,23 @@ void main() {
       expect(find.text('Copy'), findsNothing);
     });
 
+    testWidgets('closes the menu on a secondary click outside', (tester) async {
+      await tester.pumpMenu(
+        items: [SmartContextMenuItem.simple(title: 'Copy')],
+      );
+      await tester.openMenu();
+
+      final gesture = await tester.startGesture(
+        const Offset(5, 5),
+        kind: PointerDeviceKind.mouse,
+        buttons: kSecondaryButton,
+      );
+      await gesture.up();
+      await tester.settleMenu();
+
+      expect(find.text('Copy'), findsNothing);
+    });
+
     testWidgets('keeps the menu open when false', (tester) async {
       await tester.pumpMenu(
         config: const SmartContextMenuConfig(barrierDismissible: false),
@@ -174,6 +194,8 @@ void main() {
       SmartContextMenuController? controller,
       VoidCallback? onTap,
       VoidCallback? onLongPress,
+      VoidCallback? onSecondaryTap,
+      VoidCallback? onSecondaryPointerDown,
     }) {
       return CupertinoApp(
         home: Center(
@@ -181,10 +203,20 @@ void main() {
             config: SmartContextMenuConfig(activationMode: mode),
             controller: controller,
             items: [SmartContextMenuItem.simple(title: 'Copy')],
-            child: GestureDetector(
-              onTap: onTap,
-              onLongPress: onLongPress,
-              child: const Text(menuTargetText),
+            child: Listener(
+              onPointerDown: onSecondaryPointerDown == null
+                  ? null
+                  : (event) {
+                      if (event.buttons == kSecondaryButton) {
+                        onSecondaryPointerDown();
+                      }
+                    },
+              child: GestureDetector(
+                onTap: onTap,
+                onLongPress: onLongPress,
+                onSecondaryTap: onSecondaryTap,
+                child: const Text(menuTargetText),
+              ),
             ),
           ),
         ),
@@ -220,6 +252,82 @@ void main() {
 
       expect(longPresses, 0);
       expect(find.text('Copy'), findsOneWidget);
+    });
+
+    testWidgets('secondary click opens without tapping the child', (
+      tester,
+    ) async {
+      var taps = 0;
+      var longPresses = 0;
+      await tester.pumpWidget(
+        buildApp(
+          mode: SmartContextMenuActivationMode.longPress,
+          onTap: () => taps++,
+          onLongPress: () => longPresses++,
+        ),
+      );
+
+      final gesture = await tester.startGesture(
+        tester.getCenter(find.text(menuTargetText)),
+        kind: PointerDeviceKind.mouse,
+        buttons: kSecondaryButton,
+      );
+      await gesture.up();
+      await tester.settleMenu();
+
+      expect(taps, 0);
+      expect(longPresses, 0);
+      expect(find.text('Copy'), findsOneWidget);
+    });
+
+    testWidgets('secondary click also reaches the child pointer listener', (
+      tester,
+    ) async {
+      var clicks = 0;
+      await tester.pumpWidget(
+        buildApp(
+          mode: SmartContextMenuActivationMode.longPress,
+          onSecondaryPointerDown: () => clicks++,
+        ),
+      );
+
+      final gesture = await tester.startGesture(
+        tester.getCenter(find.text(menuTargetText)),
+        kind: PointerDeviceKind.mouse,
+        buttons: kSecondaryButton,
+      );
+      await tester.settleMenu();
+      await gesture.up();
+      await tester.pump();
+
+      expect(clicks, 1);
+      expect(find.text('Copy'), findsOneWidget);
+    });
+
+    testWidgets('manual leaves the secondary click to the child', (
+      tester,
+    ) async {
+      var clicks = 0;
+      final controller = SmartContextMenuController();
+      addTearDown(controller.dispose);
+      await tester.pumpWidget(
+        buildApp(
+          mode: SmartContextMenuActivationMode.manual,
+          controller: controller,
+          onSecondaryTap: () => clicks++,
+        ),
+      );
+
+      final gesture = await tester.startGesture(
+        tester.getCenter(find.text(menuTargetText)),
+        kind: PointerDeviceKind.mouse,
+        buttons: kSecondaryButton,
+      );
+      await gesture.up();
+      await tester.settleMenu();
+
+      expect(clicks, 1);
+      expect(find.text('Copy'), findsNothing);
     });
 
     testWidgets('manual leaves the long press to the child', (tester) async {

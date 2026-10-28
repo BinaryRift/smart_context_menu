@@ -1,5 +1,9 @@
 import 'package:flutter/gestures.dart'
-    show GestureBinding, LongPressGestureRecognizer, TapGestureRecognizer;
+    show
+        GestureBinding,
+        LongPressGestureRecognizer,
+        TapGestureRecognizer,
+        kSecondaryButton;
 import 'package:flutter/widgets.dart';
 
 import '../../core/ui/motion/tokens/motion_curves.dart';
@@ -7,7 +11,8 @@ import '../../core/ui/motion/tokens/motion_durations.dart';
 import '../../core/ui/motion/tokens/motion_scales.dart';
 
 /// Shrinks [child] while it is pressed and calls [onLongPress] after
-/// a long press, once [child] is back to its size.
+/// a long press, once [child] is back to its size. A secondary click calls
+/// [onSecondaryClick] immediately, without shrinking [child].
 ///
 /// The long press wins over the gestures of [child]. When disabled,
 /// [child] is returned as is.
@@ -19,6 +24,7 @@ final class SmartContextMenuPressDetector extends StatefulWidget {
   final bool isMenuActive;
 
   final VoidCallback onLongPress;
+  final VoidCallback onSecondaryClick;
   final Widget child;
 
   const SmartContextMenuPressDetector({
@@ -26,6 +32,7 @@ final class SmartContextMenuPressDetector extends StatefulWidget {
     required this.enabled,
     required this.isMenuActive,
     required this.onLongPress,
+    required this.onSecondaryClick,
     required this.child,
   });
 
@@ -168,5 +175,8 @@ final class _SmartContextMenuPressDetectorState
 
   void _handlePointerDown(PointerDownEvent event) {
     _activePointer = event.pointer;
+    if (event.buttons == kSecondaryButton && !widget.isMenuActive) {
+      widget.onSecondaryClick();
+    }
   }
 }
