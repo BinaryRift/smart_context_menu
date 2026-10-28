@@ -137,8 +137,24 @@ required by apps:
 ## Getting started
 
 Requires Flutter 3.32 or later (Dart 3.8). Works on all platforms, including [the web](https://thenothingworks.dev/demo/smart-context-menu/).
-On desktop and the web, the menu opens with a long press of the mouse or from code,
-for example from a button (see [Opening from code](#opening-from-code)); haptics do nothing there.
+On desktop and the web, the menu opens with a long press of the mouse, a right click,
+or from code, for example from a button (see [Opening from code](#opening-from-code));
+haptics do nothing there. A two-finger click on a trackpad also opens it.
+
+On web, call `BrowserContextMenu.disableContextMenu()` in your app if you want to
+hide the browser's context menu. This affects the whole page, including text fields;
+the package leaves that choice to the app. For example:
+
+```dart
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/services.dart' show BrowserContextMenu;
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  if (kIsWeb) await BrowserContextMenu.disableContextMenu();
+  runApp(const MyApp());
+}
+```
 
 ```sh
 flutter pub add smart_context_menu
@@ -183,6 +199,9 @@ SmartContextMenu(
 ```
 
 Only the long press is taken from the child: its taps, drags and other gestures keep working.
+The child's secondary pointer-down handler also runs. A secondary tap handler that
+waits for release can be canceled as the menu opens. Use `manual` and open the menu
+from the child's handler when you need to coordinate them.
 
 The preview above the open menu is a snapshot of the child, so its own buttons do not
 work there. To run the main action of the child when the preview is tapped, for example
@@ -836,7 +855,7 @@ const menuConfig = SmartContextMenuConfig(
 
 | Field | What it sets | Default |
 | --- | --- | --- |
-| `activationMode` | Opens the menu on long press or only from code, see [Opening from code](#opening-from-code). | `longPress` |
+| `activationMode` | Opens the menu on long press or right click, or only from code, see [Opening from code](#opening-from-code). | `longPress` |
 | `enableHaptics` | Plays haptic feedback when the menu opens on long press, an item is highlighted or tapped, the preview is tapped, and a submenu opens or closes. | `true` |
 | `barrierDismissible` | Closes the menu on a tap outside the menu, the widget and the [header slivers](#header-slivers). When `false`, the menu closes only from an item, the preview, the header slivers or the controller. | `true` |
 | `enableSwipeBack` | Returns from a submenu on a swipe right in LTR or left in RTL, see [Submenu](#submenu). | `true` |
