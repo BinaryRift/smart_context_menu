@@ -31,6 +31,8 @@ above the widget.
   if you need.
 - **Drag-to-select**: Long press to start. Then, once you've slided your finger, 
   drag over the menu items. Release to select on the item you want.
+- **Cursor hover**: On desktop and web, moving the pointer over an available menu
+  item highlights it. Click to select it.
 - **`Hero` support**: If the widget has a `Hero` (eg. a photo), the `Hero` remains 
   active on tap of the preview, transitioning smoothly from its position to full screen.
 
