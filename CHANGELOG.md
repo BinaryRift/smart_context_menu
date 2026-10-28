@@ -1,3 +1,10 @@
+## 1.1.0 (unreleased)
+
+* The menu opens on a right click or a two-finger click on a trackpad in the default
+  `longPress` activation mode. A secondary pointer-down handler on the child also runs;
+  a secondary tap handler waiting for release can be canceled as the menu opens.
+* Menu items highlight on cursor hover on desktop and web, without selecting an action.
+
 ## 1.0.3
 
 * Shortened the package description to fit pub.dev's recommended length and updated
