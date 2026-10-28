@@ -5,7 +5,8 @@ import 'package:meta/meta.dart' show internal;
 ///
 /// Received by [SmartContextMenuContentItem.customBuilder]. Created by the menu.
 final class SmartContextMenuItemState {
-  /// Whether the finger is over the item and releasing it will tap the item.
+  /// Whether the item is highlighted under a pressed pointer or a cursor.
+  /// Hovering alone does not tap the item.
   ///
   /// Always false for disabled and loading items.
   final bool isPressed;

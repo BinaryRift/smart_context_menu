@@ -4,9 +4,11 @@ final class SmartContextMenuHoverController extends ValueNotifier<Key?> {
   SmartContextMenuHoverController() : super(null);
 
   bool isPointerReleased = false;
+  bool isPointerHover = false;
 
-  void update(Key? key) {
+  void update(Key? key, {bool isPointerHover = false}) {
     isPointerReleased = false;
+    this.isPointerHover = isPointerHover;
     value = key;
   }
 

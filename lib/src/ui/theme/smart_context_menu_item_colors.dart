@@ -20,8 +20,8 @@ final class SmartContextMenuItemColors {
 
   /// Resolves the colors of [item] with [style].
   ///
-  /// [isPressed] is true while the finger is over the item. [isBack] gives
-  /// the back item its own press highlight in the light theme.
+  /// [isPressed] is true while a pressed pointer or cursor is over the item.
+  /// [isBack] gives the back item its own highlight in the light theme.
   factory SmartContextMenuItemColors.resolve(
     BuildContext context, {
     required SmartContextMenuItem item,

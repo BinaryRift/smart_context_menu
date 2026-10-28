@@ -358,7 +358,9 @@ final class _SmartContextMenuItemViewState
   }
 
   void _generateFeedback(bool shouldHighlight) {
-    if (shouldHighlight && _config.enableHaptics) {
+    if (shouldHighlight &&
+        _config.enableHaptics &&
+        widget.hoverController?.isPointerHover != true) {
       HapticFeedback.selectionClick();
     }
   }
