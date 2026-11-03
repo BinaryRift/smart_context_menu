@@ -969,14 +969,13 @@ const menuStyle = SmartContextMenuStyle(
 
 `menuShadows` заменяет стандартные тени под меню; чтобы убрать тени, передайте пустой список.
 
-`menuDecoration` заменяет стандартный фон и рамку меню. В подменю закреплённый пункт «Назад»
-накладывает `menuColor` и `backButtonBlur` поверх прокручиваемых пунктов. Если фон градиентный,
-полупрозрачный вариант его верхнего цвета позволит градиенту просвечивать сквозь шапку и
-сделает границу менее заметной:
+`menuDecoration` заменяет стандартный фон и рамку меню. Закреплённый пункт «Назад» не наследует
+её: без `backButtonDecoration` он использует `menuColor` и `backButtonBorderRadius`.
+`backButtonDecoration` задаёт ему отдельный фон. Форма декорации обрезает и `backButtonBlur`;
+прозрачная декорация позволяет видеть градиент меню и размытые прокручиваемые пункты:
 
 ```dart
 const style = SmartContextMenuStyle(
-  menuColor: Color(0xB33634A3),
   menuDecoration: BoxDecoration(
     borderRadius: BorderRadius.all(Radius.circular(16)),
     gradient: LinearGradient(
@@ -985,11 +984,17 @@ const style = SmartContextMenuStyle(
       colors: [Color(0xFF3634A3), Color(0xFF18165F)],
     ),
   ),
+  backButtonDecoration: BoxDecoration(
+    color: Color(0x00000000),
+    borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+  ),
 );
 ```
 
-Градиент на пункт «Назад» сам по себе не продолжается. Сквозь полупрозрачный `menuColor`
-могут слегка проступать прокручиваемые пункты; при необходимости подберите прозрачность.
+Пункт «Назад» не копирует градиент, а показывает меню за собой. Если прокручиваемые пункты
+проступают слишком сильно, задайте `backButtonDecoration` полупрозрачный цвет. Её радиус
+определяет обрезку;
+`backButtonBorderRadius` действует только при `backButtonDecoration == null`.
 
 #### Стиль пунктов
 
@@ -1007,7 +1012,7 @@ const style = SmartContextMenuStyle(
   destructiveColor: Color(0xFFFF453A),
   highlightColor: Color(0x1FFFFFFF),
   dividerColor: Color(0x999E9E9E),
-  backButtonColor: Color(0xFF0A84FF),
+  backButtonForegroundColor: Color(0xFF0A84FF),
   submenuIcon: Icons.arrow_forward_ios,
   backIcon: Icons.arrow_back_ios_new,
   itemPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -1018,6 +1023,8 @@ const style = SmartContextMenuStyle(
 Цвет из `titleStyle` используется для активных пунктов, кроме destructive; неактивные
 и destructive пункты берут `disabledForegroundColor` и `destructiveColor`. Нажатый пункт
 подсвечивается полупрозрачным цветом текста или `highlightColor`, если он задан.
+`backButtonForegroundColor` красит и текст, и иконку пункта «Назад». Старое имя `backButtonColor`
+помечено как устаревшее; используйте `backButtonForegroundColor`.
 Ещё стиль задаёт пункт «Назад» в подменю, число строк текста, а также значки, выравнивание
 и индикатор у пунктов загрузки, ошибки и пустого состояния. `loadingIndicator` показывается
 в своём размере, так что подберите его под высоту строки. Все поля — в документации

@@ -4,6 +4,9 @@
   `longPress` activation mode. A secondary pointer-down handler on the child also runs;
   a secondary tap handler waiting for release can be canceled as the menu opens.
 * Menu items highlight on cursor hover on desktop and web, without selecting an action.
+* `backButtonDecoration` sets the background of the pinned Back item and clips its blur to the
+  decoration's shape. `backButtonForegroundColor` colors its title and icon; the old
+  `backButtonColor` name remains as a deprecated alias until 2.0.0.
 
 ## 1.0.3
 

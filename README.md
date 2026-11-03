@@ -977,14 +977,14 @@ const menuStyle = SmartContextMenuStyle(
 
 `menuShadows` replaces the default shadows under the menu; pass an empty list to remove them.
 
-`menuDecoration` replaces the menu's default background and border. In a submenu, the pinned
-Back item uses `menuColor` and `backButtonBlur` over the scrolling items. With a gradient,
-a partially transparent version of its top color lets the gradient show through the Back
-item and can make the boundary less noticeable:
+`menuDecoration` replaces the menu's default background and border. The pinned Back item does
+not inherit it: without `backButtonDecoration`, that item uses `menuColor` and
+`backButtonBorderRadius`. Set `backButtonDecoration` for its own background. The decoration's
+shape also clips `backButtonBlur`; a transparent decoration lets the menu gradient and blurred
+scrolling items show through:
 
 ```dart
 const style = SmartContextMenuStyle(
-  menuColor: Color(0xB33634A3),
   menuDecoration: BoxDecoration(
     borderRadius: BorderRadius.all(Radius.circular(16)),
     gradient: LinearGradient(
@@ -993,11 +993,17 @@ const style = SmartContextMenuStyle(
       colors: [Color(0xFF3634A3), Color(0xFF18165F)],
     ),
   ),
+  backButtonDecoration: BoxDecoration(
+    color: Color(0x00000000),
+    borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+  ),
 );
 ```
 
-The Back item does not continue the gradient itself. Scrolled items may be faintly visible
-through a translucent `menuColor`; adjust its opacity if needed.
+The Back item does not copy the gradient; it shows the menu behind it. Give
+`backButtonDecoration` a translucent color if the scrolling items show through too strongly.
+Its border radius controls the clip;
+`backButtonBorderRadius` applies only when `backButtonDecoration` is null.
 
 #### Item style
 
@@ -1015,7 +1021,7 @@ const style = SmartContextMenuStyle(
   destructiveColor: Color(0xFFFF453A),
   highlightColor: Color(0x1FFFFFFF),
   dividerColor: Color(0x999E9E9E),
-  backButtonColor: Color(0xFF0A84FF),
+  backButtonForegroundColor: Color(0xFF0A84FF),
   submenuIcon: Icons.arrow_forward_ios,
   backIcon: Icons.arrow_back_ios_new,
   itemPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -1026,6 +1032,8 @@ const style = SmartContextMenuStyle(
 The color of `titleStyle` is used for enabled items that are not destructive; disabled
 and destructive items use `disabledForegroundColor` and `destructiveColor`. A pressed item
 is highlighted with a translucent title color, or with `highlightColor` if it is set.
+`backButtonForegroundColor` colors both the Back title and icon. The old name `backButtonColor`
+is deprecated; use `backButtonForegroundColor` instead.
 The style also sets the back item of submenus, the number of title lines, and the icons,
 alignment and loading indicator of loading, error and empty items; `loadingIndicator` is used
 at its own size, so size it to fit an item row. See
