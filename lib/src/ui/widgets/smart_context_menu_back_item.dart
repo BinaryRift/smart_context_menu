@@ -1,3 +1,5 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/cupertino.dart'
     show CupertinoDynamicColor, CupertinoIcons;
 import 'package:flutter/widgets.dart';
@@ -20,8 +22,10 @@ final class SmartContextMenuBackItem extends StatelessWidget {
 
   /// The back item pinned to the top of a submenu.
   ///
-  /// Has the menu background and [SmartContextMenuStyle.backButtonBlur],
-  /// and keeps drags on it from scrolling the items below.
+  /// Has the menu background or
+  /// [SmartContextMenuStyle.backButtonDecoration] and
+  /// [SmartContextMenuStyle.backButtonBlur], and keeps drags on it from
+  /// scrolling the items below.
   const SmartContextMenuBackItem({
     super.key,
     required this.config,
@@ -83,20 +87,67 @@ final class SmartContextMenuBackItem extends StatelessWidget {
       );
     }
 
-    return GestureDetector(
-      onPanStart: (_) {},
-      behavior: HitTestBehavior.opaque,
-      child: SmartContextMenuBlurBox(
-        blur: style.backButtonBlur,
-        borderRadius: style.backButtonBorderRadius,
-        child: Container(
-          decoration: BoxDecoration(
+    final decoration = style.backButtonDecoration;
+    final background = DecoratedBox(
+      decoration:
+          decoration ??
+          BoxDecoration(
             color: CupertinoDynamicColor.resolve(style.menuColor, context),
             borderRadius: style.backButtonBorderRadius,
           ),
-          child: itemWithDivider,
+      child: itemWithDivider,
+    );
+
+    final Widget decoratedItem;
+    if (decoration case final decoration?) {
+      final blur = style.backButtonBlur;
+      decoratedItem = ClipPath(
+        clipper: _BackItemDecorationClipper(
+          decoration: decoration,
+          textDirection: Directionality.of(context),
         ),
-      ),
+        clipBehavior: Clip.antiAlias,
+        child: blur == null
+            ? background
+            : BackdropFilter(
+                filter: ImageFilter.blur(
+                  sigmaX: blur.sigmaX,
+                  sigmaY: blur.sigmaY,
+                ),
+                child: background,
+              ),
+      );
+    } else {
+      decoratedItem = SmartContextMenuBlurBox(
+        blur: style.backButtonBlur,
+        borderRadius: style.backButtonBorderRadius,
+        child: background,
+      );
+    }
+
+    return GestureDetector(
+      onPanStart: (_) {},
+      behavior: HitTestBehavior.opaque,
+      child: decoratedItem,
     );
   }
+}
+
+final class _BackItemDecorationClipper extends CustomClipper<Path> {
+  final Decoration decoration;
+  final TextDirection textDirection;
+
+  const _BackItemDecorationClipper({
+    required this.decoration,
+    required this.textDirection,
+  });
+
+  @override
+  Path getClip(Size size) =>
+      decoration.getClipPath(Offset.zero & size, textDirection);
+
+  @override
+  bool shouldReclip(_BackItemDecorationClipper oldClipper) =>
+      decoration != oldClipper.decoration ||
+      textDirection != oldClipper.textDirection;
 }

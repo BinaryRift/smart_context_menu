@@ -39,33 +39,34 @@ void main() {
     expect(back.color, isSameColorAs(const Color(0xFF0000FF)));
   });
 
-  testWidgets('back button color takes precedence over the text style', (
-    tester,
-  ) async {
-    const backColor = Color(0xFF00FF00);
-    await tester.pumpMenu(
-      config: customConfig.copyWith(
-        style: customStyle.copyWith(
-          backButtonColor: backColor,
-          backButtonTitleStyle: const TextStyle(color: Color(0xFF0000FF)),
+  testWidgets(
+    'back button foreground color takes precedence over the text style',
+    (tester) async {
+      const backColor = Color(0xFF00FF00);
+      await tester.pumpMenu(
+        config: customConfig.copyWith(
+          style: customStyle.copyWith(
+            backButtonForegroundColor: backColor,
+            backButtonTitleStyle: const TextStyle(color: Color(0xFF0000FF)),
+          ),
         ),
-      ),
-      items: submenuItems(),
-    );
-    await tester.openSubmenu();
+        items: submenuItems(),
+      );
+      await tester.openSubmenu();
 
-    expect(
-      tester.titleStyleOf(customConfig.labels.back).color,
-      isSameColorAs(backColor),
-    );
-  });
+      expect(
+        tester.titleStyleOf(customConfig.labels.back).color,
+        isSameColorAs(backColor),
+      );
+    },
+  );
 
-  testWidgets('applies the back item color', (tester) async {
+  testWidgets('applies the back item foreground color', (tester) async {
     const backColor = Color(0xFF0000FF);
     await tester.pumpMenu(
       config: customConfig.copyWith(
         style: customStyle.copyWith(
-          backButtonColor: backColor,
+          backButtonForegroundColor: backColor,
           defaultIconColor: const Color(0xFF000006),
         ),
       ),
