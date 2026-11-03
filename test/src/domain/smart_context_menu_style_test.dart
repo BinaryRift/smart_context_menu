@@ -14,9 +14,10 @@ void main() {
       menuShadows: [BoxShadow(blurRadius: 1)],
       backgroundColor: Color(0xFF000004),
       backgroundBlur: SmartContextMenuBlur(2),
+      backButtonDecoration: BoxDecoration(color: Color(0xFF00000D)),
       backButtonBlur: SmartContextMenuBlur(3),
       backButtonBorderRadius: BorderRadius.all(Radius.circular(2)),
-      backButtonColor: Color(0xFF00000A),
+      backButtonForegroundColor: Color(0xFF00000A),
       backButtonTitleStyle: TextStyle(fontSize: 12),
       itemPadding: EdgeInsets.all(1),
       itemChildrenGap: 1,
@@ -54,9 +55,10 @@ void main() {
       'menuShadows': (s) => s.menuShadows,
       'backgroundColor': (s) => s.backgroundColor,
       'backgroundBlur': (s) => s.backgroundBlur,
+      'backButtonDecoration': (s) => s.backButtonDecoration,
       'backButtonBlur': (s) => s.backButtonBlur,
       'backButtonBorderRadius': (s) => s.backButtonBorderRadius,
-      'backButtonColor': (s) => s.backButtonColor,
+      'backButtonForegroundColor': (s) => s.backButtonForegroundColor,
       'backButtonTitleStyle': (s) => s.backButtonTitleStyle,
       'itemPadding': (s) => s.itemPadding,
       'itemChildrenGap': (s) => s.itemChildrenGap,
@@ -109,14 +111,18 @@ void main() {
         () => original.copyWith(backgroundColor: color),
       ),
       'backgroundBlur': (blur, () => original.copyWith(backgroundBlur: blur)),
+      'backButtonDecoration': (
+        decoration,
+        () => original.copyWith(backButtonDecoration: decoration),
+      ),
       'backButtonBlur': (blur, () => original.copyWith(backButtonBlur: blur)),
       'backButtonBorderRadius': (
         radius,
         () => original.copyWith(backButtonBorderRadius: radius),
       ),
-      'backButtonColor': (
+      'backButtonForegroundColor': (
         color,
-        () => original.copyWith(backButtonColor: color),
+        () => original.copyWith(backButtonForegroundColor: color),
       ),
       'itemPadding': (
         const EdgeInsets.all(9),
@@ -218,5 +224,33 @@ void main() {
         }
       });
     }
+  });
+
+  test('backButtonColor remains a compatible alias', () {
+    // ignore: deprecated_member_use
+    const style = SmartContextMenuStyle(backButtonColor: Color(0xFF000001));
+    expect(style.backButtonForegroundColor, const Color(0xFF000001));
+    // ignore: deprecated_member_use
+    expect(style.backButtonColor, const Color(0xFF000001));
+
+    // ignore: deprecated_member_use
+    final copy = style.copyWith(backButtonColor: const Color(0xFF000002));
+    expect(copy.backButtonForegroundColor, const Color(0xFF000002));
+  });
+
+  test('backButtonForegroundColor takes precedence over the old name', () {
+    // ignore: deprecated_member_use
+    const style = SmartContextMenuStyle(
+      backButtonForegroundColor: Color(0xFF000002),
+      backButtonColor: Color(0xFF000001),
+    );
+    expect(style.backButtonForegroundColor, const Color(0xFF000002));
+
+    // ignore: deprecated_member_use
+    final copy = style.copyWith(
+      backButtonForegroundColor: const Color(0xFF000004),
+      backButtonColor: const Color(0xFF000003),
+    );
+    expect(copy.backButtonForegroundColor, const Color(0xFF000004));
   });
 }

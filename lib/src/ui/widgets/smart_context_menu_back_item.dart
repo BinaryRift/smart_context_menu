@@ -54,7 +54,7 @@ final class SmartContextMenuBackItem extends StatelessWidget {
         title: config.labels.back,
         titleStyle: style.titleStyle
             .merge(style.backButtonTitleStyle)
-            .copyWith(color: style.backButtonColor),
+            .copyWith(color: style.backButtonForegroundColor),
         leading: Icon(
           style.backIcon == SmartContextMenuDefaults.backIcon &&
                   Directionality.of(context) == TextDirection.rtl
@@ -62,7 +62,7 @@ final class SmartContextMenuBackItem extends StatelessWidget {
               : style.backIcon,
           size: style.defaultIconSize,
           color: CupertinoDynamicColor.maybeResolve(
-            style.backButtonColor ?? style.defaultIconColor,
+            style.backButtonForegroundColor ?? style.defaultIconColor,
             context,
           ),
         ),

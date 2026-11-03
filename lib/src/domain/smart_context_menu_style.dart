@@ -1,11 +1,13 @@
 import 'package:flutter/widgets.dart'
     show
         BorderRadiusGeometry,
+        BoxDecoration,
         BoxShadow,
         Color,
         Decoration,
         EdgeInsets,
         IconData,
+        ShapeDecoration,
         TextAlign,
         TextStyle,
         Widget;
@@ -35,7 +37,8 @@ final class SmartContextMenuStyle {
 
   /// The background color of the menu and the back item of submenus.
   ///
-  /// Ignored for the menu itself when [menuDecoration] is set.
+  /// Ignored for the menu itself when [menuDecoration] is set, and for the
+  /// back item when [backButtonDecoration] is set.
   /// For a gradient menu, a partially transparent version of its top color
   /// can let the gradient show through the back item. The back item does not
   /// inherit the gradient directly.
@@ -58,8 +61,9 @@ final class SmartContextMenuStyle {
   ///
   /// Replaces the default decoration built from [menuColor], [borderColor]
   /// and [borderRadius]. The pinned back item of a submenu is painted
-  /// separately with [menuColor] and [backButtonBlur] to obscure scrolling
-  /// items beneath it. It does not inherit this decoration.
+  /// separately with [menuColor] or [backButtonDecoration], and
+  /// [backButtonBlur] to obscure scrolling items beneath it. It does not
+  /// inherit this decoration.
   final Decoration? menuDecoration;
 
   /// The blur behind the menu.
@@ -89,6 +93,17 @@ final class SmartContextMenuStyle {
 
   // Back item
 
+  /// The background decoration of the back item pinned to a submenu.
+  ///
+  /// Replaces its default background from [menuColor] and
+  /// [backButtonBorderRadius]. The decoration determines the clip of both
+  /// the back item and [backButtonBlur]. It must support
+  /// [Decoration.getClipPath] for clipping; [BoxDecoration] and
+  /// [ShapeDecoration] do. Use a transparent decoration to show the blurred
+  /// scrolling items underneath without painting a background.
+  /// If null, the default background is used.
+  final Decoration? backButtonDecoration;
+
   /// The blur behind the back item pinned to the top of a submenu.
   ///
   /// Visible when submenu items scroll under the back item. If null,
@@ -97,18 +112,24 @@ final class SmartContextMenuStyle {
 
   /// The corner radius of the back item pinned to the top of a submenu.
   ///
-  /// Defaults to [SmartContextMenuDefaults.backButtonBorderRadius].
+  /// Ignored when [backButtonDecoration] is set; that decoration determines
+  /// the clip instead. Defaults to
+  /// [SmartContextMenuDefaults.backButtonBorderRadius].
   final BorderRadiusGeometry backButtonBorderRadius;
 
   /// The title and icon color of the back item in a submenu.
   ///
-  /// If null, the title uses the color of [titleStyle] and the icon uses
-  /// [defaultIconColor].
-  final Color? backButtonColor;
+  /// If null, the title uses [backButtonTitleStyle] over [titleStyle], and
+  /// the icon uses [defaultIconColor].
+  final Color? backButtonForegroundColor;
+
+  /// The former name of [backButtonForegroundColor].
+  @Deprecated('Use backButtonForegroundColor instead.')
+  Color? get backButtonColor => backButtonForegroundColor;
 
   /// The style of the back item title, merged over [titleStyle].
   ///
-  /// [backButtonColor] takes precedence over its color.
+  /// [backButtonForegroundColor] takes precedence over its color.
   /// Defaults to [SmartContextMenuDefaults.backButtonTitleStyle].
   final TextStyle backButtonTitleStyle;
 
@@ -230,8 +251,8 @@ final class SmartContextMenuStyle {
 
   /// The color of the submenu chevron and the back icon.
   ///
-  /// [backButtonColor] takes precedence for the back icon. If null, the
-  /// icons take the title color of their item.
+  /// [backButtonForegroundColor] takes precedence for the back icon. If null,
+  /// the icons take the title color of their item.
   final Color? defaultIconColor;
 
   /// The chevron of an item that opens a submenu.
@@ -299,10 +320,13 @@ final class SmartContextMenuStyle {
     this.menuShadows = SmartContextMenuDefaults.menuShadows,
     this.backgroundColor = SmartContextMenuDefaults.backgroundColor,
     this.backgroundBlur = SmartContextMenuBlur.medium,
+    this.backButtonDecoration,
     this.backButtonBlur = SmartContextMenuBlur.strong,
     this.backButtonBorderRadius =
         SmartContextMenuDefaults.backButtonBorderRadius,
-    this.backButtonColor,
+    Color? backButtonForegroundColor,
+    @Deprecated('Use backButtonForegroundColor instead.')
+    Color? backButtonColor,
     this.backButtonTitleStyle = SmartContextMenuDefaults.backButtonTitleStyle,
     this.itemPadding = SmartContextMenuDefaults.itemPadding,
     this.itemChildrenGap = SmartContextMenuDefaults.itemChildrenGap,
@@ -330,7 +354,7 @@ final class SmartContextMenuStyle {
     this.emptyIcon = SmartContextMenuDefaults.emptyIcon,
     this.loadingIndicator,
     this.loaderVerticalPadding = SmartContextMenuDefaults.loaderVerticalPadding,
-  });
+  }) : backButtonForegroundColor = backButtonForegroundColor ?? backButtonColor;
 
   /// Creates a copy of this style with the given fields replaced.
   ///
@@ -345,8 +369,11 @@ final class SmartContextMenuStyle {
     List<BoxShadow>? menuShadows,
     Color? backgroundColor,
     SmartContextMenuBlur? backgroundBlur,
+    Decoration? backButtonDecoration,
     SmartContextMenuBlur? backButtonBlur,
     BorderRadiusGeometry? backButtonBorderRadius,
+    Color? backButtonForegroundColor,
+    @Deprecated('Use backButtonForegroundColor instead.')
     Color? backButtonColor,
     TextStyle? backButtonTitleStyle,
     EdgeInsets? itemPadding,
@@ -384,10 +411,14 @@ final class SmartContextMenuStyle {
       menuShadows: menuShadows ?? this.menuShadows,
       backgroundColor: backgroundColor ?? this.backgroundColor,
       backgroundBlur: backgroundBlur ?? this.backgroundBlur,
+      backButtonDecoration: backButtonDecoration ?? this.backButtonDecoration,
       backButtonBlur: backButtonBlur ?? this.backButtonBlur,
       backButtonBorderRadius:
           backButtonBorderRadius ?? this.backButtonBorderRadius,
-      backButtonColor: backButtonColor ?? this.backButtonColor,
+      backButtonForegroundColor:
+          backButtonForegroundColor ??
+          backButtonColor ??
+          this.backButtonForegroundColor,
       backButtonTitleStyle: backButtonTitleStyle ?? this.backButtonTitleStyle,
       itemPadding: itemPadding ?? this.itemPadding,
       itemChildrenGap: itemChildrenGap ?? this.itemChildrenGap,
