@@ -21,7 +21,7 @@ import 'smart_context_menu_blur.dart';
 /// Set it as [SmartContextMenuConfig.style], in a [SmartContextMenuTheme]
 /// or for one menu. Every field has a default, so set only what you need.
 ///
-/// Colors may be [CupertinoDynamicColor]s, which are resolved for the
+/// Color fields may be [CupertinoDynamicColor]s, which are resolved for the
 /// current theme brightness. A plain [Color] is used as is in both themes.
 ///
 /// ```dart

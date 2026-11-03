@@ -7,6 +7,7 @@
 * `backButtonDecoration` sets the background of the pinned Back item and clips its blur to the
   decoration's shape. `backButtonForegroundColor` colors its title and icon; the old
   `backButtonColor` name remains as a deprecated alias until 2.0.0.
+* Dynamic colors in `menuShadows` now follow the theme.
 
 ## 1.0.3
 

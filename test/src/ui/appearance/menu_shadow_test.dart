@@ -39,6 +39,38 @@ void main() {
     expect(shadowsOf(tester), shadows);
   });
 
+  testWidgets('resolves dynamic shadow colors for the theme', (tester) async {
+    const color = CupertinoDynamicColor.withBrightness(
+      color: Color(0xFF000001),
+      darkColor: Color(0xFF000002),
+    );
+    await tester.pumpMenu(
+      items: appearanceItems(),
+      brightness: Brightness.dark,
+      config: const SmartContextMenuConfig(
+        style: SmartContextMenuStyle(
+          menuShadows: [
+            BoxShadow(
+              color: color,
+              offset: Offset(1, 2),
+              blurRadius: 3,
+              spreadRadius: 4,
+              blurStyle: BlurStyle.outer,
+            ),
+          ],
+        ),
+      ),
+    );
+    await tester.openMenu();
+
+    final shadow = shadowsOf(tester)!.single;
+    expect(shadow.color.toARGB32(), color.darkColor.toARGB32());
+    expect(shadow.offset, const Offset(1, 2));
+    expect(shadow.blurRadius, 3);
+    expect(shadow.spreadRadius, 4);
+    expect(shadow.blurStyle, BlurStyle.outer);
+  });
+
   testWidgets('keeps the shadows with a custom decoration', (tester) async {
     const shadows = [BoxShadow(color: Color(0xFF000001), blurRadius: 3)];
     await tester.pumpMenu(

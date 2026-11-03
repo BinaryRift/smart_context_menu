@@ -1075,7 +1075,7 @@ SmartContextMenuItem.simple(
 )
 ```
 
-Colors may be `CupertinoDynamicColor`s: they follow the light and dark theme.
+Color fields may be `CupertinoDynamicColor`s: they follow the light and dark theme.
 A plain `Color` is used as is in both themes. The default values are available
 in `SmartContextMenuDefaults`.
 
