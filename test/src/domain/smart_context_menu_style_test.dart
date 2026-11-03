@@ -227,28 +227,28 @@ void main() {
   });
 
   test('backButtonColor remains a compatible alias', () {
-    // ignore: deprecated_member_use
+    // ignore: deprecated_member_use, deprecated_member_use_from_same_package
     const style = SmartContextMenuStyle(backButtonColor: Color(0xFF000001));
     expect(style.backButtonForegroundColor, const Color(0xFF000001));
-    // ignore: deprecated_member_use
+    // ignore: deprecated_member_use, deprecated_member_use_from_same_package
     expect(style.backButtonColor, const Color(0xFF000001));
 
-    // ignore: deprecated_member_use
+    // ignore: deprecated_member_use, deprecated_member_use_from_same_package
     final copy = style.copyWith(backButtonColor: const Color(0xFF000002));
     expect(copy.backButtonForegroundColor, const Color(0xFF000002));
   });
 
   test('backButtonForegroundColor takes precedence over the old name', () {
-    // ignore: deprecated_member_use
     const style = SmartContextMenuStyle(
       backButtonForegroundColor: Color(0xFF000002),
+      // ignore: deprecated_member_use, deprecated_member_use_from_same_package
       backButtonColor: Color(0xFF000001),
     );
     expect(style.backButtonForegroundColor, const Color(0xFF000002));
 
-    // ignore: deprecated_member_use
     final copy = style.copyWith(
       backButtonForegroundColor: const Color(0xFF000004),
+      // ignore: deprecated_member_use, deprecated_member_use_from_same_package
       backButtonColor: const Color(0xFF000003),
     );
     expect(copy.backButtonForegroundColor, const Color(0xFF000004));
