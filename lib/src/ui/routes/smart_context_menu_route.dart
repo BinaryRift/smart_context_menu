@@ -1,7 +1,14 @@
 import 'dart:async' show FutureOr;
 import 'dart:ui' as ui show Image;
 import 'package:flutter/widgets.dart'
-    show PageRoute, Rect, Widget, Color, BuildContext, Animation;
+    show
+        PageRoute,
+        Rect,
+        Widget,
+        Color,
+        BuildContext,
+        Animation,
+        TransitionRoute;
 
 import '../../core/ui/motion/tokens/motion_durations.dart';
 import '../../domain/smart_context_menu_config.dart';
@@ -53,6 +60,10 @@ final class SmartContextMenuRoute extends PageRoute<void> {
 
   @override
   bool get maintainState => true;
+
+  /// The page below stays in place while the menu is open.
+  @override
+  bool canTransitionFrom(TransitionRoute<dynamic> previousRoute) => false;
 
   @override
   Widget buildPage(
