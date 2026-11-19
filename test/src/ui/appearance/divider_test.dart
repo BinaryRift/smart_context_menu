@@ -1,7 +1,7 @@
 import 'dart:async';
 
+// ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Divider;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
 
@@ -16,7 +16,6 @@ void main() {
     dividerIndent: 8,
     dividerEndIndent: 4,
   );
-  final dividers = find.byType(Divider);
   List<SmartContextMenuItem> items(List<String> titles) => [
     for (final title in titles) SmartContextMenuItem.simple(title: title),
   ];
@@ -38,7 +37,7 @@ void main() {
     );
     await tester.openMenu();
 
-    final divider = tester.widget<Divider>(dividers);
+    final divider = tester.dividerLookOf(dividers);
     expect(divider.thickness, SmartContextMenuDefaults.dividerThickness);
     expect(divider.height, SmartContextMenuDefaults.dividerThickness);
     expect(divider.indent, 0);
@@ -56,7 +55,7 @@ void main() {
     );
     await tester.openMenu();
 
-    final divider = tester.widget<Divider>(dividers);
+    final divider = tester.dividerLookOf(dividers);
     expect(divider.thickness, 2);
     expect(divider.height, 2);
     expect(divider.indent, 8);
@@ -189,9 +188,9 @@ void main() {
     await tester.openSubmenu();
 
     // The back item and its invisible placeholder; one child has none.
-    final backDividers = tester.widgetList<Divider>(dividers);
-    expect(backDividers, hasLength(2));
-    for (final divider in backDividers) {
+    expect(dividers, findsNWidgets(2));
+    for (var i = 0; i < 2; i++) {
+      final divider = tester.dividerLookOf(dividers.at(i));
       expect(divider.thickness, 2);
       expect(divider.indent, 8);
     }

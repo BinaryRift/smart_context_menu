@@ -1,3 +1,4 @@
+// ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart';
 
 abstract final class ChatColors {

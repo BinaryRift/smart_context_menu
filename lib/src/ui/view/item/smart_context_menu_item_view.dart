@@ -1,5 +1,6 @@
 import 'dart:async';
 
+// ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart' show CupertinoDynamicColor;
 import 'package:flutter/services.dart' show HapticFeedback;
 import 'package:flutter/widgets.dart';

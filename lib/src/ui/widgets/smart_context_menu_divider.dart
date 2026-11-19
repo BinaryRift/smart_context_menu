@@ -1,5 +1,5 @@
+// ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart' show CupertinoDynamicColor;
-import 'package:flutter/material.dart' show Divider;
 import 'package:flutter/widgets.dart';
 
 import '../../domain/smart_context_menu_style.dart';
@@ -12,12 +12,29 @@ final class SmartContextMenuDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Divider(
-      height: style.dividerThickness,
-      thickness: style.dividerThickness,
-      indent: style.dividerIndent,
-      endIndent: style.dividerEndIndent,
-      color: CupertinoDynamicColor.resolve(style.dividerColor, context),
+    final thickness = style.dividerThickness;
+    return SizedBox(
+      height: thickness,
+      child: Center(
+        child: Container(
+          height: thickness,
+          margin: EdgeInsetsDirectional.only(
+            start: style.dividerIndent,
+            end: style.dividerEndIndent,
+          ),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: CupertinoDynamicColor.resolve(
+                  style.dividerColor,
+                  context,
+                ),
+                width: thickness,
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

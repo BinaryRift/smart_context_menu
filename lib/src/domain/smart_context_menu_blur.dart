@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' show immutable;
+import 'package:flutter/widgets.dart' show immutable;
 
 /// The strength of a Gaussian blur used by the menu.
 ///

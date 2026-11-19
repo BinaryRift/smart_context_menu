@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' show immutable, Offset;
+import 'package:flutter/widgets.dart' show immutable, Offset;
 
 @immutable
 /// Fractional values

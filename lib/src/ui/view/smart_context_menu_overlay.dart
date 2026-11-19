@@ -1,6 +1,8 @@
 import 'dart:async' show FutureOr;
 import 'dart:ui' as ui show Image;
-import 'package:flutter/material.dart';
+// ignore: deprecated_member_use
+import 'package:flutter/material.dart' show Material, MaterialType;
+import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart' show HapticFeedback;
 import '../../core/ui/gestures/gesture_thresholds.dart';
 import '../../core/ui/motion/tokens/motion_curves.dart';

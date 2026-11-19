@@ -1,5 +1,7 @@
+// ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Divider, Icons;
+// ignore: deprecated_member_use
+import 'package:flutter/material.dart' show Icons;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
 
@@ -8,7 +10,7 @@ import '../../../helpers/menu_tester.dart';
 
 void main() {
   Color dividerColorOf(WidgetTester tester) =>
-      tester.widget<Divider>(find.byType(Divider).first).color!;
+      tester.dividerLookOf(dividers.first).color;
 
   testWidgets('uses the default colors', (tester) async {
     await tester.pumpMenu(

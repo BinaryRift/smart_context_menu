@@ -1,6 +1,5 @@
 import 'dart:async' show FutureOr;
 import 'dart:ui' as ui show Image;
-import 'package:flutter/material.dart' show Colors;
 import 'package:flutter/widgets.dart'
     show PageRoute, Rect, Widget, Color, BuildContext, Animation;
 
@@ -44,7 +43,7 @@ final class SmartContextMenuRoute extends PageRoute<void> {
   bool get barrierDismissible => config.barrierDismissible;
 
   @override
-  Color? get barrierColor => Colors.transparent;
+  Color? get barrierColor => const Color(0x00000000);
 
   @override
   Duration get transitionDuration => MotionDurations.standard;

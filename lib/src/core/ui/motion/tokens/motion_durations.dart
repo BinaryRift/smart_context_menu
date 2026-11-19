@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' show immutable;
+import 'package:flutter/widgets.dart' show immutable;
 
 @immutable
 abstract final class MotionDurations {

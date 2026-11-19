@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 final class WidgetSizeListener extends StatefulWidget {
   final Widget child;

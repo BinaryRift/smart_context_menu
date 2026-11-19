@@ -1,6 +1,5 @@
 import 'dart:ui' as ui show Image;
 
-import 'package:flutter/material.dart' show Colors;
 import 'package:flutter/widgets.dart';
 
 /// The widget the menu is attached to, in its place on the screen.
@@ -79,7 +78,7 @@ final class SmartContextMenuAnchor extends StatelessWidget {
           child: isMenuVisible && image != null
               ? RawImage(image: image, fit: BoxFit.fill)
               : const DecoratedBox(
-                  decoration: BoxDecoration(color: Colors.transparent),
+                  decoration: BoxDecoration(color: Color(0x00000000)),
                 ),
         ),
       ),

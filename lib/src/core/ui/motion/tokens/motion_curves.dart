@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' show immutable, Curves, Interval;
+import 'package:flutter/widgets.dart' show immutable, Curves, Interval;
 
 @immutable
 abstract final class MotionCurves {

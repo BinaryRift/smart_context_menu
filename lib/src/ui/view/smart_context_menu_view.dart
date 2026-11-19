@@ -1,5 +1,6 @@
+// ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart' show CupertinoDynamicColor;
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import '../../core/ui/motion/tokens/motion_curves.dart';
 import '../../core/ui/motion/tokens/motion_durations.dart';

@@ -1,3 +1,4 @@
+// ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart';
 
 /// [color] with its darker high contrast variant in the light theme,

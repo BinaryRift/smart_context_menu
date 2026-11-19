@@ -1,3 +1,4 @@
+// ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart';
 
 /// A message field at the bottom of the chat; it does not send messages.

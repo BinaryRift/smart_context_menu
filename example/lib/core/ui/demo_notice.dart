@@ -1,5 +1,6 @@
 import 'dart:async';
 
+// ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart';
 
 /// Brief feedback for actions in the example app.

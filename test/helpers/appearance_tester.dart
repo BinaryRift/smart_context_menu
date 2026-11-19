@@ -1,6 +1,8 @@
+// ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
+import 'package:smart_context_menu/src/ui/widgets/smart_context_menu_divider.dart';
 
 import 'menu_tester.dart';
 
@@ -34,10 +36,38 @@ List<SmartContextMenuItem> submenuItems() => [
   ),
 ];
 
+/// The dividers drawn in the menu.
+final dividers = find.byType(SmartContextMenuDivider);
+
+/// How a divider is drawn.
+typedef DividerLook = ({
+  double height,
+  double thickness,
+  double indent,
+  double endIndent,
+  Color color,
+});
+
 /// The light variant of a dynamic color.
 Color light(CupertinoDynamicColor color) => color.color;
 
 extension AppearanceTester on WidgetTester {
+  /// How the [divider] is drawn.
+  DividerLook dividerLookOf(Finder divider) {
+    final line = widget<Container>(
+      find.descendant(of: divider, matching: find.byType(Container)),
+    );
+    final margin = line.margin! as EdgeInsetsDirectional;
+    final side = ((line.decoration! as BoxDecoration).border! as Border).bottom;
+    return (
+      height: getSize(divider).height,
+      thickness: side.width,
+      indent: margin.start,
+      endIndent: margin.end,
+      color: side.color,
+    );
+  }
+
   TextStyle titleStyleOf(String title) =>
       widget<Text>(find.text(title).first).style!;
 
