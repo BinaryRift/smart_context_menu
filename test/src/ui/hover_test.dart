@@ -1,5 +1,6 @@
 import 'dart:ui' show PointerDeviceKind;
 
+// ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart'
     show kMiddleMouseButton, kPrimaryButton, kSecondaryMouseButton;
