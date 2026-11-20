@@ -20,7 +20,10 @@ import 'smart_context_menu_item_row.dart';
 /// has its own; icons take the title color.
 final class SmartContextMenuItemCell extends StatelessWidget {
   /// The distance of the submenu icon from the top and the end of the cell.
-  static const double _submenuIconInset = 6;
+  static const double _submenuIconInset = 4;
+
+  /// The size of the submenu icon relative to the default icon size.
+  static const double _submenuIconScale = 0.6;
 
   final String title;
   final TextStyle? titleStyle;
@@ -112,7 +115,7 @@ final class SmartContextMenuItemCell extends StatelessWidget {
             end: _submenuIconInset - (isLtr ? padding.right : padding.left),
             child: SmartContextMenuSubmenuIcon(
               style: style,
-              size: style.defaultIconSize / 2,
+              size: style.defaultIconSize * _submenuIconScale,
               isDisabled: isDisabled,
             ),
           ),

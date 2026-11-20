@@ -22,10 +22,10 @@ void main() {
         final cell = tester.cellFrameOf(find.byIcon(copyIcon));
         expect(
           tester.getSize(icon),
-          Size.square(defaultStyle.defaultIconSize / 2),
+          Size.square(defaultStyle.defaultIconSize * 0.6),
         );
-        expect(tester.getRect(icon).top - cell.top, 6);
-        expect(cell.right - tester.getRect(icon).right, 6);
+        expect(tester.getRect(icon).top - cell.top, 4);
+        expect(cell.right - tester.getRect(icon).right, 4);
         expect(tester.getRect(find.byIcon(copyIcon)).center.dx, cell.center.dx);
       });
     }
@@ -41,8 +41,8 @@ void main() {
 
       final icon = find.byIcon(CupertinoIcons.chevron_back);
       final cell = tester.cellFrameOf(find.byIcon(copyIcon));
-      expect(tester.getRect(icon).top - cell.top, 6);
-      expect(tester.getRect(icon).left - cell.left, 6);
+      expect(tester.getRect(icon).top - cell.top, 4);
+      expect(tester.getRect(icon).left - cell.left, 4);
     });
 
     testWidgets('is dimmed on a disabled cell', (tester) async {
