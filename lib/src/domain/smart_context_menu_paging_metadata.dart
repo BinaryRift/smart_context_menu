@@ -12,9 +12,11 @@ import '../core/ui/styles/smart_context_menu_defaults.dart';
 /// The first page is described by
 /// [SmartContextMenuPagingSubmenuItem.initialMetadata]. Each next page is
 /// described by the `pagingMetadata` of the last item of the previous page,
-/// see [SmartContextMenuSimpleItem.pagingMetadata] and
-/// [SmartContextMenuSeparatorItem.pagingMetadata]. To mark the last page, leave the metadata of its last item null
-/// or return an empty page.
+/// see [SmartContextMenuSimpleItem.pagingMetadata],
+/// [SmartContextMenuSeparatorItem.pagingMetadata] and
+/// [SmartContextMenuRowItem.pagingMetadata]; the cells of a row do not
+/// describe the next page. To mark the last page, leave the metadata of its
+/// last item null or return an empty page.
 @immutable
 final class SmartContextMenuPagingMetadata {
   /// The number of the page to load.

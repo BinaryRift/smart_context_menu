@@ -269,12 +269,14 @@ sealed class SmartContextMenuItem implements _MenuNode {
   /// Creates an item that opens a submenu with items loaded page by page.
   ///
   /// [asyncPagingChildren] is called with [initialMetadata] when the item
-  /// is tapped. The [SmartContextMenuSimpleItem.pagingMetadata] of the last
-  /// item of each page describes the next page, which is loaded when the
-  /// user scrolls to the end of the submenu. A page that is empty or whose
-  /// last item has no metadata is the last one. While a page loads, the
-  /// submenu shows [loading], a [SmartContextMenuItem.loading], or by
-  /// default an activity indicator in the middle, after the loaded items.
+  /// is tapped. The `pagingMetadata` of the last item of each page,
+  /// a [SmartContextMenuItem.simple], a [SmartContextMenuItem.separator] or
+  /// a [SmartContextMenuItem.row], describes the next page, which is loaded
+  /// when the user scrolls to the end of the submenu. A page that is empty
+  /// or whose last item has no metadata is the last one. While a page
+  /// loads, the submenu shows [loading], a [SmartContextMenuItem.loading],
+  /// or by default an activity indicator in the middle, after the loaded
+  /// items.
   ///
   /// If a page fails to load or takes longer than [timeout], the submenu
   /// shows [error], a [SmartContextMenuItem.error], after the loaded items,

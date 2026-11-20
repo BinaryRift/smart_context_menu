@@ -268,12 +268,17 @@ final class _SmartContextMenuItemViewState
     }
   }
 
+  // A row stretches its separators to its height.
   Widget _buildSeparator(SmartContextMenuSeparatorItem item) {
-    return item.child ??
-        Container(
-          height: _style.separatorThickness,
-          color: CupertinoDynamicColor.resolve(_style.separatorColor, context),
-        );
+    if (item.child case final child?) return child;
+    final color = CupertinoDynamicColor.resolve(_style.separatorColor, context);
+    if (widget.rowSize != null) {
+      return SizedBox(
+        width: _style.separatorThickness,
+        child: ColoredBox(color: color),
+      );
+    }
+    return Container(height: _style.separatorThickness, color: color);
   }
 
   Widget _buildContent(SmartContextMenuItemState state) {

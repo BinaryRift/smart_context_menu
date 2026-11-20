@@ -281,7 +281,8 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
     List<SmartContextMenuItem> page,
   ) => switch (page.lastOrNull) {
     SmartContextMenuSimpleItem(:final pagingMetadata) ||
-    SmartContextMenuSeparatorItem(:final pagingMetadata) => pagingMetadata,
+    SmartContextMenuSeparatorItem(:final pagingMetadata) ||
+    SmartContextMenuRowItem(:final pagingMetadata) => pagingMetadata,
     _ => null,
   };
 
