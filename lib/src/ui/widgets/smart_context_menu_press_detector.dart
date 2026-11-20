@@ -12,7 +12,8 @@ import '../../core/ui/motion/tokens/motion_scales.dart';
 
 /// Shrinks [child] while it is pressed and calls [onLongPress] after
 /// a long press, once [child] is back to its size. A secondary click calls
-/// [onSecondaryClick] immediately, without shrinking [child].
+/// [onSecondaryClick] immediately, without shrinking [child]. Of nested
+/// detectors, only the innermost one handles the secondary click.
 ///
 /// The long press wins over the gestures of [child]. When disabled,
 /// [child] is returned as is.
@@ -45,6 +46,11 @@ final class _SmartContextMenuPressDetectorState
     extends State<SmartContextMenuPressDetector>
     with SingleTickerProviderStateMixin {
   static const Duration _pressDuration = MotionDurations.medium;
+
+  /// The pointer-down event that already opened a menu. Listeners get
+  /// the event from the innermost detector outward, so the outer ones
+  /// skip it.
+  static PointerEvent? _handledSecondaryDown;
 
   late final LongPressGestureRecognizer _longPressRecognizer;
   late final TapGestureRecognizer _tapRecognizer;
@@ -175,7 +181,11 @@ final class _SmartContextMenuPressDetectorState
 
   void _handlePointerDown(PointerDownEvent event) {
     _activePointer = event.pointer;
-    if (event.buttons == kSecondaryButton && !widget.isMenuActive) {
+    final original = event.original ?? event;
+    if (event.buttons == kSecondaryButton &&
+        !widget.isMenuActive &&
+        !identical(original, _handledSecondaryDown)) {
+      _handledSecondaryDown = original;
       widget.onSecondaryClick();
     }
   }
