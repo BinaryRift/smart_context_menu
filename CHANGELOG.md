@@ -36,6 +36,10 @@
   remains as a deprecated alias until 2.0.0, in the style and in `SmartContextMenuDefaults`.
 * Dynamic colors in `menuShadows` now follow the theme.
 * Fixed nested menus: a press on the inner menu no longer shrinks the outer widget too.
+* Fixed section titles: a separator with a `child` at the start of a menu, a submenu or a row
+  is now shown, since it titles the items after it. Of several separators next to each other,
+  the last one with a `child` is shown instead of the first separator. Bands without a `child`
+  are shown as before.
 
 ## 1.0.4
 
