@@ -1,7 +1,7 @@
 import 'dart:ui' show PointerDeviceKind;
 
 import 'package:flutter/foundation.dart' show ValueListenable;
-import 'package:flutter/gestures.dart' show PointerExitEvent;
+import 'package:flutter/gestures.dart' show PointerExitEvent, kPrimaryButton;
 import 'package:flutter/widgets.dart';
 
 import '../extensions/render_object_ext.dart';
@@ -9,6 +9,9 @@ import '../state/smart_context_menu_hover_controller.dart';
 
 /// Tracks presses and cursor hover over [child] and reports the item under
 /// the pointer to [hoverController].
+///
+/// Only a touch, a stylus or the primary mouse button selects items.
+/// Other mouse buttons keep the cursor hover.
 ///
 /// During a press, scrolling inside [child] or swiping back a level
 /// (see [isSwiping]) blocks drag selection until the pointer is lifted.
@@ -43,6 +46,7 @@ final class SmartContextMenuPointerTracker extends StatefulWidget {
 
 final class _SmartContextMenuPointerTrackerState
     extends State<SmartContextMenuPointerTracker> {
+  int? _pointer;
   Offset? _startPosition;
   Offset? _hoverPosition;
   bool _isSelectionBlocked = false;
@@ -139,8 +143,16 @@ final class _SmartContextMenuPointerTrackerState
 
   void _onPointerEvent(PointerEvent event) {
     if (event is PointerDownEvent) {
-      _handlePointerDown(event);
-    } else if (event is PointerMoveEvent) {
+      if (event.buttons & kPrimaryButton != 0) _handlePointerDown(event);
+      return;
+    }
+    if (event.pointer != _pointer) {
+      if (event is PointerMoveEvent && event.kind == PointerDeviceKind.mouse) {
+        _onHover(event);
+      }
+      return;
+    }
+    if (event is PointerMoveEvent) {
       _handlePointerMove(event);
     } else if (event is PointerUpEvent) {
       _handlePointerReset(isCanceled: false);
@@ -150,6 +162,7 @@ final class _SmartContextMenuPointerTrackerState
   }
 
   void _handlePointerDown(PointerDownEvent event) {
+    _pointer = event.pointer;
     _startPosition = event.position;
     if (event.kind == PointerDeviceKind.mouse) _hoverPosition = event.position;
     _isSelectionBlocked = false;
@@ -167,6 +180,7 @@ final class _SmartContextMenuPointerTrackerState
   /// A canceled pointer, for example interrupted by the system,
   /// only clears the highlight and does not tap the item under it.
   void _handlePointerReset({required bool isCanceled}) {
+    _pointer = null;
     if (!isCanceled && _hoverController.value != null && !_isSelectionBlocked) {
       _hoverController.setReleased();
     }

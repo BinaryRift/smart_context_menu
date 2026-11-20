@@ -1,6 +1,8 @@
 import 'dart:ui' show PointerDeviceKind;
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart'
+    show kMiddleMouseButton, kPrimaryButton, kSecondaryMouseButton;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
 
@@ -14,8 +16,15 @@ void main() {
     style: SmartContextMenuStyle(highlightColor: highlight),
   );
 
-  Future<TestGesture> mouseAt(WidgetTester tester, Finder target) async {
-    final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+  Future<TestGesture> mouseAt(
+    WidgetTester tester,
+    Finder target, {
+    int buttons = kPrimaryButton,
+  }) async {
+    final mouse = await tester.createGesture(
+      kind: PointerDeviceKind.mouse,
+      buttons: buttons,
+    );
     await mouse.addPointer(location: Offset.zero);
     addTearDown(mouse.removePointer);
     await mouse.moveTo(tester.getCenter(target));
@@ -145,6 +154,80 @@ void main() {
 
     expect(taps, 1);
     expect(tester.backgroundOf('Copy'), isSameColorAs(highlight));
+  });
+
+  for (final (name, buttons) in [
+    ('secondary', kSecondaryMouseButton),
+    ('middle', kMiddleMouseButton),
+  ]) {
+    testWidgets('a $name click does not select the hovered item', (
+      tester,
+    ) async {
+      var taps = 0;
+      await tester.pumpMenu(
+        config: config,
+        items: [
+          SmartContextMenuItem.simple(title: 'Copy', onTap: () => taps++),
+        ],
+      );
+      await tester.openMenu();
+
+      final mouse = await mouseAt(tester, find.text('Copy'), buttons: buttons);
+      await mouse.down(tester.getCenter(find.text('Copy')));
+      await tester.pump();
+      await mouse.up();
+      await tester.pumpAndSettle();
+
+      expect(taps, 0);
+      expect(find.text('Copy'), findsOneWidget);
+      expect(tester.backgroundOf('Copy'), isSameColorAs(highlight));
+
+      await tester.tap(find.text('Copy'));
+      await tester.pumpAndSettle();
+      expect(taps, 1);
+    });
+  }
+
+  testWidgets('hover follows the cursor while a secondary button is held', (
+    tester,
+  ) async {
+    var taps = 0;
+    await tester.pumpMenu(
+      config: config,
+      items: [
+        SmartContextMenuItem.simple(title: 'First', onTap: () => taps++),
+        SmartContextMenuItem.simple(title: 'Second', onTap: () => taps++),
+      ],
+    );
+    await tester.openMenu();
+
+    final mouse = await mouseAt(
+      tester,
+      find.text('First'),
+      buttons: kSecondaryMouseButton,
+    );
+    await mouse.down(tester.getCenter(find.text('First')));
+    await mouse.moveTo(tester.getCenter(find.text('Second')));
+    await tester.pump();
+    expect(tester.backgroundOf('First'), isSameColorAs(transparent));
+    expect(tester.backgroundOf('Second'), isSameColorAs(highlight));
+
+    await mouse.up();
+    await tester.pumpAndSettle();
+    expect(taps, 0);
+    expect(tester.backgroundOf('Second'), isSameColorAs(highlight));
+  });
+
+  testWidgets('a stylus tap selects the item', (tester) async {
+    var taps = 0;
+    await tester.pumpMenu(
+      items: [SmartContextMenuItem.simple(title: 'Copy', onTap: () => taps++)],
+    );
+    await tester.openMenu();
+
+    await tester.tap(find.text('Copy'), kind: PointerDeviceKind.stylus);
+    await tester.pumpAndSettle();
+    expect(taps, 1);
   });
 
   testWidgets('highlights the back item of a submenu', (tester) async {
