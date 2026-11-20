@@ -664,8 +664,9 @@ SmartContextMenuItem.asyncSubmenu(
 titles the last group.*
 
 A separator splits the items into groups. It has no actions and no press highlight,
-and drag-to-select passes over it. By default it is a band set by `separatorHeight`
+and drag-to-select passes over it. By default it is a band set by `separatorThickness`
 and `separatorColor` in the style; `child` replaces it, for example with a section title.
+The old name `separatorHeight` is deprecated; use `separatorThickness` instead.
 
 Separators at the start or the end of a menu are not shown, and several separators
 in a row show as one. So a menu whose items depend on the user or the content
@@ -688,7 +689,7 @@ needs no extra checks:
 ]
 ```
 
-For a thin line instead of a band, set a small `separatorHeight` and the
+For a thin line instead of a band, set a small `separatorThickness` and the
 `dividerColor` as `separatorColor`. To draw lines between all items, see
 [Dividers](#dividers).
 

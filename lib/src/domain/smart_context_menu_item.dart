@@ -350,17 +350,18 @@ sealed class SmartContextMenuItem implements _MenuNode {
   ///
   /// A separator has no actions and no press highlight, and drag-to-select
   /// passes over it. By default it is a band of
-  /// [SmartContextMenuStyle.separatorHeight] in
+  /// [SmartContextMenuStyle.separatorThickness] in
   /// [SmartContextMenuStyle.separatorColor];
   /// [child] replaces the band, for example with a section title.
   ///
   /// A separator at the start or the end of a menu level is not shown, and
-  /// of several separators in a row only the first one is. So items shown
-  /// on condition can keep their separators without extra checks. A separator
-  /// at the end of a loaded page appears when the next page loads; set
-  /// [pagingMetadata] on it if it is the last item of a page, see
-  /// [SmartContextMenuItem.pagingSubmenu]. In a [SmartContextMenuItem.row]
-  /// the band is vertical and [pagingMetadata] must be null.
+  /// of several separators next to each other only the first one is. So
+  /// items shown on condition can keep their separators without extra
+  /// checks. A separator at the end of a loaded page appears when the next
+  /// page loads; set [pagingMetadata] on it if it is the last item of
+  /// a page, see [SmartContextMenuItem.pagingSubmenu]. In
+  /// a [SmartContextMenuItem.row] the band is vertical and [pagingMetadata]
+  /// must be null.
   ///
   /// ```dart
   /// [

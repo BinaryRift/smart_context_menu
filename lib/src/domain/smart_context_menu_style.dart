@@ -228,10 +228,15 @@ final class SmartContextMenuStyle {
   /// item of a submenu always has a divider below it. Defaults to false.
   final bool dividersBetweenItems;
 
-  /// The height of a [SmartContextMenuItem.separator] without a child.
+  /// The thickness of a [SmartContextMenuItem.separator] without a child:
+  /// its height in a menu level, its width in a [SmartContextMenuItem.row].
   ///
-  /// Defaults to [SmartContextMenuDefaults.separatorHeight].
-  final double separatorHeight;
+  /// Defaults to [SmartContextMenuDefaults.separatorThickness].
+  final double separatorThickness;
+
+  /// The former name of [separatorThickness].
+  @Deprecated('Use separatorThickness instead.')
+  double get separatorHeight => separatorThickness;
 
   /// The color of a [SmartContextMenuItem.separator] without a child.
   ///
@@ -343,7 +348,8 @@ final class SmartContextMenuStyle {
     this.dividerIndent = 0,
     this.dividerEndIndent = 0,
     this.dividersBetweenItems = false,
-    this.separatorHeight = SmartContextMenuDefaults.separatorHeight,
+    double? separatorThickness,
+    @Deprecated('Use separatorThickness instead.') double? separatorHeight,
     this.separatorColor = SmartContextMenuDefaults.separatorColor,
     this.defaultIconSize = SmartContextMenuDefaults.iconSize,
     this.defaultIconColor,
@@ -354,7 +360,11 @@ final class SmartContextMenuStyle {
     this.emptyIcon = SmartContextMenuDefaults.emptyIcon,
     this.loadingIndicator,
     this.loaderVerticalPadding = SmartContextMenuDefaults.loaderVerticalPadding,
-  }) : backButtonForegroundColor = backButtonForegroundColor ?? backButtonColor;
+  }) : backButtonForegroundColor = backButtonForegroundColor ?? backButtonColor,
+       separatorThickness =
+           separatorThickness ??
+           separatorHeight ??
+           SmartContextMenuDefaults.separatorThickness;
 
   /// Creates a copy of this style with the given fields replaced.
   ///
@@ -390,7 +400,8 @@ final class SmartContextMenuStyle {
     double? dividerIndent,
     double? dividerEndIndent,
     bool? dividersBetweenItems,
-    double? separatorHeight,
+    double? separatorThickness,
+    @Deprecated('Use separatorThickness instead.') double? separatorHeight,
     Color? separatorColor,
     double? defaultIconSize,
     Color? defaultIconColor,
@@ -436,7 +447,8 @@ final class SmartContextMenuStyle {
       dividerIndent: dividerIndent ?? this.dividerIndent,
       dividerEndIndent: dividerEndIndent ?? this.dividerEndIndent,
       dividersBetweenItems: dividersBetweenItems ?? this.dividersBetweenItems,
-      separatorHeight: separatorHeight ?? this.separatorHeight,
+      separatorThickness:
+          separatorThickness ?? separatorHeight ?? this.separatorThickness,
       separatorColor: separatorColor ?? this.separatorColor,
       defaultIconSize: defaultIconSize ?? this.defaultIconSize,
       defaultIconColor: defaultIconColor ?? this.defaultIconColor,

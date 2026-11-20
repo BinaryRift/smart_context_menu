@@ -251,7 +251,7 @@ final class _SmartContextMenuItemViewState
   Widget _buildSeparator(SmartContextMenuSeparatorItem item) {
     return item.child ??
         Container(
-          height: _style.separatorHeight,
+          height: _style.separatorThickness,
           color: CupertinoDynamicColor.resolve(_style.separatorColor, context),
         );
   }

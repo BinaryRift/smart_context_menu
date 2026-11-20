@@ -11,6 +11,8 @@
 * `backButtonDecoration` sets the background of the pinned Back item and clips its blur to the
   decoration's shape. `backButtonForegroundColor` colors its title and icon; the old
   `backButtonColor` name remains as a deprecated alias until 2.0.0.
+* `separatorThickness` sets the thickness of a separator band. The old `separatorHeight` name
+  remains as a deprecated alias until 2.0.0, in the style and in `SmartContextMenuDefaults`.
 * Dynamic colors in `menuShadows` now follow the theme.
 * Fixed nested menus: a press on the inner menu no longer shrinks the outer widget too.
 

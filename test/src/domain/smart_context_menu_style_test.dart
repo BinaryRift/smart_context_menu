@@ -35,7 +35,7 @@ void main() {
       dividerIndent: 1,
       dividerEndIndent: 1,
       dividersBetweenItems: true,
-      separatorHeight: 1,
+      separatorThickness: 1,
       separatorColor: Color(0xFF00000C),
       defaultIconSize: 11,
       defaultIconColor: Color(0xFF000009),
@@ -76,7 +76,7 @@ void main() {
       'dividerIndent': (s) => s.dividerIndent,
       'dividerEndIndent': (s) => s.dividerEndIndent,
       'dividersBetweenItems': (s) => s.dividersBetweenItems,
-      'separatorHeight': (s) => s.separatorHeight,
+      'separatorThickness': (s) => s.separatorThickness,
       'separatorColor': (s) => s.separatorColor,
       'defaultIconSize': (s) => s.defaultIconSize,
       'defaultIconColor': (s) => s.defaultIconColor,
@@ -165,7 +165,10 @@ void main() {
         false,
         () => original.copyWith(dividersBetweenItems: false),
       ),
-      'separatorHeight': (9.0, () => original.copyWith(separatorHeight: 9)),
+      'separatorThickness': (
+        9.0,
+        () => original.copyWith(separatorThickness: 9),
+      ),
       'separatorColor': (color, () => original.copyWith(separatorColor: color)),
       'defaultIconSize': (19.0, () => original.copyWith(defaultIconSize: 19)),
       'defaultIconColor': (
@@ -254,5 +257,39 @@ void main() {
       backButtonColor: const Color(0xFF000003),
     );
     expect(copy.backButtonForegroundColor, const Color(0xFF000004));
+  });
+
+  test('separatorHeight remains a compatible alias', () {
+    // ignore: deprecated_member_use, deprecated_member_use_from_same_package
+    const style = SmartContextMenuStyle(separatorHeight: 3);
+    expect(style.separatorThickness, 3);
+    // ignore: deprecated_member_use, deprecated_member_use_from_same_package
+    expect(style.separatorHeight, 3);
+
+    // ignore: deprecated_member_use, deprecated_member_use_from_same_package
+    final copy = style.copyWith(separatorHeight: 4);
+    expect(copy.separatorThickness, 4);
+
+    expect(
+      // ignore: deprecated_member_use, deprecated_member_use_from_same_package
+      SmartContextMenuDefaults.separatorHeight,
+      SmartContextMenuDefaults.separatorThickness,
+    );
+  });
+
+  test('separatorThickness takes precedence over the old name', () {
+    const style = SmartContextMenuStyle(
+      separatorThickness: 2,
+      // ignore: deprecated_member_use, deprecated_member_use_from_same_package
+      separatorHeight: 1,
+    );
+    expect(style.separatorThickness, 2);
+
+    final copy = style.copyWith(
+      separatorThickness: 4,
+      // ignore: deprecated_member_use, deprecated_member_use_from_same_package
+      separatorHeight: 3,
+    );
+    expect(copy.separatorThickness, 4);
   });
 }

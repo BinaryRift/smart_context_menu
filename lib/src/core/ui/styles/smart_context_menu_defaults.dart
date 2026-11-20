@@ -132,8 +132,12 @@ abstract final class SmartContextMenuDefaults {
   /// The default of [SmartContextMenuStyle.dividerThickness].
   static const double dividerThickness = 0.5;
 
-  /// The default of [SmartContextMenuStyle.separatorHeight].
-  static const double separatorHeight = 8;
+  /// The default of [SmartContextMenuStyle.separatorThickness].
+  static const double separatorThickness = 8;
+
+  /// The former name of [separatorThickness].
+  @Deprecated('Use separatorThickness instead.')
+  static const double separatorHeight = separatorThickness;
 
   /// The default of [SmartContextMenuStyle.separatorColor].
   ///

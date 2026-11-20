@@ -28,7 +28,7 @@ void main() {
     expect(band, findsOneWidget);
     expect(
       tester.getSize(band).height,
-      SmartContextMenuDefaults.separatorHeight,
+      SmartContextMenuDefaults.separatorThickness,
     );
   });
 
@@ -36,7 +36,10 @@ void main() {
     const color = Color(0xFF000001);
     await tester.pumpMenu(
       config: const SmartContextMenuConfig(
-        style: SmartContextMenuStyle(separatorHeight: 3, separatorColor: color),
+        style: SmartContextMenuStyle(
+          separatorThickness: 3,
+          separatorColor: color,
+        ),
       ),
       items: [
         SmartContextMenuItem.simple(title: 'Copy'),
