@@ -243,6 +243,59 @@ final class SmartContextMenuStyle {
   /// Defaults to [SmartContextMenuDefaults.separatorColor].
   final Color separatorColor;
 
+  // Rows
+
+  /// The padding around the cells of a [SmartContextMenuItem.row] without
+  /// its own padding, see [SmartContextMenuRowItem.padding].
+  ///
+  /// Defaults to [EdgeInsets.zero].
+  final EdgeInsets rowPadding;
+
+  /// The gap between the cells of a [SmartContextMenuItem.row] without its
+  /// own gap, see [SmartContextMenuRowItem.childrenGap].
+  ///
+  /// The gap belongs to no cell: a finger over it removes the highlight.
+  /// Defaults to 0.
+  final double rowChildrenGap;
+
+  /// The padding around the content of the cells of a small row without
+  /// their own padding, see [SmartContextMenuRowSize.small].
+  ///
+  /// The whole cell, padding included, is pressed and highlighted.
+  /// Defaults to [SmartContextMenuDefaults.rowSmallItemPadding].
+  final EdgeInsets rowSmallItemPadding;
+
+  /// The padding around the content of the cells of a medium row without
+  /// their own padding, see [SmartContextMenuRowSize.medium].
+  ///
+  /// The whole cell, padding included, is pressed and highlighted.
+  /// Defaults to [SmartContextMenuDefaults.rowMediumItemPadding].
+  final EdgeInsets rowMediumItemPadding;
+
+  /// The gap between the leading and the title of the cells of a medium row
+  /// without their own gap.
+  ///
+  /// Defaults to [SmartContextMenuDefaults.rowItemChildrenGap].
+  final double rowItemChildrenGap;
+
+  /// The style of the titles of the cells of a [SmartContextMenuItem.row],
+  /// merged over the title style of their items.
+  ///
+  /// Defaults to [SmartContextMenuDefaults.rowTitleStyle].
+  final TextStyle rowTitleStyle;
+
+  /// The empty space above the vertical dividers between the cells of
+  /// a row, see [SmartContextMenuRowItem.dividersBetweenChildren].
+  ///
+  /// Defaults to 0.
+  final double rowDividerIndent;
+
+  /// The empty space below the vertical dividers between the cells of
+  /// a row, see [SmartContextMenuRowItem.dividersBetweenChildren].
+  ///
+  /// Defaults to 0.
+  final double rowDividerEndIndent;
+
   // Icons
 
   /// The size of the icons drawn by the menu itself: the submenu chevron,
@@ -351,6 +404,14 @@ final class SmartContextMenuStyle {
     double? separatorThickness,
     @Deprecated('Use separatorThickness instead.') double? separatorHeight,
     this.separatorColor = SmartContextMenuDefaults.separatorColor,
+    this.rowPadding = EdgeInsets.zero,
+    this.rowChildrenGap = 0,
+    this.rowSmallItemPadding = SmartContextMenuDefaults.rowSmallItemPadding,
+    this.rowMediumItemPadding = SmartContextMenuDefaults.rowMediumItemPadding,
+    this.rowItemChildrenGap = SmartContextMenuDefaults.rowItemChildrenGap,
+    this.rowTitleStyle = SmartContextMenuDefaults.rowTitleStyle,
+    this.rowDividerIndent = 0,
+    this.rowDividerEndIndent = 0,
     this.defaultIconSize = SmartContextMenuDefaults.iconSize,
     this.defaultIconColor,
     this.submenuIcon = SmartContextMenuDefaults.submenuIcon,
@@ -403,6 +464,14 @@ final class SmartContextMenuStyle {
     double? separatorThickness,
     @Deprecated('Use separatorThickness instead.') double? separatorHeight,
     Color? separatorColor,
+    EdgeInsets? rowPadding,
+    double? rowChildrenGap,
+    EdgeInsets? rowSmallItemPadding,
+    EdgeInsets? rowMediumItemPadding,
+    double? rowItemChildrenGap,
+    TextStyle? rowTitleStyle,
+    double? rowDividerIndent,
+    double? rowDividerEndIndent,
     double? defaultIconSize,
     Color? defaultIconColor,
     IconData? submenuIcon,
@@ -450,6 +519,14 @@ final class SmartContextMenuStyle {
       separatorThickness:
           separatorThickness ?? separatorHeight ?? this.separatorThickness,
       separatorColor: separatorColor ?? this.separatorColor,
+      rowPadding: rowPadding ?? this.rowPadding,
+      rowChildrenGap: rowChildrenGap ?? this.rowChildrenGap,
+      rowSmallItemPadding: rowSmallItemPadding ?? this.rowSmallItemPadding,
+      rowMediumItemPadding: rowMediumItemPadding ?? this.rowMediumItemPadding,
+      rowItemChildrenGap: rowItemChildrenGap ?? this.rowItemChildrenGap,
+      rowTitleStyle: rowTitleStyle ?? this.rowTitleStyle,
+      rowDividerIndent: rowDividerIndent ?? this.rowDividerIndent,
+      rowDividerEndIndent: rowDividerEndIndent ?? this.rowDividerEndIndent,
       defaultIconSize: defaultIconSize ?? this.defaultIconSize,
       defaultIconColor: defaultIconColor ?? this.defaultIconColor,
       submenuIcon: submenuIcon ?? this.submenuIcon,

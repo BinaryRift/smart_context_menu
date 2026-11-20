@@ -10,12 +10,14 @@ import '../../../core/ui/motion/transitions/tricky_transition.dart';
 import '../../../domain/smart_context_menu_config.dart';
 import '../../../domain/smart_context_menu_item.dart';
 import '../../../domain/smart_context_menu_item_state.dart';
+import '../../../domain/smart_context_menu_row_size.dart';
 import '../../../domain/smart_context_menu_style.dart';
 import '../../extensions/render_object_ext.dart';
 import '../../keys/item_content_key.dart';
 import '../../keys/service_item_key.dart';
 import '../../state/smart_context_menu_hover_controller.dart';
 import '../../theme/smart_context_menu_item_colors.dart';
+import 'smart_context_menu_item_cell.dart';
 import 'smart_context_menu_item_row.dart';
 import 'smart_context_menu_status_content.dart';
 
@@ -28,12 +30,16 @@ final class SmartContextMenuItemView extends StatefulWidget {
   final ValueChanged<SmartContextMenuItem>? onTap;
   final SmartContextMenuHoverController? hoverController;
 
+  /// The size of the cell if the item is shown in a row, or null in a list.
+  final SmartContextMenuRowSize? rowSize;
+
   const SmartContextMenuItemView({
     super.key,
     required this.item,
     required this.config,
     this.onTap,
     this.hoverController,
+    this.rowSize,
   }) : cachedItem = null,
        onLoaded = null,
        onRetry = null;
@@ -46,6 +52,7 @@ final class SmartContextMenuItemView extends StatefulWidget {
     required this.onLoaded,
     this.cachedItem,
     this.hoverController,
+    this.rowSize,
   }) : onRetry = null;
 
   const SmartContextMenuItemView.error({
@@ -54,6 +61,7 @@ final class SmartContextMenuItemView extends StatefulWidget {
     required this.config,
     required this.onRetry,
     this.hoverController,
+    this.rowSize,
   }) : onTap = null,
        cachedItem = null,
        onLoaded = null;
@@ -112,7 +120,7 @@ final class _SmartContextMenuItemViewState
 
   // A failed load keeps the padding of the loading item, so the item does
   // not change its size.
-  EdgeInsetsGeometry get _padding =>
+  EdgeInsets get _padding =>
       switch (_item) {
         SmartContextMenuContentItem(:final padding) ||
         SmartContextMenuStatusItem(:final padding) => padding,
@@ -123,7 +131,11 @@ final class _SmartContextMenuItemViewState
           loading.padding,
         _ => null,
       } ??
-      _style.itemPadding;
+      switch (widget.rowSize) {
+        null => _style.itemPadding,
+        SmartContextMenuRowSize.small => _style.rowSmallItemPadding,
+        SmartContextMenuRowSize.medium => _style.rowMediumItemPadding,
+      };
 
   static Listenable? _listenableOf(SmartContextMenuItem item) => switch (item) {
     SmartContextMenuListenableItem(:final listenable) => listenable,
@@ -206,6 +218,7 @@ final class _SmartContextMenuItemViewState
       isDisabled: isDisabled,
       isDestructive: isDestructive,
       foregroundColor: colors.foreground,
+      rowSize: widget.rowSize,
     );
 
     final item = MetaData(
@@ -219,6 +232,13 @@ final class _SmartContextMenuItemViewState
           duration: MotionDurations.fast,
           transitionBuilder: (child, animation) =>
               TrickyTransition(animation: animation, child: child),
+          // A cell lower than its row keeps its content at the top.
+          layoutBuilder: widget.rowSize == null
+              ? AnimatedSwitcher.defaultLayoutBuilder
+              : (currentChild, previousChildren) => Stack(
+                  alignment: Alignment.topCenter,
+                  children: [...previousChildren, ?currentChild],
+                ),
           child: _buildContent(itemState),
         ),
       ),
@@ -269,16 +289,26 @@ final class _SmartContextMenuItemViewState
         foregroundColor: state.foregroundColor,
         // The menu retries the failed load on tap.
         retries: _error != null,
+        rowSize: widget.rowSize,
       ),
       SmartContextMenuContentItem item => KeyedSubtree(
         key: ItemContentKey.content,
         child:
             item.customBuilder?.call(context, state) ??
-            SmartContextMenuItemRow.content(
-              item: item,
-              style: _style,
-              foregroundColor: state.foregroundColor,
-            ),
+            switch (widget.rowSize) {
+              null => SmartContextMenuItemRow.content(
+                item: item,
+                style: _style,
+                foregroundColor: state.foregroundColor,
+              ),
+              final size => SmartContextMenuItemCell.content(
+                item: item,
+                size: size,
+                padding: _padding,
+                style: _style,
+                foregroundColor: state.foregroundColor,
+              ),
+            },
       ),
       // Async and listenable items show the item they load or build, and
       // a separator and a row are built without the item frame.

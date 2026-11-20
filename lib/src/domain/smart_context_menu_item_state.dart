@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart' show Color;
 import 'package:meta/meta.dart' show internal;
 
+import 'smart_context_menu_row_size.dart';
+
 /// The current state of an item, passed to its builders.
 ///
 /// Received by [SmartContextMenuContentItem.customBuilder]. Created by the menu.
@@ -33,6 +35,13 @@ final class SmartContextMenuItemState {
   /// [SmartContextMenuContentItem.titleStyle] and [SmartContextMenuStyle].
   final Color foregroundColor;
 
+  /// The size of the cell if the item is shown in a
+  /// [SmartContextMenuItem.row], or null elsewhere.
+  ///
+  /// Lets a custom builder fit its content to a cell, for example show only
+  /// an icon in a [SmartContextMenuRowSize.small] cell.
+  final SmartContextMenuRowSize? rowSize;
+
   /// Creates an item state. Used by the menu.
   @internal
   const SmartContextMenuItemState({
@@ -41,5 +50,6 @@ final class SmartContextMenuItemState {
     required this.isDisabled,
     required this.isDestructive,
     required this.foregroundColor,
+    this.rowSize,
   });
 }

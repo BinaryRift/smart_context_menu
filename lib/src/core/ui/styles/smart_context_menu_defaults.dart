@@ -36,6 +36,21 @@ abstract final class SmartContextMenuDefaults {
     vertical: 12,
   );
 
+  /// The default of [SmartContextMenuStyle.rowSmallItemPadding].
+  static const EdgeInsets rowSmallItemPadding = EdgeInsets.symmetric(
+    horizontal: 4,
+    vertical: 14,
+  );
+
+  /// The default of [SmartContextMenuStyle.rowMediumItemPadding].
+  static const EdgeInsets rowMediumItemPadding = EdgeInsets.symmetric(
+    horizontal: 4,
+    vertical: 10,
+  );
+
+  /// The default of [SmartContextMenuStyle.rowItemChildrenGap].
+  static const double rowItemChildrenGap = 4;
+
   /// The default of [SmartContextMenuStyle.loaderVerticalPadding].
   static const double loaderVerticalPadding = 12;
 
@@ -222,6 +237,10 @@ abstract final class SmartContextMenuDefaults {
   static const TextStyle backButtonTitleStyle = TextStyle(
     fontWeight: FontWeight.w600,
   );
+
+  /// The default of [SmartContextMenuStyle.rowTitleStyle]: smaller, so that
+  /// titles fit narrow cells.
+  static const TextStyle rowTitleStyle = TextStyle(fontSize: 12);
 
   /// The default of [SmartContextMenuStyle.titleMaxLines].
   static const int titleMaxLines = 2;

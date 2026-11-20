@@ -4,13 +4,17 @@ import 'package:flutter/widgets.dart';
 
 import '../../../domain/smart_context_menu_config.dart';
 import '../../../domain/smart_context_menu_item.dart';
+import '../../../domain/smart_context_menu_row_size.dart';
+import 'smart_context_menu_item_cell.dart';
 import 'smart_context_menu_item_row.dart';
 
 /// The content of a loading, error or empty item.
 ///
 /// Shows [SmartContextMenuStatusItem.child] in the item color, or a row
 /// with the title and the sign of the state after it, unless the item has
-/// its own.
+/// its own. In a cell of a row, with [rowSize], it shows the sign of the
+/// state, and in a medium cell the title below it, without the leading and
+/// the trailing of the item.
 final class SmartContextMenuStatusContent extends StatelessWidget {
   final SmartContextMenuStatusItem item;
   final SmartContextMenuConfig config;
@@ -22,12 +26,16 @@ final class SmartContextMenuStatusContent extends StatelessWidget {
   /// tap: then it shows the retry title and icon.
   final bool retries;
 
+  /// The size of the cell if the item is shown in a row.
+  final SmartContextMenuRowSize? rowSize;
+
   const SmartContextMenuStatusContent({
     super.key,
     required this.item,
     required this.config,
     required this.foregroundColor,
     this.retries = false,
+    this.rowSize,
   });
 
   @override
@@ -47,26 +55,42 @@ final class SmartContextMenuStatusContent extends StatelessWidget {
     }
 
     final labels = config.labels;
-    final (String title, Widget sign) = switch (item) {
+    // The titles in a list and in a row, and the sign of the state.
+    final (String title, String rowTitle, Widget sign) = switch (item) {
       _ when retries => (
         labels.retry,
+        labels.rowRetry,
         Icon(style.retryIcon, size: style.defaultIconSize),
       ),
       SmartContextMenuLoadingItem() => (
         labels.loading,
+        labels.rowLoading,
         // As large as the icons of other items.
         style.loadingIndicator ??
             CupertinoActivityIndicator(radius: style.defaultIconSize / 2),
       ),
       SmartContextMenuErrorItem() => (
         labels.error,
+        labels.rowError,
         Icon(style.errorIcon, size: style.defaultIconSize),
       ),
       SmartContextMenuEmptyItem() => (
         labels.empty,
+        labels.rowEmpty,
         Icon(style.emptyIcon, size: style.defaultIconSize),
       ),
     };
+    if (rowSize case final size?) {
+      return SmartContextMenuItemCell(
+        title: item.title ?? rowTitle,
+        titleStyle: item.titleStyle,
+        leading: sign,
+        childrenGap: item.childrenGap,
+        size: size,
+        style: style,
+        foregroundColor: foregroundColor,
+      );
+    }
     return SmartContextMenuItemRow(
       title: item.title ?? title,
       titleStyle: item.titleStyle,
