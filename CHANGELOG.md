@@ -1,9 +1,12 @@
 ## 1.1.0 (unreleased)
 
 * The menu opens on a right click or a two-finger click on a trackpad in the default
-  `longPress` activation mode. A secondary pointer-down handler on the child also runs;
-  a secondary tap handler waiting for release can be canceled as the menu opens.
-* Menu items highlight on cursor hover on desktop and web, without selecting an action.
+  `longPress` activation mode. Of nested menus, only the innermost one opens. A secondary
+  pointer-down handler on the child also runs; a secondary tap handler waiting for release
+  can be canceled as the menu opens.
+* Menu items highlight on cursor hover on desktop and web, without selecting an action. The
+  highlight follows the item under a stationary cursor as the menu scrolls, switches levels
+  or resizes. Items are selected with the primary mouse button only.
   `SmartContextMenuItemState.isHovered` tells hover from a press in `customBuilder`.
 * `backButtonDecoration` sets the background of the pinned Back item and clips its blur to the
   decoration's shape. `backButtonForegroundColor` colors its title and icon; the old
