@@ -356,9 +356,12 @@ sealed class SmartContextMenuItem implements _MenuNode {
   /// [SmartContextMenuStyle.separatorColor];
   /// [child] replaces the band, for example with a section title.
   ///
-  /// A separator at the start or the end of a menu level is not shown, and
-  /// of several separators next to each other only the first one is. So
-  /// items shown on condition can keep their separators without extra
+  /// A band is shown only between items: not at the start or the end of
+  /// a menu level. A separator with a [child] titles the items after it, so
+  /// it is also shown at the start of a level, below the back item of
+  /// a submenu, but not at the end. Of several separators next to each
+  /// other, the last one with a [child] is shown, or else the first band.
+  /// So items shown on condition can keep their separators without extra
   /// checks. A separator at the end of a loaded page appears when the next
   /// page loads; set [pagingMetadata] on it if it is the last item of
   /// a page, see [SmartContextMenuItem.pagingSubmenu]. In
@@ -657,9 +660,10 @@ sealed class SmartContextMenuItem implements _MenuNode {
   ///
   /// A separator in a row is a vertical band of
   /// [SmartContextMenuStyle.separatorThickness]; its `child` replaces the
-  /// band and takes the height of the row. As in a menu level, a separator
-  /// at the start or the end of the row is not shown, and of several
-  /// separators next to each other only the first one is. A row without
+  /// band and takes the height of the row. The same rules apply as in a menu
+  /// level: a band is shown only between cells, a separator with a child
+  /// also at the start of the row, and of several separators next to each
+  /// other only one is shown. A row without
   /// cells, or with separators only, is not shown, so cells shown on
   /// condition need no extra checks.
   ///

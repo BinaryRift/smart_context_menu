@@ -65,6 +65,47 @@ void main() {
       expect(share.left - copy.right, defaultStyle.separatorThickness);
     });
 
+    testWidgets('shows a title at the start but not at the end', (
+      tester,
+    ) async {
+      await tester.pumpMenu(
+        items: [
+          SmartContextMenuItem.row(
+            children: [
+              SmartContextMenuItem.separator(child: const Text('Speed')),
+              rowCell('Slow'),
+              rowCell('Fast'),
+              SmartContextMenuItem.separator(child: const Text('End')),
+            ],
+          ),
+        ],
+      );
+      await tester.openMenu();
+
+      expect(find.text('Speed'), findsOneWidget);
+      expect(find.text('End'), findsNothing);
+      final row = tester.getRect(rowLayouts);
+      expect(tester.getTopLeft(find.text('Speed')).dx, row.left);
+      expect(tester.cellRectOf('Fast').right, row.right);
+    });
+
+    testWidgets('a row with a title only is not shown', (tester) async {
+      await tester.pumpMenu(
+        items: [
+          SmartContextMenuItem.simple(title: 'Copy'),
+          SmartContextMenuItem.row(
+            children: [
+              SmartContextMenuItem.separator(child: const Text('Speed')),
+            ],
+          ),
+        ],
+      );
+      await tester.openMenu();
+
+      expect(find.text('Speed'), findsNothing);
+      expect(rowLayouts, findsNothing);
+    });
+
     testWidgets('shows its child as tall as the row', (tester) async {
       await tester.pumpMenu(
         items: [

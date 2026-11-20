@@ -11,6 +11,7 @@ import '../../domain/smart_context_menu_item.dart';
 import '../../domain/smart_context_menu_level.dart';
 import '../../domain/smart_context_menu_row_size.dart';
 import '../keys/service_item_key.dart';
+import '../layout/smart_context_menu_separator_rule.dart';
 import '../state/smart_context_menu_hover_controller.dart';
 import '../widgets/smart_context_menu_back_item.dart';
 import '../widgets/smart_context_menu_divider.dart';
@@ -205,7 +206,11 @@ final class SmartContextMenuLevelView extends StatelessWidget {
     final item = level.items[relativeIndex];
     if (_isHidden(item) ||
         item is SmartContextMenuSeparatorItem &&
-            !_showsSeparatorAt(relativeIndex)) {
+            !SmartContextMenuSeparatorRule.showsAt(
+              level.items,
+              relativeIndex,
+              isHidden: _isHidden,
+            )) {
       return const SizedBox.shrink();
     }
 
@@ -242,44 +247,20 @@ final class SmartContextMenuLevelView extends StatelessWidget {
   static bool _isHidden(SmartContextMenuItem item) =>
       item is SmartContextMenuRowItem && _cellsOf(item).isEmpty;
 
-  // A separator is shown only between items: not at the start or the end
-  // of the level, and only the first one of several in a row. Items shown
-  // on condition can keep their separators without extra checks. Hidden
-  // rows do not count.
-  bool _showsSeparatorAt(int index) {
-    final items = level.items;
-    final previous = items
-        .take(index)
-        .where((item) => !_isHidden(item))
-        .lastOrNull;
-    if (previous is SmartContextMenuSeparatorItem) return false;
-    final hasItemBefore = items.take(index).any(_isContent);
-    final hasItemAfter = items.skip(index + 1).any(_isContent);
-    return hasItemBefore && hasItemAfter;
-  }
-
-  static bool _isContent(SmartContextMenuItem item) =>
-      item is! SmartContextMenuSeparatorItem && !_isHidden(item);
-
   /// The items of [row] with their flex, without the separators that are
   /// not shown: the same rules apply as in a level.
   static List<(SmartContextMenuItem, int?)> _cellsOf(
     SmartContextMenuRowItem row,
   ) {
-    final cells = <(SmartContextMenuItem, int?)>[];
-    for (final entry in row.children) {
-      final cell = _unwrap(entry);
-      final isSeparator = cell.$1 is SmartContextMenuSeparatorItem;
-      if (isSeparator &&
-          (cells.isEmpty || cells.last.$1 is SmartContextMenuSeparatorItem)) {
-        continue;
-      }
-      cells.add(isSeparator ? (cell.$1, null) : cell);
-    }
-    while (cells.lastOrNull?.$1 is SmartContextMenuSeparatorItem) {
-      cells.removeLast();
-    }
-    return cells;
+    final entries = row.children.map(_unwrap).toList();
+    final items = [for (final (item, _) in entries) item];
+    return [
+      for (var i = 0; i < entries.length; i++)
+        if (items[i] is! SmartContextMenuSeparatorItem)
+          entries[i]
+        else if (SmartContextMenuSeparatorRule.showsAt(items, i))
+          (items[i], null),
+    ];
   }
 
   static (SmartContextMenuItem, int?) _unwrap(SmartContextMenuRowEntry entry) {

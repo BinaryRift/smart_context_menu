@@ -276,20 +276,22 @@ List<SmartContextMenuItem> _swipeBackRows() => [
   _action('Reset', icon: CupertinoIcons.arrow_counterclockwise),
 ];
 
-/// A caption above a row. Without an action it is not highlighted and
-/// ignores taps. A separator would not do: it is not shown at the start of
-/// a level.
-SmartContextMenuSimpleItem _caption(String text) {
-  return SmartContextMenuItem.simple(
-    closeOnTap: false,
-    padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
-    customBuilder: (context, state) => Text(
-      text,
-      style: TextStyle(
-        fontSize: 13,
-        color: CupertinoDynamicColor.resolve(
-          CupertinoColors.secondaryLabel,
-          context,
+/// A caption above a row: a section title, shown at the start of a level
+/// too.
+SmartContextMenuSeparatorItem _caption(String text) {
+  return SmartContextMenuItem.separator(
+    child: Padding(
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
+      child: Builder(
+        builder: (context) => Text(
+          text,
+          style: TextStyle(
+            fontSize: 13,
+            color: CupertinoDynamicColor.resolve(
+              CupertinoColors.secondaryLabel,
+              context,
+            ),
+          ),
         ),
       ),
     ),

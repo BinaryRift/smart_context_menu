@@ -110,32 +110,95 @@ void main() {
   group('cleanup', () {
     Finder sections() => find.textContaining('Section');
 
-    testWidgets('hides separators at the start and the end', (tester) async {
+    Finder bands() => bandOf(SmartContextMenuDefaults.separatorColor.color);
+
+    testWidgets('hides bands at the start and the end', (tester) async {
       await tester.pumpMenu(
+        brightness: Brightness.light,
         items: [
-          SmartContextMenuItem.separator(child: const Text('Section 1')),
+          SmartContextMenuItem.separator(),
           SmartContextMenuItem.simple(title: 'Copy'),
-          SmartContextMenuItem.separator(child: const Text('Section 2')),
+          SmartContextMenuItem.separator(),
         ],
       );
       await tester.openMenu();
 
-      expect(sections(), findsNothing);
+      expect(bands(), findsNothing);
     });
 
-    testWidgets('shows one of several separators in a row', (tester) async {
+    testWidgets('shows a title at the start but not at the end', (
+      tester,
+    ) async {
       await tester.pumpMenu(
         items: [
-          SmartContextMenuItem.simple(title: 'Copy'),
           SmartContextMenuItem.separator(child: const Text('Section 1')),
+          SmartContextMenuItem.simple(title: 'Copy'),
           SmartContextMenuItem.separator(child: const Text('Section 2')),
-          SmartContextMenuItem.simple(title: 'Delete'),
         ],
       );
       await tester.openMenu();
 
       expect(find.text('Section 1'), findsOneWidget);
       expect(find.text('Section 2'), findsNothing);
+    });
+
+    testWidgets('shows a title at the start of a submenu', (tester) async {
+      await tester.pumpMenu(
+        items: [
+          SmartContextMenuItem.submenu(
+            title: 'More',
+            children: [
+              SmartContextMenuItem.separator(child: const Text('Section')),
+              SmartContextMenuItem.simple(title: 'Child'),
+            ],
+          ),
+        ],
+      );
+      await tester.openMenu();
+      await tester.tap(find.text('More'));
+      await tester.settleMenu();
+
+      expect(find.text('Section'), findsOneWidget);
+      expect(
+        tester.getTopLeft(find.text('Section')).dy,
+        greaterThan(tester.getBottomLeft(find.text('Back').first).dy),
+      );
+    });
+
+    testWidgets('shows one of several bands in a row', (tester) async {
+      await tester.pumpMenu(
+        brightness: Brightness.light,
+        items: [
+          SmartContextMenuItem.simple(title: 'Copy'),
+          SmartContextMenuItem.separator(),
+          SmartContextMenuItem.separator(),
+          SmartContextMenuItem.simple(title: 'Delete'),
+        ],
+      );
+      await tester.openMenu();
+
+      expect(bands(), findsOneWidget);
+    });
+
+    testWidgets('shows only the last title of several separators', (
+      tester,
+    ) async {
+      await tester.pumpMenu(
+        brightness: Brightness.light,
+        items: [
+          SmartContextMenuItem.simple(title: 'Copy'),
+          SmartContextMenuItem.separator(),
+          SmartContextMenuItem.separator(child: const Text('Section 1')),
+          SmartContextMenuItem.separator(child: const Text('Section 2')),
+          SmartContextMenuItem.separator(),
+          SmartContextMenuItem.simple(title: 'Delete'),
+        ],
+      );
+      await tester.openMenu();
+
+      expect(find.text('Section 1'), findsNothing);
+      expect(find.text('Section 2'), findsOneWidget);
+      expect(bands(), findsNothing);
     });
 
     testWidgets('keeps items shown on condition free of checks', (
