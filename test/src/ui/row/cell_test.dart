@@ -202,7 +202,9 @@ void main() {
   });
 
   group('title style', () {
-    testWidgets('merges rowTitleStyle over the title style', (tester) async {
+    testWidgets('merges the row title style over the title style', (
+      tester,
+    ) async {
       await _pumpCells(tester, [
         SmartContextMenuItem.simple(
           title: 'Copy',
@@ -223,12 +225,16 @@ void main() {
       );
     });
 
-    testWidgets('takes rowTitleStyle from the style', (tester) async {
+    testWidgets('takes the row title style from the style', (tester) async {
       await _pumpCells(
         tester,
         [SmartContextMenuItem.simple(title: 'Copy')],
         config: const SmartContextMenuConfig(
-          style: SmartContextMenuStyle(rowTitleStyle: TextStyle(fontSize: 10)),
+          style: SmartContextMenuStyle(
+            rowStyle: SmartContextMenuRowStyle(
+              titleStyle: TextStyle(fontSize: 10),
+            ),
+          ),
         ),
       );
 
@@ -261,9 +267,11 @@ void main() {
       const medium = EdgeInsets.all(2);
       const config = SmartContextMenuConfig(
         style: SmartContextMenuStyle(
-          rowSmallItemPadding: small,
-          rowMediumItemPadding: medium,
-          rowItemChildrenGap: 7,
+          rowStyle: SmartContextMenuRowStyle(
+            smallItemPadding: small,
+            mediumItemPadding: medium,
+            itemChildrenGap: 7,
+          ),
         ),
       );
 

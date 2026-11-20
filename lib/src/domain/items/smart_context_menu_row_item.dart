@@ -29,12 +29,12 @@ final class SmartContextMenuRowItem extends SmartContextMenuItem {
 
   /// The padding around the cells.
   ///
-  /// If null, [SmartContextMenuStyle.rowPadding] is used.
+  /// If null, [SmartContextMenuRowStyle.padding] is used.
   final EdgeInsets? padding;
 
   /// The gap between the cells.
   ///
-  /// If null, [SmartContextMenuStyle.rowChildrenGap] is used. The gap belongs
+  /// If null, [SmartContextMenuRowStyle.childrenGap] is used. The gap belongs
   /// to no cell: a finger over it removes the highlight.
   final double? childrenGap;
 

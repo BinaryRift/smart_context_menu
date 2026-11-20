@@ -70,7 +70,7 @@ final class SmartContextMenuItemCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textStyle = (titleStyle ?? style.titleStyle)
-        .merge(style.rowTitleStyle)
+        .merge(style.rowStyle.titleStyle)
         .copyWith(color: foregroundColor);
     final titleText = Text(
       title,
@@ -89,7 +89,7 @@ final class SmartContextMenuItemCell extends StatelessWidget {
       SmartContextMenuRowSize.medium => [
         ?leading,
         if (leading != null && title.isNotEmpty)
-          SizedBox(height: childrenGap ?? style.rowItemChildrenGap),
+          SizedBox(height: childrenGap ?? style.rowStyle.itemChildrenGap),
         if (title.isNotEmpty || leading == null) titleText,
       ],
     };

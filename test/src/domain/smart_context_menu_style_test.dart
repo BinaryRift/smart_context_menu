@@ -37,14 +37,7 @@ void main() {
       dividersBetweenItems: true,
       separatorThickness: 1,
       separatorColor: Color(0xFF00000C),
-      rowPadding: EdgeInsets.all(1),
-      rowChildrenGap: 1,
-      rowSmallItemPadding: EdgeInsets.all(1),
-      rowMediumItemPadding: EdgeInsets.all(1),
-      rowItemChildrenGap: 1,
-      rowTitleStyle: TextStyle(fontSize: 11),
-      rowDividerIndent: 1,
-      rowDividerEndIndent: 1,
+      rowStyle: SmartContextMenuRowStyle(childrenGap: 1),
       defaultIconSize: 11,
       defaultIconColor: Color(0xFF000009),
       submenuIcon: Icons.arrow_forward_ios,
@@ -86,14 +79,7 @@ void main() {
       'dividersBetweenItems': (s) => s.dividersBetweenItems,
       'separatorThickness': (s) => s.separatorThickness,
       'separatorColor': (s) => s.separatorColor,
-      'rowPadding': (s) => s.rowPadding,
-      'rowChildrenGap': (s) => s.rowChildrenGap,
-      'rowSmallItemPadding': (s) => s.rowSmallItemPadding,
-      'rowMediumItemPadding': (s) => s.rowMediumItemPadding,
-      'rowItemChildrenGap': (s) => s.rowItemChildrenGap,
-      'rowTitleStyle': (s) => s.rowTitleStyle,
-      'rowDividerIndent': (s) => s.rowDividerIndent,
-      'rowDividerEndIndent': (s) => s.rowDividerEndIndent,
+      'rowStyle': (s) => s.rowStyle,
       'defaultIconSize': (s) => s.defaultIconSize,
       'defaultIconColor': (s) => s.defaultIconColor,
       'submenuIcon': (s) => s.submenuIcon,
@@ -111,6 +97,7 @@ void main() {
     const decoration = BoxDecoration(color: color);
     const titleStyle = TextStyle(fontSize: 19);
     const indicator = SizedBox(width: 9);
+    const rowStyle = SmartContextMenuRowStyle(childrenGap: 9);
     final changes = <String, (Object, SmartContextMenuStyle Function())>{
       'menuColor': (color, () => original.copyWith(menuColor: color)),
       'borderColor': (color, () => original.copyWith(borderColor: color)),
@@ -186,32 +173,7 @@ void main() {
         () => original.copyWith(separatorThickness: 9),
       ),
       'separatorColor': (color, () => original.copyWith(separatorColor: color)),
-      'rowPadding': (
-        const EdgeInsets.all(9),
-        () => original.copyWith(rowPadding: const EdgeInsets.all(9)),
-      ),
-      'rowChildrenGap': (9.0, () => original.copyWith(rowChildrenGap: 9)),
-      'rowSmallItemPadding': (
-        const EdgeInsets.all(9),
-        () => original.copyWith(rowSmallItemPadding: const EdgeInsets.all(9)),
-      ),
-      'rowMediumItemPadding': (
-        const EdgeInsets.all(9),
-        () => original.copyWith(rowMediumItemPadding: const EdgeInsets.all(9)),
-      ),
-      'rowItemChildrenGap': (
-        9.0,
-        () => original.copyWith(rowItemChildrenGap: 9),
-      ),
-      'rowTitleStyle': (
-        titleStyle,
-        () => original.copyWith(rowTitleStyle: titleStyle),
-      ),
-      'rowDividerIndent': (9.0, () => original.copyWith(rowDividerIndent: 9)),
-      'rowDividerEndIndent': (
-        9.0,
-        () => original.copyWith(rowDividerEndIndent: 9),
-      ),
+      'rowStyle': (rowStyle, () => original.copyWith(rowStyle: rowStyle)),
       'defaultIconSize': (19.0, () => original.copyWith(defaultIconSize: 19)),
       'defaultIconColor': (
         color,
@@ -271,28 +233,6 @@ void main() {
         }
       });
     }
-  });
-
-  test('row fields have their defaults', () {
-    const style = SmartContextMenuStyle();
-
-    expect(style.rowPadding, EdgeInsets.zero);
-    expect(style.rowChildrenGap, 0);
-    expect(
-      style.rowSmallItemPadding,
-      SmartContextMenuDefaults.rowSmallItemPadding,
-    );
-    expect(
-      style.rowMediumItemPadding,
-      SmartContextMenuDefaults.rowMediumItemPadding,
-    );
-    expect(
-      style.rowItemChildrenGap,
-      SmartContextMenuDefaults.rowItemChildrenGap,
-    );
-    expect(style.rowTitleStyle, SmartContextMenuDefaults.rowTitleStyle);
-    expect(style.rowDividerIndent, 0);
-    expect(style.rowDividerEndIndent, 0);
   });
 
   test('backButtonColor remains a compatible alias', () {

@@ -133,8 +133,8 @@ final class _SmartContextMenuItemViewState
       } ??
       switch (widget.rowSize) {
         null => _style.itemPadding,
-        SmartContextMenuRowSize.small => _style.rowSmallItemPadding,
-        SmartContextMenuRowSize.medium => _style.rowMediumItemPadding,
+        SmartContextMenuRowSize.small => _style.rowStyle.smallItemPadding,
+        SmartContextMenuRowSize.medium => _style.rowStyle.mediumItemPadding,
       };
 
   static Listenable? _listenableOf(SmartContextMenuItem item) => switch (item) {

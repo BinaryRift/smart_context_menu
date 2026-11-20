@@ -666,8 +666,8 @@ sealed class SmartContextMenuItem implements _MenuNode {
   /// is drawn next to a separator.
   ///
   /// [padding] is the padding around the cells and [childrenGap] the gap
-  /// between them. If null, [SmartContextMenuStyle.rowPadding] and
-  /// [SmartContextMenuStyle.rowChildrenGap] are used. The gap belongs to no
+  /// between them. If null, [SmartContextMenuRowStyle.padding] and
+  /// [SmartContextMenuRowStyle.childrenGap] are used. The gap belongs to no
   /// cell: a finger over it removes the highlight.
   ///
   /// With [enableSwipeBack] false, the default, a horizontal drag that
