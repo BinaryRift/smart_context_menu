@@ -63,7 +63,11 @@ final class _ChatPageState extends State<ChatPage> {
     // with the titles of the other items.
     return SmartContextMenuTheme(
       config: theme.copyWith(
-        style: theme.style.copyWith(statusTitleAlign: TextAlign.start),
+        style: theme.style.copyWith(
+          statusStyle: theme.style.statusStyle.copyWith(
+            titleAlign: TextAlign.start,
+          ),
+        ),
       ),
       child: _buildPage(),
     );

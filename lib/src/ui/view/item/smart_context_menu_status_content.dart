@@ -55,29 +55,30 @@ final class SmartContextMenuStatusContent extends StatelessWidget {
     }
 
     final labels = config.labels;
+    final statusStyle = style.statusStyle;
     // The titles in a list and in a row, and the sign of the state.
     final (String title, String rowTitle, Widget sign) = switch (item) {
       _ when retries => (
         labels.retry,
         labels.rowRetry,
-        Icon(style.retryIcon, size: style.defaultIconSize),
+        Icon(statusStyle.retryIcon, size: style.defaultIconSize),
       ),
       SmartContextMenuLoadingItem() => (
         labels.loading,
         labels.rowLoading,
         // As large as the icons of other items.
-        style.loadingIndicator ??
+        statusStyle.loadingIndicator ??
             CupertinoActivityIndicator(radius: style.defaultIconSize / 2),
       ),
       SmartContextMenuErrorItem() => (
         labels.error,
         labels.rowError,
-        Icon(style.errorIcon, size: style.defaultIconSize),
+        Icon(statusStyle.errorIcon, size: style.defaultIconSize),
       ),
       SmartContextMenuEmptyItem() => (
         labels.empty,
         labels.rowEmpty,
-        Icon(style.emptyIcon, size: style.defaultIconSize),
+        Icon(statusStyle.emptyIcon, size: style.defaultIconSize),
       ),
     };
     if (rowSize case final size?) {
@@ -99,7 +100,7 @@ final class SmartContextMenuStatusContent extends StatelessWidget {
       childrenGap: item.childrenGap,
       style: style,
       foregroundColor: foregroundColor,
-      titleAlign: style.statusTitleAlign,
+      titleAlign: statusStyle.titleAlign,
     );
   }
 }

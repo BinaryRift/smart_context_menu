@@ -5,7 +5,7 @@ part of '../smart_context_menu_item.dart';
 ///
 /// It does not respond to taps and is not dimmed. Its [title] is aligned
 /// between [leading] and [trailing] by
-/// [SmartContextMenuStyle.statusTitleAlign], in the middle by default. A sign
+/// [SmartContextMenuStatusStyle.titleAlign], in the middle by default. A sign
 /// of the state is shown after [title] unless [trailing] is set. In
 /// a [SmartContextMenuItem.row] the item always shows the sign of the state,
 /// without [leading] and [trailing].

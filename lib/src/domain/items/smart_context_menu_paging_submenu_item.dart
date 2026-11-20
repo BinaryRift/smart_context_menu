@@ -21,14 +21,14 @@ final class SmartContextMenuPagingSubmenuItem
   /// The item shown after the loaded items while a page is loading.
   ///
   /// If null, the submenu shows an activity indicator in the middle, see
-  /// [SmartContextMenuStyle.loaderVerticalPadding].
+  /// [SmartContextMenuStatusStyle.loaderVerticalPadding].
   final SmartContextMenuLoadingItem? loading;
 
   /// The item shown after the loaded items when a page has failed to load.
   ///
   /// Tapping it retries loading the page. Without its own title and
   /// trailing, it shows [SmartContextMenuLabels.retry] and
-  /// [SmartContextMenuStyle.retryIcon]. If null, it is a default
+  /// [SmartContextMenuStatusStyle.retryIcon]. If null, it is a default
   /// [SmartContextMenuItem.error].
   final SmartContextMenuErrorItem? error;
 

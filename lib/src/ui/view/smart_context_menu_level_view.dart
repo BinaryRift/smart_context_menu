@@ -182,13 +182,14 @@ final class SmartContextMenuLevelView extends StatelessWidget {
   }
 
   SmartContextMenuLoadingItem _defaultLoadingItem() {
+    final statusStyle = config.style.statusStyle;
     return SmartContextMenuItem.loading(
       padding: EdgeInsets.symmetric(
-        vertical: config.style.loaderVerticalPadding,
+        vertical: statusStyle.loaderVerticalPadding,
       ),
       child: Center(
         child:
-            config.style.loadingIndicator ??
+            statusStyle.loadingIndicator ??
             const CupertinoActivityIndicator(
               radius: SmartContextMenuDefaults.loaderIndicatorRadius,
             ),

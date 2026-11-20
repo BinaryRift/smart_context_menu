@@ -1,26 +1,28 @@
 import 'package:flutter/widgets.dart'
     show
         BorderRadiusGeometry,
-        BoxDecoration,
         BoxShadow,
         Color,
         Decoration,
         EdgeInsets,
         IconData,
-        ShapeDecoration,
         TextAlign,
         TextStyle,
         Widget;
 
 import '../core/ui/styles/smart_context_menu_defaults.dart';
+import 'smart_context_menu_back_button_style.dart';
 import 'smart_context_menu_blur.dart';
 import 'smart_context_menu_row_style.dart';
+import 'smart_context_menu_status_style.dart';
 
 /// The appearance of a [SmartContextMenu]: colors, blurs, radii, text
 /// and icons.
 ///
 /// Set it as [SmartContextMenuConfig.style], in a [SmartContextMenuTheme]
 /// or for one menu. Every field has a default, so set only what you need.
+/// The back item, the status items and the rows have their own parts:
+/// [backButtonStyle], [statusStyle] and [rowStyle].
 ///
 /// Color fields may be [CupertinoDynamicColor]s, which are resolved for the
 /// current theme brightness. A plain [Color] is used as is in both themes.
@@ -39,7 +41,7 @@ final class SmartContextMenuStyle {
   /// The background color of the menu and the back item of submenus.
   ///
   /// Ignored for the menu itself when [menuDecoration] is set, and for the
-  /// back item when [backButtonDecoration] is set.
+  /// back item when [SmartContextMenuBackButtonStyle.decoration] is set.
   /// For a gradient menu, a partially transparent version of its top color
   /// can let the gradient show through the back item. The back item does not
   /// inherit the gradient directly.
@@ -62,8 +64,8 @@ final class SmartContextMenuStyle {
   ///
   /// Replaces the default decoration built from [menuColor], [borderColor]
   /// and [borderRadius]. The pinned back item of a submenu is painted
-  /// separately with [menuColor] or [backButtonDecoration], and
-  /// [backButtonBlur] to obscure scrolling items beneath it. It does not
+  /// separately with [menuColor] or its own decoration, and its own blur to
+  /// obscure scrolling items beneath it, see [backButtonStyle]. It does not
   /// inherit this decoration.
   final Decoration? menuDecoration;
 
@@ -94,45 +96,47 @@ final class SmartContextMenuStyle {
 
   // Back item
 
-  /// The background decoration of the back item pinned to a submenu.
+  /// The appearance of the back item pinned to the top of a submenu.
   ///
-  /// Replaces its default background from [menuColor] and
-  /// [backButtonBorderRadius]. The decoration determines the clip of both
-  /// the back item and [backButtonBlur]. It must support
-  /// [Decoration.getClipPath] for clipping; [BoxDecoration] and
-  /// [ShapeDecoration] do. Use a transparent decoration to show the blurred
-  /// scrolling items underneath without painting a background.
-  /// If null, the default background is used.
-  final Decoration? backButtonDecoration;
+  /// If none is given, it is built from the deprecated back item fields,
+  /// such as [backButtonBlur], which default to the defaults of
+  /// [SmartContextMenuBackButtonStyle].
+  SmartContextMenuBackButtonStyle get backButtonStyle =>
+      _backButtonStyle ??
+      SmartContextMenuBackButtonStyle(
+        blur: _backButtonBlur,
+        borderRadius: _backButtonBorderRadius,
+        foregroundColor: _backButtonColor,
+        titleStyle: _backButtonTitleStyle,
+        icon: _backIcon,
+      );
+  final SmartContextMenuBackButtonStyle? _backButtonStyle;
+  final SmartContextMenuBlur? _backButtonBlur;
+  final BorderRadiusGeometry _backButtonBorderRadius;
+  final Color? _backButtonColor;
+  final TextStyle _backButtonTitleStyle;
+  final IconData _backIcon;
 
-  /// The blur behind the back item pinned to the top of a submenu.
-  ///
-  /// Visible when submenu items scroll under the back item. If null,
-  /// they are not blurred. Defaults to [SmartContextMenuBlur.strong].
-  final SmartContextMenuBlur? backButtonBlur;
+  /// The former place of [SmartContextMenuBackButtonStyle.blur].
+  @Deprecated('Use backButtonStyle.blur instead.')
+  SmartContextMenuBlur? get backButtonBlur => backButtonStyle.blur;
 
-  /// The corner radius of the back item pinned to the top of a submenu.
-  ///
-  /// Ignored when [backButtonDecoration] is set; that decoration determines
-  /// the clip instead. Defaults to
-  /// [SmartContextMenuDefaults.backButtonBorderRadius].
-  final BorderRadiusGeometry backButtonBorderRadius;
+  /// The former place of [SmartContextMenuBackButtonStyle.borderRadius].
+  @Deprecated('Use backButtonStyle.borderRadius instead.')
+  BorderRadiusGeometry get backButtonBorderRadius =>
+      backButtonStyle.borderRadius;
 
-  /// The title and icon color of the back item in a submenu.
-  ///
-  /// If null, the title uses [backButtonTitleStyle] over [titleStyle], and
-  /// the icon uses [defaultIconColor].
-  final Color? backButtonForegroundColor;
+  /// The former place of [SmartContextMenuBackButtonStyle.foregroundColor].
+  @Deprecated('Use backButtonStyle.foregroundColor instead.')
+  Color? get backButtonColor => backButtonStyle.foregroundColor;
 
-  /// The former name of [backButtonForegroundColor].
-  @Deprecated('Use backButtonForegroundColor instead.')
-  Color? get backButtonColor => backButtonForegroundColor;
+  /// The former place of [SmartContextMenuBackButtonStyle.titleStyle].
+  @Deprecated('Use backButtonStyle.titleStyle instead.')
+  TextStyle get backButtonTitleStyle => backButtonStyle.titleStyle;
 
-  /// The style of the back item title, merged over [titleStyle].
-  ///
-  /// [backButtonForegroundColor] takes precedence over its color.
-  /// Defaults to [SmartContextMenuDefaults.backButtonTitleStyle].
-  final TextStyle backButtonTitleStyle;
+  /// The former place of [SmartContextMenuBackButtonStyle.icon].
+  @Deprecated('Use backButtonStyle.icon instead.')
+  IconData get backIcon => backButtonStyle.icon;
 
   // Items
 
@@ -156,8 +160,8 @@ final class SmartContextMenuStyle {
   ///
   /// Used for items without their own title style, see
   /// [SmartContextMenuContentItem.titleStyle], and for the
-  /// retry and loading items. The back item merges [backButtonTitleStyle]
-  /// over it. Its color is used only while an item is
+  /// retry and loading items. The back item merges
+  /// [SmartContextMenuBackButtonStyle.titleStyle] over it. Its color is used only while an item is
   /// enabled, not destructive and has no
   /// [SmartContextMenuContentItem.tintColor],
   /// and also tints the press highlight unless [highlightColor] is set.
@@ -170,13 +174,6 @@ final class SmartContextMenuStyle {
   /// Longer titles are truncated with an ellipsis.
   /// Defaults to [SmartContextMenuDefaults.titleMaxLines].
   final int titleMaxLines;
-
-  /// The alignment of the titles of loading, error and empty items in the
-  /// space between their leading and trailing.
-  ///
-  /// Does not affect their child. Defaults to
-  /// [SmartContextMenuDefaults.statusTitleAlign], the middle.
-  final TextAlign statusTitleAlign;
 
   /// The color of the title, icons and submenu chevron of a disabled item.
   ///
@@ -249,7 +246,60 @@ final class SmartContextMenuStyle {
   /// The appearance of the rows, see [SmartContextMenuItem.row].
   ///
   /// Defaults to a [SmartContextMenuRowStyle] with its defaults.
-  final SmartContextMenuRowStyle rowStyle;
+  SmartContextMenuRowStyle get rowStyle =>
+      _rowStyle ?? const SmartContextMenuRowStyle();
+  final SmartContextMenuRowStyle? _rowStyle;
+
+  // Status items
+
+  /// The appearance of the loading, error and empty items, and of the
+  /// loading indicator of a submenu or page.
+  ///
+  /// If none is given, it is built from the deprecated status fields, such
+  /// as [errorIcon], which default to the defaults of
+  /// [SmartContextMenuStatusStyle].
+  SmartContextMenuStatusStyle get statusStyle =>
+      _statusStyle ??
+      SmartContextMenuStatusStyle(
+        titleAlign: _statusTitleAlign,
+        errorIcon: _errorIcon,
+        retryIcon: _retryIcon,
+        emptyIcon: _emptyIcon,
+        loadingIndicator: _loadingIndicator,
+        loaderVerticalPadding: _loaderVerticalPadding,
+      );
+  final SmartContextMenuStatusStyle? _statusStyle;
+  final TextAlign _statusTitleAlign;
+  final IconData _errorIcon;
+  final IconData _retryIcon;
+  final IconData _emptyIcon;
+  final Widget? _loadingIndicator;
+  final double _loaderVerticalPadding;
+
+  /// The former place of [SmartContextMenuStatusStyle.titleAlign].
+  @Deprecated('Use statusStyle.titleAlign instead.')
+  TextAlign get statusTitleAlign => statusStyle.titleAlign;
+
+  /// The former place of [SmartContextMenuStatusStyle.errorIcon].
+  @Deprecated('Use statusStyle.errorIcon instead.')
+  IconData get errorIcon => statusStyle.errorIcon;
+
+  /// The former place of [SmartContextMenuStatusStyle.retryIcon].
+  @Deprecated('Use statusStyle.retryIcon instead.')
+  IconData get retryIcon => statusStyle.retryIcon;
+
+  /// The former place of [SmartContextMenuStatusStyle.emptyIcon].
+  @Deprecated('Use statusStyle.emptyIcon instead.')
+  IconData get emptyIcon => statusStyle.emptyIcon;
+
+  /// The former place of [SmartContextMenuStatusStyle.loadingIndicator].
+  @Deprecated('Use statusStyle.loadingIndicator instead.')
+  Widget? get loadingIndicator => statusStyle.loadingIndicator;
+
+  /// The former place of
+  /// [SmartContextMenuStatusStyle.loaderVerticalPadding].
+  @Deprecated('Use statusStyle.loaderVerticalPadding instead.')
+  double get loaderVerticalPadding => statusStyle.loaderVerticalPadding;
 
   // Icons
 
@@ -264,7 +314,8 @@ final class SmartContextMenuStyle {
 
   /// The color of the submenu chevron and the back icon.
   ///
-  /// [backButtonForegroundColor] takes precedence for the back icon. If null,
+  /// [SmartContextMenuBackButtonStyle.foregroundColor] takes precedence for
+  /// the back icon. If null,
   /// the icons take the title color of their item.
   final Color? defaultIconColor;
 
@@ -273,57 +324,12 @@ final class SmartContextMenuStyle {
   /// Defaults to [SmartContextMenuDefaults.submenuIcon].
   final IconData submenuIcon;
 
-  /// The icon of the back item in a submenu.
-  ///
-  /// Defaults to [SmartContextMenuDefaults.backIcon].
-  final IconData backIcon;
-
-  /// The icon after the title of a [SmartContextMenuItem.error] item
-  /// without its own trailing.
-  ///
-  /// Defaults to [SmartContextMenuDefaults.errorIcon].
-  final IconData errorIcon;
-
-  /// The icon after the title of an error item that retries a failed load,
-  /// unless the item has its own trailing.
-  ///
-  /// Defaults to [SmartContextMenuDefaults.retryIcon].
-  final IconData retryIcon;
-
-  /// The icon after the title of a [SmartContextMenuItem.empty] item
-  /// without its own trailing.
-  ///
-  /// Defaults to [SmartContextMenuDefaults.emptyIcon].
-  final IconData emptyIcon;
-
-  // Loader
-
-  /// The activity indicator of loading items without their own trailing,
-  /// and of a loading submenu or page.
-  ///
-  /// The widget is used at its own size, so size it to fit an item row:
-  ///
-  /// ```dart
-  /// const style = SmartContextMenuStyle(
-  ///   loadingIndicator: SizedBox.square(
-  ///     dimension: 20,
-  ///     child: CircularProgressIndicator(strokeWidth: 2),
-  ///   ),
-  /// );
-  /// ```
-  ///
-  /// If null, which is the default, a [CupertinoActivityIndicator] is used:
-  /// in loading items as large as [defaultIconSize], and in a submenu with
-  /// [SmartContextMenuDefaults.loaderIndicatorRadius].
-  final Widget? loadingIndicator;
-
-  /// The vertical padding around the activity indicator of a loading
-  /// submenu or page.
-  ///
-  /// Defaults to [SmartContextMenuDefaults.loaderVerticalPadding].
-  final double loaderVerticalPadding;
-
   /// Creates a menu style.
+  ///
+  /// Set the back item with [backButtonStyle] or with the deprecated back
+  /// item fields, such as [backButtonBlur], not both; the same goes for
+  /// [statusStyle] and the deprecated status fields. With a group, the
+  /// deprecated fields would be ignored, so a debug assert fails.
   const SmartContextMenuStyle({
     this.menuColor = SmartContextMenuDefaults.menuColor,
     this.borderColor = SmartContextMenuDefaults.borderColor,
@@ -333,19 +339,23 @@ final class SmartContextMenuStyle {
     this.menuShadows = SmartContextMenuDefaults.menuShadows,
     this.backgroundColor = SmartContextMenuDefaults.backgroundColor,
     this.backgroundBlur = SmartContextMenuBlur.medium,
-    this.backButtonDecoration,
-    this.backButtonBlur = SmartContextMenuBlur.strong,
-    this.backButtonBorderRadius =
+    SmartContextMenuBackButtonStyle? backButtonStyle,
+    @Deprecated('Use backButtonStyle.blur instead.')
+    SmartContextMenuBlur? backButtonBlur = SmartContextMenuBlur.strong,
+    @Deprecated('Use backButtonStyle.borderRadius instead.')
+    BorderRadiusGeometry backButtonBorderRadius =
         SmartContextMenuDefaults.backButtonBorderRadius,
-    Color? backButtonForegroundColor,
-    @Deprecated('Use backButtonForegroundColor instead.')
+    @Deprecated('Use backButtonStyle.foregroundColor instead.')
     Color? backButtonColor,
-    this.backButtonTitleStyle = SmartContextMenuDefaults.backButtonTitleStyle,
+    @Deprecated('Use backButtonStyle.titleStyle instead.')
+    TextStyle backButtonTitleStyle =
+        SmartContextMenuDefaults.backButtonTitleStyle,
+    @Deprecated('Use backButtonStyle.icon instead.')
+    IconData backIcon = SmartContextMenuDefaults.backIcon,
     this.itemPadding = SmartContextMenuDefaults.itemPadding,
     this.itemChildrenGap = SmartContextMenuDefaults.itemChildrenGap,
     this.titleStyle = SmartContextMenuDefaults.titleStyle,
     this.titleMaxLines = SmartContextMenuDefaults.titleMaxLines,
-    this.statusTitleAlign = SmartContextMenuDefaults.statusTitleAlign,
     this.disabledForegroundColor =
         SmartContextMenuDefaults.disabledForegroundColor,
     this.destructiveColor = SmartContextMenuDefaults.destructiveColor,
@@ -359,26 +369,82 @@ final class SmartContextMenuStyle {
     double? separatorThickness,
     @Deprecated('Use separatorThickness instead.') double? separatorHeight,
     this.separatorColor = SmartContextMenuDefaults.separatorColor,
-    this.rowStyle = const SmartContextMenuRowStyle(),
+    SmartContextMenuRowStyle? rowStyle,
+    SmartContextMenuStatusStyle? statusStyle,
+    @Deprecated('Use statusStyle.titleAlign instead.')
+    TextAlign statusTitleAlign = SmartContextMenuDefaults.statusTitleAlign,
+    @Deprecated('Use statusStyle.errorIcon instead.')
+    IconData errorIcon = SmartContextMenuDefaults.errorIcon,
+    @Deprecated('Use statusStyle.retryIcon instead.')
+    IconData retryIcon = SmartContextMenuDefaults.retryIcon,
+    @Deprecated('Use statusStyle.emptyIcon instead.')
+    IconData emptyIcon = SmartContextMenuDefaults.emptyIcon,
+    @Deprecated('Use statusStyle.loadingIndicator instead.')
+    Widget? loadingIndicator,
+    @Deprecated('Use statusStyle.loaderVerticalPadding instead.')
+    double loaderVerticalPadding =
+        SmartContextMenuDefaults.loaderVerticalPadding,
     this.defaultIconSize = SmartContextMenuDefaults.iconSize,
     this.defaultIconColor,
     this.submenuIcon = SmartContextMenuDefaults.submenuIcon,
-    this.backIcon = SmartContextMenuDefaults.backIcon,
-    this.errorIcon = SmartContextMenuDefaults.errorIcon,
-    this.retryIcon = SmartContextMenuDefaults.retryIcon,
-    this.emptyIcon = SmartContextMenuDefaults.emptyIcon,
-    this.loadingIndicator,
-    this.loaderVerticalPadding = SmartContextMenuDefaults.loaderVerticalPadding,
-  }) : backButtonForegroundColor = backButtonForegroundColor ?? backButtonColor,
+  }) : assert(
+         backButtonStyle == null ||
+             (identical(backButtonBlur, SmartContextMenuBlur.strong) &&
+                 identical(
+                   backButtonBorderRadius,
+                   SmartContextMenuDefaults.backButtonBorderRadius,
+                 ) &&
+                 backButtonColor == null &&
+                 identical(
+                   backButtonTitleStyle,
+                   SmartContextMenuDefaults.backButtonTitleStyle,
+                 ) &&
+                 identical(backIcon, SmartContextMenuDefaults.backIcon)),
+         'Set the back item either with backButtonStyle or with the '
+         'deprecated fields, such as backButtonBlur, not both.',
+       ),
+       assert(
+         statusStyle == null ||
+             (identical(
+                   statusTitleAlign,
+                   SmartContextMenuDefaults.statusTitleAlign,
+                 ) &&
+                 identical(errorIcon, SmartContextMenuDefaults.errorIcon) &&
+                 identical(retryIcon, SmartContextMenuDefaults.retryIcon) &&
+                 identical(emptyIcon, SmartContextMenuDefaults.emptyIcon) &&
+                 loadingIndicator == null &&
+                 identical(
+                   loaderVerticalPadding,
+                   SmartContextMenuDefaults.loaderVerticalPadding,
+                 )),
+         'Set the status items either with statusStyle or with the '
+         'deprecated fields, such as errorIcon, not both.',
+       ),
+       _backButtonStyle = backButtonStyle,
+       _backButtonBlur = backButtonBlur,
+       _backButtonBorderRadius = backButtonBorderRadius,
+       _backButtonColor = backButtonColor,
+       _backButtonTitleStyle = backButtonTitleStyle,
+       _backIcon = backIcon,
        separatorThickness =
            separatorThickness ??
            separatorHeight ??
-           SmartContextMenuDefaults.separatorThickness;
+           SmartContextMenuDefaults.separatorThickness,
+       _rowStyle = rowStyle,
+       _statusStyle = statusStyle,
+       _statusTitleAlign = statusTitleAlign,
+       _errorIcon = errorIcon,
+       _retryIcon = retryIcon,
+       _emptyIcon = emptyIcon,
+       _loadingIndicator = loadingIndicator,
+       _loaderVerticalPadding = loaderVerticalPadding;
 
   /// Creates a copy of this style with the given fields replaced.
   ///
   /// Null arguments keep the current values, so nullable fields such as
-  /// [menuBlur] cannot be reset to null with it.
+  /// [menuBlur] cannot be reset to null with it. The deprecated back item
+  /// and status fields replace the fields of [backButtonStyle] and
+  /// [statusStyle]; pass either a group or its deprecated fields.
   SmartContextMenuStyle copyWith({
     Color? menuColor,
     Color? borderColor,
@@ -388,18 +454,20 @@ final class SmartContextMenuStyle {
     List<BoxShadow>? menuShadows,
     Color? backgroundColor,
     SmartContextMenuBlur? backgroundBlur,
-    Decoration? backButtonDecoration,
+    SmartContextMenuBackButtonStyle? backButtonStyle,
+    @Deprecated('Use backButtonStyle.blur instead.')
     SmartContextMenuBlur? backButtonBlur,
+    @Deprecated('Use backButtonStyle.borderRadius instead.')
     BorderRadiusGeometry? backButtonBorderRadius,
-    Color? backButtonForegroundColor,
-    @Deprecated('Use backButtonForegroundColor instead.')
+    @Deprecated('Use backButtonStyle.foregroundColor instead.')
     Color? backButtonColor,
+    @Deprecated('Use backButtonStyle.titleStyle instead.')
     TextStyle? backButtonTitleStyle,
+    @Deprecated('Use backButtonStyle.icon instead.') IconData? backIcon,
     EdgeInsets? itemPadding,
     double? itemChildrenGap,
     TextStyle? titleStyle,
     int? titleMaxLines,
-    TextAlign? statusTitleAlign,
     Color? disabledForegroundColor,
     Color? destructiveColor,
     Color? disabledBackgroundColor,
@@ -413,16 +481,41 @@ final class SmartContextMenuStyle {
     @Deprecated('Use separatorThickness instead.') double? separatorHeight,
     Color? separatorColor,
     SmartContextMenuRowStyle? rowStyle,
+    SmartContextMenuStatusStyle? statusStyle,
+    @Deprecated('Use statusStyle.titleAlign instead.')
+    TextAlign? statusTitleAlign,
+    @Deprecated('Use statusStyle.errorIcon instead.') IconData? errorIcon,
+    @Deprecated('Use statusStyle.retryIcon instead.') IconData? retryIcon,
+    @Deprecated('Use statusStyle.emptyIcon instead.') IconData? emptyIcon,
+    @Deprecated('Use statusStyle.loadingIndicator instead.')
+    Widget? loadingIndicator,
+    @Deprecated('Use statusStyle.loaderVerticalPadding instead.')
+    double? loaderVerticalPadding,
     double? defaultIconSize,
     Color? defaultIconColor,
     IconData? submenuIcon,
-    IconData? backIcon,
-    IconData? errorIcon,
-    IconData? retryIcon,
-    IconData? emptyIcon,
-    Widget? loadingIndicator,
-    double? loaderVerticalPadding,
   }) {
+    assert(
+      backButtonStyle == null ||
+          (backButtonBlur == null &&
+              backButtonBorderRadius == null &&
+              backButtonColor == null &&
+              backButtonTitleStyle == null &&
+              backIcon == null),
+      'Pass either backButtonStyle or the deprecated back item fields, '
+      'such as backButtonBlur, not both.',
+    );
+    assert(
+      statusStyle == null ||
+          (statusTitleAlign == null &&
+              errorIcon == null &&
+              retryIcon == null &&
+              emptyIcon == null &&
+              loadingIndicator == null &&
+              loaderVerticalPadding == null),
+      'Pass either statusStyle or the deprecated status fields, such as '
+      'errorIcon, not both.',
+    );
     return SmartContextMenuStyle(
       menuColor: menuColor ?? this.menuColor,
       borderColor: borderColor ?? this.borderColor,
@@ -432,20 +525,19 @@ final class SmartContextMenuStyle {
       menuShadows: menuShadows ?? this.menuShadows,
       backgroundColor: backgroundColor ?? this.backgroundColor,
       backgroundBlur: backgroundBlur ?? this.backgroundBlur,
-      backButtonDecoration: backButtonDecoration ?? this.backButtonDecoration,
-      backButtonBlur: backButtonBlur ?? this.backButtonBlur,
-      backButtonBorderRadius:
-          backButtonBorderRadius ?? this.backButtonBorderRadius,
-      backButtonForegroundColor:
-          backButtonForegroundColor ??
-          backButtonColor ??
-          this.backButtonForegroundColor,
-      backButtonTitleStyle: backButtonTitleStyle ?? this.backButtonTitleStyle,
+      backButtonStyle:
+          backButtonStyle ??
+          this.backButtonStyle.copyWith(
+            blur: backButtonBlur,
+            borderRadius: backButtonBorderRadius,
+            foregroundColor: backButtonColor,
+            titleStyle: backButtonTitleStyle,
+            icon: backIcon,
+          ),
       itemPadding: itemPadding ?? this.itemPadding,
       itemChildrenGap: itemChildrenGap ?? this.itemChildrenGap,
       titleStyle: titleStyle ?? this.titleStyle,
       titleMaxLines: titleMaxLines ?? this.titleMaxLines,
-      statusTitleAlign: statusTitleAlign ?? this.statusTitleAlign,
       disabledForegroundColor:
           disabledForegroundColor ?? this.disabledForegroundColor,
       destructiveColor: destructiveColor ?? this.destructiveColor,
@@ -461,16 +553,19 @@ final class SmartContextMenuStyle {
           separatorThickness ?? separatorHeight ?? this.separatorThickness,
       separatorColor: separatorColor ?? this.separatorColor,
       rowStyle: rowStyle ?? this.rowStyle,
+      statusStyle:
+          statusStyle ??
+          this.statusStyle.copyWith(
+            titleAlign: statusTitleAlign,
+            errorIcon: errorIcon,
+            retryIcon: retryIcon,
+            emptyIcon: emptyIcon,
+            loadingIndicator: loadingIndicator,
+            loaderVerticalPadding: loaderVerticalPadding,
+          ),
       defaultIconSize: defaultIconSize ?? this.defaultIconSize,
       defaultIconColor: defaultIconColor ?? this.defaultIconColor,
       submenuIcon: submenuIcon ?? this.submenuIcon,
-      backIcon: backIcon ?? this.backIcon,
-      errorIcon: errorIcon ?? this.errorIcon,
-      retryIcon: retryIcon ?? this.retryIcon,
-      emptyIcon: emptyIcon ?? this.emptyIcon,
-      loadingIndicator: loadingIndicator ?? this.loadingIndicator,
-      loaderVerticalPadding:
-          loaderVerticalPadding ?? this.loaderVerticalPadding,
     );
   }
 }

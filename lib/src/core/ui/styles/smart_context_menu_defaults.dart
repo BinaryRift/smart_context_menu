@@ -51,11 +51,11 @@ abstract final class SmartContextMenuDefaults {
   /// The default of [SmartContextMenuRowStyle.itemChildrenGap].
   static const double rowItemChildrenGap = 4;
 
-  /// The default of [SmartContextMenuStyle.loaderVerticalPadding].
+  /// The default of [SmartContextMenuStatusStyle.loaderVerticalPadding].
   static const double loaderVerticalPadding = 12;
 
   /// The radius of the activity indicator of a loading submenu or page
-  /// without [SmartContextMenuStyle.loadingIndicator].
+  /// without [SmartContextMenuStatusStyle.loadingIndicator].
   static const double loaderIndicatorRadius = 12;
 
   /// The default of [SmartContextMenuStyle.defaultIconSize].
@@ -81,7 +81,7 @@ abstract final class SmartContextMenuDefaults {
     Radius.circular(cornerRadius),
   );
 
-  /// The default of [SmartContextMenuStyle.backButtonBorderRadius].
+  /// The default of [SmartContextMenuBackButtonStyle.borderRadius].
   static const BorderRadius backButtonBorderRadius = BorderRadius.vertical(
     top: Radius.circular(cornerRadius),
   );
@@ -233,7 +233,7 @@ abstract final class SmartContextMenuDefaults {
     fontWeight: FontWeight.w400,
   );
 
-  /// The default of [SmartContextMenuStyle.backButtonTitleStyle]: bold.
+  /// The default of [SmartContextMenuBackButtonStyle.titleStyle]: bold.
   static const TextStyle backButtonTitleStyle = TextStyle(
     fontWeight: FontWeight.w600,
   );
@@ -245,7 +245,7 @@ abstract final class SmartContextMenuDefaults {
   /// The default of [SmartContextMenuStyle.titleMaxLines].
   static const int titleMaxLines = 2;
 
-  /// The default of [SmartContextMenuStyle.statusTitleAlign].
+  /// The default of [SmartContextMenuStatusStyle.titleAlign].
   static const TextAlign statusTitleAlign = TextAlign.center;
 
   // Icons
@@ -253,15 +253,15 @@ abstract final class SmartContextMenuDefaults {
   /// The default of [SmartContextMenuStyle.submenuIcon].
   static const IconData submenuIcon = CupertinoIcons.chevron_forward;
 
-  /// The default of [SmartContextMenuStyle.backIcon].
+  /// The default of [SmartContextMenuBackButtonStyle.icon].
   static const IconData backIcon = CupertinoIcons.chevron_back;
 
-  /// The default of [SmartContextMenuStyle.errorIcon].
+  /// The default of [SmartContextMenuStatusStyle.errorIcon].
   static const IconData errorIcon = CupertinoIcons.exclamationmark_triangle;
 
-  /// The default of [SmartContextMenuStyle.retryIcon].
+  /// The default of [SmartContextMenuStatusStyle.retryIcon].
   static const IconData retryIcon = CupertinoIcons.refresh;
 
-  /// The default of [SmartContextMenuStyle.emptyIcon].
+  /// The default of [SmartContextMenuStatusStyle.emptyIcon].
   static const IconData emptyIcon = CupertinoIcons.tray;
 }

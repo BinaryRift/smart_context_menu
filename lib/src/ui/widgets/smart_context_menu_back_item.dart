@@ -23,8 +23,8 @@ final class SmartContextMenuBackItem extends StatelessWidget {
   /// The back item pinned to the top of a submenu.
   ///
   /// Has the menu background or
-  /// [SmartContextMenuStyle.backButtonDecoration] and
-  /// [SmartContextMenuStyle.backButtonBlur], and keeps drags on it from
+  /// [SmartContextMenuBackButtonStyle.decoration] and
+  /// [SmartContextMenuBackButtonStyle.blur], and keeps drags on it from
   /// scrolling the items below.
   const SmartContextMenuBackItem({
     super.key,
@@ -45,6 +45,7 @@ final class SmartContextMenuBackItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final style = config.style;
+    final backStyle = style.backButtonStyle;
     final item = SmartContextMenuItemView(
       key: _isPlaceholder
           ? ServiceItemKey.backPlaceholder
@@ -57,16 +58,16 @@ final class SmartContextMenuBackItem extends StatelessWidget {
         closeOnTap: false,
         title: config.labels.back,
         titleStyle: style.titleStyle
-            .merge(style.backButtonTitleStyle)
-            .copyWith(color: style.backButtonForegroundColor),
+            .merge(backStyle.titleStyle)
+            .copyWith(color: backStyle.foregroundColor),
         leading: Icon(
-          style.backIcon == SmartContextMenuDefaults.backIcon &&
+          backStyle.icon == SmartContextMenuDefaults.backIcon &&
                   Directionality.of(context) == TextDirection.rtl
               ? CupertinoIcons.chevron_forward
-              : style.backIcon,
+              : backStyle.icon,
           size: style.defaultIconSize,
           color: CupertinoDynamicColor.maybeResolve(
-            style.backButtonForegroundColor ?? style.defaultIconColor,
+            backStyle.foregroundColor ?? style.defaultIconColor,
             context,
           ),
         ),
@@ -87,20 +88,20 @@ final class SmartContextMenuBackItem extends StatelessWidget {
       );
     }
 
-    final decoration = style.backButtonDecoration;
+    final decoration = backStyle.decoration;
     final background = DecoratedBox(
       decoration:
           decoration ??
           BoxDecoration(
             color: CupertinoDynamicColor.resolve(style.menuColor, context),
-            borderRadius: style.backButtonBorderRadius,
+            borderRadius: backStyle.borderRadius,
           ),
       child: itemWithDivider,
     );
 
     final Widget decoratedItem;
     if (decoration case final decoration?) {
-      final blur = style.backButtonBlur;
+      final blur = backStyle.blur;
       decoratedItem = ClipPath(
         clipper: _BackItemDecorationClipper(
           decoration: decoration,
@@ -119,8 +120,8 @@ final class SmartContextMenuBackItem extends StatelessWidget {
       );
     } else {
       decoratedItem = SmartContextMenuBlurBox(
-        blur: style.backButtonBlur,
-        borderRadius: style.backButtonBorderRadius,
+        blur: backStyle.blur,
+        borderRadius: backStyle.borderRadius,
         child: background,
       );
     }

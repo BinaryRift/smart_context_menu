@@ -215,7 +215,7 @@ sealed class SmartContextMenuItem implements _MenuNode {
   ///
   /// [timeout] defaults to [SmartContextMenuDefaults.loadingTimeout].
   /// Without its own title and trailing, [error] shows
-  /// [SmartContextMenuLabels.retry] and [SmartContextMenuStyle.retryIcon].
+  /// [SmartContextMenuLabels.retry] and [SmartContextMenuStatusStyle.retryIcon].
   ///
   /// ```dart
   /// SmartContextMenuItem.asyncSubmenu(
@@ -286,7 +286,7 @@ sealed class SmartContextMenuItem implements _MenuNode {
   ///
   /// [timeout] defaults to [SmartContextMenuDefaults.loadingTimeout].
   /// Without its own title and trailing, [error] shows
-  /// [SmartContextMenuLabels.retry] and [SmartContextMenuStyle.retryIcon].
+  /// [SmartContextMenuLabels.retry] and [SmartContextMenuStatusStyle.retryIcon].
   ///
   /// ```dart
   /// SmartContextMenuItem.pagingSubmenu(
@@ -401,7 +401,7 @@ sealed class SmartContextMenuItem implements _MenuNode {
   /// [timeout] defaults to [SmartContextMenuDefaults.loadingTimeout].
   ///
   /// Without its own title and trailing, [error] shows
-  /// [SmartContextMenuLabels.retry] and [SmartContextMenuStyle.retryIcon].
+  /// [SmartContextMenuLabels.retry] and [SmartContextMenuStatusStyle.retryIcon].
   /// Without its own padding, it keeps the padding of [loading]; the loaded
   /// item uses its own.
   ///
@@ -525,7 +525,7 @@ sealed class SmartContextMenuItem implements _MenuNode {
   /// Creates an item that shows a failed load.
   ///
   /// The item shows [title] (or [SmartContextMenuLabels.error]) with
-  /// [leading] and [SmartContextMenuStyle.errorIcon], and does not
+  /// [leading] and [SmartContextMenuStatusStyle.errorIcon], and does not
   /// respond to taps. [trailing] replaces the icon. Pass [child] to replace
   /// this content; text and icons in it take the color of the item.
   /// Interactive widgets in [child], such as buttons, handle their own taps.
@@ -575,7 +575,7 @@ sealed class SmartContextMenuItem implements _MenuNode {
   /// Creates an item that shows that there are no items.
   ///
   /// The item shows [title] (or [SmartContextMenuLabels.empty]) with
-  /// [leading] and [SmartContextMenuStyle.emptyIcon], and does not
+  /// [leading] and [SmartContextMenuStatusStyle.emptyIcon], and does not
   /// respond to taps. [trailing] replaces the icon. Pass [child] to replace
   /// this content; text and icons in it take the color of the item.
   ///

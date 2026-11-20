@@ -19,7 +19,7 @@ final class SmartContextMenuAsyncItem extends SmartContextMenuItem
   ///
   /// Tapping it retries loading. Without its own title and trailing, it
   /// shows [SmartContextMenuLabels.retry] and
-  /// [SmartContextMenuStyle.retryIcon]. Without its own padding, it keeps
+  /// [SmartContextMenuStatusStyle.retryIcon]. Without its own padding, it keeps
   /// the padding of [loading].
   final SmartContextMenuErrorItem error;
 

@@ -61,18 +61,20 @@ const insetDividersStyle = SmartContextMenuStyle(
 /// Own signs of loading, error and empty items, with the titles at the
 /// start rather than in the middle: a Material progress indicator instead
 /// of the Cupertino one, and other icons.
-const statusStyle = SmartContextMenuStyle(
-  loadingIndicator: SizedBox.square(
-    dimension: 18,
-    child: CircularProgressIndicator(
-      strokeWidth: 2,
-      color: CupertinoColors.systemOrange,
+const statusItemsStyle = SmartContextMenuStyle(
+  statusStyle: SmartContextMenuStatusStyle(
+    loadingIndicator: SizedBox.square(
+      dimension: 18,
+      child: CircularProgressIndicator(
+        strokeWidth: 2,
+        color: CupertinoColors.systemOrange,
+      ),
     ),
+    errorIcon: CupertinoIcons.wifi_exclamationmark,
+    retryIcon: CupertinoIcons.arrow_clockwise,
+    emptyIcon: CupertinoIcons.tray,
+    titleAlign: TextAlign.start,
   ),
-  errorIcon: CupertinoIcons.wifi_exclamationmark,
-  retryIcon: CupertinoIcons.arrow_clockwise,
-  emptyIcon: CupertinoIcons.tray,
-  statusTitleAlign: TextAlign.start,
 );
 
 /// Bolder titles in the cells, gaps between them and vertical lines that

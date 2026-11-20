@@ -104,7 +104,7 @@ final class _AppearancePageState extends State<AppearancePage> {
             _buildPreset(
               title: 'Status items',
               subtitle: 'Own loading, error and empty signs',
-              config: (app) => app.copyWith(style: statusStyle),
+              config: (app) => app.copyWith(style: statusItemsStyle),
               items: statusItems(_statusLoader),
             ),
             _buildGroupHeader('Rows'),
