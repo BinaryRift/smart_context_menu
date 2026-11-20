@@ -1109,7 +1109,8 @@ To split items into groups, use a [separator](#separator).
 are kept, and taps work as usual. Interactive widgets inside, such as
 buttons, handle their own taps: the item is not triggered over them. The builder
 receives the item state, including `foregroundColor`: the color of the title and icons
-for the current state and theme.
+for the current state and theme. `isPressed` and `isHovered` tell a press from cursor
+hover, so the content can react to each in its own way.
 
 ```dart
 SmartContextMenuItem.simple(

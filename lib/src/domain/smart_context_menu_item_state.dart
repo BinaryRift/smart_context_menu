@@ -5,11 +5,17 @@ import 'package:meta/meta.dart' show internal;
 ///
 /// Received by [SmartContextMenuContentItem.customBuilder]. Created by the menu.
 final class SmartContextMenuItemState {
-  /// Whether the item is highlighted under a pressed pointer or a cursor.
-  /// Hovering alone does not tap the item.
+  /// Whether a finger, a stylus or a mouse button is pressed on the item,
+  /// so releasing it there will tap the item.
   ///
   /// Always false for disabled and loading items.
   final bool isPressed;
+
+  /// Whether a cursor is over the item on desktop and web, pressed or not.
+  /// Hovering alone does not tap the item.
+  ///
+  /// Always false for disabled and loading items.
+  final bool isHovered;
 
   /// Whether the item is disabled, see
   /// [SmartContextMenuContentItem.isDisabled].
@@ -31,6 +37,7 @@ final class SmartContextMenuItemState {
   @internal
   const SmartContextMenuItemState({
     required this.isPressed,
+    required this.isHovered,
     required this.isDisabled,
     required this.isDestructive,
     required this.foregroundColor,

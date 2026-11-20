@@ -47,6 +47,7 @@ final class SmartContextMenuPointerTracker extends StatefulWidget {
 final class _SmartContextMenuPointerTrackerState
     extends State<SmartContextMenuPointerTracker> {
   int? _pointer;
+  bool _isMousePress = false;
   Offset? _startPosition;
   Offset? _hoverPosition;
   bool _isSelectionBlocked = false;
@@ -164,7 +165,8 @@ final class _SmartContextMenuPointerTrackerState
   void _handlePointerDown(PointerDownEvent event) {
     _pointer = event.pointer;
     _startPosition = event.position;
-    if (event.kind == PointerDeviceKind.mouse) _hoverPosition = event.position;
+    _isMousePress = event.kind == PointerDeviceKind.mouse;
+    if (_isMousePress) _hoverPosition = event.position;
     _isSelectionBlocked = false;
     _updateHoveredItem(event.position);
   }
@@ -172,7 +174,7 @@ final class _SmartContextMenuPointerTrackerState
   void _handlePointerMove(PointerMoveEvent event) {
     final startPosition = _startPosition;
     if (startPosition == null) return;
-    if (event.kind == PointerDeviceKind.mouse) _hoverPosition = event.position;
+    if (_isMousePress) _hoverPosition = event.position;
     _updateHoveredItem(event.position);
     widget.onDrag(event.position - startPosition);
   }
@@ -188,6 +190,7 @@ final class _SmartContextMenuPointerTrackerState
     Future.microtask(() {
       _hoverController.update(null);
       _startPosition = null;
+      _isMousePress = false;
       _isSelectionBlocked = false;
       widget.onRelease();
       _scheduleHoverRefresh();
@@ -204,9 +207,15 @@ final class _SmartContextMenuPointerTrackerState
     }
 
     final key = context.findRenderObject()?.findMenuItemKeyAt(globalPosition);
+    final isCursor = isPointerHover || _isMousePress;
     if (_hoverController.value != key ||
-        _hoverController.isPointerHover != isPointerHover) {
-      _hoverController.update(key, isPointerHover: isPointerHover);
+        _hoverController.isPointerHover != isPointerHover ||
+        _hoverController.isCursor != isCursor) {
+      _hoverController.update(
+        key,
+        isPointerHover: isPointerHover,
+        isCursor: isCursor,
+      );
     }
   }
 }

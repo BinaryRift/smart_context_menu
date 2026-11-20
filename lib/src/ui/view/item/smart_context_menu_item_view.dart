@@ -64,13 +64,15 @@ final class SmartContextMenuItemView extends StatefulWidget {
 
 final class _SmartContextMenuItemViewState
     extends State<SmartContextMenuItemView> {
-  bool _isHighlight = false;
+  bool _isPressed = false;
+  bool _isHovered = false;
+  bool get _isHighlight => _isPressed || _isHovered;
 
-  /// Runs from the moment the item is highlighted: a tapped item stays
-  /// highlighted until it ends, so even a quick tap shows the highlight.
+  /// Runs from the moment the item is pressed: a tapped item stays
+  /// pressed until it ends, so even a quick tap shows the highlight.
   Timer? _minHighlightTimer;
 
-  /// Whether the item is tapped and keeps the highlight until
+  /// Whether the item is tapped and stays pressed until
   /// [_minHighlightTimer] ends.
   bool _isTapHighlightHeld = false;
 
@@ -196,7 +198,8 @@ final class _SmartContextMenuItemViewState
       _ => (false, false),
     };
     final itemState = SmartContextMenuItemState(
-      isPressed: _isHighlight,
+      isPressed: _isPressed,
+      isHovered: _isHovered,
       isDisabled: isDisabled,
       isDestructive: isDestructive,
       foregroundColor: colors.foreground,
@@ -306,36 +309,47 @@ final class _SmartContextMenuItemViewState
 
   void _buildListenableItem(SmartContextMenuListenableItem item) {
     _resolvedItem = item.builder();
-    _isHighlight = widget.hoverController?.value == widget.key && !_isDisabled;
+    final (:isPressed, :isHovered) = _pointerState;
+    _isPressed = isPressed;
+    _isHovered = isHovered;
+    _isTapHighlightHeld = false;
+  }
+
+  /// The pointer state of the item in [widget.hoverController].
+  ({bool isPressed, bool isHovered}) get _pointerState {
+    final controller = widget.hoverController;
+    if (controller == null || controller.value != widget.key || _isDisabled) {
+      return (isPressed: false, isHovered: false);
+    }
+    return (
+      isPressed: !controller.isPointerHover,
+      isHovered: controller.isCursor,
+    );
   }
 
   void _handleGlobalPointer() {
-    final activeKey = widget.hoverController?.value;
     final bool isReleased = widget.hoverController?.isPointerReleased ?? false;
-    final myKey = widget.key;
+    final bool wasHighlight = _isHighlight;
+    final (isPressed: isPointerPressed, :isHovered) = _pointerState;
 
-    final bool isMeHovered = activeKey == myKey;
-    final bool shouldHighlight = isMeHovered && !_isDisabled;
-
-    if (_isTapHighlightHeld) {
-      if (!shouldHighlight) return;
-      // Pressed again before the highlight of the tap ended.
+    if (isPointerPressed && (!_isPressed || _isTapHighlightHeld)) {
+      // Pressed, or pressed again before the highlight of the tap ended.
       _isTapHighlightHeld = false;
       _startMinHighlightTimer();
     }
+    final isPressed = isPointerPressed || _isTapHighlightHeld;
 
-    if (shouldHighlight != _isHighlight) {
-      if (shouldHighlight) _startMinHighlightTimer();
-      setState(() => _isHighlight = shouldHighlight);
-      _generateFeedback(shouldHighlight);
+    if (isPressed != _isPressed || isHovered != _isHovered) {
+      setState(() {
+        _isPressed = isPressed;
+        _isHovered = isHovered;
+      });
+      if (!wasHighlight && isPressed) _generateFeedback();
     }
 
-    if (isReleased) {
-      if (_isHighlight && !_isDisabled) {
-        _handleTap();
-      }
-      if (_isHighlight) _clearHighlightAfterTap();
-      return;
+    if (isReleased && isPointerPressed) {
+      _handleTap();
+      _clearHighlightAfterTap();
     }
   }
 
@@ -348,21 +362,17 @@ final class _SmartContextMenuItemViewState
     if (_minHighlightTimer?.isActive ?? false) {
       _isTapHighlightHeld = true;
     } else {
-      setState(() => _isHighlight = false);
+      setState(() => _isPressed = false);
     }
   }
 
   void _onMinHighlightEnd() {
     if (!_isTapHighlightHeld || !mounted) return;
     _isTapHighlightHeld = false;
-    setState(() => _isHighlight = false);
+    setState(() => _isPressed = false);
   }
 
-  void _generateFeedback(bool shouldHighlight) {
-    if (shouldHighlight &&
-        _config.enableHaptics &&
-        widget.hoverController?.isPointerHover != true) {
-      HapticFeedback.selectionClick();
-    }
+  void _generateFeedback() {
+    if (_config.enableHaptics) HapticFeedback.selectionClick();
   }
 }
