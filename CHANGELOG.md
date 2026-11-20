@@ -1,5 +1,19 @@
 ## 1.1.0 (unreleased)
 
+* `SmartContextMenuItem.row` shows items side by side as compact cells in one line, as in the
+  compact menus of iOS. The cells are items of the other types and keep their actions, states
+  and colors. `SmartContextMenuRowSize.medium`, the default, shows the icon above the title,
+  and `SmartContextMenuRowSize.small` the icon only. `SmartContextMenuRowFlex` gives a cell a
+  larger share of the width. Drag-to-select and cursor hover work across the cells. In a
+  submenu, a horizontal drag that starts on a row selects its cells unless `enableSwipeBack`
+  is set. A row returned by a page loader carries its own `pagingMetadata`. This is a new item
+  type, so keep a `_` case when you switch on items.
+* `SmartContextMenuRowStyle`, the `rowStyle` of the style, sets the padding, the gaps, the title
+  style and the divider indents of rows. `dividersBetweenChildren` of a row draws vertical
+  lines between its cells.
+* `SmartContextMenuItemState.rowSize` lets a `customBuilder` fit its content to a cell.
+* `SmartContextMenuLabels` has short titles for loading, error and empty cells: `rowLoading`,
+  `rowError`, `rowRetry` and `rowEmpty`.
 * The menu opens on a right click or a two-finger click on a trackpad in the default
   `longPress` activation mode. Of nested menus, only the innermost one opens. A secondary
   pointer-down handler on the child also runs; a secondary tap handler waiting for release
