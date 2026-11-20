@@ -13,7 +13,9 @@ A powerful, fully customizable iOS-style context menu for Flutter: smart positio
 fluid animations, drag-to-select, rich submenus (async, paginated) and your own content
 above the widget.
 
-<img src="doc/gifs/open_and_select_themes.gif" width="600" alt="File and chat menus open in light and dark themes; a finger drags across their items, with a reactions bar above the chat message">
+<img src="doc/gifs/open_and_select_themes.gif" width="600" alt="File and chat menus open in light and dark themes; a finger drags across their items, from the row of the chat menu down its list, with a reactions bar above the chat message">
+
+<img src="doc/gifs/wide_row.gif" width="600" alt="A menu of one row of seven tools, its left half in the light theme and its right half in the dark theme; Shapes opens a submenu of one row of shapes, and Back returns to the tools">
 
 <br>
 
@@ -704,11 +706,10 @@ For a thin line instead of a band, set a small `separatorThickness` and the
 
 #### Row
 
-<img src="doc/gifs/rows.png" width="600" alt="The Quick actions, Only rows, Styled rows and Wide row menus of the example, in the light and dark themes">
+<img src="doc/gifs/rows.png" width="800" alt="The Quick actions, Only rows and Wide row menus of the example and the Shapes submenu of Wide row, in the light theme above and the dark theme below">
 
-*Four menus from the example, in the light and dark themes: a row above the list, a menu
-of rows only, rows in their own style with a badge and colors to pick, and seven tools in
-a wider menu. [Code in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/domain/appearance_items.dart#L148-L344).*
+*Menus from the example, in the light and dark themes: a row above the list, a menu of rows
+only, seven tools in a wider menu, and its Shapes submenu of one row. [Code in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/domain/appearance_items.dart#L148-L344).*
 
 A row puts the most used actions side by side, as the compact menus of iOS do. Its cells
 are items of the other types: actions, submenus, async and listenable items, loading, error
@@ -1126,10 +1127,11 @@ own: `rowLoading`, `rowError`, `rowRetry` and `rowEmpty`.
 
 ### Appearance
 
-<img src="doc/gifs/appearance.png" width="600" alt="The Brand, Solid and Custom content menus of the example, in the light and dark themes">
+<img src="doc/gifs/appearance.png" width="800" alt="The Brand, Solid, Custom content and Styled rows menus of the example, in the light theme above and the dark theme below">
 
-*Three styles from the example, in the light and dark themes: brand colors with only dimming
-behind the menu, an opaque menu, and items with their own content.*
+*Four styles from the example, in the light and dark themes: brand colors with only dimming
+behind the menu, an opaque menu, items with their own content, and rows in their own style
+with a badge and colors to pick.*
 
 The look of the menu is set by `SmartContextMenuStyle`, the `style` of the config.
 Its fields have defaults too:
