@@ -13,7 +13,7 @@ import '../../core/ui/motion/tokens/motion_scales.dart';
 /// Shrinks [child] while it is pressed and calls [onLongPress] after
 /// a long press, once [child] is back to its size. A secondary click calls
 /// [onSecondaryClick] immediately, without shrinking [child]. Of nested
-/// detectors, only the innermost one handles the secondary click.
+/// detectors, only the innermost one handles a press.
 ///
 /// The long press wins over the gestures of [child]. When disabled,
 /// [child] is returned as is.
@@ -47,10 +47,10 @@ final class _SmartContextMenuPressDetectorState
     with SingleTickerProviderStateMixin {
   static const Duration _pressDuration = MotionDurations.medium;
 
-  /// The pointer-down event that already opened a menu. Listeners get
+  /// The pointer-down event that a detector already took. Listeners get
   /// the event from the innermost detector outward, so the outer ones
   /// skip it.
-  static PointerEvent? _handledSecondaryDown;
+  static PointerEvent? _takenDown;
 
   late final LongPressGestureRecognizer _longPressRecognizer;
   late final TapGestureRecognizer _tapRecognizer;
@@ -58,6 +58,9 @@ final class _SmartContextMenuPressDetectorState
   late final CurvedAnimation _scaleCurve;
   late final Animation<double> _scaleAnimation;
   int? _activePointer;
+
+  /// Whether this detector took the current press, see [_takenDown].
+  bool _isPressTaken = false;
 
   @override
   void initState() {
@@ -154,7 +157,7 @@ final class _SmartContextMenuPressDetectorState
   }
 
   void _startScale() {
-    if (!widget.isMenuActive) _scaleController.forward();
+    if (_isPressTaken && !widget.isMenuActive) _scaleController.forward();
   }
 
   void _stopScale() {
@@ -182,11 +185,9 @@ final class _SmartContextMenuPressDetectorState
   void _handlePointerDown(PointerDownEvent event) {
     _activePointer = event.pointer;
     final original = event.original ?? event;
-    if (event.buttons == kSecondaryButton &&
-        !widget.isMenuActive &&
-        !identical(original, _handledSecondaryDown)) {
-      _handledSecondaryDown = original;
-      widget.onSecondaryClick();
-    }
+    _isPressTaken = !widget.isMenuActive && !identical(original, _takenDown);
+    if (!_isPressTaken) return;
+    _takenDown = original;
+    if (event.buttons == kSecondaryButton) widget.onSecondaryClick();
   }
 }

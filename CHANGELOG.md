@@ -12,6 +12,7 @@
   decoration's shape. `backButtonForegroundColor` colors its title and icon; the old
   `backButtonColor` name remains as a deprecated alias until 2.0.0.
 * Dynamic colors in `menuShadows` now follow the theme.
+* Fixed nested menus: a press on the inner menu no longer shrinks the outer widget too.
 
 ## 1.0.4
 

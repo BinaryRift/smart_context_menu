@@ -109,4 +109,89 @@ void main() {
     expect(find.text('Outer item'), findsOneWidget);
     expect(find.text('Inner item'), findsNothing);
   });
+
+  double scaleAround(WidgetTester tester, Finder child) => tester
+      .widget<ScaleTransition>(
+        find.ancestor(of: child, matching: find.byType(ScaleTransition)).first,
+      )
+      .scale
+      .value;
+  double innerScale(WidgetTester tester) =>
+      scaleAround(tester, find.text('Inner'));
+  double outerScale(WidgetTester tester) =>
+      scaleAround(tester, find.byType(SmartContextMenu).last);
+
+  testWidgets('a press on the inner menu shrinks only its child', (
+    tester,
+  ) async {
+    await tester.pumpWidget(buildApp());
+
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.text('Inner')),
+    );
+    await tester.pump(const Duration(milliseconds: 150));
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(innerScale(tester), lessThan(1));
+    expect(outerScale(tester), 1);
+    await gesture.cancel();
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('a press outside the inner menu shrinks the outer child', (
+    tester,
+  ) async {
+    await tester.pumpWidget(buildApp());
+
+    final gesture = await tester.startGesture(outerOnly(tester));
+    await tester.pump(const Duration(milliseconds: 150));
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(outerScale(tester), lessThan(1));
+    expect(innerScale(tester), 1);
+    await gesture.cancel();
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('a long press on the inner menu keeps the outer child size', (
+    tester,
+  ) async {
+    await tester.pumpWidget(buildApp());
+
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.text('Inner')),
+    );
+    for (var i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+      expect(outerScale(tester), 1);
+    }
+    await gesture.up();
+    await tester.settleMenu();
+
+    expect(find.text('Inner item'), findsOneWidget);
+    expect(find.text('Outer item'), findsNothing);
+  });
+
+  testWidgets('a manual inner menu leaves the press to the outer', (
+    tester,
+  ) async {
+    final controller = SmartContextMenuController();
+    addTearDown(controller.dispose);
+    await tester.pumpWidget(
+      buildApp(
+        innerMode: SmartContextMenuActivationMode.manual,
+        innerController: controller,
+      ),
+    );
+
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.text('Inner')),
+    );
+    await tester.pump(const Duration(milliseconds: 150));
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(outerScale(tester), lessThan(1));
+    await gesture.cancel();
+    await tester.pumpAndSettle();
+  });
 }
