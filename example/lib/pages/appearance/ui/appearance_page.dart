@@ -8,7 +8,8 @@ import '../../settings/ui/widgets/settings_button.dart';
 import '../domain/appearance_items.dart';
 import 'appearance_styles.dart';
 
-/// Cards with menus of different looks, one preset each.
+/// Cards with menus of different looks, one preset each: styles of the
+/// whole menu, then rows of compact cells.
 ///
 /// Every card has its own [SmartContextMenuTheme] built from the config of
 /// the app, so the settings of the app apply to all of them.
@@ -24,10 +25,12 @@ final class _AppearancePageState extends State<AppearancePage> {
   final _russianLoader = DemoLoader()..failEveryOther = true;
   final _statusLoader = DemoLoader()..failEveryOther = true;
   final _tagColor = ValueNotifier<Color>(CupertinoColors.systemBlue);
+  final _rowTagColor = ValueNotifier<Color>(CupertinoColors.systemBlue);
 
   @override
   void dispose() {
     _tagColor.dispose();
+    _rowTagColor.dispose();
     super.dispose();
   }
 
@@ -43,6 +46,7 @@ final class _AppearancePageState extends State<AppearancePage> {
         child: ListView(
           padding: const EdgeInsets.symmetric(vertical: 8),
           children: [
+            _buildGroupHeader('Styles'),
             _buildPreset(
               title: 'Default',
               subtitle: 'The config of the app',
@@ -103,7 +107,54 @@ final class _AppearancePageState extends State<AppearancePage> {
               config: (app) => app.copyWith(style: statusStyle),
               items: statusItems(_statusLoader),
             ),
+            _buildGroupHeader('Rows'),
+            _buildPreset(
+              title: 'Quick actions',
+              subtitle: 'A row of medium cells above the list',
+              config: (app) => app,
+              items: quickActionItems(),
+            ),
+            _buildPreset(
+              title: 'Only rows',
+              subtitle: 'Small and medium cells, a separator',
+              config: (app) => app,
+              items: onlyRowItems(),
+            ),
+            _buildPreset(
+              title: 'Styled rows',
+              subtitle: 'Bold titles, gaps, dividers, a badge, colors',
+              config: (app) => app.copyWith(
+                style: app.style.copyWith(
+                  dividersBetweenItems: true,
+                  rowStyle: styledRowStyle,
+                ),
+              ),
+              items: styledRowItems(_rowTagColor),
+            ),
+            _buildPreset(
+              title: 'Wide row',
+              subtitle: 'Seven small cells in a wider menu',
+              config: (app) => app.copyWith(menuWidth: wideRowMenuWidth),
+              items: wideRowItems(),
+            ),
           ],
+        ),
+      ),
+    );
+  }
+
+  /// The title of a group of cards, as in a grouped list of iOS.
+  Widget _buildGroupHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(36, 16, 36, 4),
+      child: Text(
+        title.toUpperCase(),
+        style: TextStyle(
+          fontSize: 13,
+          color: CupertinoDynamicColor.resolve(
+            CupertinoColors.secondaryLabel,
+            context,
+          ),
         ),
       ),
     );

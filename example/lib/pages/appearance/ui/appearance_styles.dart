@@ -75,6 +75,21 @@ const statusStyle = SmartContextMenuStyle(
   statusTitleAlign: TextAlign.start,
 );
 
+/// Bolder titles in the cells, gaps between them and vertical lines that
+/// stop short of the edges of the row.
+const styledRowStyle = SmartContextMenuRowStyle(
+  titleStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+  childrenGap: 4,
+  dividerIndent: 12,
+  dividerEndIndent: 12,
+);
+
+/// Wide enough for seven small cells of 48, the touch target of Material
+/// and more than the 44 of iOS. A screen narrower than the menu with its
+/// screen padding makes the menu narrower: a phone of 360 still leaves
+/// about 47 for a cell.
+const wideRowMenuWidth = 336.0;
+
 /// The strings the menu shows itself, in Russian.
 const russianLabels = SmartContextMenuLabels(
   back: 'Назад',
