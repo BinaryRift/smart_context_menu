@@ -681,9 +681,11 @@ and drag-to-select passes over it. By default it is a band set by `separatorThic
 and `separatorColor` in the style; `child` replaces it, for example with a section title.
 The old name `separatorHeight` is deprecated; use `separatorThickness` instead.
 
-Separators at the start or the end of a menu are not shown, and several separators
-in a row show as one. So a menu whose items depend on the user or the content
-needs no extra checks:
+A band is shown only between items: not at the start or the end of a menu, and several
+bands in a row show as one. A separator with a `child` titles the items after it, so it is
+also shown at the start of a menu or a submenu, but not at the end. Of several separators
+next to each other, the last one with a `child` is shown, or else the first band. So a menu
+whose items depend on the user or the content needs no extra checks:
 
 ```dart
 [
@@ -827,9 +829,11 @@ A separator does not work as a spacer: it is not shown at the end of a row.
 ]
 ```
 
-As in the list, a separator in a row is a band, vertical here; it is not shown at the start or
-the end of the row, and several separators next to each other show as one. A row without cells,
-or with separators only, is not shown, so cells shown on condition need no extra checks.
+As in the list, a separator in a row is a band, vertical here, and the same rules apply: a band
+is shown only between cells, a separator with a `child` also at the start of the row, for
+example as a label before the cells, and of several separators next to each other only one is
+shown. A row without cells, or with separators only, is not shown, so cells shown on condition
+need no extra checks.
 `dividersBetweenChildren` draws vertical lines between the cells; if it is `null`, it follows
 `dividersBetweenItems` of the style. `padding` and `childrenGap` set the space around and between
 the cells of this row; the gap belongs to no cell, so a finger over it removes the highlight.
