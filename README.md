@@ -59,6 +59,9 @@ You can find all these effects in [Animations](#animations).
 
 - **Actions** with icons, destructive and tinted colors, disabled items, separators
   and dividers.
+- **Rows** put the most used actions side by side, as the compact menus of iOS do: icons
+  with titles or icons alone, mixed with the usual items. Drag-to-select glides across the
+  cells and on into the list.
 - **Custom items**:  use any widget as an item's content. This widget can have its own
   buttons, while still get highlighted and tapped correctly.
 - **Submenus** can be static, or loaded asynchronously or paginated. They have a back
@@ -101,6 +104,7 @@ app, a chat, a gallery of styles and a lab of edge cases.
     - [Error item](#error-item)
     - [Empty item](#empty-item)
     - [Separator](#separator)
+    - [Row](#row)
   - [Opening from code](#opening-from-code)
   - [Header slivers](#header-slivers)
   - [Hero widgets](#hero-widgets)
@@ -110,7 +114,9 @@ app, a chat, a gallery of styles and a lab of edge cases.
   - [Appearance](#appearance)
     - [Item style](#item-style)
     - [Dividers](#dividers)
+    - [Row style](#row-style)
     - [Custom item content](#custom-item-content)
+  - [Design guidelines](#design-guidelines)
 - [Animations](#animations)
 - [Coming soon](#coming-soon)
 - [Additional information](#additional-information)
@@ -122,6 +128,7 @@ This package keeps the long-press gesture and introduces features commonly
 required by apps:
 
 - Submenus (either asynchronous or paginated).
+- Rows of compact actions side by side, as in the menus of iOS.
 - Drag-to-select across the items.
 - Visual connection between the menu and the preview with a liquid stretching effect 
   under the user's finger.
@@ -285,6 +292,7 @@ Create items with the method that matches what the item does:
 | `SmartContextMenuItem.error` | Shows a failed load; tapping it retries when it is the `error` of an async item or an async or paginated submenu. |
 | `SmartContextMenuItem.empty` | Shows a submenu without items. |
 | `SmartContextMenuItem.separator` | Separates groups of items. |
+| `SmartContextMenuItem.row` | Shows other items as compact cells side by side in one line. |
 
 Async items and async or paginated submenus load their data themselves: the menu calls
 the loader, shows the loading and error states, and keeps the result until it closes.
@@ -300,7 +308,7 @@ Simple items and submenus share these settings:
 | --- | --- |
 | `title` | The text of the item, in up to `titleMaxLines` lines of the style. |
 | `leading` | A widget before the title, usually an icon. |
-| `trailing` | A widget after the title; a submenu shows it before its chevron. |
+| `trailing` | A widget after the title; a submenu shows it before its chevron. Not shown in a [row](#row). |
 | `isDestructive` | Tints the item with `destructiveColor` of the style. |
 | `tintColor` | Tints the item with its own color, see [Item style](#item-style). |
 | `isDisabled` | Dims the item; it ignores taps. |
@@ -387,9 +395,10 @@ SmartContextMenuItem.asyncSubmenu(
 *In the light theme: Reactions loads the first page of people when it opens and the next page
 when it scrolls to the end. [Code in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/chat/ui/chat_page.dart#L290-L321).*
 
-The first page is loaded with `initialMetadata`. The last item of each page, a `simple` item or
-a separator, carries the metadata of the next page in `pagingMetadata`; the next page is loaded
-when the user scrolls to the end. Leave it `null` on the last page. While a page loads, the
+The first page is loaded with `initialMetadata`. The last item of each page, a `simple` item,
+a separator or a [row](#row), carries the metadata of the next page in `pagingMetadata`; the next
+page is loaded when the user scrolls to the end. Leave it `null` on the last page. A row carries
+its own `pagingMetadata`: the metadata of its cells does not describe the next page. While a page loads, the
 submenu shows `loading` after the loaded items, as an async submenu does. If a page fails to
 load or takes longer than `timeout` (10 seconds by default), the submenu shows `error` after
 the loaded items, and tapping it loads the page again. If the first page is empty, the submenu
@@ -693,6 +702,153 @@ For a thin line instead of a band, set a small `separatorThickness` and the
 `dividerColor` as `separatorColor`. To draw lines between all items, see
 [Dividers](#dividers).
 
+#### Row
+
+<img src="doc/gifs/rows.png" width="600" alt="The Quick actions, Only rows, Styled rows and Wide row menus of the example, in the light and dark themes">
+
+*Four menus from the example, in the light and dark themes: a row above the list, a menu
+of rows only, rows in their own style with a badge and colors to pick, and seven tools in
+a wider menu. [Code in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/domain/appearance_items.dart#L148-L344).*
+
+A row puts the most used actions side by side, as the compact menus of iOS do. Its cells
+are items of the other types: actions, submenus, async and listenable items, loading, error
+and empty items, and separators. They keep their actions, colors, ids and rules of closing
+the menu; the row only makes them compact. Rows and other items can be mixed, and a menu
+can consist of rows only.
+
+```dart
+[
+  SmartContextMenuItem.row(
+    children: [
+      SmartContextMenuItem.simple(
+        title: 'Copy',
+        leading: const Icon(CupertinoIcons.doc_on_doc),
+        onTap: () => copy(),
+      ),
+      SmartContextMenuItem.submenu(
+        title: 'Share',
+        leading: const Icon(CupertinoIcons.share),
+        children: shareItems,
+      ),
+      SmartContextMenuItem.simple(
+        title: 'Delete',
+        leading: const Icon(CupertinoIcons.delete),
+        isDestructive: true,
+        onTap: () => delete(),
+      ),
+    ],
+  ),
+  SmartContextMenuItem.simple(
+    title: 'Pin',
+    leading: const Icon(CupertinoIcons.pin),
+    onTap: () => pin(),
+  ),
+]
+```
+
+`size` sets the look of the cells:
+
+- `SmartContextMenuRowSize.medium`, the default, shows the `leading` above the `title`.
+- `SmartContextMenuRowSize.small` shows only the `leading`, and the `title` is what a screen
+  reader says. A cell without a `leading` shows its `title`, for example `0.5×`, `1×`, `2×`.
+
+A row is one line and does not wrap: for six cells in two lines, make two rows of three.
+The Only rows menu of the example has eight small cells in two rows and a row of medium cells:
+
+```dart
+[
+  SmartContextMenuItem.row(
+    size: SmartContextMenuRowSize.small,
+    children: [bold, italic, underline, strikethrough],
+  ),
+  SmartContextMenuItem.row(
+    size: SmartContextMenuRowSize.small,
+    children: [alignLeft, center, alignRight, justify],
+  ),
+  SmartContextMenuItem.separator(),
+  SmartContextMenuItem.row(children: [cut, copy, paste]),
+]
+```
+
+Every kind of item works as a cell:
+
+- A cell that opens a submenu shows a small submenu icon in its top corner. The submenu shows
+  its items as usual, and it can have rows of its own.
+- Async and listenable cells stay compact while they load and after. Loading, error and empty
+  cells show the sign of their state, with short titles from the
+  [labels](#localization).
+- Disabled, destructive and tinted cells look as they do in the list.
+- The `trailing` of a cell is not shown; a [`customBuilder`](#custom-item-content) can draw it.
+
+The width of the row is divided between its cells, equally by default.
+`SmartContextMenuRowFlex` gives a cell a larger share, and the id and the action stay on its
+`child`. The width of a cell does not change with its content. The row is as tall as its
+tallest cell, and each cell is pressed and highlighted over its full share of the width and
+the full height of the row. Content wider than its cell is clipped, text gets an ellipsis,
+and in RTL the cells go from right to left.
+
+```dart
+SmartContextMenuItem.row(
+  children: [
+    inbox,
+    flag,
+    // Twice as wide as the other cells.
+    SmartContextMenuRowFlex(flex: 2, child: markAsRead),
+  ],
+)
+```
+
+A row with fewer cells than the row above it still divides its whole width, so a single cell
+takes the full width of the menu. To keep the cells as wide as in the other row, fill the rest
+with empty cells: a simple item without `title`, `leading` and `onTap`, and with
+`closeOnTap: false`, is not highlighted and ignores taps. Add one empty cell for each missing
+cell rather than one `SmartContextMenuRowFlex`, so that the gaps match too, and turn off the
+dividers of the row. If the other row draws dividers, the widths differ by their thickness.
+A separator does not work as a spacer: it is not shown at the end of a row.
+
+```dart
+[
+  SmartContextMenuItem.row(
+    size: SmartContextMenuRowSize.small,
+    children: [undo, redo, cut, copy],
+  ),
+  SmartContextMenuItem.row(
+    size: SmartContextMenuRowSize.small,
+    dividersBetweenChildren: false,
+    children: [
+      paste,
+      for (var i = 0; i < 3; i++)
+        SmartContextMenuItem.simple(closeOnTap: false),
+    ],
+  ),
+]
+```
+
+As in the list, a separator in a row is a band, vertical here; it is not shown at the start or
+the end of the row, and several separators next to each other show as one. A row without cells,
+or with separators only, is not shown, so cells shown on condition need no extra checks.
+`dividersBetweenChildren` draws vertical lines between the cells; if it is `null`, it follows
+`dividersBetweenItems` of the style. `padding` and `childrenGap` set the space around and between
+the cells of this row; the gap belongs to no cell, so a finger over it removes the highlight.
+The look of all rows is set by the [row style](#row-style).
+
+<img src="doc/gifs/row_drag_to_select.gif" width="300" alt="A finger slides across the cells of a row and on into the items of the list below, in the light theme">
+
+*In the light theme: the highlight follows the finger from cell to cell and on into the list.*
+
+Drag-to-select works across the cells as over other items, and a release selects the cell
+under the finger. In a submenu, a horizontal drag that starts on a row selects its cells
+instead of going back; with `enableSwipeBack: true`, the drag goes back, as on other items.
+Outside the row and on the back item, swipe back always works.
+
+`children` takes `SmartContextMenuRowEntry`: every item type and `SmartContextMenuRowFlex`,
+but not a row, so a row cannot contain another row. A helper that returns a cell should
+return its own item type, such as `SmartContextMenuSimpleItem` or
+`SmartContextMenuAsyncSubmenuItem`, rather than `SmartContextMenuItem`, and a list of cells
+built in advance needs its type: `<SmartContextMenuRowEntry>[...]`.
+
+Keep cells wide enough to tap, see [Design guidelines](#design-guidelines).
+
 ### Opening from code
 
 Create a `SmartContextMenuController()` and pass it to the menu to open and close
@@ -957,9 +1113,16 @@ SmartContextMenuConfig(
     loading: l10n.loading,
     error: l10n.couldNotLoad,
     empty: l10n.noItems,
+    rowLoading: l10n.loadingShort,
+    rowError: l10n.error,
+    rowRetry: l10n.retryShort,
+    rowEmpty: l10n.noItems,
   ),
 )
 ```
+
+Cells of a [row](#row) are narrow, so loading, error and empty cells use short titles of their
+own: `rowLoading`, `rowError`, `rowRetry` and `rowEmpty`.
 
 ### Appearance
 
@@ -1108,6 +1271,40 @@ const style = SmartContextMenuStyle(
 
 To split items into groups, use a [separator](#separator).
 
+#### Row style
+
+`SmartContextMenuRowStyle`, the `rowStyle` of the style, sets the look of all [rows](#row):
+
+| Field | What it does | Default |
+| --- | --- | --- |
+| `padding` | The padding around the cells of a row. | `EdgeInsets.zero` |
+| `childrenGap` | The gap between the cells; it belongs to no cell. | `0` |
+| `smallItemPadding` | The padding of small cells. The whole cell is pressed and highlighted. | 4 horizontal, 14 vertical |
+| `mediumItemPadding` | The padding of medium cells. | 4 horizontal, 10 vertical |
+| `itemChildrenGap` | The gap between the leading and the title of medium cells. | `4` |
+| `titleStyle` | The style of the titles of the cells, merged over the title style of the item or of the menu. | 12 px |
+| `dividerIndent` | The space above the vertical dividers between the cells. | `0` |
+| `dividerEndIndent` | The space below the vertical dividers. | `0` |
+
+The own `padding` and `childrenGap` of a row, and the `padding` and `childrenGap` of an item
+in a cell, take precedence. Colors, icons, `titleMaxLines`, separators and dividers of rows
+come from the menu style. The Styled rows menu of the example sets bolder titles, gaps between
+the cells and dividers that stop short of the edges ([code in the
+example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/ui/appearance_styles.dart#L80-L85)):
+
+```dart
+const style = SmartContextMenuStyle(
+  dividersBetweenItems: true,
+  rowStyle: SmartContextMenuRowStyle(
+    // Replaces the default, so it sets the size too.
+    titleStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+    childrenGap: 4,
+    dividerIndent: 12,
+    dividerEndIndent: 12,
+  ),
+);
+```
+
 #### Custom item content
 
 `customBuilder` replaces the content of an item. The item padding and press highlight
@@ -1129,6 +1326,78 @@ SmartContextMenuItem.simple(
   ),
 )
 ```
+
+In a [row](#row), `state.rowSize` is the size of the cell, and `null` in the list, so one
+builder can fit both. The cell keeps its padding and highlight, but only the built-in content
+is centered in it: align your own content yourself. In a small cell, also label it with
+`Semantics`, as the built-in content is labeled with the `title`. For example, an icon with
+a badge, as Inbox in the Styled rows menu of the example ([code in the
+example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/domain/appearance_items.dart#L251-L313)):
+
+```dart
+SmartContextMenuItem.simple(
+  title: 'Inbox',
+  onTap: () => openInbox(),
+  customBuilder: (context, state) {
+    final color = state.foregroundColor;
+    final icon = Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Icon(CupertinoIcons.tray, color: color),
+        const PositionedDirectional(
+          top: -6,
+          start: 14,
+          child: CountBadge(count: 3),
+        ),
+      ],
+    );
+    return switch (state.rowSize) {
+      null => Row(
+        children: [
+          icon,
+          const SizedBox(width: 12),
+          Text('Inbox', style: TextStyle(color: color)),
+        ],
+      ),
+      SmartContextMenuRowSize.small => Align(
+        alignment: Alignment.topCenter,
+        heightFactor: 1,
+        child: Semantics(label: 'Inbox', child: icon),
+      ),
+      SmartContextMenuRowSize.medium => Align(
+        alignment: Alignment.topCenter,
+        heightFactor: 1,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            icon,
+            const SizedBox(height: 4),
+            Text('Inbox', style: TextStyle(fontSize: 12, color: color)),
+          ],
+        ),
+      ),
+    };
+  },
+)
+```
+
+### Design guidelines
+
+The defaults follow the menus of iOS, such as the menu width of 250. A few choices stay
+with you:
+
+- **Cells wide enough to tap.** The Apple Human Interface Guidelines ask for touch targets of
+  at least 44 × 44 points, and Material Design for 48 × 48. A [row](#row) divides the width of
+  the menu between its cells, so at the default width use up to five cells, 50 points each.
+  For more, widen the menu with `menuWidth`: the Wide row menu of the example fits seven cells
+  of 48 into 336. On a screen narrower than the menu and its `screenPadding`, the menu gets
+  narrower, so check it on the narrowest phone you support. With a mouse, narrower cells are
+  easy to hit too.
+- **A title for every cell.** Give each cell a `title` and a `leading`: a small cell shows only
+  the icon, and its title is what a screen reader says. Keep small cells for icons people know
+  without a label, such as text formatting, and use medium cells for the rest.
+- **The most used actions first.** A row at the top of the menu keeps them a short reach away,
+  and the rest of the actions stay in the list below.
 
 ## Animations
 
@@ -1176,9 +1445,8 @@ Planned for the next minor version:
 
 - `SmartContextMenuItem.listenableSubmenu`: a submenu that rebuilds from the state of your app
   while it is open, for example the people who liked a post, updated as new likes come in.
-- `SmartContextMenuItem.row`: several actions in one row of icons, as in the compact menus of iOS.
 
-Both are new item types, so keep a `_` case when you switch on items, see
+It is a new item type, so keep a `_` case when you switch on items, see
 [Item types](#item-types).
 
 ## Additional information

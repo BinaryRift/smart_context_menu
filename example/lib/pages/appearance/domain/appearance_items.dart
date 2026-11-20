@@ -284,20 +284,25 @@ SmartContextMenuSimpleItem _inboxItem({required int unread}) {
               badge,
             ],
           ),
-          // Centered in the cell, at the top, as the built-in content.
-          final _ => Align(
+          // Only the built-in content is centered in its cell, at the top.
+          SmartContextMenuRowSize.small => Align(
+            alignment: Alignment.topCenter,
+            heightFactor: 1,
+            // The built-in content labels an icon without a title, own
+            // content labels itself.
+            child: Semantics(label: 'Inbox', child: iconWithBadge),
+          ),
+          SmartContextMenuRowSize.medium => Align(
             alignment: Alignment.topCenter,
             heightFactor: 1,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 iconWithBadge,
-                if (state.rowSize == SmartContextMenuRowSize.medium) ...[
-                  const SizedBox(
-                    height: SmartContextMenuDefaults.rowItemChildrenGap,
-                  ),
-                  title,
-                ],
+                const SizedBox(
+                  height: SmartContextMenuDefaults.rowItemChildrenGap,
+                ),
+                title,
               ],
             ),
           ),
