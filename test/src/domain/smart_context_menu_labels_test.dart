@@ -10,5 +10,9 @@ void main() {
     expect(labels.loading, 'Loading…');
     expect(labels.error, 'Could not load');
     expect(labels.empty, 'No items');
+    expect(labels.rowLoading, 'Loading…');
+    expect(labels.rowError, 'Error');
+    expect(labels.rowRetry, 'Retry');
+    expect(labels.rowEmpty, 'No items');
   });
 }
