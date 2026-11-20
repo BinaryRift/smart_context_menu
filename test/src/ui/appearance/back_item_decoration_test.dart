@@ -39,7 +39,7 @@ void main() {
     await tester.openSubmenu();
   }
 
-  testWidgets('uses menuColor and backButtonBorderRadius by default', (
+  testWidgets('uses menuColor and the border radius by default', (
     tester,
   ) async {
     const color = Color(0xFF123456);
@@ -48,7 +48,7 @@ void main() {
       tester,
       const SmartContextMenuStyle(
         menuColor: color,
-        backButtonBorderRadius: radius,
+        backButtonStyle: SmartContextMenuBackButtonStyle(borderRadius: radius),
       ),
     );
 
@@ -73,8 +73,10 @@ void main() {
       tester,
       const SmartContextMenuStyle(
         menuColor: Color(0xFFABCDEF),
-        backButtonBorderRadius: BorderRadius.zero,
-        backButtonDecoration: decoration,
+        backButtonStyle: SmartContextMenuBackButtonStyle(
+          borderRadius: BorderRadius.zero,
+          decoration: decoration,
+        ),
       ),
     );
 
@@ -103,7 +105,11 @@ void main() {
     const decoration = BoxDecoration(color: Color(0x00000000));
     await openSubmenu(
       tester,
-      const SmartContextMenuStyle(backButtonDecoration: decoration),
+      const SmartContextMenuStyle(
+        backButtonStyle: SmartContextMenuBackButtonStyle(
+          decoration: decoration,
+        ),
+      ),
     );
 
     final background = tester.widget<DecoratedBox>(
@@ -122,7 +128,9 @@ void main() {
     await openSubmenu(
       tester,
       SmartContextMenuStyle(
-        backButtonDecoration: BoxDecoration(border: Border.all(width: 6)),
+        backButtonStyle: SmartContextMenuBackButtonStyle(
+          decoration: BoxDecoration(border: Border.all(width: 6)),
+        ),
       ),
     );
 

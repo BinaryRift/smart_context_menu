@@ -78,7 +78,9 @@ void main() {
           style: SmartContextMenuStyle(
             backgroundBlur: null,
             menuBlur: SmartContextMenuBlur.small,
-            backButtonBlur: backButtonBlur,
+            backButtonStyle: SmartContextMenuBackButtonStyle(
+              blur: backButtonBlur,
+            ),
           ),
         ),
         items: [
@@ -101,9 +103,7 @@ void main() {
       expect(blurOf(SmartContextMenuBlur.strong), findsOneWidget);
     });
 
-    testWidgets('does not blur the back item without backButtonBlur', (
-      tester,
-    ) async {
+    testWidgets('does not blur the back item without a blur', (tester) async {
       await openSubmenu(tester, backButtonBlur: null);
 
       expect(find.byType(BackdropFilter), findsOneWidget);

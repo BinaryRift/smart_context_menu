@@ -22,10 +22,12 @@ void main() {
     await tester.pumpMenu(
       config: customConfig.copyWith(
         style: customStyle.copyWith(
-          backButtonTitleStyle: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w300,
-            color: Color(0xFF0000FF),
+          backButtonStyle: const SmartContextMenuBackButtonStyle(
+            titleStyle: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w300,
+              color: Color(0xFF0000FF),
+            ),
           ),
         ),
       ),
@@ -47,8 +49,10 @@ void main() {
       await tester.pumpMenu(
         config: customConfig.copyWith(
           style: customStyle.copyWith(
-            backButtonForegroundColor: backColor,
-            backButtonTitleStyle: const TextStyle(color: Color(0xFF0000FF)),
+            backButtonStyle: const SmartContextMenuBackButtonStyle(
+              foregroundColor: backColor,
+              titleStyle: TextStyle(color: Color(0xFF0000FF)),
+            ),
           ),
         ),
         items: submenuItems(),
@@ -67,7 +71,9 @@ void main() {
     await tester.pumpMenu(
       config: customConfig.copyWith(
         style: customStyle.copyWith(
-          backButtonForegroundColor: backColor,
+          backButtonStyle: const SmartContextMenuBackButtonStyle(
+            foregroundColor: backColor,
+          ),
           defaultIconColor: const Color(0xFF000006),
         ),
       ),

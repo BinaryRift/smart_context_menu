@@ -57,7 +57,9 @@ void main() {
       await loaderPaddingOf(
         tester,
         config: const SmartContextMenuConfig(
-          style: SmartContextMenuStyle(loaderVerticalPadding: 16),
+          style: SmartContextMenuStyle(
+            statusStyle: SmartContextMenuStatusStyle(loaderVerticalPadding: 16),
+          ),
         ),
       ),
       const EdgeInsets.symmetric(vertical: 16),
