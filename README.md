@@ -1558,12 +1558,14 @@ and a long one finishes on its own. [Code in the example](https://github.com/Bin
 
 ## Coming soon
 
-Planned for the next minor version:
+Planned for the next versions:
 
+- A full accessibility pass with VoiceOver and TalkBack: opening the menu, every item type,
+  rows and submenus, and announcements of loading and errors.
 - `SmartContextMenuItem.listenableSubmenu`: a submenu that rebuilds from the state of your app
   while it is open, for example the people who liked a post, updated as new likes come in.
 
-It is a new item type, so keep a `_` case when you switch on items, see
+`listenableSubmenu` is a new item type, so keep a `_` case when you switch on items, see
 [Item types](#item-types).
 
 ## Additional information
