@@ -157,7 +157,7 @@ flutter pub add smart_context_menu
 
 ```yaml
 dependencies:
-  smart_context_menu: ^1.0.3
+  smart_context_menu: ^1.0.4
 ```
 
 ```dart

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' show Offset, immutable;
+import 'package:flutter/widgets.dart' show Offset, immutable;
 
 @immutable
 // Absolute values

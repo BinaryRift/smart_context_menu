@@ -1,12 +1,12 @@
 import 'dart:ui' show PointerDeviceKind;
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart' show kSecondaryButton;
-import 'package:flutter/material.dart' show Divider;
+// ignore: deprecated_member_use
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
 import 'package:smart_context_menu/src/core/ui/gestures/gesture_thresholds.dart';
 
+import '../../helpers/appearance_tester.dart';
 import '../../helpers/menu_tester.dart';
 
 void main() {
@@ -104,7 +104,7 @@ void main() {
       );
       await tester.openMenu();
 
-      final divider = tester.widget<Divider>(find.byType(Divider));
+      final divider = tester.dividerLookOf(dividers);
       expect(
         divider.color,
         isSameColorAs(SmartContextMenuDefaults.dividerColor.darkColor),

@@ -1,3 +1,4 @@
+// ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart';
 
 /// An empty area with a hint that calls [onDoubleTap] when tapped.

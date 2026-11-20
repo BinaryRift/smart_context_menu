@@ -1,8 +1,14 @@
 import 'dart:async' show FutureOr;
 import 'dart:ui' as ui show Image;
-import 'package:flutter/material.dart' show Colors;
 import 'package:flutter/widgets.dart'
-    show PageRoute, Rect, Widget, Color, BuildContext, Animation;
+    show
+        PageRoute,
+        Rect,
+        Widget,
+        Color,
+        BuildContext,
+        Animation,
+        TransitionRoute;
 
 import '../../core/ui/motion/tokens/motion_durations.dart';
 import '../../domain/smart_context_menu_config.dart';
@@ -44,7 +50,7 @@ final class SmartContextMenuRoute extends PageRoute<void> {
   bool get barrierDismissible => config.barrierDismissible;
 
   @override
-  Color? get barrierColor => Colors.transparent;
+  Color? get barrierColor => const Color(0x00000000);
 
   @override
   Duration get transitionDuration => MotionDurations.standard;
@@ -54,6 +60,10 @@ final class SmartContextMenuRoute extends PageRoute<void> {
 
   @override
   bool get maintainState => true;
+
+  /// The page below stays in place while the menu is open.
+  @override
+  bool canTransitionFrom(TransitionRoute<dynamic> previousRoute) => false;
 
   @override
   Widget buildPage(

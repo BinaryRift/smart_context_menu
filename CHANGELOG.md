@@ -9,6 +9,15 @@
   `backButtonColor` name remains as a deprecated alias until 2.0.0.
 * Dynamic colors in `menuShadows` now follow the theme.
 
+## 1.0.4
+
+* Fixed static analysis on Flutter 3.50: the package no longer reports the deprecated
+  `package:flutter/material.dart` and `package:flutter/cupertino.dart` libraries. Flutter 3.32
+  and `CupertinoDynamicColor`s from `package:flutter/cupertino.dart` are still supported.
+* The page below the menu no longer plays its exit transition when it was pushed with a plain
+  `PageRoute`, such as `PageRouteBuilder` or custom routes of navigation packages.
+* The animated GIF is now the first image on pub.dev.
+
 ## 1.0.3
 
 * Shortened the package description to fit pub.dev's recommended length and updated

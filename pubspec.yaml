@@ -1,6 +1,6 @@
 name: smart_context_menu
 description: "A powerful, customizable iOS-style context menu: smart positioning, fluid animations, drag-to-select, submenus (async, paginated), and widgets above the preview (e.g. reactions)."
-version: 1.0.3
+version: 1.0.4
 repository: https://github.com/BinaryRift/smart_context_menu
 issue_tracker: https://github.com/BinaryRift/smart_context_menu/issues
 topics:
@@ -10,12 +10,12 @@ topics:
   - overlay
   - chat-context-menu
 screenshots:
+  - description: "File and chat menus in light and dark themes show drag-to-select, with a reactions bar above the chat message."
+    path: doc/gifs/open_and_select_themes.gif
   - description: "A file context menu in the light theme next to a chat context menu in the dark theme."
     path: doc/gifs/carousel_cover.png
   - description: "Three styles of the menu in the light and dark themes: brand colors, an opaque menu and items with their own content."
     path: doc/gifs/appearance.png
-  - description: "File and chat menus in light and dark themes show drag-to-select, with a reactions bar above the chat message."
-    path: doc/gifs/open_and_select_themes.gif
 
 environment:
   sdk: ^3.8.0

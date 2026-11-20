@@ -1,9 +1,10 @@
 import 'dart:async' show FutureOr, unawaited;
 import 'dart:ui' as ui;
 
+// ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart'
     show CupertinoLocalizations, DefaultCupertinoLocalizations;
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter/rendering.dart' show RenderRepaintBoundary;
 import 'package:flutter/services.dart' show HapticFeedback;
 
