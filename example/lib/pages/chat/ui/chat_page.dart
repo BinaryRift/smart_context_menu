@@ -243,13 +243,19 @@ final class _ChatPageState extends State<ChatPage> {
   }
 
   List<SmartContextMenuItem> _menuItems(ChatMessage message) => [
-    _action('Reply', CupertinoIcons.reply),
-    if (message.image == null)
-      _action('Copy', CupertinoIcons.doc_on_doc)
-    else
-      _action('Save', CupertinoIcons.arrow_down_to_line),
-    _forwardItem(),
+    // The most frequent actions side by side, as in the menus of iOS.
+    SmartContextMenuItem.row(
+      children: [
+        _action('Reply', CupertinoIcons.reply),
+        if (message.image == null)
+          _action('Copy', CupertinoIcons.doc_on_doc)
+        else
+          _action('Save', CupertinoIcons.arrow_down_to_line),
+        _forwardItem(),
+      ],
+    ),
     _pinItem(message),
+    _action('Select', CupertinoIcons.checkmark),
     if (message.reactionCount > 0) _reactionsItem(message),
     if (message.isMine) _seenByItem(),
     SmartContextMenuItem.separator(),
@@ -257,7 +263,7 @@ final class _ChatPageState extends State<ChatPage> {
   ];
 
   /// A submenu loaded when it opens.
-  SmartContextMenuItem _forwardItem() {
+  SmartContextMenuAsyncSubmenuItem _forwardItem() {
     return SmartContextMenuItem.asyncSubmenu(
       title: 'Forward',
       leading: const Icon(CupertinoIcons.arrowshape_turn_up_right),

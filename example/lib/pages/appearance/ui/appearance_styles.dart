@@ -82,4 +82,8 @@ const russianLabels = SmartContextMenuLabels(
   loading: 'Загрузка…',
   error: 'Не удалось загрузить',
   empty: 'Пусто',
+  rowLoading: 'Загрузка…',
+  rowError: 'Ошибка',
+  rowRetry: 'Повторить',
+  rowEmpty: 'Пусто',
 );

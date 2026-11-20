@@ -187,9 +187,13 @@ List<SmartContextMenuItem> statusItems() {
 }
 
 /// Rows of both sizes mixed with ordinary items: a wider cell, a separator,
-/// a disabled and a destructive cell, a cell that opens a submenu with a row
-/// and a cell loaded on the fly.
-List<SmartContextMenuItem> rowItems(DemoLoader loader) => [
+/// disabled and destructive cells, cells loaded on the fly or built from the
+/// state of the app, a row of statuses, and a submenu with rows that keep
+/// a horizontal drag for selection or let it go back.
+List<SmartContextMenuItem> rowItems({
+  required DemoLoader loader,
+  required DemoFavorite favorite,
+}) => [
   SmartContextMenuItem.row(
     children: [
       _action('Copy', icon: CupertinoIcons.doc_on_doc),
@@ -205,15 +209,9 @@ List<SmartContextMenuItem> rowItems(DemoLoader loader) => [
       _action('Underline', icon: CupertinoIcons.underline, isDisabled: true),
       SmartContextMenuItem.separator(),
       SmartContextMenuItem.submenu(
-        title: 'More',
+        title: 'Swipe back',
         leading: const Icon(CupertinoIcons.ellipsis),
-        children: [
-          SmartContextMenuItem.row(
-            size: SmartContextMenuRowSize.small,
-            children: [_action('0.5×'), _action('1×'), _action('2×')],
-          ),
-          _action('Reset', icon: CupertinoIcons.arrow_counterclockwise),
-        ],
+        children: _swipeBackRows(),
       ),
     ],
   ),
@@ -230,9 +228,73 @@ List<SmartContextMenuItem> rowItems(DemoLoader loader) => [
           return _action('Pin', icon: CupertinoIcons.pin);
         },
       ),
+      SmartContextMenuItem.listenable(
+        listenable: favorite,
+        builder: () {
+          if (favorite.isSaving) return SmartContextMenuItem.loading();
+          return SmartContextMenuItem.simple(
+            title: 'Favorite',
+            leading: Icon(
+              favorite.isFavorite
+                  ? CupertinoIcons.heart_fill
+                  : CupertinoIcons.heart,
+            ),
+            closeOnTap: false,
+            onTap: favorite.toggle,
+          );
+        },
+      ),
+    ],
+  ),
+  SmartContextMenuItem.separator(),
+  SmartContextMenuItem.row(
+    children: [
+      SmartContextMenuItem.loading(),
+      SmartContextMenuItem.error(),
+      SmartContextMenuItem.empty(),
     ],
   ),
 ];
+
+/// A row that keeps a horizontal drag for selecting its cells, the default,
+/// and a row where the drag goes back, as on other items.
+List<SmartContextMenuItem> _swipeBackRows() => [
+  _caption('Swipe back is off: a drag across the row selects'),
+  SmartContextMenuItem.row(
+    size: SmartContextMenuRowSize.small,
+    children: [_action('0.5×'), _action('1×'), _action('2×')],
+  ),
+  _caption('Swipe back is on: a drag goes back'),
+  SmartContextMenuItem.row(
+    size: SmartContextMenuRowSize.small,
+    enableSwipeBack: true,
+    children: [
+      _action('Undo', icon: CupertinoIcons.arrow_uturn_left),
+      _action('Redo', icon: CupertinoIcons.arrow_uturn_right),
+    ],
+  ),
+  _action('Reset', icon: CupertinoIcons.arrow_counterclockwise),
+];
+
+/// A caption above a row. Without an action it is not highlighted and
+/// ignores taps. A separator would not do: it is not shown at the start of
+/// a level.
+SmartContextMenuSimpleItem _caption(String text) {
+  return SmartContextMenuItem.simple(
+    closeOnTap: false,
+    padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
+    customBuilder: (context, state) => Text(
+      text,
+      style: TextStyle(
+        fontSize: 13,
+        color: CupertinoDynamicColor.resolve(
+          CupertinoColors.secondaryLabel,
+          context,
+        ),
+      ),
+    ),
+  );
+}
 
 /// Every kind of submenu: static, async, paginated and nested.
 List<SmartContextMenuItem> allSubmenuTypes(DemoLoader loader) => [

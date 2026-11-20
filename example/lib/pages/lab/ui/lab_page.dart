@@ -120,7 +120,7 @@ final class _LabPageState extends State<LabPage> {
                   _buildMenu(
                     title: 'Rows',
                     subtitle: 'Small and medium cells, Copy Link has flex 2',
-                    items: rowItems(_loader),
+                    items: rowItems(loader: _loader, favorite: _favorite),
                   ),
                   _buildMenu(
                     title: 'Nested levels',
