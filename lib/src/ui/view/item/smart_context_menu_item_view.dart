@@ -11,6 +11,7 @@ import '../../../domain/smart_context_menu_config.dart';
 import '../../../domain/smart_context_menu_item.dart';
 import '../../../domain/smart_context_menu_item_state.dart';
 import '../../../domain/smart_context_menu_style.dart';
+import '../../extensions/render_object_ext.dart';
 import '../../keys/item_content_key.dart';
 import '../../keys/service_item_key.dart';
 import '../../state/smart_context_menu_hover_controller.dart';
@@ -175,6 +176,7 @@ final class _SmartContextMenuItemViewState
   void dispose() {
     _minHighlightTimer?.cancel();
     widget.hoverController?.removeListener(_handleGlobalPointer);
+    widget.hoverController?.forget(this);
     _listenableOf(widget.item)?.removeListener(_onListenableChanged);
     super.dispose();
   }
@@ -205,7 +207,7 @@ final class _SmartContextMenuItemViewState
       foregroundColor: colors.foreground,
     );
 
-    return MetaData(
+    final item = MetaData(
       metaData: widget.key,
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
@@ -220,6 +222,29 @@ final class _SmartContextMenuItemViewState
         ),
       ),
     );
+    if (widget.hoverController == null) return item;
+
+    // The mouse tracker updates the regions after every frame, so the hover
+    // follows the item under a stationary cursor as the menu changes.
+    return MouseRegion(
+      onEnter: _onCursor,
+      onHover: _onCursor,
+      onExit: (_) => widget.hoverController?.unhover(this),
+      child: item,
+    );
+  }
+
+  /// An interactive child of the item handles the cursor itself.
+  void _onCursor(PointerEvent event) {
+    final controller = widget.hoverController;
+    final key = widget.key;
+    if (controller == null || key == null) return;
+    final keyAt = context.findRenderObject()?.findMenuItemKeyAt(event.position);
+    if (keyAt == key) {
+      controller.hover(this, key);
+    } else {
+      controller.unhover(this);
+    }
   }
 
   Widget _buildSeparator(SmartContextMenuSeparatorItem item) {

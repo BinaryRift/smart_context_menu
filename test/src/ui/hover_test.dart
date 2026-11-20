@@ -289,4 +289,202 @@ void main() {
     await mouseAt(tester, find.text('Item 6'));
     expect(tester.backgroundOf('Item 6'), isSameColorAs(highlight));
   });
+
+  group('a stationary cursor', () {
+    /// Expects only the item under [cursor] of [titles] to be highlighted
+    /// and exactly one of them to be under it.
+    void expectHoverAt(
+      WidgetTester tester,
+      Offset cursor,
+      List<String> titles,
+    ) {
+      var itemsUnderCursor = 0;
+      for (final title in titles) {
+        final text = find.text(title).hitTestable();
+        if (text.evaluate().isEmpty) continue;
+        final item = find
+            .ancestor(of: text.first, matching: find.byType(AnimatedContainer))
+            .first;
+        final isUnderCursor = tester.getRect(item).contains(cursor);
+        if (isUnderCursor) itemsUnderCursor++;
+        expect(
+          tester.backgroundAt(text.first),
+          isSameColorAs(isUnderCursor ? highlight : transparent),
+          reason: title,
+        );
+      }
+      expect(itemsUnderCursor, 1);
+    }
+
+    testWidgets('follows the items as the whole content scrolls', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(390, 800);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      const titles = ['First', 'Second', 'Third'];
+
+      await tester.pumpWidget(
+        CupertinoApp(
+          home: Center(
+            child: SmartContextMenu(
+              config: config,
+              items: [
+                for (final title in titles)
+                  SmartContextMenuItem.simple(title: title),
+              ],
+              child: const SizedBox(height: 700, child: Text(menuTargetText)),
+            ),
+          ),
+        ),
+      );
+      await tester.openMenu();
+
+      await mouseAt(tester, find.text('First'));
+      final cursor = tester.getCenter(find.text('First'));
+      expect(tester.backgroundOf('First'), isSameColorAs(highlight));
+
+      final itemHeight =
+          tester.getCenter(find.text('Second')).dy -
+          tester.getCenter(find.text('First')).dy;
+      final content = tester.state<ScrollableState>(
+        find.byType(Scrollable).first,
+      );
+      expect(content.position.maxScrollExtent, greaterThan(itemHeight));
+      content.position.jumpTo(content.position.pixels + itemHeight);
+      await tester.pump();
+      await tester.pump();
+
+      expect(tester.backgroundOf('First'), isSameColorAs(transparent));
+      expect(tester.backgroundOf('Second'), isSameColorAs(highlight));
+      expectHoverAt(tester, cursor, titles);
+    });
+
+    testWidgets('follows the level after a click on a submenu and back', (
+      tester,
+    ) async {
+      final back = const SmartContextMenuLabels().back;
+      final titles = ['Copy', 'More', 'Paste', back, 'Child 1', 'Child 2'];
+      await tester.pumpMenu(
+        config: config,
+        items: [
+          SmartContextMenuItem.simple(title: 'Copy'),
+          SmartContextMenuItem.submenu(
+            title: 'More',
+            children: [
+              SmartContextMenuItem.simple(title: 'Child 1'),
+              SmartContextMenuItem.simple(title: 'Child 2'),
+            ],
+          ),
+          SmartContextMenuItem.simple(title: 'Paste'),
+        ],
+      );
+      await tester.openMenu();
+
+      final mouse = await mouseAt(tester, find.text('More'));
+      final cursor = tester.getCenter(find.text('More'));
+      await mouse.down(cursor);
+      await mouse.up();
+      await tester.settleMenu();
+      expect(find.text('Child 1'), findsOneWidget);
+      expectHoverAt(tester, cursor, titles);
+
+      final target = find.text(back).hitTestable().first;
+      final backCursor = tester.getCenter(target);
+      await mouse.moveTo(backCursor);
+      await tester.pump();
+      await mouse.down(backCursor);
+      await mouse.up();
+      await tester.settleMenu();
+      expect(find.text('Child 1'), findsNothing);
+      expectHoverAt(tester, backCursor, titles);
+    });
+
+    testWidgets('keeps the pinned back item over the scrolled items', (
+      tester,
+    ) async {
+      final back = const SmartContextMenuLabels().back;
+      await tester.pumpMenu(
+        config: config,
+        items: [
+          SmartContextMenuItem.submenu(
+            title: 'More',
+            children: [
+              for (var i = 1; i <= 20; i++)
+                SmartContextMenuItem.simple(title: 'Child $i'),
+            ],
+          ),
+        ],
+      );
+      await tester.openMenu();
+      await tester.tap(find.text('More'));
+      await tester.settleMenu();
+
+      final pinnedBack = find.text(back).last;
+      await mouseAt(tester, pinnedBack);
+      final cursor = tester.getCenter(pinnedBack);
+      final scrollable = tester.state<ScrollableState>(
+        find
+            .ancestor(
+              of: find.text('Child 1'),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      scrollable.position.jumpTo(100);
+      await tester.pump();
+      await tester.pump();
+
+      expect(tester.backgroundAt(pinnedBack), isSameColorAs(highlight));
+      var childrenUnderBack = 0;
+      for (var i = 1; i <= 20; i++) {
+        final child = find.text('Child $i');
+        if (child.evaluate().isEmpty) continue;
+        final item = find
+            .ancestor(of: child, matching: find.byType(AnimatedContainer))
+            .first;
+        if (tester.getRect(item).contains(cursor)) childrenUnderBack++;
+        expect(
+          tester.backgroundAt(child),
+          isSameColorAs(transparent),
+          reason: 'Child $i',
+        );
+      }
+      expect(childrenUnderBack, 1);
+    });
+
+    testWidgets('follows an item that changes its height', (tester) async {
+      final isTall = ValueNotifier(false);
+      addTearDown(isTall.dispose);
+      const titles = ['Status', 'Copy', 'Paste'];
+      await tester.pumpMenu(
+        config: config,
+        items: [
+          SmartContextMenuItem.listenable(
+            listenable: isTall,
+            builder: () => SmartContextMenuItem.simple(
+              title: 'Status',
+              padding: EdgeInsets.symmetric(
+                vertical: isTall.value ? 40 : 10,
+                horizontal: 16,
+              ),
+            ),
+          ),
+          SmartContextMenuItem.simple(title: 'Copy'),
+          SmartContextMenuItem.simple(title: 'Paste'),
+        ],
+      );
+      await tester.openMenu();
+
+      await mouseAt(tester, find.text('Copy'));
+      final cursor = tester.getCenter(find.text('Copy'));
+      expect(tester.backgroundOf('Copy'), isSameColorAs(highlight));
+
+      isTall.value = true;
+      await tester.pumpAndSettle();
+
+      expect(tester.getRect(find.text('Copy')).contains(cursor), isFalse);
+      expectHoverAt(tester, cursor, titles);
+    });
+  });
 }

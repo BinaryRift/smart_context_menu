@@ -1,21 +1,19 @@
 import 'dart:ui' show PointerDeviceKind;
 
 import 'package:flutter/foundation.dart' show ValueListenable;
-import 'package:flutter/gestures.dart' show PointerExitEvent, kPrimaryButton;
+import 'package:flutter/gestures.dart' show kPrimaryButton;
 import 'package:flutter/widgets.dart';
 
 import '../extensions/render_object_ext.dart';
 import '../state/smart_context_menu_hover_controller.dart';
 
-/// Tracks presses and cursor hover over [child] and reports the item under
-/// the pointer to [hoverController].
+/// Tracks presses over [child] and reports the item under the pressed
+/// pointer to [hoverController]. Items report the cursor hover themselves.
 ///
 /// Only a touch, a stylus or the primary mouse button selects items.
-/// Other mouse buttons keep the cursor hover.
 ///
 /// During a press, scrolling inside [child] or swiping back a level
 /// (see [isSwiping]) blocks drag selection until the pointer is lifted.
-/// Cursor hover follows the visible item as the menu scrolls.
 final class SmartContextMenuPointerTracker extends StatefulWidget {
   final SmartContextMenuHoverController hoverController;
 
@@ -49,9 +47,7 @@ final class _SmartContextMenuPointerTrackerState
   int? _pointer;
   bool _isMousePress = false;
   Offset? _startPosition;
-  Offset? _hoverPosition;
   bool _isSelectionBlocked = false;
-  bool _hoverRefreshScheduled = false;
 
   SmartContextMenuHoverController get _hoverController =>
       widget.hoverController;
@@ -69,7 +65,6 @@ final class _SmartContextMenuPointerTrackerState
       oldWidget.isSwiping.removeListener(_onSwipeChanged);
       widget.isSwiping.addListener(_onSwipeChanged);
     }
-    _scheduleHoverRefresh();
   }
 
   @override
@@ -82,64 +77,29 @@ final class _SmartContextMenuPointerTrackerState
   Widget build(BuildContext context) {
     return NotificationListener<ScrollNotification>(
       onNotification: _onScrollNotification,
-      child: MouseRegion(
-        onEnter: _onHover,
-        onHover: _onHover,
-        onExit: _onHoverExit,
-        child: Listener(
-          onPointerDown: _onPointerEvent,
-          onPointerMove: _onPointerEvent,
-          onPointerUp: _onPointerEvent,
-          onPointerCancel: _onPointerEvent,
-          child: widget.child,
-        ),
+      child: Listener(
+        onPointerDown: _onPointerEvent,
+        onPointerMove: _onPointerEvent,
+        onPointerUp: _onPointerEvent,
+        onPointerCancel: _onPointerEvent,
+        child: widget.child,
       ),
     );
   }
 
   bool _onScrollNotification(ScrollNotification notification) {
     if (notification is ScrollStartNotification) _blockSelection();
-    _scheduleHoverRefresh();
     return false;
   }
 
   void _onSwipeChanged() {
-    if (widget.isSwiping.value) {
-      _blockSelection();
-    } else {
-      _scheduleHoverRefresh();
-    }
-  }
-
-  void _onHover(PointerEvent event) {
-    _hoverPosition = event.position;
-    if (_startPosition == null) {
-      _updateHoveredItem(event.position, isPointerHover: true);
-    }
-  }
-
-  void _onHoverExit(PointerExitEvent _) {
-    _hoverPosition = null;
-    if (_startPosition == null) _hoverController.update(null);
-  }
-
-  void _scheduleHoverRefresh() {
-    if (_hoverRefreshScheduled || _hoverPosition == null) return;
-    _hoverRefreshScheduled = true;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _hoverRefreshScheduled = false;
-      if (!mounted || _startPosition != null) return;
-      final position = _hoverPosition;
-      if (position != null) {
-        _updateHoveredItem(position, isPointerHover: true);
-      }
-    });
+    if (widget.isSwiping.value) _blockSelection();
   }
 
   void _blockSelection() {
     if (_startPosition == null) return;
     _isSelectionBlocked = true;
-    if (_hoverController.value != null) _hoverController.update(null);
+    _press(null);
   }
 
   void _onPointerEvent(PointerEvent event) {
@@ -147,12 +107,7 @@ final class _SmartContextMenuPointerTrackerState
       if (event.buttons & kPrimaryButton != 0) _handlePointerDown(event);
       return;
     }
-    if (event.pointer != _pointer) {
-      if (event is PointerMoveEvent && event.kind == PointerDeviceKind.mouse) {
-        _onHover(event);
-      }
-      return;
-    }
+    if (event.pointer != _pointer) return;
     if (event is PointerMoveEvent) {
       _handlePointerMove(event);
     } else if (event is PointerUpEvent) {
@@ -166,16 +121,14 @@ final class _SmartContextMenuPointerTrackerState
     _pointer = event.pointer;
     _startPosition = event.position;
     _isMousePress = event.kind == PointerDeviceKind.mouse;
-    if (_isMousePress) _hoverPosition = event.position;
     _isSelectionBlocked = false;
-    _updateHoveredItem(event.position);
+    _updatePressedItem(event.position);
   }
 
   void _handlePointerMove(PointerMoveEvent event) {
     final startPosition = _startPosition;
     if (startPosition == null) return;
-    if (_isMousePress) _hoverPosition = event.position;
-    _updateHoveredItem(event.position);
+    _updatePressedItem(event.position);
     widget.onDrag(event.position - startPosition);
   }
 
@@ -188,34 +141,21 @@ final class _SmartContextMenuPointerTrackerState
     }
 
     Future.microtask(() {
-      _hoverController.update(null);
+      _hoverController.endPress();
       _startPosition = null;
       _isMousePress = false;
       _isSelectionBlocked = false;
       widget.onRelease();
-      _scheduleHoverRefresh();
     });
   }
 
-  void _updateHoveredItem(
-    Offset globalPosition, {
-    bool isPointerHover = false,
-  }) {
+  void _updatePressedItem(Offset globalPosition) {
     if (_isSelectionBlocked) {
-      if (_hoverController.value != null) _hoverController.update(null);
+      _press(null);
       return;
     }
-
-    final key = context.findRenderObject()?.findMenuItemKeyAt(globalPosition);
-    final isCursor = isPointerHover || _isMousePress;
-    if (_hoverController.value != key ||
-        _hoverController.isPointerHover != isPointerHover ||
-        _hoverController.isCursor != isCursor) {
-      _hoverController.update(
-        key,
-        isPointerHover: isPointerHover,
-        isCursor: isCursor,
-      );
-    }
+    _press(context.findRenderObject()?.findMenuItemKeyAt(globalPosition));
   }
+
+  void _press(Key? key) => _hoverController.press(key, isMouse: _isMousePress);
 }
