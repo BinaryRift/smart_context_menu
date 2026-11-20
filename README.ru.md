@@ -109,6 +109,7 @@
   - [Настройки](#настройки)
     - [Тема и конфиг](#тема-и-конфиг)
     - [Локализация](#локализация)
+    - [Приложения на `cupertino_ui`](#приложения-на-cupertino_ui)
   - [Внешний вид](#внешний-вид)
     - [Стиль пунктов](#стиль-пунктов)
     - [Линии между пунктами](#линии-между-пунктами)
@@ -1123,6 +1124,43 @@ SmartContextMenuConfig(
 
 Ячейки [ряда](#ряд) узкие, поэтому у загрузки, ошибки и пустого состояния в них свои короткие
 подписи: `rowLoading`, `rowError`, `rowRetry` и `rowEmpty`.
+
+#### Приложения на `cupertino_ui`
+
+С Flutter 3.50 `flutter/cupertino.dart` устарел, на смену ему пришёл пакет
+[`cupertino_ui`](https://pub.dev/packages/cupertino_ui). До 2.0.0 меню использует
+`flutter/cupertino.dart` и не видит тему и локализации `CupertinoApp` из `cupertino_ui`: оно
+следует системной теме, а подпись барьера для экранного диктора — на английском. Поставьте
+`CupertinoUiCompatibilityBridge` из `cupertino_ui` в `builder` приложения. Меню открывается поверх
+всего приложения, поэтому мост вокруг одного экрана или виджета его тему не меняет.
+
+```dart
+CupertinoApp(
+  theme: const CupertinoThemeData(brightness: Brightness.dark),
+  builder: (context, child) => CupertinoUiCompatibilityBridge(child: child!),
+  home: const HomePage(),
+)
+```
+
+Меню резолвит только `CupertinoDynamicColor` из `flutter/cupertino.dart`, например свои значения
+по умолчанию. `CupertinoDynamicColor` из `cupertino_ui` в стиле остаётся в светлом цвете, поэтому
+резолвите его в `builder`, где тема приложения уже известна:
+
+```dart
+builder: (context, child) => CupertinoUiCompatibilityBridge(
+  child: SmartContextMenuTheme(
+    config: SmartContextMenuConfig(
+      style: SmartContextMenuStyle(
+        menuColor: CupertinoDynamicColor.resolve(brandMenuColor, context),
+      ),
+    ),
+    child: child!,
+  ),
+),
+```
+
+Мост помечен устаревшим как временный инструмент миграции, поэтому анализатор сообщает о его
+использовании. В версии 2.0.0 пакет переходит на `cupertino_ui`, и мост станет не нужен.
 
 ### Внешний вид
 

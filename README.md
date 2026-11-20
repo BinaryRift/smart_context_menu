@@ -113,6 +113,7 @@ app, a chat, a gallery of styles and a lab of edge cases.
   - [Configuration](#configuration)
     - [Theme and config](#theme-and-config)
     - [Localization](#localization)
+    - [Apps on `cupertino_ui`](#apps-on-cupertino_ui)
   - [Appearance](#appearance)
     - [Item style](#item-style)
     - [Dividers](#dividers)
@@ -1130,6 +1131,44 @@ SmartContextMenuConfig(
 
 Cells of a [row](#row) are narrow, so loading, error and empty cells use short titles of their
 own: `rowLoading`, `rowError`, `rowRetry` and `rowEmpty`.
+
+#### Apps on `cupertino_ui`
+
+Since Flutter 3.50, `flutter/cupertino.dart` is deprecated in favor of the
+[`cupertino_ui`](https://pub.dev/packages/cupertino_ui) package. Until 2.0.0, the menu uses
+`flutter/cupertino.dart`, so it does not see the theme and the localizations of a
+`CupertinoApp` from `cupertino_ui`: it follows the system brightness, and the screen reader
+label of its barrier is in English. Put `CupertinoUiCompatibilityBridge` of `cupertino_ui` in
+the `builder` of the app. The menu opens over the whole app, so a bridge around one screen or
+widget does not change its theme.
+
+```dart
+CupertinoApp(
+  theme: const CupertinoThemeData(brightness: Brightness.dark),
+  builder: (context, child) => CupertinoUiCompatibilityBridge(child: child!),
+  home: const HomePage(),
+)
+```
+
+The menu resolves only the `CupertinoDynamicColor`s of `flutter/cupertino.dart`, such as its
+defaults. A `CupertinoDynamicColor` of `cupertino_ui` in the style keeps its light color, so
+resolve it in the `builder`, where the theme of the app is known:
+
+```dart
+builder: (context, child) => CupertinoUiCompatibilityBridge(
+  child: SmartContextMenuTheme(
+    config: SmartContextMenuConfig(
+      style: SmartContextMenuStyle(
+        menuColor: CupertinoDynamicColor.resolve(brandMenuColor, context),
+      ),
+    ),
+    child: child!,
+  ),
+),
+```
+
+The bridge is marked deprecated as a temporary migration utility, so the analyzer reports its
+use. Version 2.0.0 of this package moves to `cupertino_ui`, and the bridge will not be needed.
 
 ### Appearance
 
