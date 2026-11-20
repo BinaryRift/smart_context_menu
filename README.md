@@ -116,6 +116,8 @@ app, a chat, a gallery of styles and a lab of edge cases.
   - [Appearance](#appearance)
     - [Item style](#item-style)
     - [Dividers](#dividers)
+    - [Back item style](#back-item-style)
+    - [Status style](#status-style)
     - [Row style](#row-style)
     - [Custom item content](#custom-item-content)
   - [Design guidelines](#design-guidelines)
@@ -1134,7 +1136,9 @@ behind the menu, an opaque menu, items with their own content, and rows in their
 with a badge and colors to pick.*
 
 The look of the menu is set by `SmartContextMenuStyle`, the `style` of the config.
-Its fields have defaults too:
+The Back item, the loading, error and empty items, and rows have their own parts of it:
+[`backButtonStyle`](#back-item-style), [`statusStyle`](#status-style) and
+[`rowStyle`](#row-style). All fields have defaults:
 
 ```dart
 const menuStyle = SmartContextMenuStyle(
@@ -1148,10 +1152,10 @@ const menuStyle = SmartContextMenuStyle(
 `menuShadows` replaces the default shadows under the menu; pass an empty list to remove them.
 
 `menuDecoration` replaces the menu's default background and border. The pinned Back item does
-not inherit it: without `backButtonDecoration`, that item uses `menuColor` and
-`backButtonBorderRadius`. Set `backButtonDecoration` for its own background. The decoration's
-shape also clips `backButtonBlur`; a transparent decoration lets the menu gradient and blurred
-scrolling items show through:
+not inherit it: by default, that item uses `menuColor` and the `borderRadius` of
+`backButtonStyle`. Its `decoration` gives the Back item its own background. The decoration's
+shape also clips the blur of the Back item; a transparent decoration lets the menu gradient and
+blurred scrolling items show through:
 
 ```dart
 const style = SmartContextMenuStyle(
@@ -1163,17 +1167,18 @@ const style = SmartContextMenuStyle(
       colors: [Color(0xFF3634A3), Color(0xFF18165F)],
     ),
   ),
-  backButtonDecoration: BoxDecoration(
-    color: Color(0x00000000),
-    borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+  backButtonStyle: SmartContextMenuBackButtonStyle(
+    decoration: BoxDecoration(
+      color: Color(0x00000000),
+      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+    ),
   ),
 );
 ```
 
-The Back item does not copy the gradient; it shows the menu behind it. Give
-`backButtonDecoration` a translucent color if the scrolling items show through too strongly.
-Its border radius controls the clip;
-`backButtonBorderRadius` applies only when `backButtonDecoration` is null.
+The Back item does not copy the gradient; it shows the menu behind it. Give the decoration a
+translucent color if the scrolling items show through too strongly. Its border radius controls
+the clip; the `borderRadius` of `backButtonStyle` applies only without a `decoration`.
 
 #### Item style
 
@@ -1191,9 +1196,7 @@ const style = SmartContextMenuStyle(
   destructiveColor: Color(0xFFFF453A),
   highlightColor: Color(0x1FFFFFFF),
   dividerColor: Color(0x999E9E9E),
-  backButtonForegroundColor: Color(0xFF0A84FF),
   submenuIcon: Icons.arrow_forward_ios,
-  backIcon: Icons.arrow_back_ios_new,
   itemPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
   itemChildrenGap: 10,
 );
@@ -1202,11 +1205,8 @@ const style = SmartContextMenuStyle(
 The color of `titleStyle` is used for enabled items that are not destructive; disabled
 and destructive items use `disabledForegroundColor` and `destructiveColor`. A pressed item
 is highlighted with a translucent title color, or with `highlightColor` if it is set.
-`backButtonForegroundColor` colors both the Back title and icon. The old name `backButtonColor`
-is deprecated; use `backButtonForegroundColor` instead.
-The style also sets the back item of submenus, the number of title lines, and the icons,
-alignment and loading indicator of loading, error and empty items; `loadingIndicator` is used
-at its own size, so size it to fit an item row. See
+The style also sets the number of title lines; the Back item and the loading, error and empty
+items have their own [Back item style](#back-item-style) and [Status style](#status-style). See
 [`SmartContextMenuStyle`](https://pub.dev/documentation/smart_context_menu/latest/smart_context_menu/SmartContextMenuStyle-class.html)
 for all fields.
 
@@ -1273,6 +1273,78 @@ const style = SmartContextMenuStyle(
 
 To split items into groups, use a [separator](#separator).
 
+#### Back item style
+
+`SmartContextMenuBackButtonStyle`, the `backButtonStyle` of the style, sets the look of the
+Back item pinned to the top of a submenu:
+
+| Field | What it does | Default |
+| --- | --- | --- |
+| `decoration` | The background of the Back item. Its shape also clips the blur. | `null`: `menuColor` with `borderRadius` |
+| `blur` | The blur of the submenu items that scroll under the Back item; `null` turns it off. | `SmartContextMenuBlur.strong` |
+| `borderRadius` | The corners of the default background; ignored with a `decoration`. | 16 px at the top |
+| `foregroundColor` | The color of the title and the icon. | `null`: the colors of the menu |
+| `titleStyle` | The style of the title, merged over the `titleStyle` of the menu. | semibold |
+| `icon` | The icon before the title. The default one points the other way in right-to-left text. | `CupertinoIcons.chevron_back` |
+
+The padding, the press highlight and the icon size come from the menu style, and a line is
+always drawn below the Back item.
+
+```dart
+const style = SmartContextMenuStyle(
+  backButtonStyle: SmartContextMenuBackButtonStyle(
+    foregroundColor: Color(0xFF0A84FF),
+    icon: Icons.arrow_back_ios_new,
+  ),
+);
+```
+
+Before 1.1.0, these fields were in the style itself: `backButtonBlur`, `backButtonColor`,
+`backIcon` and others. The old names still work until 2.0.0 and are deprecated; pass either
+`backButtonStyle` or the old names, not both.
+
+#### Status style
+
+`SmartContextMenuStatusStyle`, the `statusStyle` of the style, sets the look of the
+[loading](#loading-item), [error](#error-item) and [empty](#empty-item) items, and of the
+indicator of a loading submenu or page:
+
+| Field | What it does | Default |
+| --- | --- | --- |
+| `titleAlign` | The alignment of the title between the leading and the trailing. | `TextAlign.center` |
+| `errorIcon` | The icon after the title of an error item. | `CupertinoIcons.exclamationmark_triangle` |
+| `retryIcon` | The icon of an error item that retries a failed load. | `CupertinoIcons.refresh` |
+| `emptyIcon` | The icon after the title of an empty item. | `CupertinoIcons.tray` |
+| `loadingIndicator` | The indicator of loading items and of a loading submenu or page, shown at its own size. | `null`: `CupertinoActivityIndicator` |
+| `loaderVerticalPadding` | The space above and below the indicator of a loading submenu or page. | `12` |
+
+The own `trailing` of an item replaces its icon or indicator. Size `loadingIndicator` to fit an
+item row. The Status items menu of the example puts the titles at the start and uses a Material
+indicator and other icons ([code in the
+example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/ui/appearance_styles.dart#L64-L78)):
+
+```dart
+const style = SmartContextMenuStyle(
+  statusStyle: SmartContextMenuStatusStyle(
+    loadingIndicator: SizedBox.square(
+      dimension: 18,
+      child: CircularProgressIndicator(
+        strokeWidth: 2,
+        color: CupertinoColors.systemOrange,
+      ),
+    ),
+    errorIcon: CupertinoIcons.wifi_exclamationmark,
+    retryIcon: CupertinoIcons.arrow_clockwise,
+    emptyIcon: CupertinoIcons.tray,
+    titleAlign: TextAlign.start,
+  ),
+);
+```
+
+Before 1.1.0, these fields were in the style itself, and `titleAlign` was called
+`statusTitleAlign`. The old names still work until 2.0.0 and are deprecated; pass either
+`statusStyle` or the old names, not both.
+
 #### Row style
 
 `SmartContextMenuRowStyle`, the `rowStyle` of the style, sets the look of all [rows](#row):
@@ -1292,7 +1364,7 @@ The own `padding` and `childrenGap` of a row, and the `padding` and `childrenGap
 in a cell, take precedence. Colors, icons, `titleMaxLines`, separators and dividers of rows
 come from the menu style. The Styled rows menu of the example sets bolder titles, gaps between
 the cells and dividers that stop short of the edges ([code in the
-example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/ui/appearance_styles.dart#L80-L85)):
+example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/ui/appearance_styles.dart#L82-L87)):
 
 ```dart
 const style = SmartContextMenuStyle(

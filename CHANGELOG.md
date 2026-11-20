@@ -22,9 +22,16 @@
   highlight follows the item under a stationary cursor as the menu scrolls, switches levels
   or resizes. Items are selected with the primary mouse button only.
   `SmartContextMenuItemState.isHovered` tells hover from a press in `customBuilder`.
-* `backButtonDecoration` sets the background of the pinned Back item and clips its blur to the
-  decoration's shape. `backButtonForegroundColor` colors its title and icon; the old
-  `backButtonColor` name remains as a deprecated alias until 2.0.0.
+* `SmartContextMenuBackButtonStyle`, the `backButtonStyle` of the style, sets the look of the
+  pinned Back item. Its new `decoration` sets the background and clips the blur to the
+  decoration's shape, and `foregroundColor` colors the title and the icon. The fields
+  `backButtonBlur`, `backButtonBorderRadius`, `backButtonColor`, `backButtonTitleStyle` and
+  `backIcon` of the style remain as deprecated aliases until 2.0.0.
+* `SmartContextMenuStatusStyle`, the `statusStyle` of the style, sets the look of loading, error
+  and empty items: `titleAlign`, `errorIcon`, `retryIcon`, `emptyIcon`, `loadingIndicator` and
+  `loaderVerticalPadding`. The same fields of the style, with `statusTitleAlign` for
+  `titleAlign`, remain as deprecated aliases until 2.0.0. A group and its deprecated fields
+  cannot be set together.
 * `separatorThickness` sets the thickness of a separator band. The old `separatorHeight` name
   remains as a deprecated alias until 2.0.0, in the style and in `SmartContextMenuDefaults`.
 * Dynamic colors in `menuShadows` now follow the theme.

@@ -112,6 +112,8 @@
   - [Внешний вид](#внешний-вид)
     - [Стиль пунктов](#стиль-пунктов)
     - [Линии между пунктами](#линии-между-пунктами)
+    - [Стиль пункта «Назад»](#стиль-пункта-назад)
+    - [Стиль состояний](#стиль-состояний)
     - [Стиль рядов](#стиль-рядов)
     - [Свой контент в пункте](#свой-контент-в-пункте)
   - [Рекомендации по дизайну](#рекомендации-по-дизайну)
@@ -1127,7 +1129,9 @@ SmartContextMenuConfig(
 непрозрачное меню, пункты со своим контентом и ряды в своём стиле с бейджем и выбором цвета.*
 
 Внешний вид меню задаёт `SmartContextMenuStyle` — поле `style` в конфиге.
-У его полей тоже есть значения по умолчанию:
+У пункта «Назад», пунктов загрузки, ошибки и пустого состояния и у рядов в нём свои части:
+[`backButtonStyle`](#стиль-пункта-назад), [`statusStyle`](#стиль-состояний) и
+[`rowStyle`](#стиль-рядов). У всех полей есть значения по умолчанию:
 
 ```dart
 const menuStyle = SmartContextMenuStyle(
@@ -1141,9 +1145,9 @@ const menuStyle = SmartContextMenuStyle(
 `menuShadows` заменяет стандартные тени под меню; чтобы убрать тени, передайте пустой список.
 
 `menuDecoration` заменяет стандартный фон и рамку меню. Закреплённый пункт «Назад» не наследует
-её: без `backButtonDecoration` он использует `menuColor` и `backButtonBorderRadius`.
-`backButtonDecoration` задаёт ему отдельный фон. Форма декорации обрезает и `backButtonBlur`;
-прозрачная декорация позволяет видеть градиент меню и размытые прокручиваемые пункты:
+её: по умолчанию он использует `menuColor` и `borderRadius` из `backButtonStyle`. Поле
+`decoration` там же задаёт ему отдельный фон. Форма декорации обрезает и размытие пункта
+«Назад»; прозрачная декорация позволяет видеть градиент меню и размытые прокручиваемые пункты:
 
 ```dart
 const style = SmartContextMenuStyle(
@@ -1155,17 +1159,18 @@ const style = SmartContextMenuStyle(
       colors: [Color(0xFF3634A3), Color(0xFF18165F)],
     ),
   ),
-  backButtonDecoration: BoxDecoration(
-    color: Color(0x00000000),
-    borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+  backButtonStyle: SmartContextMenuBackButtonStyle(
+    decoration: BoxDecoration(
+      color: Color(0x00000000),
+      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+    ),
   ),
 );
 ```
 
 Пункт «Назад» не копирует градиент, а показывает меню за собой. Если прокручиваемые пункты
-проступают слишком сильно, задайте `backButtonDecoration` полупрозрачный цвет. Её радиус
-определяет обрезку;
-`backButtonBorderRadius` действует только при `backButtonDecoration == null`.
+проступают слишком сильно, задайте декорации полупрозрачный цвет. Её радиус определяет обрезку;
+`borderRadius` из `backButtonStyle` действует только без `decoration`.
 
 #### Стиль пунктов
 
@@ -1183,9 +1188,7 @@ const style = SmartContextMenuStyle(
   destructiveColor: Color(0xFFFF453A),
   highlightColor: Color(0x1FFFFFFF),
   dividerColor: Color(0x999E9E9E),
-  backButtonForegroundColor: Color(0xFF0A84FF),
   submenuIcon: Icons.arrow_forward_ios,
-  backIcon: Icons.arrow_back_ios_new,
   itemPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
   itemChildrenGap: 10,
 );
@@ -1194,11 +1197,9 @@ const style = SmartContextMenuStyle(
 Цвет из `titleStyle` используется для активных пунктов, кроме destructive; неактивные
 и destructive пункты берут `disabledForegroundColor` и `destructiveColor`. Нажатый пункт
 подсвечивается полупрозрачным цветом текста или `highlightColor`, если он задан.
-`backButtonForegroundColor` красит и текст, и иконку пункта «Назад». Старое имя `backButtonColor`
-помечено как устаревшее; используйте `backButtonForegroundColor`.
-Ещё стиль задаёт пункт «Назад» в подменю, число строк текста, а также значки, выравнивание
-и индикатор у пунктов загрузки, ошибки и пустого состояния. `loadingIndicator` показывается
-в своём размере, так что подберите его под высоту строки. Все поля — в документации
+Ещё стиль задаёт число строк текста; у пункта «Назад» и пунктов загрузки, ошибки и пустого
+состояния свои [стиль пункта «Назад»](#стиль-пункта-назад) и [стиль состояний](#стиль-состояний).
+Все поля — в документации
 [`SmartContextMenuStyle`](https://pub.dev/documentation/smart_context_menu/latest/smart_context_menu/SmartContextMenuStyle-class.html).
 
 **Настройки пункта важнее стиля.** Стиль задаёт вид всех пунктов, а пункт может поменять его
@@ -1264,6 +1265,78 @@ const style = SmartContextMenuStyle(
 
 Чтобы поделить пункты на группы, используйте [разделитель](#разделитель).
 
+#### Стиль пункта «Назад»
+
+`SmartContextMenuBackButtonStyle`, поле `backButtonStyle` стиля, задаёт вид пункта «Назад»,
+закреплённого вверху подменю:
+
+| Поле | Что делает | По умолчанию |
+| --- | --- | --- |
+| `decoration` | Фон пункта «Назад». Его форма обрезает и размытие. | `null`: `menuColor` и `borderRadius` |
+| `blur` | Размытие пунктов подменю, которые прокручиваются под «Назад»; `null` выключает его. | `SmartContextMenuBlur.strong` |
+| `borderRadius` | Углы стандартного фона; с `decoration` не действует. | 16 px сверху |
+| `foregroundColor` | Цвет текста и иконки. | `null`: цвета меню |
+| `titleStyle` | Стиль текста поверх `titleStyle` меню. | полужирный |
+| `icon` | Иконка перед текстом. Стандартная смотрит в другую сторону при письме справа налево. | `CupertinoIcons.chevron_back` |
+
+Отступы, подсветка нажатия и размер иконки берутся из стиля меню, а под пунктом «Назад» всегда
+есть линия.
+
+```dart
+const style = SmartContextMenuStyle(
+  backButtonStyle: SmartContextMenuBackButtonStyle(
+    foregroundColor: Color(0xFF0A84FF),
+    icon: Icons.arrow_back_ios_new,
+  ),
+);
+```
+
+До 1.1.0 эти поля были в самом стиле: `backButtonBlur`, `backButtonColor`, `backIcon` и другие.
+Старые имена работают до 2.0.0 и помечены как устаревшие; передавайте либо `backButtonStyle`,
+либо старые имена, но не всё вместе.
+
+#### Стиль состояний
+
+`SmartContextMenuStatusStyle`, поле `statusStyle` стиля, задаёт вид пунктов
+[загрузки](#загрузка), [ошибки](#ошибка) и [пустого состояния](#пустое-состояние), а также
+индикатора подменю или страницы, которые загружаются:
+
+| Поле | Что делает | По умолчанию |
+| --- | --- | --- |
+| `titleAlign` | Выравнивание текста между `leading` и `trailing`. | `TextAlign.center` |
+| `errorIcon` | Иконка после текста пункта ошибки. | `CupertinoIcons.exclamationmark_triangle` |
+| `retryIcon` | Иконка пункта ошибки, который повторяет загрузку. | `CupertinoIcons.refresh` |
+| `emptyIcon` | Иконка после текста пункта пустого состояния. | `CupertinoIcons.tray` |
+| `loadingIndicator` | Индикатор пунктов загрузки и загружающегося подменю или страницы, в своём размере. | `null`: `CupertinoActivityIndicator` |
+| `loaderVerticalPadding` | Отступ сверху и снизу от индикатора загружающегося подменю или страницы. | `12` |
+
+Свой `trailing` пункта заменяет его иконку или индикатор. Подберите `loadingIndicator` под
+высоту строки. Меню Status items в примере ставит текст в начало строки, а индикатор и иконки
+берёт другие ([код в
+примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/ui/appearance_styles.dart#L64-L78)):
+
+```dart
+const style = SmartContextMenuStyle(
+  statusStyle: SmartContextMenuStatusStyle(
+    loadingIndicator: SizedBox.square(
+      dimension: 18,
+      child: CircularProgressIndicator(
+        strokeWidth: 2,
+        color: CupertinoColors.systemOrange,
+      ),
+    ),
+    errorIcon: CupertinoIcons.wifi_exclamationmark,
+    retryIcon: CupertinoIcons.arrow_clockwise,
+    emptyIcon: CupertinoIcons.tray,
+    titleAlign: TextAlign.start,
+  ),
+);
+```
+
+До 1.1.0 эти поля были в самом стиле, а `titleAlign` назывался `statusTitleAlign`. Старые имена
+работают до 2.0.0 и помечены как устаревшие; передавайте либо `statusStyle`, либо старые имена,
+но не всё вместе.
+
 #### Стиль рядов
 
 `SmartContextMenuRowStyle`, поле `rowStyle` стиля, задаёт вид всех [рядов](#ряд):
@@ -1282,7 +1355,7 @@ const style = SmartContextMenuStyle(
 Свои `padding` и `childrenGap` ряда, а также `padding` и `childrenGap` пункта в ячейке важнее
 стиля. Цвета, значки, `titleMaxLines`, разделители и линии рядов берутся из стиля меню. Меню
 Styled rows из примера задаёт подписи пожирнее, промежутки между ячейками и линии, которые
-не доходят до краёв ([код в примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/ui/appearance_styles.dart#L80-L85)):
+не доходят до краёв ([код в примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/ui/appearance_styles.dart#L82-L87)):
 
 ```dart
 const style = SmartContextMenuStyle(
