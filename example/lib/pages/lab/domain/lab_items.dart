@@ -213,6 +213,20 @@ List<SmartContextMenuItem> nestedLevels() => [
   _action('Delete', icon: CupertinoIcons.delete, isDestructive: true),
 ];
 
+/// The menu of a card with a photo that has a menu of its own.
+List<SmartContextMenuItem> outerCardItems() => [
+  _action('Pin', icon: CupertinoIcons.pin),
+  _action('Share card', icon: CupertinoIcons.share),
+  SmartContextMenuItem.separator(),
+  _action('Delete card', icon: CupertinoIcons.delete, isDestructive: true),
+];
+
+/// The menu of the photo inside the card of [outerCardItems].
+List<SmartContextMenuItem> innerPhotoItems() => [
+  _action('Save photo', icon: CupertinoIcons.arrow_down_to_line),
+  _action('Copy photo', icon: CupertinoIcons.doc_on_doc),
+];
+
 /// A short root with a long scrollable submenu.
 List<SmartContextMenuItem> shortRootLongSubmenu() => [
   _action('Open', icon: CupertinoIcons.arrow_up_right_square),

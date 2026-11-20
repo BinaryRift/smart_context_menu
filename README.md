@@ -205,6 +205,10 @@ The child's secondary pointer-down handler also runs. A secondary tap handler th
 waits for release can be canceled as the menu opens. Use `manual` and open the menu
 from the child's handler when you need to coordinate them.
 
+Menus can be nested, for example a photo with its own menu inside a card with a menu.
+A long press or a right click on the photo opens only its menu, and anywhere else
+on the card opens the menu of the card.
+
 The preview above the open menu is a snapshot of the child, so its own buttons do not
 work there. To run the main action of the child when the preview is tapped, for example
 to open a message, pass `onPreviewTap`. The menu closes first, and `onPreviewTap` is called
