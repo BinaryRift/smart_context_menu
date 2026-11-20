@@ -17,6 +17,7 @@ import '../widgets/smart_context_menu_divider.dart';
 import '../widgets/smart_context_menu_pagination_trigger.dart';
 import '../widgets/smart_context_menu_retry_row.dart';
 import '../widgets/smart_context_menu_row_layout.dart';
+import '../widgets/smart_context_menu_swipe_back_exclusion.dart';
 import 'item/smart_context_menu_item_view.dart';
 
 /// The content of a menu [level]: its items, the back item of a submenu
@@ -314,11 +315,14 @@ final class SmartContextMenuLevelView extends StatelessWidget {
             : SmartContextMenuRowCell(flex: flex ?? 1, child: view),
       );
     }
-    return SmartContextMenuRowLayout(
+    return SmartContextMenuSwipeBackExclusion(
       key: ValueKey(row.id),
-      padding: row.padding ?? style.rowStyle.padding,
-      childrenGap: row.childrenGap ?? style.rowStyle.childrenGap,
-      children: children,
+      excludes: !row.enableSwipeBack,
+      child: SmartContextMenuRowLayout(
+        padding: row.padding ?? style.rowStyle.padding,
+        childrenGap: row.childrenGap ?? style.rowStyle.childrenGap,
+        children: children,
+      ),
     );
   }
 

@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../core/ui/gestures/gesture_thresholds.dart';
@@ -8,6 +7,7 @@ import '../../core/ui/motion/tokens/motion_slides.dart';
 import '../../core/ui/motion/transitions/fade_slide_transition.dart';
 import '../state/smart_context_menu_level_entry.dart';
 import 'smart_context_menu_level_stack.dart';
+import 'smart_context_menu_swipe_back_exclusion.dart';
 
 /// Switches menu levels: a submenu slides in from the trailing side over the
 /// current level, which moves towards the leading side. Going back reverses
@@ -17,7 +17,8 @@ import 'smart_context_menu_level_stack.dart';
 /// With [enableSwipeBack] and a [previous] level, swiping towards the trailing
 /// side (right in LTR, left in RTL) drags the current level away and reveals
 /// [previous]. If the swipe goes far or fast enough, [onSwipeBack] is called
-/// once released.
+/// once released. A swipe does not start on a
+/// [SmartContextMenuSwipeBackExclusion].
 ///
 /// The height follows the transitions: it moves from the height of one
 /// level to the other along with the levels. A change of height inside
@@ -184,11 +185,11 @@ final class _SmartContextMenuLevelSwitcherState
     return RawGestureDetector(
       gestures: {
         if (_canSwipe)
-          HorizontalDragGestureRecognizer:
+          SmartContextMenuSwipeBackRecognizer:
               GestureRecognizerFactoryWithHandlers<
-                HorizontalDragGestureRecognizer
+                SmartContextMenuSwipeBackRecognizer
               >(
-                HorizontalDragGestureRecognizer.new,
+                SmartContextMenuSwipeBackRecognizer.new,
                 (recognizer) => recognizer
                   ..onStart = _onSwipeStart
                   ..onUpdate = _onSwipeUpdate
