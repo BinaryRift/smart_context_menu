@@ -4,7 +4,8 @@ part of '../smart_context_menu_item.dart';
 /// the item loaded by [asyncItem].
 ///
 /// Create it with [SmartContextMenuItem.async].
-final class SmartContextMenuAsyncItem extends SmartContextMenuItem {
+final class SmartContextMenuAsyncItem extends SmartContextMenuItem
+    implements SmartContextMenuRowEntry {
   /// Loads the item shown in place of this placeholder.
   final SmartContextMenuItemLoader asyncItem;
 

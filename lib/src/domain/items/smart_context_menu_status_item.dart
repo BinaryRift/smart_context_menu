@@ -6,12 +6,14 @@ part of '../smart_context_menu_item.dart';
 /// It does not respond to taps and is not dimmed. Its [title] is aligned
 /// between [leading] and [trailing] by
 /// [SmartContextMenuStyle.statusTitleAlign], in the middle by default. A sign
-/// of the state is shown after [title] unless [trailing] is set.
+/// of the state is shown after [title] unless [trailing] is set. In
+/// a [SmartContextMenuItem.row] the item always shows the sign of the state,
+/// without [leading] and [trailing].
 ///
 /// See [SmartContextMenuLoadingItem], [SmartContextMenuErrorItem] and
 /// [SmartContextMenuEmptyItem].
 sealed class SmartContextMenuStatusItem extends SmartContextMenuItem
-    implements SmartContextMenuListenableResult {
+    implements SmartContextMenuListenableResult, SmartContextMenuRowEntry {
   /// The text of the item.
   ///
   /// If null, the label of the state from [SmartContextMenuLabels] is shown.
@@ -25,13 +27,15 @@ sealed class SmartContextMenuStatusItem extends SmartContextMenuItem
   /// A widget shown before [title], usually an [Icon].
   ///
   /// Text without its own style takes the style and the color of the title;
-  /// icons without their own color take the title color.
+  /// icons without their own color take the title color. Not shown in
+  /// a [SmartContextMenuItem.row].
   final Widget? leading;
 
   /// A widget shown after [title] instead of the sign of the state.
   ///
   /// Text without its own style takes the style and the color of the title;
-  /// icons without their own color take the title color.
+  /// icons without their own color take the title color. Not shown in
+  /// a [SmartContextMenuItem.row].
   final Widget? trailing;
 
   /// The content shown instead of [title], [leading] and [trailing].

@@ -32,6 +32,7 @@ void main() {
   final SmartContextMenuEmptyItem empty = SmartContextMenuItem.empty();
   final SmartContextMenuSeparatorItem separator =
       SmartContextMenuItem.separator();
+  final SmartContextMenuRowItem row = SmartContextMenuItem.row(children: []);
 
   test('actions and submenus are content items', () {
     for (final item in [simple, submenu, asyncSubmenu, pagingSubmenu]) {
@@ -56,6 +57,7 @@ void main() {
       async,
       listenableItem,
       separator,
+      row,
     ]) {
       expect(item, isNot(isA<SmartContextMenuListenableResult>()));
     }
@@ -73,8 +75,26 @@ void main() {
     ]) {
       expect(item, isA<SmartContextMenuAsyncResult>());
     }
-    for (final item in [async, listenableItem, separator]) {
+    for (final item in [async, listenableItem, separator, row]) {
       expect(item, isNot(isA<SmartContextMenuAsyncResult>()));
     }
+  });
+
+  test('a row takes every item but a row', () {
+    for (final item in [
+      simple,
+      submenu,
+      asyncSubmenu,
+      pagingSubmenu,
+      async,
+      listenableItem,
+      loading,
+      error,
+      empty,
+      separator,
+    ]) {
+      expect(item, isA<SmartContextMenuRowEntry>());
+    }
+    expect(row, isNot(isA<SmartContextMenuRowEntry>()));
   });
 }

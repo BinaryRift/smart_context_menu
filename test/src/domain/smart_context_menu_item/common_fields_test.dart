@@ -25,9 +25,10 @@ void main() {
         SmartContextMenuItem.error().id,
         SmartContextMenuItem.empty().id,
         SmartContextMenuItem.separator().id,
+        SmartContextMenuItem.row(children: []).id,
       };
 
-      expect(ids, hasLength(11));
+      expect(ids, hasLength(12));
     });
 
     test('keeps the given value', () {
@@ -56,6 +57,7 @@ void main() {
         SmartContextMenuItem.error(id: 'a'),
         SmartContextMenuItem.empty(id: 'a'),
         SmartContextMenuItem.separator(id: 'a'),
+        SmartContextMenuItem.row(id: 'a', children: []),
       ];
 
       for (final item in items) {

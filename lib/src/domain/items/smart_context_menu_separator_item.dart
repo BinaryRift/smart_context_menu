@@ -3,7 +3,8 @@ part of '../smart_context_menu_item.dart';
 /// A [SmartContextMenuItem] that separates groups of items.
 ///
 /// Create it with [SmartContextMenuItem.separator].
-final class SmartContextMenuSeparatorItem extends SmartContextMenuItem {
+final class SmartContextMenuSeparatorItem extends SmartContextMenuItem
+    implements SmartContextMenuRowEntry {
   /// The content shown instead of the default band.
   final Widget? child;
 
@@ -11,6 +12,7 @@ final class SmartContextMenuSeparatorItem extends SmartContextMenuItem {
   /// a [SmartContextMenuPageLoader].
   ///
   /// Null there marks the last page, see [SmartContextMenuItem.pagingSubmenu].
+  /// Must be null in a [SmartContextMenuItem.row].
   final SmartContextMenuPagingMetadata? pagingMetadata;
 
   const SmartContextMenuSeparatorItem._({

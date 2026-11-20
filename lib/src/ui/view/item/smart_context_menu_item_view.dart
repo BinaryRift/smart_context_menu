@@ -103,7 +103,8 @@ final class _SmartContextMenuItemViewState
         SmartContextMenuAsyncItem() => true,
         SmartContextMenuListenableItem() ||
         SmartContextMenuStatusItem() ||
-        SmartContextMenuSeparatorItem() => false,
+        SmartContextMenuSeparatorItem() ||
+        SmartContextMenuRowItem() => false,
       };
   SmartContextMenuItem get _item => _resolvedItem ?? widget.item;
   SmartContextMenuConfig get _config => widget.config;
@@ -280,10 +281,11 @@ final class _SmartContextMenuItemViewState
             ),
       ),
       // Async and listenable items show the item they load or build, and
-      // a separator is built without the item frame.
+      // a separator and a row are built without the item frame.
       SmartContextMenuAsyncItem() ||
       SmartContextMenuListenableItem() ||
-      SmartContextMenuSeparatorItem() => const SizedBox.shrink(),
+      SmartContextMenuSeparatorItem() ||
+      SmartContextMenuRowItem() => const SizedBox.shrink(),
     };
   }
 

@@ -7,7 +7,7 @@ part of '../smart_context_menu_item.dart';
 /// [SmartContextMenuSubmenuItem], [SmartContextMenuAsyncSubmenuItem] and
 /// [SmartContextMenuPagingSubmenuItem].
 sealed class SmartContextMenuContentItem extends SmartContextMenuItem
-    implements SmartContextMenuAsyncResult {
+    implements SmartContextMenuAsyncResult, SmartContextMenuRowEntry {
   /// The text of the item.
   ///
   /// Shown in up to [SmartContextMenuStyle.titleMaxLines] lines and truncated
@@ -28,7 +28,8 @@ sealed class SmartContextMenuContentItem extends SmartContextMenuItem
 
   /// A widget shown after [title].
   ///
-  /// Items that open a submenu also show a chevron after it.
+  /// Items that open a submenu also show a chevron after it. Not shown in
+  /// a [SmartContextMenuItem.row].
   /// Text without its own style takes the style and the color of the title;
   /// icons without their own color take the title color.
   final Widget? trailing;

@@ -203,6 +203,8 @@ final class SmartContextMenuLevelView extends StatelessWidget {
         !_showsSeparatorAt(relativeIndex)) {
       return const SizedBox.shrink();
     }
+    // TODO: lay out the cells of the row.
+    if (item is SmartContextMenuRowItem) return const SizedBox.shrink();
 
     final itemView = _buildItemView(item);
     if (!config.style.dividersBetweenItems) return itemView;

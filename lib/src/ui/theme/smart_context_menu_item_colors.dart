@@ -49,10 +49,12 @@ final class SmartContextMenuItemColors {
         item.tintColor ?? (item.isDestructive ? style.destructiveColor : null),
       ),
       SmartContextMenuStatusItem() => (item.titleStyle, false, null),
-      // Shown through the item they load or build, or without colors.
+      // Shown through the item they load or build, through their cells or
+      // without colors.
       SmartContextMenuAsyncItem() ||
       SmartContextMenuListenableItem() ||
-      SmartContextMenuSeparatorItem() => (null, false, null),
+      SmartContextMenuSeparatorItem() ||
+      SmartContextMenuRowItem() => (null, false, null),
     };
 
     final Color foreground;
