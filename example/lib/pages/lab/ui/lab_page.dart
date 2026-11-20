@@ -118,6 +118,11 @@ final class _LabPageState extends State<LabPage> {
                     items: statusItems(),
                   ),
                   _buildMenu(
+                    title: 'Rows',
+                    subtitle: 'Small and medium cells, Copy Link has flex 2',
+                    items: rowItems(_loader),
+                  ),
+                  _buildMenu(
                     title: 'Nested levels',
                     subtitle: 'Share → Messages',
                     items: nestedLevels(),

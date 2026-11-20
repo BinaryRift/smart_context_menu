@@ -186,6 +186,54 @@ List<SmartContextMenuItem> statusItems() {
   ];
 }
 
+/// Rows of both sizes mixed with ordinary items: a wider cell, a separator,
+/// a disabled and a destructive cell, a cell that opens a submenu with a row
+/// and a cell loaded on the fly.
+List<SmartContextMenuItem> rowItems(DemoLoader loader) => [
+  SmartContextMenuItem.row(
+    children: [
+      _action('Copy', icon: CupertinoIcons.doc_on_doc),
+      _action('Share', icon: CupertinoIcons.share),
+      _action('Delete', icon: CupertinoIcons.delete, isDestructive: true),
+    ],
+  ),
+  SmartContextMenuItem.row(
+    size: SmartContextMenuRowSize.small,
+    children: [
+      _action('Bold', icon: CupertinoIcons.bold),
+      _action('Italic', icon: CupertinoIcons.italic),
+      _action('Underline', icon: CupertinoIcons.underline, isDisabled: true),
+      SmartContextMenuItem.separator(),
+      SmartContextMenuItem.submenu(
+        title: 'More',
+        leading: const Icon(CupertinoIcons.ellipsis),
+        children: [
+          SmartContextMenuItem.row(
+            size: SmartContextMenuRowSize.small,
+            children: [_action('0.5×'), _action('1×'), _action('2×')],
+          ),
+          _action('Reset', icon: CupertinoIcons.arrow_counterclockwise),
+        ],
+      ),
+    ],
+  ),
+  _action('Reply', icon: CupertinoIcons.reply),
+  SmartContextMenuItem.row(
+    children: [
+      SmartContextMenuRowFlex(
+        flex: 2,
+        child: _action('Copy Link · flex 2', icon: CupertinoIcons.link),
+      ),
+      SmartContextMenuItem.async(
+        asyncItem: () async {
+          await loader.load('Pin');
+          return _action('Pin', icon: CupertinoIcons.pin);
+        },
+      ),
+    ],
+  ),
+];
+
 /// Every kind of submenu: static, async, paginated and nested.
 List<SmartContextMenuItem> allSubmenuTypes(DemoLoader loader) => [
   _action('Reply', icon: CupertinoIcons.reply),
