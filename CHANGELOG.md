@@ -22,6 +22,10 @@
   highlight follows the item under a stationary cursor as the menu scrolls, switches levels
   or resizes. Items are selected with the primary mouse button only.
   `SmartContextMenuItemState.isHovered` tells hover from a press in `customBuilder`.
+* `SmartContextMenu.of(context)` opens the menu from its child, for example from a "⋯" button
+  in a list row, without a controller. It returns the controller passed to the menu or the
+  menu's own one; `SmartContextMenu.maybeOf(context)` returns `null` outside a menu. The
+  `manual` activation mode no longer requires a controller.
 * `SmartContextMenuBackButtonStyle`, the `backButtonStyle` of the style, sets the look of the
   pinned Back item. Its new `decoration` sets the background and clips the blur to the
   decoration's shape, and `foregroundColor` colors the title and the icon. The fields
