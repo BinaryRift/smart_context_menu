@@ -38,18 +38,10 @@ final class _FilesPageState extends State<FilesPage> {
   final _favorites = FileFavorites();
   final _downloads = FileDownloads();
 
-  /// Open the menus of the rows from their buttons.
-  final _rowMenus = {
-    for (final file in documents) file: SmartContextMenuController(),
-  };
-
   @override
   void dispose() {
     _favorites.dispose();
     _downloads.dispose();
-    for (final controller in _rowMenus.values) {
-      controller.dispose();
-    }
     super.dispose();
   }
 
@@ -83,15 +75,9 @@ final class _FilesPageState extends State<FilesPage> {
                 separatorBuilder: (context, index) => const SizedBox(height: 8),
                 itemBuilder: (context, index) {
                   final file = documents[index];
-                  final menu = _rowMenus[file]!;
                   return _buildMenu(
                     file,
-                    controller: menu,
-                    child: FileRow(
-                      file: file,
-                      favorites: _favorites,
-                      onMore: menu.open,
-                    ),
+                    child: FileRow(file: file, favorites: _favorites),
                   );
                 },
               ),
@@ -150,15 +136,10 @@ final class _FilesPageState extends State<FilesPage> {
     );
   }
 
-  /// A tap on [child] opens [file]; a long press, secondary click or
-  /// [controller] opens its menu.
-  Widget _buildMenu(
-    DemoFile file, {
-    required Widget child,
-    SmartContextMenuController? controller,
-  }) {
+  /// A tap on [child] opens [file]; a long press or secondary click opens
+  /// its menu.
+  Widget _buildMenu(DemoFile file, {required Widget child}) {
     return SmartContextMenu(
-      controller: controller,
       items: _menuItems(file),
       // A tap on the lifted file opens it, like a tap on the file itself.
       onPreviewTap: () => _open(file),

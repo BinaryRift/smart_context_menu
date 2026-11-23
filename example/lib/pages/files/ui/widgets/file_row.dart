@@ -1,23 +1,18 @@
 // ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart';
+import 'package:smart_context_menu/smart_context_menu.dart';
 
 import '../../domain/demo_file.dart';
 import '../../domain/file_favorites.dart';
 import 'favorite_mark.dart';
 import 'file_icon.dart';
 
-/// A file in the list, with a button that calls [onMore].
+/// A file in the list, with a button that opens the menu around the row.
 final class FileRow extends StatelessWidget {
   final DemoFile file;
   final FileFavorites favorites;
-  final VoidCallback onMore;
 
-  const FileRow({
-    super.key,
-    required this.file,
-    required this.favorites,
-    required this.onMore,
-  });
+  const FileRow({super.key, required this.file, required this.favorites});
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +52,9 @@ final class FileRow extends StatelessWidget {
           ),
           FavoriteMark(file: file, favorites: favorites),
           CupertinoButton(
-            onPressed: onMore,
+            // The row is the child of a SmartContextMenu, so the button
+            // finds its menu without a controller.
+            onPressed: () => SmartContextMenu.of(context).open(),
             child: const Icon(CupertinoIcons.ellipsis_circle),
           ),
         ],
