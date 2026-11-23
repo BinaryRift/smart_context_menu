@@ -39,6 +39,12 @@ void main() {
     ('Styled rows', find.text('Inbox')),
     // Small cells show only their icons.
     ('Wide row', find.byIcon(CupertinoIcons.lasso)),
+    ('Indigo', find.text('Rename')),
+    ('Terminal', find.text('rm -rf')),
+    ('Tiny', find.text('Duplicate')),
+    ('Colorful', find.text('Favorite')),
+    ('Paper', find.text('Rename')),
+    ('Glow', find.text('Duplicate')),
   ]) {
     testWidgets('$preset opens its menu', (tester) async {
       await openAppearance(tester);

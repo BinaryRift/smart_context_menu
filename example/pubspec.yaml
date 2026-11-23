@@ -27,3 +27,13 @@ flutter:
 
   assets:
     - assets/images/
+
+  # Latin subsets of two fonts under the SIL Open Font License, for the
+  # Terminal and Paper cards of Appearance: system fonts differ by platform.
+  fonts:
+    - family: JetBrains Mono
+      fonts:
+        - asset: assets/fonts/JetBrainsMono-Regular.ttf
+    - family: Literata
+      fonts:
+        - asset: assets/fonts/Literata-Regular.ttf
