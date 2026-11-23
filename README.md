@@ -9,9 +9,8 @@
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![live demo](https://img.shields.io/badge/demo-live-8b5cf6)](https://thenothingworks.dev/demo/smart-context-menu/)
 
-A powerful, fully customizable iOS-style context menu for Flutter: smart positioning,
-fluid animations, drag-to-select, rich submenus (async, paginated) and your own content
-above the widget.
+Right click on your desktop, long press on your phone, tap on your "⋯" button: a single widget provides your Flutter app with a context menu that is styled and animated like the one in iOS. It takes your own widgets as menu items and above the preview (e.g. a reactions bar), and it has no third-party dependencies. You can build it in many ways: a simple list of items, a compact row of the most used actions, or a complex mix of rows, dynamic submenus and live items. Not into the iOS design? Make your own: customize colors, shapes, blur, items and more, and keep the sweet animations.
+Requires Flutter 3.32 or later (Dart 3.8). **[Get started →](#getting-started)**
 
 <img src="doc/gifs/open_and_select_themes.gif" width="600" alt="File and chat menus open in light and dark themes; a finger drags across their items, from the row of the chat menu down its list, with a reactions bar above the chat message">
 
@@ -24,72 +23,74 @@ above the widget.
 
 ## Features
 
-**Opening**
+**On every platform**
 
-- **Lifted preview**: Preview lifted over a blurred background. Tap it to trigger 
-  the main action of the widget (eg. open a message).
-- **From code**: A "⋯" button in the widget opens its menu with
+- **Mobile, desktop and web**: a long press on a touch screen, a right click with a mouse
+  or a two-finger click on a trackpad opens the same menu. No platform code needed.
+- **Cursor hover**: on desktop and the web, items highlight under the pointer, as in
+  native menus. Click to select.
+- **Drag-to-select**: once the menu is open, put your finger on it and slide across the
+  items, rows included. Lift it on the one you want.
+- **Open from a button or from code**: a "⋯" button in the widget opens its menu with
   `SmartContextMenu.of(context)`, no controller needed. A `SmartContextMenuController`
-  opens and closes the menu from anywhere else. You can also turn off the long press
-  in config, if you need.
-- **Drag-to-select**: Long press to start. Then, once you've slided your finger, 
-  drag over the menu items. Release to select on the item you want.
-- **Cursor hover**: On desktop and web, moving the pointer over an available menu
-  item highlights it. Click to select it.
-- **`Hero` support**: If the widget has a `Hero` (eg. a photo), the `Hero` remains 
-  active on tap of the preview, transitioning smoothly from its position to full screen.
-
-**Positioning**
-
-- **The widget stays in place**: In presence of enough space, the preview stays put 
-  and moves only as needed. A widget that is too tall scrolls with the menu.
-- **Long menus** scroll internally, up to a specific part of the screen you choose.
+  opens and closes the menu from anywhere else, and the gestures can be turned off.
 
 **Motion**
 
-- **Alive under the finger**: as you slides over menu items, the menu stretches towards
-  your finger and the preview follows. Both return to their original position when 
-  you release.
-- **No jumps**: the menu smoothly transitions in height as a submenu opens or when
-  items are being fetched. If there's not enough space, the preview and menu both
-  smoothly glide upwards, leaving space in the process.
-- **Swipe back** drags the submenu with your finger while the menu smoothly adjusts its
-  height to the parent menu being revealed.
+- **Alive under the finger**: as you slide over the items, the menu stretches towards
+  your finger and the preview follows. Both spring back when you lift it.
+- **No jumps**: the menu smoothly changes its height as a submenu opens or items load.
+  If there's not enough space, the preview and the menu glide up together to make room.
+- **Swipe back** drags the submenu with your finger while the menu smoothly takes the
+  height of the parent menu.
 
 You can find all these effects in [Animations](#animations).
 
 **Content**
 
-- **Actions** with icons, destructive and tinted colors, disabled items, separators
-  and dividers.
+- **Actions** with icons, destructive and tinted colors, disabled items, separators,
+  section titles and dividers.
 - **Rows** put the most used actions side by side, as the compact menus of iOS do: icons
   with titles or icons alone, mixed with the usual items. Drag-to-select glides across the
   cells and on into the list.
-- **Custom items**:  use any widget as an item's content. This widget can have its own
-  buttons, while still get highlighted and tapped correctly.
-- **Submenus** can be static, or loaded asynchronously or paginated. They have a back
-  navigation item, and support swipe back.
+- **Custom items**: any widget can be the content of an item, for a look entirely your
+  own. It knows whether the item is pressed or hovered, can have its own buttons, and the
+  item still highlights and handles taps correctly.
+- **Submenus** can be static, loaded asynchronously or paginated. They have a back item
+  and support swipe back.
 - **RTL submenus**: transitions, swipe back and the default navigation chevrons follow
   the reading direction. The example app has an RTL layout switch to try them.
-- **Async items** can have loading, error and empty states, and can be retried on
-  failure. All these elements have the same appearance throughout the menu.
-- **Lazy lists**: items are only built as they appear on scroll. Async items only start
-  loading in the moment. This ensures long menus perform well.
-- **Listenable items** can rebuild based on app state while the menu is open. Such as
-  toggles, counters and actions in progress (eg. download progress).
-- **Custom widgets above the preview**. Place Slivers (eg. reactions bar) above the
-  preview, animated along with the menu. These can be pinned to the top, optionally.
+- **Async items** can show loading, error and empty states and be retried on failure,
+  with the same look throughout the menu.
+- **Lazy lists**: items are built only as they scroll into view, and async items start
+  loading only then, so long menus stay fast.
+- **Listenable items** rebuild from app state while the menu is open: toggles, counters
+  and actions in progress, such as a download.
+- **Custom widgets above the preview**: slivers, such as a reactions bar, above the
+  preview, animated with the menu and optionally pinned to the top.
+
+**Preview**
+
+- **Lifted preview**: the widget lifts over a blurred background. A tap on it runs the
+  main action of the widget, for example opens a message.
+- **`Hero` support**: a photo that opens full screen keeps its `Hero` and flies from its
+  place after a tap on the preview.
+
+**Positioning**
+
+- **The widget stays in place**: if there is enough space, the preview stays put and
+  moves only as much as needed. A widget that is too tall scrolls with the menu.
+- **Long menus** scroll inside, up to the part of the screen you choose.
 
 **Appearance**
 
 - **Light and dark themes** out of the box. Colors given as `CupertinoDynamicColor`s
-  adopt to the theme of the app (see [Item style](#item-style)).
-- **Customizable**: size, colors, text, icons, blur, shadows and labels7 All of these
-  and more can be set once for the whole app with a global theme or in each individual
-  menu. Also you can customize individual items in the menu.
+  adapt to the theme of the app (see [Item style](#item-style)).
+- **Customizable**: size, colors, text, icons, blur, shadows and labels. Set them once
+  for the whole app with a theme, for a single menu, or for a single item.
 
-The [example app](example/) shows every feature of all of the above. It includes a files
-app, a chat, a gallery of styles and a lab of edge cases. 
+The [example app](example/) shows all of the above: a files app, a chat, a gallery of
+styles and a lab of edge cases.
 
 ## Contents
 
@@ -129,47 +130,25 @@ app, a chat, a gallery of styles and a lab of edge cases.
 
 ## Why not `CupertinoContextMenu`?
 
-`CupertinoContextMenu` from Flutter opens a list of actions on a long press.
-This package keeps the long-press gesture and introduces features commonly 
-required by apps:
+`CupertinoContextMenu` from Flutter opens a list of actions on a long press only.
+This package keeps the long press and adds what apps usually need:
 
-- Submenus (either asynchronous or paginated).
+- A right click, a two-finger click on a trackpad and cursor hover on desktop and the web.
+- Submenus: static, async or paginated, with swipe back.
 - Rows of compact actions side by side, as in the menus of iOS.
 - Drag-to-select across the items.
-- Visual connection between the menu and the preview with a liquid stretching effect 
-  under the user's finger.
-- A smooth height animation and a smooth upward gliding animation for the preview as 
-  the menu is opened.
-- Ability to place **custom slivers** above the widget (e.g. a reactions bar).
-- Ability to open and close the widget programmatically.
-- Full control over the appearance: a unified theme for all menus (also for specific
-  menus) and a style for the colors, text, blur, shadows. Defining styles for items. 
-  And custom item content.
-- Full control over the interaction with the menu with control of the menu's width and
-  height, distance to the widget and screen edges, haptic feedback and opening or
-  closing on tap outside or a swipe back gesture.
+- A liquid stretch that ties the menu to the preview under your finger.
+- Smooth height changes, and the preview gliding up to make room as the menu opens.
+- Your own slivers above the widget, such as a reactions bar.
+- Opening from a button in the widget or from code.
+- Full control over the look: one theme for all menus or a config per menu, a style for
+  the colors, text, blur and shadows, styles for items and your own item content.
+- Full control over the behavior: the width and height of the menu, its distance to the
+  widget and the screen edges, haptics, and closing on a tap outside or with swipe back.
 
 ## Getting started
 
-Requires Flutter 3.32 or later (Dart 3.8). Works on all platforms, including [the web](https://thenothingworks.dev/demo/smart-context-menu/).
-On desktop and the web, the menu opens with a long press of the mouse, a right click,
-or from code, for example from a button (see [Opening from code](#opening-from-code));
-haptics do nothing there. A two-finger click on a trackpad also opens it.
-
-On web, call `BrowserContextMenu.disableContextMenu()` in your app if you want to
-hide the browser's context menu. This affects the whole page, including text fields;
-the package leaves that choice to the app. For example:
-
-```dart
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:flutter/services.dart' show BrowserContextMenu;
-
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  if (kIsWeb) await BrowserContextMenu.disableContextMenu();
-  runApp(const MyApp());
-}
-```
+Add the package:
 
 ```sh
 flutter pub add smart_context_menu
@@ -182,17 +161,13 @@ dependencies:
   smart_context_menu: ^1.0.4
 ```
 
+Import it:
+
 ```dart
 import 'package:smart_context_menu/smart_context_menu.dart';
 ```
 
-In debug builds, the first openings of the menu and its transitions may stutter while
-the code is compiled; release builds are smooth from the start. The iOS Simulator runs only
-debug builds, so check smoothness on a device or in a release build on macOS.
-
-## Usage
-
-Wrap a widget with `SmartContextMenu` and pass the items. The menu opens on long press.
+Wrap your widget with `SmartContextMenu` and pass the items:
 
 ```dart
 SmartContextMenu(
@@ -213,7 +188,37 @@ SmartContextMenu(
 )
 ```
 
-Only the long press is taken from the child: its taps, drags and other gestures keep working.
+That's it: a long press, a right click or a two-finger click on a trackpad opens the menu.
+See [Usage](#usage) for everything else.
+
+**Good to know**
+
+- Requires Flutter 3.32 or later (Dart 3.8).
+- On desktop and the web, a long press of the mouse opens the menu too, and haptics
+  do nothing.
+- On the web, the browser shows its own context menu on a right click as well. To hide
+  it, call `BrowserContextMenu.disableContextMenu()` in your app. This affects the whole
+  page, including text fields, so the package leaves that choice to the app:
+
+  ```dart
+  import 'package:flutter/foundation.dart' show kIsWeb;
+  import 'package:flutter/services.dart' show BrowserContextMenu;
+
+  Future<void> main() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    if (kIsWeb) await BrowserContextMenu.disableContextMenu();
+    runApp(const MyApp());
+  }
+  ```
+
+- In debug builds, the first openings of the menu and its transitions may stutter while
+  the code is compiled; release builds are smooth from the start. The iOS Simulator runs
+  only debug builds, so check smoothness on a device or in a release build on macOS.
+
+## Usage
+
+Wrap a widget with `SmartContextMenu` and pass the items, as in [Getting started](#getting-started).
+The menu takes only the long press from the child: its taps, drags and other gestures keep working.
 The child's secondary pointer-down handler also runs. A secondary tap handler that
 waits for release can be canceled as the menu opens. Use `manual` and open the menu
 from the child's handler with `SmartContextMenu.of(context).open()` when you need to
