@@ -99,7 +99,7 @@ final class SmartContextMenuStyle {
   /// The appearance of the back item pinned to the top of a submenu.
   ///
   /// If none is given, it is built from the deprecated back item fields,
-  /// such as [backButtonBlur], which default to the defaults of
+  /// such as `backButtonBlur`, which default to the defaults of
   /// [SmartContextMenuBackButtonStyle].
   SmartContextMenuBackButtonStyle get backButtonStyle =>
       _backButtonStyle ??
@@ -256,7 +256,7 @@ final class SmartContextMenuStyle {
   /// loading indicator of a submenu or page.
   ///
   /// If none is given, it is built from the deprecated status fields, such
-  /// as [errorIcon], which default to the defaults of
+  /// as `errorIcon`, which default to the defaults of
   /// [SmartContextMenuStatusStyle].
   SmartContextMenuStatusStyle get statusStyle =>
       _statusStyle ??
