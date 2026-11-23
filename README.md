@@ -28,9 +28,10 @@ above the widget.
 
 - **Lifted preview**: Preview lifted over a blurred background. Tap it to trigger 
   the main action of the widget (eg. open a message).
-- **From code**: Use `SmartContextMenuController` to open and close the menu 
-  (eg. on a "⋯" button). You can also disable the long press gesture in config, 
-  if you need.
+- **From code**: A "⋯" button in the widget opens its menu with
+  `SmartContextMenu.of(context)`, no controller needed. A `SmartContextMenuController`
+  opens and closes the menu from anywhere else. You can also turn off the long press
+  in config, if you need.
 - **Drag-to-select**: Long press to start. Then, once you've slided your finger, 
   drag over the menu items. Release to select on the item you want.
 - **Cursor hover**: On desktop and web, moving the pointer over an available menu
@@ -215,7 +216,8 @@ SmartContextMenu(
 Only the long press is taken from the child: its taps, drags and other gestures keep working.
 The child's secondary pointer-down handler also runs. A secondary tap handler that
 waits for release can be canceled as the menu opens. Use `manual` and open the menu
-from the child's handler when you need to coordinate them.
+from the child's handler with `SmartContextMenu.of(context).open()` when you need to
+coordinate them.
 
 Menus can be nested, for example a photo with its own menu inside a card with a menu.
 A long press or a right click on the photo opens only its menu, and anywhere else
@@ -241,7 +243,7 @@ SmartContextMenu(
 | `child` | The widget that opens the menu on long press and is shown as the preview. |
 | `items` | The items of the menu, see [Item types](#item-types). |
 | `config` | The settings of this menu, see [Configuration](#configuration). |
-| `controller` | Opens and closes the menu from code, see [Opening from code](#opening-from-code). |
+| `controller` | Opens and closes the menu from outside the child, see [Opening from code](#opening-from-code). |
 | `onPreviewTap` | Runs the main action of the child once the menu has closed after a tap on the preview. |
 | `headerSliversBuilder` | Builds your slivers above the widget, see [Header slivers](#header-slivers). |
 | `fadeHeaderSlivers` | Whether the slivers fade in and out with the menu, `true` by default. |
@@ -859,32 +861,57 @@ Keep cells wide enough to tap, see [Design guidelines](#design-guidelines).
 
 ### Opening from code
 
-Create a `SmartContextMenuController()` and pass it to the menu to open and close
-it from code.
-To open the menu only from code, set the activation mode to `manual`. In this mode
-the controller is required: without it, an assert fails in debug builds.
+A button inside the child opens the menu with `SmartContextMenu.of(context)`. It returns
+the controller of the nearest menu around `context`, so the button needs no setup:
+
+```dart
+SmartContextMenu(
+  items: items,
+  child: Row(
+    children: [
+      const Expanded(child: Text('Report.pdf')),
+      Builder(
+        builder: (context) => CupertinoButton(
+          onPressed: () => SmartContextMenu.of(context).open(),
+          child: const Icon(CupertinoIcons.ellipsis_circle),
+        ),
+      ),
+    ],
+  ),
+)
+```
+
+The `Builder` gives the button a `context` inside the menu. A button in a widget of its
+own, such as a list row, uses the `context` of that widget. The items of the open menu
+are not inside the child, so `of` does not find the menu from them.
+`SmartContextMenu.maybeOf(context)` returns `null` where there is no menu.
+
+To open the menu from outside the child, for example on a double tap next to a message,
+create a `SmartContextMenuController()` and pass it to the menu:
 
 ```dart
 final controller = SmartContextMenuController();
 
 SmartContextMenu(
   controller: controller,
-  config: const SmartContextMenuConfig(
-    activationMode: SmartContextMenuActivationMode.manual,
-  ),
   items: items,
   child: child,
 );
 
-IconButton(
-  icon: const Icon(CupertinoIcons.ellipsis),
-  onPressed: controller.open,
+GestureDetector(
+  onDoubleTap: controller.open,
+  child: background,
 );
 ```
 
-The controller notifies its listeners when the menu opens or closes, see `isOpen`.
+To open the menu only from code, set the activation mode to `manual`: the long press and
+the right click then stay with the child. The menu opens from `SmartContextMenu.of` in the
+child or from its controller, so without either of them it never opens.
+
+`SmartContextMenu.of` returns the controller passed to the menu, or the menu's own one.
+A controller notifies its listeners when the menu opens or closes, see `isOpen`.
 `open()` completes when the menu has closed, so `await controller.open()` waits for it.
-Dispose the controller when it is no longer needed.
+Dispose a controller you create when it is no longer needed; the menu disposes its own.
 
 ### Header slivers
 
