@@ -144,12 +144,14 @@ void main() {
     expect(find.text('Copy'), findsOneWidget);
   });
 
-  testWidgets('manual activation of the theme requires a controller', (
+  testWidgets('manual activation of the theme turns off the long press', (
     tester,
   ) async {
     await tester.pumpWidget(buildApp(theme: manualConfig));
 
-    expect(tester.takeException(), isAssertionError);
+    await tester.openMenu();
+
+    expect(find.text('Copy'), findsNothing);
   });
 
   // CupertinoUiCompatibilityBridge of cupertino_ui puts a CupertinoTheme
