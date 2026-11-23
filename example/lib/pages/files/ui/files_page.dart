@@ -152,22 +152,29 @@ final class _FilesPageState extends State<FilesPage> {
   }
 
   List<SmartContextMenuItem> _menuItems(DemoFile file) => [
-    SmartContextMenuItem.simple(
-      title: 'Open',
-      leading: const Icon(CupertinoIcons.arrow_up_right_square),
-      // Runs when the menu is almost closed, so it can open a page.
-      onTap: () => _open(file),
+    // The most frequent actions side by side, as in the menus of iOS. Share
+    // opens its submenu from a cell, and Rename is a disabled cell in
+    // a read-only file.
+    SmartContextMenuItem.row(
+      children: [
+        SmartContextMenuItem.simple(
+          title: 'Open',
+          leading: const Icon(CupertinoIcons.arrow_up_right_square),
+          // Runs when the menu is almost closed, so it can open a page.
+          onTap: () => _open(file),
+        ),
+        _shareItem(file),
+        SmartContextMenuItem.simple(
+          title: 'Rename',
+          leading: const Icon(CupertinoIcons.pencil),
+          isDisabled: file.isReadOnly,
+          onTap: () => _notice('Rename ${file.name} (demo only)'),
+        ),
+      ],
     ),
-    _shareItem(file),
     _moveToItem(file),
     _favoriteItem(file),
     _downloadItem(file),
-    SmartContextMenuItem.simple(
-      title: 'Rename',
-      leading: const Icon(CupertinoIcons.pencil),
-      isDisabled: file.isReadOnly,
-      onTap: () => _notice('Rename ${file.name} (demo only)'),
-    ),
     SmartContextMenuItem.separator(),
     SmartContextMenuItem.simple(
       title: 'Delete',
@@ -178,7 +185,7 @@ final class _FilesPageState extends State<FilesPage> {
   ];
 
   /// A static submenu with an async submenu inside.
-  SmartContextMenuItem _shareItem(DemoFile file) {
+  SmartContextMenuSubmenuItem _shareItem(DemoFile file) {
     return SmartContextMenuItem.submenu(
       title: 'Share',
       leading: const Icon(CupertinoIcons.share),
