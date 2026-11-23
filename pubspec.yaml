@@ -10,9 +10,9 @@ topics:
   - overlay
   - chat-context-menu
 screenshots:
-  - description: "File and chat menus in light and dark themes show drag-to-select, from the row of the chat menu down its list, with a reactions bar above the chat message."
+  - description: "File and chat menus in light and dark themes show drag-to-select, from the row of the file menu down its list and down the chat menu under a reactions bar."
     path: doc/gifs/open_and_select_themes.gif
-  - description: "A file context menu in the light theme next to a chat context menu with a row of actions in the dark theme."
+  - description: "A file context menu with a row of actions in the light theme next to a chat context menu with a reactions bar in the dark theme."
     path: doc/gifs/carousel_cover.png
   - description: "Four styles of the menu in the light and dark themes: brand colors, an opaque menu, items with their own content and rows in their own style."
     path: doc/gifs/appearance.png

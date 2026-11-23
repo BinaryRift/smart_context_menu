@@ -12,7 +12,7 @@
 Right click on your desktop, long press on your phone, tap on your button: a single widget provides your Flutter app with a context menu that is styled and animated like the one in iOS. It takes your own widgets as menu items and above the preview (e.g. a reactions bar), and it has no third-party dependencies. You can build it in many ways: a simple list of items, a compact row of the most used actions, or a complex mix of rows, dynamic submenus and live items. Not into the iOS design? Make your own: customize colors, shapes, blur, items and more, and keep the sweet animations.
 Requires Flutter 3.32 or later (Dart 3.8). **[Get started →](#getting-started)**
 
-<img src="doc/gifs/open_and_select_themes.gif" width="600" alt="File and chat menus open in light and dark themes; a finger drags across their items, from the row of the chat menu down its list, with a reactions bar above the chat message">
+<img src="doc/gifs/open_and_select_themes.gif" width="600" alt="File and chat menus open in light and dark themes; a finger drags across their items, from the row of the file menu down its list, and down the chat menu under a reactions bar">
 
 <img src="doc/gifs/wide_row.gif" width="600" alt="A menu of one row of seven tools, its left half in the light theme and its right half in the dark theme; Shapes opens a submenu of one row of shapes, and Back returns to the tools">
 
