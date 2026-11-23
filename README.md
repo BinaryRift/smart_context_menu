@@ -9,7 +9,7 @@
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![live demo](https://img.shields.io/badge/demo-live-8b5cf6)](https://thenothingworks.dev/demo/smart-context-menu/)
 
-Right click on your desktop, long press on your phone, tap on your button: a single widget provides your Flutter app with a context menu that is styled and animated like the one in iOS. It takes your own widgets as menu items and above the preview (e.g. a reactions bar), and it has no third-party dependencies. You can build it in many ways: a simple list of items, a compact row of the most used actions, or a complex mix of rows, dynamic submenus and live items. Not into the iOS design? Make your own: customize colors, shapes, blur, items and more, and keep the sweet animations.
+Right click on your desktop, long press on your phone, tap on your button: a single widget provides your Flutter app with a context menu that is styled and animated like the one in iOS. It takes your own widgets as menu items and above the preview (e.g. a reactions bar), and it has no third-party dependencies. You can build it in many ways: a simple list of items, a compact row of the most used actions, or a complex mix of rows, dynamic submenus and live items. Not into the iOS design? [Make your own](#appearance): customize colors, shapes, blur, items and more, and keep the sweet animations.
 Requires Flutter 3.32 or later (Dart 3.8). **[Get started →](#getting-started)**
 
 <img src="doc/gifs/open_and_select_themes.gif" width="600" alt="File and chat menus open in light and dark themes; a finger drags across their items, from the row of the file menu down its list, and down the chat menu under a reactions bar">
@@ -19,7 +19,7 @@ Requires Flutter 3.32 or later (Dart 3.8). **[Get started →](#getting-started)
 <br>
 
 **[Try the live demo in your browser →](https://thenothingworks.dev/demo/smart-context-menu/)** 
-**[Watch the 56-second overview →](https://youtube.com/shorts/NIzPK4mWpc8?feature=share)**
+**[Watch the 90-second overview →](https://youtube.com/shorts/NIzPK4mWpc8?feature=share)**
 
 ## Features
 
