@@ -6,9 +6,10 @@ typedef _SmartContextMenuAction = Future<void> Function();
 /// Opens and closes a [SmartContextMenu] programmatically
 /// and reports whether it is currently open.
 ///
-/// Required when [SmartContextMenuConfig.activationMode] is
-/// [SmartContextMenuActivationMode.manual]. Can also be used with
-/// long-press activation to close the menu from code.
+/// Pass it to [SmartContextMenu.controller] to open and close the menu from
+/// outside its child, for example on a double tap next to it. A button
+/// inside the child does not need one: [SmartContextMenu.of] returns the
+/// controller of the menu, its own one if none was passed.
 ///
 /// Listeners are notified when the menu opens or closes.
 ///

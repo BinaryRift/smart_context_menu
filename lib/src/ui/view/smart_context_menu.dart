@@ -28,8 +28,10 @@ import '../widgets/smart_context_menu_press_detector.dart';
 /// size changes, for example when the device turns, the menu closes without
 /// an action, as the system menu of iOS does.
 ///
-/// To open the menu from code, pass a [controller]. To turn off gesture
-/// activation, set [SmartContextMenuConfig.activationMode] to
+/// A button inside [child] opens the menu with
+/// `SmartContextMenu.of(context).open()`. To open the menu from outside
+/// [child], pass a [controller]. To turn off gesture activation, set
+/// [SmartContextMenuConfig.activationMode] to
 /// [SmartContextMenuActivationMode.manual].
 /// On web, the app can call `BrowserContextMenu.disableContextMenu()` to
 /// prevent the browser's menu from appearing on a secondary click. This
@@ -80,10 +82,10 @@ final class SmartContextMenu extends StatefulWidget {
   /// `const SmartContextMenuConfig()`.
   final SmartContextMenuConfig? config;
 
-  /// Opens and closes the menu from code.
+  /// Opens and closes the menu from code, also from outside [child].
   ///
-  /// Required when [SmartContextMenuConfig.activationMode] is
-  /// [SmartContextMenuActivationMode.manual].
+  /// If null, the menu has its own controller. Inside [child], [of] returns
+  /// either of them.
   final SmartContextMenuController? controller;
 
   /// Called when the preview above the open menu is tapped.
@@ -144,6 +146,42 @@ final class SmartContextMenu extends StatefulWidget {
     this.headerSliversDelay = Duration.zero,
   });
 
+  /// The controller of the nearest [SmartContextMenu] whose [child]
+  /// contains [context].
+  ///
+  /// It is [controller], or the menu's own controller if [controller] is
+  /// null. Use it to open the menu from a button in [child]:
+  ///
+  /// ```dart
+  /// CupertinoButton(
+  ///   onPressed: () => SmartContextMenu.of(context).open(),
+  ///   child: const Icon(CupertinoIcons.ellipsis_circle),
+  /// )
+  /// ```
+  ///
+  /// The items of the open menu are not inside [child], so their context
+  /// does not find it. If there is no such menu, an assert fails in debug
+  /// builds; see [maybeOf] for a nullable result.
+  static SmartContextMenuController of(BuildContext context) {
+    final controller = maybeOf(context);
+    assert(
+      controller != null,
+      "SmartContextMenu.of() was called with a context that is not inside "
+      "the child of a SmartContextMenu.",
+    );
+    return controller!;
+  }
+
+  /// The controller of the nearest [SmartContextMenu] whose [child]
+  /// contains [context], or null if there is none.
+  ///
+  /// See [of].
+  static SmartContextMenuController? maybeOf(BuildContext context) {
+    return context
+        .dependOnInheritedWidgetOfExactType<_SmartContextMenuScope>()
+        ?.controller;
+  }
+
   @override
   State<SmartContextMenu> createState() => _SmartContextMenuState();
 }
@@ -155,6 +193,12 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
 
   late final SmartContextMenuSession _session;
   late SmartContextMenuConfig _config;
+
+  /// Used when [SmartContextMenu.controller] is null.
+  SmartContextMenuController? _ownController;
+
+  SmartContextMenuController get _controller =>
+      widget.controller ?? (_ownController ??= SmartContextMenuController());
 
   List<SmartContextMenuItem> get _items => widget.items;
   bool get _hasInternalActivation =>
@@ -179,7 +223,7 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
     super.didUpdateWidget(oldWidget);
     _resolveConfig();
     if (oldWidget.controller != widget.controller) {
-      oldWidget.controller?.detach(this);
+      (oldWidget.controller ?? _ownController)?.detach(this);
       _bindController();
       return;
     }
@@ -193,15 +237,13 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
       _dismissRouteIfNeeded(activeRoute);
     }
     _session.invalidate();
-    widget.controller?.detach(this);
+    (widget.controller ?? _ownController)?.detach(this);
+    _ownController?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Validated in build, where the framework reports an error
-    // and keeps the element tree consistent.
-    _debugValidateConfiguration();
     return SmartContextMenuPressDetector(
       enabled: _hasInternalActivation && _items.isNotEmpty,
       isMenuActive: _session.hasActiveSession,
@@ -214,7 +256,10 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
         snapshot: () => _session.snapshot,
         isMenuActive: _session.hasActiveSession,
         isMenuVisible: _session.isMenuVisible,
-        child: widget.child,
+        child: _SmartContextMenuScope(
+          controller: _controller,
+          child: widget.child,
+        ),
       ),
     );
   }
@@ -224,7 +269,7 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
   }
 
   void _bindController() {
-    widget.controller?.attach(
+    _controller.attach(
       owner: this,
       open: _openMenu,
       close: _closeMenu,
@@ -233,7 +278,7 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
   }
 
   void _syncControllerVisibility() {
-    widget.controller?.syncVisibility(this, _session.isMenuVisible);
+    _controller.syncVisibility(this, _session.isMenuVisible);
   }
 
   Future<void> _handleLongPress() async {
@@ -385,12 +430,20 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
     if (mounted) setState(() {});
     _syncControllerVisibility();
   }
+}
 
-  void _debugValidateConfiguration() {
-    assert(
-      _config.activationMode != SmartContextMenuActivationMode.manual ||
-          widget.controller != null,
-      "SmartContextMenu in manual mode requires a controller.",
-    );
+/// Gives the child of a [SmartContextMenu] the controller of the menu, see
+/// [SmartContextMenu.of].
+final class _SmartContextMenuScope extends InheritedWidget {
+  final SmartContextMenuController controller;
+
+  const _SmartContextMenuScope({
+    required this.controller,
+    required super.child,
+  });
+
+  @override
+  bool updateShouldNotify(_SmartContextMenuScope oldWidget) {
+    return controller != oldWidget.controller;
   }
 }
