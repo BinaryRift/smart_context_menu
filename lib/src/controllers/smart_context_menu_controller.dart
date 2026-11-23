@@ -49,28 +49,40 @@ final class SmartContextMenuController extends ChangeNotifier {
     await binding.close();
   }
 
-  /// Binds the controller to a menu. Called by [SmartContextMenu].
+  /// Binds the controller to the menu [owner]. Called by [SmartContextMenu].
   @internal
   void attach({
+    required Object owner,
     required Future<void> Function() open,
     required Future<void> Function() close,
     required bool isOpen,
   }) {
-    _binding = _SmartContextMenuBinding(open: open, close: close);
-    syncVisibility(isOpen);
+    _binding = _SmartContextMenuBinding(owner: owner, open: open, close: close);
+    syncVisibility(owner, isOpen);
   }
 
-  /// Unbinds the controller from its menu. Called by [SmartContextMenu].
+  /// Unbinds the controller from the menu [owner]. Called by
+  /// [SmartContextMenu].
+  ///
+  /// Does nothing if the controller is bound to another menu by now.
   @internal
-  void detach() {
+  void detach(Object owner) {
+    if (!identical(_binding?.owner, owner)) return;
     _binding = null;
-    syncVisibility(false);
+    _setOpen(false);
   }
 
-  /// Updates [isOpen] and notifies listeners on change.
+  /// Updates [isOpen] from the menu [owner] and notifies listeners on change.
   /// Called by [SmartContextMenu].
+  ///
+  /// Does nothing if the controller is not bound to [owner].
   @internal
-  void syncVisibility(bool isOpen) {
+  void syncVisibility(Object owner, bool isOpen) {
+    if (!identical(_binding?.owner, owner)) return;
+    _setOpen(isOpen);
+  }
+
+  void _setOpen(bool isOpen) {
     if (_isOpen == isOpen) return;
     _isOpen = isOpen;
     notifyListeners();
@@ -78,8 +90,13 @@ final class SmartContextMenuController extends ChangeNotifier {
 }
 
 final class _SmartContextMenuBinding {
+  final Object owner;
   final _SmartContextMenuAction open;
   final _SmartContextMenuAction close;
 
-  const _SmartContextMenuBinding({required this.open, required this.close});
+  const _SmartContextMenuBinding({
+    required this.owner,
+    required this.open,
+    required this.close,
+  });
 }

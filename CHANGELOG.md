@@ -40,6 +40,8 @@
   is now shown, since it titles the items after it. Of several separators next to each other,
   the last one with a `child` is shown instead of the first separator. Bands without a `child`
   are shown as before.
+* Fixed a controller passed to another menu: it no longer stops working when the menu it
+  was passed to before is removed or rebuilt without it.
 
 ## 1.0.4
 

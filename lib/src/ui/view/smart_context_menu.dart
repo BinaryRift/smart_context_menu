@@ -179,7 +179,7 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
     super.didUpdateWidget(oldWidget);
     _resolveConfig();
     if (oldWidget.controller != widget.controller) {
-      oldWidget.controller?.detach();
+      oldWidget.controller?.detach(this);
       _bindController();
       return;
     }
@@ -193,7 +193,7 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
       _dismissRouteIfNeeded(activeRoute);
     }
     _session.invalidate();
-    widget.controller?.detach();
+    widget.controller?.detach(this);
     super.dispose();
   }
 
@@ -225,6 +225,7 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
 
   void _bindController() {
     widget.controller?.attach(
+      owner: this,
       open: _openMenu,
       close: _closeMenu,
       isOpen: _session.isMenuVisible,
@@ -232,7 +233,7 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
   }
 
   void _syncControllerVisibility() {
-    widget.controller?.syncVisibility(_session.isMenuVisible);
+    widget.controller?.syncVisibility(this, _session.isMenuVisible);
   }
 
   Future<void> _handleLongPress() async {
