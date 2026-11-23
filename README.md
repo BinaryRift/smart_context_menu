@@ -1211,7 +1211,7 @@ use. Version 2.0.0 of this package moves to `cupertino_ui`, and the bridge will 
 behind the menu, an opaque menu, items with their own content, and rows in their own style
 with a badge and colors to pick.*
 
-<img src="doc/gifs/themes.png" width="800" alt="The Indigo, Terminal, Tiny, Colorful, Paper and Glow menus from the Themes section of the example">
+<img src="doc/gifs/themes.png" width="610" alt="The Indigo, Terminal, Tiny, Colorful, Paper and Glow menus from the Themes section of the example">
 
 *One package, six apps: brand indigo with a row on top, a terminal in a monospaced font,
 a tiny menu of small cells, icons in colored squares as in Settings, warm paper in a serif

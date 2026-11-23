@@ -1213,7 +1213,7 @@ builder: (context, child) => CupertinoUiCompatibilityBridge(
 *Четыре стиля из примера в светлой и тёмной темах: фирменные цвета и только затемнение за меню,
 непрозрачное меню, пункты со своим контентом и ряды в своём стиле с бейджем и выбором цвета.*
 
-<img src="doc/gifs/themes.png" width="800" alt="Меню Indigo, Terminal, Tiny, Colorful, Paper и Glow из раздела Themes примера">
+<img src="doc/gifs/themes.png" width="610" alt="Меню Indigo, Terminal, Tiny, Colorful, Paper и Glow из раздела Themes примера">
 
 *Один пакет — шесть приложений: фирменный индиго с рядом сверху, терминал с моноширинным шрифтом,
 крошечное меню из маленьких ячеек, иконки в цветных квадратах как в Настройках, тёплая бумага
