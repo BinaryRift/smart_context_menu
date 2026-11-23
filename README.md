@@ -1211,6 +1211,13 @@ use. Version 2.0.0 of this package moves to `cupertino_ui`, and the bridge will 
 behind the menu, an opaque menu, items with their own content, and rows in their own style
 with a badge and colors to pick.*
 
+<img src="doc/gifs/themes.png" width="800" alt="The Indigo, Terminal, Tiny, Colorful, Paper and Glow menus from the Themes section of the example">
+
+*One package, six apps: brand indigo with a row on top, a terminal in a monospaced font,
+a tiny menu of small cells, icons in colored squares as in Settings, warm paper in a serif
+font, and text only on glass with a cyan glow. Each is a `SmartContextMenuStyle` and its items. [Code in
+the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/ui/theme_styles.dart).*
+
 The look of the menu is set by `SmartContextMenuStyle`, the `style` of the config.
 The Back item, the loading, error and empty items, and rows have their own parts of it:
 [`backButtonStyle`](#back-item-style), [`statusStyle`](#status-style) and

@@ -8,6 +8,7 @@ doc/gifs/*
 !doc/gifs/appearance.png
 !doc/gifs/open_and_select_themes.gif
 !doc/gifs/rows.png
+!doc/gifs/themes.png
 
 # Rules of .gitignore
 
