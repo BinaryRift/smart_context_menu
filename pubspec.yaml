@@ -18,7 +18,7 @@ screenshots:
     path: doc/gifs/appearance.png
   - description: "Rows of compact actions in the light and dark themes: a row above the list, a menu of rows only, seven tools in a wider menu and a submenu of one row."
     path: doc/gifs/rows.png
-  - description: "Six themes of the menu made with its style: brand indigo with a row, a terminal, a tiny menu, icons in colored squares, warm paper and text only on glass with a cyan glow."
+  - description: "Green terminal, tiny menu, cyan glow, editing and clipboard rows, warm paper, icons in colored squares, indigo with a row, and a seven-tool drawing toolbar."
     path: doc/gifs/themes.png
 
 environment:
