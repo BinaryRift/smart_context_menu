@@ -12,8 +12,8 @@ topics:
 screenshots:
   - description: "File and chat menus in light and dark themes show drag-to-select, from the row of the file menu down its list and down the chat menu under a reactions bar."
     path: doc/gifs/open_and_select_themes.gif
-  - description: "A file context menu with a row of actions in the light theme next to a chat context menu with a reactions bar in the dark theme."
-    path: doc/gifs/carousel_cover.png
+  - description: "A light file menu with an action row, a dark chat menu with a reactions bar, and a dark drawing toolbar with colored icons."
+    path: doc/gifs/carousel_cover.webp
   - description: "Four styles of the menu in the light and dark themes: brand colors, an opaque menu, items with their own content and rows in their own style."
     path: doc/gifs/appearance.png
   - description: "Rows of compact actions in the light and dark themes: a row above the list, a menu of rows only, seven tools in a wider menu and a submenu of one row."
