@@ -27,7 +27,7 @@
 
 **[Попробовать демо в браузере →](https://thenothingworks.dev/demo/smart-context-menu/)** 
 
-**[Посмотреть 90-секундный обзор →](https://youtube.com/shorts/NIzPK4mWpc8?feature=share)**
+**[Посмотреть 90-секундный обзор →](https://youtube.com/shorts/8x6S-AkH4R8)**
 
 ## Возможности
 

@@ -27,7 +27,7 @@ Requires Flutter 3.32 or later (Dart 3.8). **[Get started →](#getting-started)
 
 **[Try the live demo in your browser →](https://thenothingworks.dev/demo/smart-context-menu/)** 
 
-**[Watch the 90-second overview →](https://youtube.com/shorts/NIzPK4mWpc8?feature=share)**
+**[Watch the 90-second overview →](https://youtube.com/shorts/8x6S-AkH4R8)**
 
 ## Features
 
