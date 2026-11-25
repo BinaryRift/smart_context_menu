@@ -1,7 +1,10 @@
+import 'dart:ui' show PointerDeviceKind;
+
 // ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu_example/core/data/demo_loader.dart';
+import 'package:smart_context_menu_example/pages/appearance/ui/theme_styles.dart';
 
 import '../helpers/menu_tester.dart';
 
@@ -45,6 +48,8 @@ void main() {
     ('Colorful', find.text('Favorite')),
     ('Paper', find.text('Rename')),
     ('Glow', find.text('Duplicate')),
+    ('Editing rows', find.text('Cut')),
+    ('Drawing toolbar', find.byIcon(CupertinoIcons.lasso)),
   ]) {
     testWidgets('$preset opens its menu', (tester) async {
       await openAppearance(tester);
@@ -141,4 +146,101 @@ void main() {
     expect(find.text('Back'), findsWidgets);
     expect(find.text('Hexagon'), findsOneWidget);
   });
+
+  testWidgets('editing rows keep independent formatting selections', (
+    tester,
+  ) async {
+    await openAppearance(tester);
+    await openPreset(tester, 'Editing rows');
+
+    final bold = find.text('B');
+    final italic = find.text('I');
+    final accent = editingRowsAccent.resolveFrom(tester.element(bold));
+    Color? colorOf(Finder label) => tester.widget<Text>(label).style?.color;
+    expect(colorOf(bold), accent);
+    expect(colorOf(italic), isNot(accent));
+
+    await tester.tap(italic);
+    await tester.pumpAndSettle();
+
+    expect(colorOf(bold), accent);
+    expect(colorOf(italic), accent);
+  });
+
+  for (final (preset, icon, light, dark) in [
+    (
+      'Editing rows',
+      CupertinoIcons.scissors,
+      const Color(0xFFDC2858),
+      const Color(0xFFFF718F),
+    ),
+    (
+      'Drawing toolbar',
+      CupertinoIcons.pencil,
+      drawingToolbarAccent.color,
+      drawingToolbarAccent.darkColor,
+    ),
+  ]) {
+    testWidgets('$preset follows brightness changes while open', (
+      tester,
+    ) async {
+      final dispatcher = tester.binding.platformDispatcher;
+      dispatcher.platformBrightnessTestValue = Brightness.light;
+      addTearDown(dispatcher.clearPlatformBrightnessTestValue);
+      await openAppearance(tester);
+      await openPreset(tester, preset);
+
+      int iconColor() =>
+          tester.widget<Icon>(find.byIcon(icon)).color!.toARGB32();
+      expect(iconColor(), light.toARGB32());
+
+      dispatcher.platformBrightnessTestValue = Brightness.dark;
+      await tester.pumpAndSettle();
+      expect(iconColor(), dark.toARGB32());
+
+      dispatcher.platformBrightnessTestValue = Brightness.light;
+      await tester.pumpAndSettle();
+      expect(iconColor(), light.toARGB32());
+    });
+  }
+
+  for (final (preset, label, accent, openShapes) in [
+    ('Editing rows', 'Cut', editingRowsAccent, false),
+    ('Drawing toolbar', 'Hexagon', drawingToolbarAccent, true),
+  ]) {
+    for (final brightness in Brightness.values) {
+      testWidgets(
+        '$preset changes the color of $label on hover in ${brightness.name}',
+        (tester) async {
+          final dispatcher = tester.binding.platformDispatcher;
+          dispatcher.platformBrightnessTestValue = brightness;
+          addTearDown(dispatcher.clearPlatformBrightnessTestValue);
+          await openAppearance(tester);
+          await openPreset(tester, preset);
+          if (openShapes) {
+            await tester.tap(find.byIcon(CupertinoIcons.square_on_circle));
+            await tester.settleMenu();
+          }
+
+          final text = find.text(label);
+          final hoverColor = accent.resolveFrom(tester.element(text));
+          Color? colorOfLabel() => tester.widget<Text>(text).style?.color;
+          final resting = colorOfLabel();
+          expect(resting, isNot(hoverColor));
+
+          final mouse = await tester.createGesture(
+            kind: PointerDeviceKind.mouse,
+          );
+          await mouse.addPointer(location: tester.getCenter(text));
+          addTearDown(mouse.removePointer);
+          await tester.pump();
+          expect(colorOfLabel(), hoverColor);
+
+          await mouse.moveTo(Offset.zero);
+          await tester.pump();
+          expect(colorOfLabel(), resting);
+        },
+      );
+    }
+  }
 }

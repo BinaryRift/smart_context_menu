@@ -165,33 +165,47 @@ List<SmartContextMenuItem> quickActionItems() => [
   _action('Rename', CupertinoIcons.pencil),
 ];
 
+typedef AppearanceAction = ({String title, IconData icon});
+
+const formattingActions = <AppearanceAction>[
+  (title: 'Bold', icon: CupertinoIcons.bold),
+  (title: 'Italic', icon: CupertinoIcons.italic),
+  (title: 'Underline', icon: CupertinoIcons.underline),
+  (title: 'Strikethrough', icon: CupertinoIcons.strikethrough),
+];
+
+const alignmentActions = <AppearanceAction>[
+  (title: 'Align Left', icon: CupertinoIcons.text_alignleft),
+  (title: 'Center', icon: CupertinoIcons.text_aligncenter),
+  (title: 'Align Right', icon: CupertinoIcons.text_alignright),
+  (title: 'Justify', icon: CupertinoIcons.text_justify),
+];
+
+const clipboardActions = <AppearanceAction>[
+  (title: 'Cut', icon: CupertinoIcons.scissors),
+  (title: 'Copy', icon: CupertinoIcons.doc_on_doc),
+  (title: 'Paste', icon: CupertinoIcons.doc_on_clipboard),
+];
+
 /// A menu of rows only: eight small cells in two rows, a separator and
 /// a row of medium cells.
 List<SmartContextMenuItem> onlyRowItems() => [
   SmartContextMenuItem.row(
     size: SmartContextMenuRowSize.small,
     children: [
-      _action('Bold', CupertinoIcons.bold),
-      _action('Italic', CupertinoIcons.italic),
-      _action('Underline', CupertinoIcons.underline),
-      _action('Strikethrough', CupertinoIcons.strikethrough),
+      for (final (:title, :icon) in formattingActions) _action(title, icon),
     ],
   ),
   SmartContextMenuItem.row(
     size: SmartContextMenuRowSize.small,
     children: [
-      _action('Align Left', CupertinoIcons.text_alignleft),
-      _action('Center', CupertinoIcons.text_aligncenter),
-      _action('Align Right', CupertinoIcons.text_alignright),
-      _action('Justify', CupertinoIcons.text_justify),
+      for (final (:title, :icon) in alignmentActions) _action(title, icon),
     ],
   ),
   SmartContextMenuItem.separator(),
   SmartContextMenuItem.row(
     children: [
-      _action('Cut', CupertinoIcons.scissors),
-      _action('Copy', CupertinoIcons.doc_on_doc),
-      _action('Paste', CupertinoIcons.doc_on_clipboard),
+      for (final (:title, :icon) in clipboardActions) _action(title, icon),
     ],
   ),
 ];
@@ -312,29 +326,37 @@ SmartContextMenuSimpleItem _inboxItem({required int unread}) {
   );
 }
 
+const drawingToolActions = <AppearanceAction>[
+  (title: 'Pen', icon: CupertinoIcons.pencil),
+  (title: 'Brush', icon: CupertinoIcons.paintbrush),
+  (title: 'Scribble', icon: CupertinoIcons.scribble),
+  (title: 'Lasso', icon: CupertinoIcons.lasso),
+  (title: 'Text', icon: CupertinoIcons.textformat),
+  (title: 'Eyedropper', icon: CupertinoIcons.eyedropper),
+];
+
+const shapeActions = <AppearanceAction>[
+  (title: 'Square', icon: CupertinoIcons.square),
+  (title: 'Circle', icon: CupertinoIcons.circle),
+  (title: 'Triangle', icon: CupertinoIcons.triangle),
+  (title: 'Hexagon', icon: CupertinoIcons.hexagon),
+  (title: 'Star', icon: CupertinoIcons.star),
+];
+
 /// Seven small cells in one row of a wider menu, see [wideRowMenuWidth],
 /// and a submenu of one row of medium cells.
 List<SmartContextMenuItem> wideRowItems() => [
   SmartContextMenuItem.row(
     size: SmartContextMenuRowSize.small,
     children: [
-      _action('Pen', CupertinoIcons.pencil),
-      _action('Brush', CupertinoIcons.paintbrush),
-      _action('Scribble', CupertinoIcons.scribble),
-      _action('Lasso', CupertinoIcons.lasso),
-      _action('Text', CupertinoIcons.textformat),
-      _action('Eyedropper', CupertinoIcons.eyedropper),
+      for (final (:title, :icon) in drawingToolActions) _action(title, icon),
       SmartContextMenuItem.submenu(
         title: 'Shapes',
         leading: const Icon(CupertinoIcons.square_on_circle),
         children: [
           SmartContextMenuItem.row(
             children: [
-              _action('Square', CupertinoIcons.square),
-              _action('Circle', CupertinoIcons.circle),
-              _action('Triangle', CupertinoIcons.triangle),
-              _action('Hexagon', CupertinoIcons.hexagon),
-              _action('Star', CupertinoIcons.star),
+              for (final (:title, :icon) in shapeActions) _action(title, icon),
             ],
           ),
         ],

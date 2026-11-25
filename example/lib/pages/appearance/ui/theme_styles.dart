@@ -154,3 +154,129 @@ const glowStyle = SmartContextMenuStyle(
 
 /// Narrow enough for titles without icons.
 const glowMenuWidth = 210.0;
+
+const editingRowsAccent = CupertinoDynamicColor.withBrightness(
+  color: Color(0xFF5C329C),
+  darkColor: Color(0xFFDFC7FF),
+);
+const editingRowsSectionColor = CupertinoDynamicColor.withBrightness(
+  color: Color(0xFFEAF2ED),
+  darkColor: Color(0xFF293A33),
+);
+const editingRowsSelectionColor = CupertinoDynamicColor.withBrightness(
+  color: Color(0xFFE7DDF9),
+  darkColor: Color(0xFF533D68),
+);
+
+/// Sections for formatting and alignment above the clipboard actions.
+const editingRowsStyle = SmartContextMenuStyle(
+  menuColor: CupertinoDynamicColor.withBrightness(
+    color: Color(0xFFF9FDFA),
+    darkColor: Color(0xFF1C2A25),
+  ),
+  borderColor: CupertinoDynamicColor.withBrightness(
+    color: Color(0xFFD7E3DB),
+    darkColor: Color(0xFF40534A),
+  ),
+  borderRadius: BorderRadius.all(Radius.circular(20)),
+  menuShadows: [
+    BoxShadow(
+      color: CupertinoDynamicColor.withBrightness(
+        color: Color(0x3018392D),
+        darkColor: Color(0x66091611),
+      ),
+      blurRadius: 22,
+      offset: Offset(0, 7),
+    ),
+  ],
+  backgroundColor: CupertinoDynamicColor.withBrightness(
+    color: Color(0x26517361),
+    darkColor: Color(0x66101715),
+  ),
+  backgroundBlur: SmartContextMenuBlur.small,
+  titleStyle: TextStyle(
+    fontSize: 17,
+    color: CupertinoDynamicColor.withBrightness(
+      color: Color(0xFF263830),
+      darkColor: Color(0xFFEAF4EE),
+    ),
+  ),
+  // The cells paint their own rounded highlights.
+  highlightColor: Color(0x00000000),
+  rowStyle: SmartContextMenuRowStyle(
+    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+    smallItemPadding: EdgeInsets.zero,
+    mediumItemPadding: EdgeInsets.zero,
+  ),
+);
+
+const drawingToolbarSurface = CupertinoDynamicColor.withBrightness(
+  color: Color(0xFFFFF8FB),
+  darkColor: Color(0xFF392632),
+);
+const drawingToolbarCapsule = CupertinoDynamicColor.withBrightness(
+  color: Color(0xFFF2E7EE),
+  darkColor: Color(0xFF523743),
+);
+const drawingToolbarAccent = CupertinoDynamicColor.withBrightness(
+  color: Color(0xFF7040AB),
+  darkColor: Color(0xFFE0C2FF),
+);
+const drawingToolbarEditingColor = CupertinoDynamicColor.withBrightness(
+  color: Color(0xFF187564),
+  darkColor: Color(0xFFA9E8D1),
+);
+const drawingToolbarPaint = CupertinoDynamicColor.withBrightness(
+  color: Color(0xFFA84924),
+  darkColor: Color(0xFFFFB48D),
+);
+const _drawingToolbarForeground = CupertinoDynamicColor.withBrightness(
+  color: Color(0xFF392633),
+  darkColor: Color(0xFFFFF0EF),
+);
+const _drawingToolbarLine = CupertinoDynamicColor.withBrightness(
+  color: Color(0xFFDAC7D4),
+  darkColor: Color(0xFF634756),
+);
+
+/// Capsules in a wide toolbar and an integrated Back row over the shapes.
+const drawingToolbarStyle = SmartContextMenuStyle(
+  menuColor: drawingToolbarSurface,
+  borderColor: _drawingToolbarLine,
+  borderRadius: BorderRadius.all(Radius.circular(20)),
+  menuShadows: [
+    BoxShadow(
+      color: CupertinoDynamicColor.withBrightness(
+        color: Color(0x30432A3B),
+        darkColor: Color(0x66210D1B),
+      ),
+      blurRadius: 26,
+      offset: Offset(0, 7),
+    ),
+  ],
+  backgroundColor: CupertinoDynamicColor.withBrightness(
+    color: Color(0x2669495E),
+    darkColor: Color(0x66301E2A),
+  ),
+  backgroundBlur: SmartContextMenuBlur.small,
+  titleStyle: TextStyle(fontSize: 14, color: _drawingToolbarForeground),
+  defaultIconSize: 16,
+  highlightColor: CupertinoDynamicColor.withBrightness(
+    color: Color(0x1F7040AB),
+    darkColor: Color(0x1FE0C2FF),
+  ),
+  dividerColor: _drawingToolbarLine,
+  dividerIndent: 8,
+  dividerEndIndent: 8,
+  itemPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 13),
+  backButtonStyle: SmartContextMenuBackButtonStyle(
+    blur: null,
+    foregroundColor: _drawingToolbarForeground,
+    titleStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+  ),
+  rowStyle: SmartContextMenuRowStyle(
+    padding: EdgeInsets.all(4),
+    smallItemPadding: EdgeInsets.zero,
+    mediumItemPadding: EdgeInsets.zero,
+  ),
+);

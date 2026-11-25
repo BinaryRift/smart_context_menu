@@ -6,6 +6,7 @@ import '../../../core/data/demo_loader.dart';
 import '../../../core/ui/demo_card.dart';
 import '../../settings/ui/widgets/settings_button.dart';
 import '../domain/appearance_items.dart';
+import '../domain/row_theme_items.dart';
 import '../domain/theme_items.dart';
 import 'appearance_styles.dart';
 import 'theme_styles.dart';
@@ -28,11 +29,17 @@ final class _AppearancePageState extends State<AppearancePage> {
   final _statusLoader = DemoLoader()..failEveryOther = true;
   final _tagColor = ValueNotifier<Color>(CupertinoColors.systemBlue);
   final _rowTagColor = ValueNotifier<Color>(CupertinoColors.systemBlue);
+  final _formatting = ValueNotifier<Set<String>>({'Bold'});
+  final _alignment = ValueNotifier('Align Left');
+  final _drawingTool = ValueNotifier('Brush');
 
   @override
   void dispose() {
     _tagColor.dispose();
     _rowTagColor.dispose();
+    _formatting.dispose();
+    _alignment.dispose();
+    _drawingTool.dispose();
     super.dispose();
   }
 
@@ -179,35 +186,19 @@ final class _AppearancePageState extends State<AppearancePage> {
               items: glowItems(),
             ),
             _buildPreset(
-              title: 'Indigo',
-              subtitle: 'Brand colors, a row on top, dividers',
-              config: (app) => app.copyWith(style: indigoStyle),
-              items: themeRowItems(),
+              title: 'Editing rows',
+              subtitle: 'Formatting, alignment and clipboard actions',
+              config: (app) => app.copyWith(style: editingRowsStyle),
+              items: editingRowsItems(_formatting, _alignment),
             ),
             _buildPreset(
-              title: 'Terminal',
-              subtitle: 'A monospaced font, a glowing frame',
-              config: (app) => app.copyWith(style: terminalStyle),
-              items: terminalItems(),
-            ),
-            _buildPreset(
-              title: 'Tiny',
-              subtitle: 'Small cells, tight items, a narrow menu',
-              config: (app) =>
-                  app.copyWith(menuWidth: tinyMenuWidth, style: tinyStyle),
-              items: tinyItems(),
-            ),
-            _buildPreset(
-              title: 'Colorful',
-              subtitle: 'Icons in colored squares, as in Settings',
-              config: (app) => app.copyWith(style: colorfulStyle),
-              items: colorfulItems(),
-            ),
-            _buildPreset(
-              title: 'Paper',
-              subtitle: 'A serif font, warm colors, a row on top',
-              config: (app) => app.copyWith(style: paperStyle),
-              items: themeRowItems(),
+              title: 'Drawing toolbar',
+              subtitle: 'Color-coded tools and a Shapes submenu',
+              config: (app) => app.copyWith(
+                menuWidth: wideRowMenuWidth,
+                style: drawingToolbarStyle,
+              ),
+              items: drawingToolbarItems(_drawingTool),
             ),
           ],
         ),

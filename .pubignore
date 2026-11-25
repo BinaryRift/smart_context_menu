@@ -4,7 +4,7 @@
 # The media of the README, linked from GitHub, stay out of the package,
 # except the files listed in `screenshots` of pubspec.yaml.
 doc/gifs/*
-!doc/gifs/carousel_cover.png
+!doc/gifs/carousel_cover.webp
 !doc/gifs/appearance.png
 !doc/gifs/open_and_select_themes.gif
 !doc/gifs/rows.png

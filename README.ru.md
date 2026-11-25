@@ -9,7 +9,14 @@
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![live demo](https://img.shields.io/badge/demo-live-8b5cf6)](https://thenothingworks.dev/demo/smart-context-menu/)
 
-Правый клик на компьютере, долгое нажатие на телефоне, тап по вашей кнопке — и один виджет даёт Flutter-приложению контекстное меню, которое выглядит и двигается как в iOS. В пункты и над превью можно положить свои виджеты (например, панель реакций), без сторонних зависимостей у пакета. Собирайте меню как удобно: простой список пунктов, компактный ряд самых частых действий или сложная смесь рядов, динамических подменю и живых пунктов. Стиль iOS не по душе? [Сделайте свой](#внешний-вид): меняйте цвета, формы, размытие, пункты и не только, а приятные анимации останутся.
+Правый клик на компьютере, долгое нажатие на телефоне, тап по вашей кнопке — и один виджет даёт Flutter-приложению контекстное меню, которое выглядит и двигается как в iOS. 
+
+В пункты и над превью можно положить свои виджеты (например, панель реакций), без сторонних зависимостей у пакета. 
+
+Собирайте меню как удобно: простой список пунктов, компактный ряд самых частых действий или сложная смесь рядов, динамических подменю и живых пунктов. 
+
+Стиль iOS не по душе? [Сделайте свой](#внешний-вид): меняйте цвета, формы, размытие, пункты и не только, а приятные анимации останутся.
+
 Нужен Flutter 3.32 или новее (Dart 3.8). **[Начать →](#начало-работы)**
 
 <img src="doc/gifs/open_and_select_themes.gif" width="600" alt="В светлой теме открывается меню файла, в тёмной — меню сообщения с панелью реакций; палец проводит по пунктам обоих меню, в меню файла — от ряда вниз по списку">
@@ -18,7 +25,9 @@
 
 <br>
 
-**[Попробовать демо в браузере →](https://thenothingworks.dev/demo/smart-context-menu/)** **[Посмотреть 90-секундный обзор →](https://youtube.com/shorts/NIzPK4mWpc8?feature=share)**
+**[Попробовать демо в браузере →](https://thenothingworks.dev/demo/smart-context-menu/)** 
+
+**[Посмотреть 90-секундный обзор →](https://youtube.com/shorts/8x6S-AkH4R8)**
 
 ## Возможности
 
@@ -148,6 +157,8 @@
 - полный контроль над поведением: ширина и высота меню, отступы до виджета и краёв экрана,
   haptics, закрытие по тапу снаружи или свайпом назад.
 
+[↑ К содержанию](#содержание)
+
 ## Начало работы
 
 Добавьте пакет:
@@ -160,7 +171,7 @@ flutter pub add smart_context_menu
 
 ```yaml
 dependencies:
-  smart_context_menu: ^1.0.4
+  smart_context_menu: ^1.1.0
 ```
 
 Импортируйте его:
@@ -217,6 +228,8 @@ SmartContextMenu(
   компилируется; в release всё плавно сразу. Симулятор iOS запускает только debug, поэтому
   плавность лучше смотреть на устройстве или в release-сборке на macOS.
 
+[↑ К содержанию](#содержание)
+
 ## Использование
 
 Оберните виджет в `SmartContextMenu` и передайте пункты, как в [Начале работы](#начало-работы).
@@ -256,6 +269,8 @@ SmartContextMenu(
 | `fadeHeaderSlivers` | Плавно ли контент над виджетом появляется и исчезает вместе с меню, по умолчанию `true`. |
 | `headerSliversDelay` | Задержка появления контента над виджетом, по умолчанию без задержки. |
 
+[↑ К содержанию](#содержание)
+
 ### Позиционирование
 
 <img src="doc/gifs/positioning.png" width="600" alt="Меню, выровненные по левому краю, по центру и по правому краю файла, и строка файла, поднятая ровно под своё подменю, в тёмной теме">
@@ -288,6 +303,8 @@ SmartContextMenu(
 Положение виджета и его снимок фиксируются в момент открытия. Если размер экрана меняется
 при открытом меню, например при повороте устройства или изменении размера окна, меню
 закрывается без действия — так же ведёт себя системное меню в iOS.
+
+[↑ К содержанию](#содержание)
 
 ### Виды пунктов
 
@@ -343,13 +360,15 @@ SmartContextMenu(
 вместе с подменю. Ошибки не кешируются: пункт загрузится заново, когда снова появится,
 например после возврата из подменю, а подменю — когда его снова откроют.
 
+[↑ К содержанию](#содержание)
+
 #### Подменю
 
 <img src="doc/gifs/submenu.gif" width="300" alt="Share открывает подменю с асинхронным подменю внутри, пункт «Назад» и свайп вправо возвращают назад, в тёмной теме">
 
 *В тёмной теме: Share — подменю, а Messages внутри него подгружается при открытии. Вернуться
 можно пунктом «Назад» или свайпом вправо. [Код в
-примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/files/ui/files_page.dart#L197-L235).*
+примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/files/ui/files_page.dart#L187-L225).*
 
 ```dart
 SmartContextMenuItem.submenu(
@@ -370,12 +389,14 @@ SmartContextMenuItem.submenu(
 Подменю едет за пальцем и возвращается на место, если свайп короткий.
 Чтобы отключить свайп, задайте `enableSwipeBack: false` в `SmartContextMenuConfig`.
 
+[↑ К содержанию](#содержание)
+
 #### Подменю с асинхронной загрузкой
 
 <img src="doc/gifs/async_submenu.gif" width="300" alt="Move to показывает индикатор загрузки, затем список папок, папка файла неактивна, в светлой теме">
 
 *В светлой теме: Move to загружает папки при открытии; Work — папка этого файла, поэтому она
-неактивна. [Код в примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/files/ui/files_page.dart#L237-L255).*
+неактивна. [Код в примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/files/ui/files_page.dart#L227-L245).*
 
 Пункты загружаются при открытии подменю и кешируются до закрытия меню. Во время загрузки
 посередине подменю крутится индикатор; чтобы вместо него была строка с текстом, передайте
@@ -402,12 +423,14 @@ SmartContextMenuItem.asyncSubmenu(
 )
 ```
 
+[↑ К содержанию](#содержание)
+
 #### Подменю с пагинацией
 
 <img src="doc/gifs/paginated_submenu.gif" width="300" alt="Подменю Reactions загружает первую страницу людей, а следующую — когда список докручен до конца, в светлой теме">
 
 *В светлой теме: Reactions загружает первую страницу людей при открытии, а следующую — когда
-список докрутили до конца. [Код в примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/chat/ui/chat_page.dart#L290-L321).*
+список докрутили до конца. [Код в примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/chat/ui/chat_page.dart#L296-L327).*
 
 Первая страница загружается с `initialMetadata`. Последний пункт каждой страницы — обычный
 пункт, разделитель или [ряд](#ряд) — несёт в `pagingMetadata` метаданные следующей страницы,
@@ -442,6 +465,8 @@ SmartContextMenuItem.pagingSubmenu(
 Для API с курсорами у `SmartContextMenuPagingMetadata` есть `nextCursor`, а для своих
 параметров — `extra`.
 
+[↑ К содержанию](#содержание)
+
 #### Асинхронный пункт
 
 <img src="doc/gifs/async_item.gif" width="300" alt="Seen by загружается в открытом меню сообщения и превращается в обычное подменю со списком тех, кто его видел, в светлой теме">
@@ -449,7 +474,7 @@ SmartContextMenuItem.pagingSubmenu(
 *В светлой теме: Seen by — асинхронный пункт, загрузчик которого возвращает обычное подменю. В
 отличие от подменю с асинхронной загрузкой, он грузится сразу при открытии меню, ещё до тапа,
 поэтому счётчик виден сразу; после возврата загруженный пункт остаётся. [Код в
-примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/chat/ui/chat_page.dart#L323-L347).*
+примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/chat/ui/chat_page.dart#L329-L353).*
 
 Заглушка начинает загрузку, как только появляется на экране. Пока идёт загрузка, она
 показывает `loading` — по умолчанию `SmartContextMenuItem.loading` со стандартной подписью.
@@ -496,13 +521,15 @@ SmartContextMenuItem.async(
 )
 ```
 
+[↑ К содержанию](#содержание)
+
 #### Пункт на Listenable
 
 <img src="doc/gifs/listenable_item.gif" width="300" alt="Download превращается в растущий прогресс прямо в открытом меню, а затем в Remove Download, в тёмной теме">
 
 *В тёмной теме: после тапа Download показывает прогресс прямо в открытом меню, а когда загрузка
 заканчивается, превращается в Remove Download. [Код в
-примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/files/ui/files_page.dart#L279-L307).*
+примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/files/ui/files_page.dart#L269-L297).*
 
 Подходит, когда состояние пункта хранится в приложении и может поменяться, пока меню
 открыто: переключатель, после которого меню не закрывается, счётчик или уже запущенное
@@ -579,6 +606,8 @@ final class StreamListenable extends ChangeNotifier {
 
 Создавайте такой адаптер рядом с состоянием, которое он слушает, и там же вызывайте `dispose`.
 
+[↑ К содержанию](#содержание)
+
 #### Загрузка
 
 Пункт `loading` показывает `title` (по умолчанию стандартную подпись загрузки) с `leading`
@@ -626,12 +655,14 @@ SmartContextMenuItem.listenable(
 )
 ```
 
+[↑ К содержанию](#содержание)
+
 #### Ошибка
 
 <img src="doc/gifs/error_and_empty.gif" width="300" alt="Shared files не загружается, тап повторяет загрузку и показывает файлы, а в Archive пусто, в тёмной теме">
 
 *В тёмной теме: Shared files не загрузился, и тап по строке загружает его заново; в Archive
-пусто. [Код в примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/lab/domain/lab_items.dart#L131-L186).*
+пусто. [Код в примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/lab/domain/lab_items.dart#L132-L187).*
 
 Пункт `error` показывает, что загрузка не удалась: `title` (по умолчанию стандартная подпись
 ошибки) со значком ошибки. Если это `error` асинхронного пункта или подменю, тап повторяет
@@ -662,6 +693,8 @@ SmartContextMenuItem.asyncSubmenu(
 например нет прав доступа, перехватите её и верните пункт сами: `error`, который не нажимается,
 или обычный пункт со своим действием.
 
+[↑ К содержанию](#содержание)
+
 #### Пустое состояние
 
 GIF в разделе [Ошибка](#ошибка) заканчивается подменю Archive, в котором нет пунктов.
@@ -680,6 +713,8 @@ SmartContextMenuItem.asyncSubmenu(
   asyncChildren: () => loadArchive(),
 )
 ```
+
+[↑ К содержанию](#содержание)
 
 #### Разделитель
 
@@ -720,13 +755,15 @@ SmartContextMenuItem.asyncSubmenu(
 `separatorColor` — цвет `dividerColor`. Линии между всеми пунктами описаны в разделе
 [Линии между пунктами](#линии-между-пунктами).
 
+[↑ К содержанию](#содержание)
+
 #### Ряд
 
 <img src="doc/gifs/rows.png" width="800" alt="Меню Quick actions, Only rows и Wide row из примера и подменю Shapes меню Wide row, сверху в светлой теме, снизу в тёмной">
 
 *Меню из примера в светлой и тёмной темах: ряд над списком, меню только из рядов, семь
 инструментов в широком меню и его подменю Shapes из одного ряда. [Код в
-примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/domain/appearance_items.dart#L148-L344).*
+примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/domain/appearance_items.dart#L147-L366).*
 
 Ряд ставит самые частые действия рядом, как компактные меню iOS. Его ячейки — пункты других
 видов: действия, подменю, асинхронные пункты и пункты на `Listenable`, загрузка, ошибка, пустое
@@ -869,6 +906,8 @@ Drag-to-select работает по ячейкам так же, как по д�
 Ячейки должны быть достаточно широкими для пальца, см.
 [Рекомендации по дизайну](#рекомендации-по-дизайну).
 
+[↑ К содержанию](#содержание)
+
 ### Открытие из кода
 
 Кнопка внутри виджета открывает меню через `SmartContextMenu.of(context)`. Он возвращает
@@ -924,12 +963,14 @@ GestureDetector(
 закрытия. Созданный вами контроллер не забудьте освободить через `dispose`, когда он больше
 не нужен; свой контроллер меню освобождает само.
 
+[↑ К содержанию](#содержание)
+
 ### Контент над виджетом
 
 <img src="doc/gifs/header_slivers.gif" width="300" alt="Панель реакций над фото в чате, в тёмной теме">
 
 *В тёмной теме: панель реакций над сообщением; тап по реакции закрывает меню. [Код в
-примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/chat/ui/chat_page.dart#L216-L241).*
+примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/chat/ui/chat_page.dart#L222-L247).*
 
 Чтобы показать свой контент над виджетом, пока меню открыто, передайте `headerSliversBuilder`.
 Он возвращает список слайверов: они плавно появляются и исчезают вместе с меню и двигаются
@@ -1016,12 +1057,14 @@ SmartContextMenu(
 )
 ```
 
+[↑ К содержанию](#содержание)
+
 ### Hero
 
 <img src="doc/gifs/hero.gif" width="300" alt="Тап по превью открывает фото на весь экран с его собственным Hero, в светлой теме">
 
 *В светлой теме: двойной тап рядом с фото открывает меню из кода, а тап по превью открывает
-фото с его собственным `Hero`. [Код в примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/chat/ui/chat_page.dart#L149-L214).*
+фото с его собственным `Hero`. [Код в примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/chat/ui/chat_page.dart#L155-L220).*
 
 У виджета может быть свой `Hero`, например у фото в чате, которое открывается на весь экран.
 Меню тоже анимирует превью через `Hero`, но не оборачивает в него ваш виджет: оно добавляет
@@ -1046,6 +1089,8 @@ SmartContextMenu(
 ```
 
 Здесь `openPhoto` открывает страницу с `Hero` с тем же тегом.
+
+[↑ К содержанию](#содержание)
 
 ### Настройки
 
@@ -1073,6 +1118,8 @@ const menuConfig = SmartContextMenuConfig(
 | `moveBackDown` | Возвращать виджет вниз, когда меню становится короче. | `false` |
 | `labels` | Тексты, которые меню показывает само, см. [Локализация](#локализация). | английские |
 | `style` | Внешний вид меню, см. [Внешний вид](#внешний-вид). | |
+
+[↑ К содержанию](#содержание)
 
 #### Тема и конфиг
 
@@ -1143,6 +1190,8 @@ SmartContextMenu(
 `SmartContextMenuTheme.of(context)` читает тему выше `context`. Если тема создаётся в том же
 методе `build`, оберните меню в `Builder`, иначе вы получите внешнюю тему.
 
+[↑ К содержанию](#содержание)
+
 #### Локализация
 
 Некоторые тексты меню показывает само: пункт «Назад», подпись повтора и тексты загрузки,
@@ -1168,6 +1217,8 @@ SmartContextMenuConfig(
 
 Ячейки [ряда](#ряд) узкие, поэтому у загрузки, ошибки и пустого состояния в них свои короткие
 подписи: `rowLoading`, `rowError`, `rowRetry` и `rowEmpty`.
+
+[↑ К содержанию](#содержание)
 
 #### Приложения на `cupertino_ui`
 
@@ -1206,6 +1257,8 @@ builder: (context, child) => CupertinoUiCompatibilityBridge(
 Мост помечен устаревшим как временный инструмент миграции, поэтому анализатор сообщает о его
 использовании. В версии 2.0.0 пакет переходит на `cupertino_ui`, и мост станет не нужен.
 
+[↑ К содержанию](#содержание)
+
 ### Внешний вид
 
 <img src="doc/gifs/appearance.png" width="800" alt="Меню Brand, Solid, Custom content и Styled rows из примера, сверху в светлой теме, снизу в тёмной">
@@ -1213,12 +1266,14 @@ builder: (context, child) => CupertinoUiCompatibilityBridge(
 *Четыре стиля из примера в светлой и тёмной темах: фирменные цвета и только затемнение за меню,
 непрозрачное меню, пункты со своим контентом и ряды в своём стиле с бейджем и выбором цвета.*
 
-<img src="doc/gifs/themes.png" width="610" alt="Меню Indigo, Terminal, Tiny, Colorful, Paper и Glow из раздела Themes примера">
+<img src="doc/gifs/themes.png" width="800" alt="Восемь меню с чередованием светлой и тёмной тем. Сверху Terminal, Tiny, Glow и Editing rows. Снизу Paper, Colorful, Indigo и Drawing toolbar.">
 
-*Один пакет — шесть приложений: фирменный индиго с рядом сверху, терминал с моноширинным шрифтом,
-крошечное меню из маленьких ячеек, иконки в цветных квадратах как в Настройках, тёплая бумага
-со шрифтом с засечками и только текст на стекле с бирюзовым свечением. Каждая тема — это `SmartContextMenuStyle`
-и её пункты. [Код в примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/ui/theme_styles.dart).*
+*Восемь пресетов из примера с чередованием светлой и тёмной тем. Сверху Terminal
+с моноширинным шрифтом, компактное меню Tiny, Glow с бирюзовым свечением и Editing rows
+с командами форматирования и буфера обмена. Снизу Paper со шрифтом с засечками, Colorful
+с иконками в цветных квадратах, Indigo с рядом быстрых действий и Drawing toolbar
+с семью инструментами. [Код в
+примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/ui/theme_styles.dart).*
 
 Внешний вид меню задаёт `SmartContextMenuStyle` — поле `style` в конфиге.
 У пункта «Назад», пунктов загрузки, ошибки и пустого состояния и у рядов в нём свои части:
@@ -1263,6 +1318,8 @@ const style = SmartContextMenuStyle(
 Пункт «Назад» не копирует градиент, а показывает меню за собой. Если прокручиваемые пункты
 проступают слишком сильно, задайте декорации полупрозрачный цвет. Её радиус определяет обрезку;
 `borderRadius` из `backButtonStyle` действует только без `decoration`.
+
+[↑ К содержанию](#содержание)
 
 #### Стиль пунктов
 
@@ -1333,6 +1390,8 @@ SmartContextMenuItem.simple(
 под светлую и тёмную тему. Обычный `Color` в обеих темах одинаковый. Стандартные значения
 лежат в `SmartContextMenuDefaults`.
 
+[↑ К содержанию](#содержание)
+
 #### Линии между пунктами
 
 <img src="doc/gifs/dividers.png" width="300" alt="Меню с тонкими линиями между пунктами, которые начинаются под текстом, в тёмной теме">
@@ -1356,6 +1415,8 @@ const style = SmartContextMenuStyle(
 ```
 
 Чтобы поделить пункты на группы, используйте [разделитель](#разделитель).
+
+[↑ К содержанию](#содержание)
 
 #### Стиль пункта «Назад»
 
@@ -1387,6 +1448,8 @@ const style = SmartContextMenuStyle(
 Старые имена работают до 2.0.0 и помечены как устаревшие; передавайте либо `backButtonStyle`,
 либо старые имена, но не всё вместе.
 
+[↑ К содержанию](#содержание)
+
 #### Стиль состояний
 
 `SmartContextMenuStatusStyle`, поле `statusStyle` стиля, задаёт вид пунктов
@@ -1405,7 +1468,7 @@ const style = SmartContextMenuStyle(
 Свой `trailing` пункта заменяет его иконку или индикатор. Подберите `loadingIndicator` под
 высоту строки. Меню Status items в примере ставит текст в начало строки, а индикатор и иконки
 берёт другие ([код в
-примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/ui/appearance_styles.dart#L64-L78)):
+примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/ui/appearance_styles.dart#L61-L78)):
 
 ```dart
 const style = SmartContextMenuStyle(
@@ -1429,6 +1492,8 @@ const style = SmartContextMenuStyle(
 работают до 2.0.0 и помечены как устаревшие; передавайте либо `statusStyle`, либо старые имена,
 но не всё вместе.
 
+[↑ К содержанию](#содержание)
+
 #### Стиль рядов
 
 `SmartContextMenuRowStyle`, поле `rowStyle` стиля, задаёт вид всех [рядов](#ряд):
@@ -1447,7 +1512,7 @@ const style = SmartContextMenuStyle(
 Свои `padding` и `childrenGap` ряда, а также `padding` и `childrenGap` пункта в ячейке важнее
 стиля. Цвета, значки, `titleMaxLines`, разделители и линии рядов берутся из стиля меню. Меню
 Styled rows из примера задаёт подписи пожирнее, промежутки между ячейками и линии, которые
-не доходят до краёв ([код в примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/ui/appearance_styles.dart#L82-L87)):
+не доходят до краёв ([код в примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/ui/appearance_styles.dart#L80-L87)):
 
 ```dart
 const style = SmartContextMenuStyle(
@@ -1461,6 +1526,8 @@ const style = SmartContextMenuStyle(
   ),
 );
 ```
+
+[↑ К содержанию](#содержание)
 
 #### Свой контент в пункте
 
@@ -1489,7 +1556,7 @@ SmartContextMenuItem.simple(
 только встроенное содержимое: своё выравнивайте сами. В маленькой ячейке ещё и подпишите его
 через `Semantics` — встроенное содержимое подписано `title`. Например, значок с бейджем, как
 Inbox в меню Styled rows из примера ([код в
-примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/domain/appearance_items.dart#L251-L313)):
+примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/domain/appearance_items.dart#L263-L327)):
 
 ```dart
 SmartContextMenuItem.simple(
@@ -1538,6 +1605,8 @@ SmartContextMenuItem.simple(
 )
 ```
 
+[↑ К содержанию](#содержание)
+
 ### Рекомендации по дизайну
 
 Значения по умолчанию повторяют меню iOS, например ширину меню 250. Кое-что остаётся
@@ -1556,13 +1625,15 @@ SmartContextMenuItem.simple(
 - **Самые частые действия — первыми.** Ряд в начале меню держит их под рукой, а остальные
   действия остаются в списке ниже.
 
+[↑ К содержанию](#содержание)
+
 ## Анимации
 
 <img src="doc/gifs/liquid_stretch.gif" width="400" alt="Крупный план меню сообщения в чате: меню тянется к пальцу, а сообщение и панель реакций плывут следом, в светлой теме">
 
 *В светлой теме, крупным планом: палец скользит по пунктам и за края меню, меню тянется
 к нему, а сообщение и панель реакций плывут следом. [Код в
-примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/chat/ui/chat_page.dart#L149-L214).*
+примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/chat/ui/chat_page.dart#L155-L220).*
 
 Меню и превью двигаются как одно целое. Ничего не появляется, не меняет размер
 и не сдвигается без анимации, а пока палец на меню, оба отзываются на каждое его движение.
@@ -1588,13 +1659,15 @@ SmartContextMenuItem.simple(
 
 *В тёмной теме: Backup.zip внизу экрана, поэтому он вместе с меню плавно поднимается ровно
 настолько, чтобы меню поместилось; Share и пункт «Назад» плавно меняют высоту меню. [Код в
-примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/files/ui/files_page.dart#L152-L169).*
+примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/files/ui/files_page.dart#L139-L152).*
 
 <img src="doc/gifs/swipe_back.gif" width="300" alt="Подменю Messages идёт за пальцем при свайпе вправо, а высота меню плавно перетекает к Share, в светлой теме">
 
 *В светлой теме: медленный свайп вправо из Messages тянет подменю за пальцем, а высота меню
 перетекает к Share; после короткого свайпа Messages возвращается на место, а длинный
-завершается сам. [Код в примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/files/ui/files_page.dart#L197-L235).*
+завершается сам. [Код в примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/files/ui/files_page.dart#L187-L225).*
+
+[↑ К содержанию](#содержание)
 
 ## В планах
 
@@ -1608,6 +1681,8 @@ SmartContextMenuItem.simple(
 
 `listenableSubmenu` — новый вид пункта, поэтому в `switch` по пунктам оставляйте ветку `_`, см.
 [Виды пунктов](#виды-пунктов).
+
+[↑ К содержанию](#содержание)
 
 ## Дополнительно
 
@@ -1627,3 +1702,5 @@ SmartContextMenuItem.simple(
 Лицензия — [MIT](LICENSE).
 
 Сделано в [The NothingWorks](https://thenothingworks.dev).
+
+[↑ К содержанию](#содержание)

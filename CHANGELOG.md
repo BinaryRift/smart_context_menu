@@ -1,4 +1,4 @@
-## 1.1.0 (unreleased)
+## 1.1.0
 
 * `SmartContextMenuItem.row` shows items side by side as compact cells in one line, as in the
   compact menus of iOS. The cells are items of the other types and keep their actions, states
