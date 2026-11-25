@@ -144,11 +144,45 @@ void main() {
     expect(find.text('Copy'), findsOneWidget);
   });
 
-  testWidgets('manual activation of the theme requires a controller', (
+  testWidgets('manual activation of the theme turns off the long press', (
     tester,
   ) async {
     await tester.pumpWidget(buildApp(theme: manualConfig));
 
-    expect(tester.takeException(), isAssertionError);
+    await tester.openMenu();
+
+    expect(find.text('Copy'), findsNothing);
+  });
+
+  // CupertinoUiCompatibilityBridge of cupertino_ui puts a CupertinoTheme
+  // of flutter/cupertino.dart in the app builder like this.
+  group('with a CupertinoTheme', () {
+    const darkTheme = CupertinoThemeData(brightness: Brightness.dark);
+    final darkTitle = SmartContextMenuDefaults.foregroundColor.darkColor;
+    final lightTitle = SmartContextMenuDefaults.foregroundColor.color;
+
+    testWidgets('in the app builder takes its brightness', (tester) async {
+      await tester.pumpWidget(
+        CupertinoApp(
+          builder: (context, child) =>
+              CupertinoTheme(data: darkTheme, child: child!),
+          home: buildMenu(),
+        ),
+      );
+      await tester.openMenu();
+
+      expect(titleColor(tester), isSameColorAs(darkTitle));
+    });
+
+    testWidgets('around the widget does not reach the menu', (tester) async {
+      await tester.pumpWidget(
+        CupertinoApp(
+          home: CupertinoTheme(data: darkTheme, child: buildMenu()),
+        ),
+      );
+      await tester.openMenu();
+
+      expect(titleColor(tester), isSameColorAs(lightTitle));
+    });
   });
 }

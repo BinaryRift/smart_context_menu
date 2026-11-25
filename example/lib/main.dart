@@ -1,5 +1,7 @@
 // ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/services.dart' show BrowserContextMenu;
 import 'package:smart_context_menu/smart_context_menu.dart';
 
 import 'core/settings/example_settings.dart';
@@ -9,7 +11,11 @@ import 'core/ui/touch_indicator.dart';
 import 'pages/tabs/ui/tabs_page.dart';
 import 'resources/app_theme/menu_config.dart';
 
-void main() => runApp(const ExampleApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  if (kIsWeb) await BrowserContextMenu.disableContextMenu();
+  runApp(const ExampleApp());
+}
 
 final class ExampleApp extends StatefulWidget {
   const ExampleApp({super.key});

@@ -390,7 +390,7 @@
   <aside class="about about-left">
     <div class="about-content">
       <section>
-        <h1>smart_context_menu <span class="version">1.0.4</span></h1>
+        <h1>smart_context_menu <span class="version">1.1.0</span></h1>
         <p class="lead" data-i18n="lead">
           A powerful, fully customizable iOS-style context menu for Flutter:
           smart positioning, fluid animations, drag-to-select, rich submenus
@@ -402,6 +402,7 @@
           <li data-i18n="featureSubmenus">Async and paginated submenus</li>
           <li data-i18n="featureStates">Loading, error with retry and empty states</li>
           <li data-i18n="featureListenable">Listenable items that update in the open menu</li>
+          <li data-i18n="featureRows">Compact rows of actions, as in iOS</li>
         </ul>
       </section>
       <section>
@@ -425,7 +426,7 @@
         <p class="or"><span data-i18n="orIn">or in</span> <code class="inline">pubspec.yaml</code>:</p>
         <div class="command multiline">
           <code>dependencies:
-  smart_context_menu: ^1.0.4</code>
+  smart_context_menu: ^1.1.0</code>
           <button class="copy" type="button" title="Copy" aria-label="Copy" data-i18n-title="copy">
             <svg class="idle" width="16" height="16" viewBox="0 0 24 24"
               fill="none" stroke="currentColor" stroke-width="2"
@@ -460,7 +461,7 @@
 
       <h3 data-i18n="everywhere">Everywhere</h3>
       <ul>
-        <li data-i18n="hintLongPress">Long press any file, message or card to open its menu.</li>
+        <li data-i18n="hintLongPress">Long press or right-click any file, message or card to open its menu.</li>
         <li data-i18n="hintSelect">Slide across the items and release on one.</li>
         <li data-i18n="hintStretch">Slide slowly past the edges: the menu stretches towards the finger.</li>
         <li data-i18n="hintSwipe">Swipe right in a submenu to go back, as in iOS.</li>
@@ -469,6 +470,7 @@
 
       <h3>Files</h3>
       <ul>
+        <li data-i18n="hintRow">Open, Share and Rename sit in one row: slide across them as across any items.</li>
         <li data-i18n="hintFilesButton">The ⋯ button in a row opens the same menu.</li>
         <li data-i18n="hintMoveTo">Move to loads the folders when it opens.</li>
         <li data-i18n="hintDownload">Tap Download: the progress shows in the open menu.</li>
@@ -504,6 +506,7 @@
       featureSubmenus: 'Асинхронные подменю и пагинация',
       featureStates: 'Загрузка, ошибки с повтором и пустые состояния',
       featureListenable: 'Пункты обновляются прямо в открытом меню',
+      featureRows: 'Компактные ряды действий, как в iOS',
       addToApp: 'Добавьте в приложение',
       orIn: 'или в',
       packageLink: 'Пакет на pub.dev',
@@ -511,11 +514,12 @@
       brand: 'Проект The NothingWorks',
       tryIt: 'Попробуйте',
       everywhere: 'Везде',
-      hintLongPress: 'Удерживайте файл, сообщение или карточку, чтобы открыть меню.',
+      hintLongPress: 'Удерживайте или нажмите правой кнопкой на файл, сообщение или карточку, чтобы открыть меню.',
       hintSelect: 'Проведите по пунктам и отпустите палец на нужном.',
       hintStretch: 'Медленно проведите за край меню: оно потянется за пальцем.',
       hintSwipe: 'Свайпните вправо в подменю, чтобы вернуться назад, как в iOS.',
       hintPreview: 'Нажмите превью, чтобы открыть файл или фото. Фото перейдёт на экран со своим Hero.',
+      hintRow: 'Open, Share и Rename стоят в одном ряду: проведите по ним, как по любым пунктам.',
       hintFilesButton: 'Кнопка ⋯ в строке открывает то же меню.',
       hintMoveTo: 'Пункт Move to загружает папки при открытии.',
       hintDownload: 'Нажмите Download: прогресс появится прямо в открытом меню.',

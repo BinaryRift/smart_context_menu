@@ -1,3 +1,5 @@
+import 'dart:ui' show PointerDeviceKind;
+
 // ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -42,6 +44,30 @@ void main() {
 
       expect(taps, 1);
       expect(find.text('Copy'), findsOneWidget);
+    });
+
+    testWidgets('a quick tap on another item taps only that item', (
+      tester,
+    ) async {
+      final taps = <String>[];
+      await tester.pumpMenu(
+        items: [
+          for (final title in ['Copy', 'Paste'])
+            SmartContextMenuItem.simple(
+              title: title,
+              closeOnTap: false,
+              onTap: () => taps.add(title),
+            ),
+        ],
+      );
+      await tester.openMenu();
+
+      await tester.tap(find.text('Copy'));
+      await tester.pump();
+      await tester.tap(find.text('Paste'));
+      await tester.pumpAndSettle();
+
+      expect(taps, ['Copy', 'Paste']);
     });
 
     testWidgets('does nothing on a disabled item', (tester) async {
@@ -200,6 +226,66 @@ void main() {
       expect(states['Copy']!.isPressed, isTrue);
 
       await tester.releaseOutside(gesture);
+      expect(states['Copy']!.isPressed, isFalse);
+    });
+
+    Future<TestGesture> mouseAt(WidgetTester tester, Finder target) async {
+      final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      await mouse.addPointer(location: Offset.zero);
+      addTearDown(mouse.removePointer);
+      await mouse.moveTo(tester.getCenter(target));
+      await tester.pump();
+      return mouse;
+    }
+
+    testWidgets('is hovered, not pressed, under a cursor', (tester) async {
+      await tester.pumpMenu(items: [item('Copy')]);
+      await tester.openMenu();
+      expect(states['Copy']!.isHovered, isFalse);
+
+      final mouse = await mouseAt(tester, find.text('Copy'));
+      expect(states['Copy']!.isHovered, isTrue);
+      expect(states['Copy']!.isPressed, isFalse);
+
+      await mouse.moveTo(const Offset(1, 1));
+      await tester.pump();
+      expect(states['Copy']!.isHovered, isFalse);
+    });
+
+    testWidgets('is hovered and pressed during a mouse press', (tester) async {
+      await tester.pumpMenu(items: [item('Copy')]);
+      await tester.openMenu();
+
+      final mouse = await mouseAt(tester, find.text('Copy'));
+      await mouse.down(tester.getCenter(find.text('Copy')));
+      await tester.pump();
+      expect(states['Copy']!.isHovered, isTrue);
+      expect(states['Copy']!.isPressed, isTrue);
+
+      await mouse.moveTo(const Offset(1, 1));
+      await tester.pump();
+      await mouse.up();
+      await tester.pumpAndSettle();
+      expect(states['Copy']!.isHovered, isFalse);
+      expect(states['Copy']!.isPressed, isFalse);
+    });
+
+    testWidgets('is not hovered under a finger', (tester) async {
+      await tester.pumpMenu(items: [item('Copy')]);
+      await tester.openMenu();
+
+      final gesture = await tester.pressAt(find.text('Copy'));
+      expect(states['Copy']!.isHovered, isFalse);
+
+      await tester.releaseOutside(gesture);
+    });
+
+    testWidgets('is never hovered on a disabled item', (tester) async {
+      await tester.pumpMenu(items: [item('Copy', isDisabled: true)]);
+      await tester.openMenu();
+
+      await mouseAt(tester, find.text('Copy'));
+      expect(states['Copy']!.isHovered, isFalse);
       expect(states['Copy']!.isPressed, isFalse);
     });
 

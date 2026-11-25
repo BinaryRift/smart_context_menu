@@ -4,7 +4,8 @@ part of '../smart_context_menu_item.dart';
 /// time [listenable] notifies.
 ///
 /// Create it with [SmartContextMenuItem.listenable].
-final class SmartContextMenuListenableItem extends SmartContextMenuItem {
+final class SmartContextMenuListenableItem extends SmartContextMenuItem
+    implements SmartContextMenuRowEntry {
   /// Notifies when the item of [builder] should be built again.
   final Listenable listenable;
 

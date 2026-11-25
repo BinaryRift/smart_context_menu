@@ -6,9 +6,13 @@ import '../../../core/data/demo_loader.dart';
 import '../../../core/ui/demo_card.dart';
 import '../../settings/ui/widgets/settings_button.dart';
 import '../domain/appearance_items.dart';
+import '../domain/row_theme_items.dart';
+import '../domain/theme_items.dart';
 import 'appearance_styles.dart';
+import 'theme_styles.dart';
 
-/// Cards with menus of different looks, one preset each.
+/// Cards with menus of different looks, one preset each: styles of the
+/// whole menu, rows of compact cells, then whole themes made of both.
 ///
 /// Every card has its own [SmartContextMenuTheme] built from the config of
 /// the app, so the settings of the app apply to all of them.
@@ -24,10 +28,18 @@ final class _AppearancePageState extends State<AppearancePage> {
   final _russianLoader = DemoLoader()..failEveryOther = true;
   final _statusLoader = DemoLoader()..failEveryOther = true;
   final _tagColor = ValueNotifier<Color>(CupertinoColors.systemBlue);
+  final _rowTagColor = ValueNotifier<Color>(CupertinoColors.systemBlue);
+  final _formatting = ValueNotifier<Set<String>>({'Bold'});
+  final _alignment = ValueNotifier('Align Left');
+  final _drawingTool = ValueNotifier('Brush');
 
   @override
   void dispose() {
     _tagColor.dispose();
+    _rowTagColor.dispose();
+    _formatting.dispose();
+    _alignment.dispose();
+    _drawingTool.dispose();
     super.dispose();
   }
 
@@ -43,6 +55,7 @@ final class _AppearancePageState extends State<AppearancePage> {
         child: ListView(
           padding: const EdgeInsets.symmetric(vertical: 8),
           children: [
+            _buildGroupHeader('Styles'),
             _buildPreset(
               title: 'Default',
               subtitle: 'The config of the app',
@@ -100,10 +113,111 @@ final class _AppearancePageState extends State<AppearancePage> {
             _buildPreset(
               title: 'Status items',
               subtitle: 'Own loading, error and empty signs',
-              config: (app) => app.copyWith(style: statusStyle),
+              config: (app) => app.copyWith(style: statusItemsStyle),
               items: statusItems(_statusLoader),
             ),
+            _buildGroupHeader('Rows'),
+            _buildPreset(
+              title: 'Quick actions',
+              subtitle: 'A row of medium cells above the list',
+              config: (app) => app,
+              items: quickActionItems(),
+            ),
+            _buildPreset(
+              title: 'Only rows',
+              subtitle: 'Small and medium cells, a separator',
+              config: (app) => app,
+              items: onlyRowItems(),
+            ),
+            _buildPreset(
+              title: 'Styled rows',
+              subtitle: 'Bold titles, gaps, dividers, a badge, colors',
+              config: (app) => app.copyWith(
+                style: app.style.copyWith(
+                  dividersBetweenItems: true,
+                  rowStyle: styledRowStyle,
+                ),
+              ),
+              items: styledRowItems(_rowTagColor),
+            ),
+            _buildPreset(
+              title: 'Wide row',
+              subtitle: 'Seven small cells in a wider menu',
+              config: (app) => app.copyWith(menuWidth: wideRowMenuWidth),
+              items: wideRowItems(),
+            ),
+            _buildGroupHeader('Themes'),
+            _buildPreset(
+              title: 'Indigo',
+              subtitle: 'Brand colors, a row on top, dividers',
+              config: (app) => app.copyWith(style: indigoStyle),
+              items: themeRowItems(),
+            ),
+            _buildPreset(
+              title: 'Terminal',
+              subtitle: 'A monospaced font, a glowing frame',
+              config: (app) => app.copyWith(style: terminalStyle),
+              items: terminalItems(),
+            ),
+            _buildPreset(
+              title: 'Tiny',
+              subtitle: 'Small cells, tight items, a narrow menu',
+              config: (app) =>
+                  app.copyWith(menuWidth: tinyMenuWidth, style: tinyStyle),
+              items: tinyItems(),
+            ),
+            _buildPreset(
+              title: 'Colorful',
+              subtitle: 'Icons in colored squares, as in Settings',
+              config: (app) => app.copyWith(style: colorfulStyle),
+              items: colorfulItems(),
+            ),
+            _buildPreset(
+              title: 'Paper',
+              subtitle: 'A serif font, warm colors, a row on top',
+              config: (app) => app.copyWith(style: paperStyle),
+              items: themeRowItems(),
+            ),
+            _buildPreset(
+              title: 'Glow',
+              subtitle: 'Text only, glass tinted cyan, a glow',
+              config: (app) =>
+                  app.copyWith(menuWidth: glowMenuWidth, style: glowStyle),
+              items: glowItems(),
+            ),
+            _buildPreset(
+              title: 'Editing rows',
+              subtitle: 'Formatting, alignment and clipboard actions',
+              config: (app) => app.copyWith(style: editingRowsStyle),
+              items: editingRowsItems(_formatting, _alignment),
+            ),
+            _buildPreset(
+              title: 'Drawing toolbar',
+              subtitle: 'Color-coded tools and a Shapes submenu',
+              config: (app) => app.copyWith(
+                menuWidth: wideRowMenuWidth,
+                style: drawingToolbarStyle,
+              ),
+              items: drawingToolbarItems(_drawingTool),
+            ),
           ],
+        ),
+      ),
+    );
+  }
+
+  /// The title of a group of cards, as in a grouped list of iOS.
+  Widget _buildGroupHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(36, 16, 36, 4),
+      child: Text(
+        title.toUpperCase(),
+        style: TextStyle(
+          fontSize: 13,
+          color: CupertinoDynamicColor.resolve(
+            CupertinoColors.secondaryLabel,
+            context,
+          ),
         ),
       ),
     );

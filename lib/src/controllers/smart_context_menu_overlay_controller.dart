@@ -97,11 +97,12 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
       case SmartContextMenuPagingSubmenuItem():
         _handleAsyncPagingStart(item);
       // Not tapped themselves: async and listenable items pass the item
-      // they show.
+      // they show, and a row passes its cells.
       case SmartContextMenuAsyncItem() ||
           SmartContextMenuListenableItem() ||
           SmartContextMenuStatusItem() ||
-          SmartContextMenuSeparatorItem():
+          SmartContextMenuSeparatorItem() ||
+          SmartContextMenuRowItem():
         break;
     }
   }
@@ -280,7 +281,8 @@ final class SmartContextMenuOverlayController extends ChangeNotifier {
     List<SmartContextMenuItem> page,
   ) => switch (page.lastOrNull) {
     SmartContextMenuSimpleItem(:final pagingMetadata) ||
-    SmartContextMenuSeparatorItem(:final pagingMetadata) => pagingMetadata,
+    SmartContextMenuSeparatorItem(:final pagingMetadata) ||
+    SmartContextMenuRowItem(:final pagingMetadata) => pagingMetadata,
     _ => null,
   };
 

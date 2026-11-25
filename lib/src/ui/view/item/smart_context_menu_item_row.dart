@@ -84,26 +84,50 @@ final class SmartContextMenuItemRow extends StatelessWidget {
             if (trailing case final trailing?) ...[gap, trailing],
             if (hasSubmenu) ...[
               gap,
-              Icon(
-                style.submenuIcon == SmartContextMenuDefaults.submenuIcon &&
-                        Directionality.of(context) == TextDirection.rtl
-                    ? CupertinoIcons.chevron_back
-                    : style.submenuIcon,
+              SmartContextMenuSubmenuIcon(
+                style: style,
                 size: style.defaultIconSize,
-                color: isDisabled
-                    ? CupertinoDynamicColor.resolve(
-                        style.disabledForegroundColor,
-                        context,
-                      )
-                    : CupertinoDynamicColor.maybeResolve(
-                        style.defaultIconColor,
-                        context,
-                      ),
+                isDisabled: isDisabled,
               ),
             ],
           ],
         ),
       ),
+    );
+  }
+}
+
+/// The icon of an item that opens a submenu, [SmartContextMenuStyle.submenuIcon].
+///
+/// The default icon points to the end of the line, so it is mirrored in
+/// RTL. It takes [SmartContextMenuStyle.defaultIconColor], or the color of
+/// the item if that is null, and is dimmed while the item is disabled.
+final class SmartContextMenuSubmenuIcon extends StatelessWidget {
+  final SmartContextMenuStyle style;
+  final double size;
+  final bool isDisabled;
+
+  const SmartContextMenuSubmenuIcon({
+    super.key,
+    required this.style,
+    required this.size,
+    required this.isDisabled,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Icon(
+      style.submenuIcon == SmartContextMenuDefaults.submenuIcon &&
+              Directionality.of(context) == TextDirection.rtl
+          ? CupertinoIcons.chevron_back
+          : style.submenuIcon,
+      size: size,
+      color: isDisabled
+          ? CupertinoDynamicColor.resolve(
+              style.disabledForegroundColor,
+              context,
+            )
+          : CupertinoDynamicColor.maybeResolve(style.defaultIconColor, context),
     );
   }
 }

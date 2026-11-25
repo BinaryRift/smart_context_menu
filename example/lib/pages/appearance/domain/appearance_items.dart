@@ -5,6 +5,8 @@ import 'package:smart_context_menu/smart_context_menu.dart';
 import '../../../core/data/demo_loader.dart';
 import '../../../core/ui/demo_notice.dart';
 import '../../../resources/app_theme/tint_colors.dart';
+import '../ui/appearance_styles.dart';
+import '../ui/widgets/count_badge.dart';
 import '../ui/widgets/tag_color_row.dart';
 
 /// The same items in most presets, so the difference in style is seen:
@@ -139,6 +141,227 @@ List<SmartContextMenuItem> statusItems(DemoLoader failingLoader) => [
       await Future<void>.delayed(demoLoadDelay);
       return [];
     },
+  ),
+];
+
+/// The most used actions as a row above the usual list.
+List<SmartContextMenuItem> quickActionItems() => [
+  SmartContextMenuItem.row(
+    children: [
+      _action('Copy', CupertinoIcons.doc_on_doc),
+      SmartContextMenuItem.submenu(
+        title: 'Share',
+        leading: const Icon(CupertinoIcons.share),
+        children: [
+          _action('Messages', CupertinoIcons.chat_bubble),
+          _action('Mail', CupertinoIcons.mail),
+        ],
+      ),
+      _action('Delete', CupertinoIcons.delete, isDestructive: true),
+    ],
+  ),
+  _action('Pin', CupertinoIcons.pin),
+  _action('Select', CupertinoIcons.checkmark_circle),
+  _action('Rename', CupertinoIcons.pencil),
+];
+
+typedef AppearanceAction = ({String title, IconData icon});
+
+const formattingActions = <AppearanceAction>[
+  (title: 'Bold', icon: CupertinoIcons.bold),
+  (title: 'Italic', icon: CupertinoIcons.italic),
+  (title: 'Underline', icon: CupertinoIcons.underline),
+  (title: 'Strikethrough', icon: CupertinoIcons.strikethrough),
+];
+
+const alignmentActions = <AppearanceAction>[
+  (title: 'Align Left', icon: CupertinoIcons.text_alignleft),
+  (title: 'Center', icon: CupertinoIcons.text_aligncenter),
+  (title: 'Align Right', icon: CupertinoIcons.text_alignright),
+  (title: 'Justify', icon: CupertinoIcons.text_justify),
+];
+
+const clipboardActions = <AppearanceAction>[
+  (title: 'Cut', icon: CupertinoIcons.scissors),
+  (title: 'Copy', icon: CupertinoIcons.doc_on_doc),
+  (title: 'Paste', icon: CupertinoIcons.doc_on_clipboard),
+];
+
+/// A menu of rows only: eight small cells in two rows, a separator and
+/// a row of medium cells.
+List<SmartContextMenuItem> onlyRowItems() => [
+  SmartContextMenuItem.row(
+    size: SmartContextMenuRowSize.small,
+    children: [
+      for (final (:title, :icon) in formattingActions) _action(title, icon),
+    ],
+  ),
+  SmartContextMenuItem.row(
+    size: SmartContextMenuRowSize.small,
+    children: [
+      for (final (:title, :icon) in alignmentActions) _action(title, icon),
+    ],
+  ),
+  SmartContextMenuItem.separator(),
+  SmartContextMenuItem.row(
+    children: [
+      for (final (:title, :icon) in clipboardActions) _action(title, icon),
+    ],
+  ),
+];
+
+const _tagColors = {
+  'Red': CupertinoColors.systemRed,
+  'Orange': CupertinoColors.systemOrange,
+  'Green': CupertinoColors.systemGreen,
+  'Blue': CupertinoColors.systemBlue,
+  'Purple': CupertinoColors.systemPurple,
+};
+
+/// Rows in their own style, see [styledRowStyle]: a cell with a badge,
+/// a wider cell, and a row of colors to tag with; the preset adds dividers
+/// between the items and the cells.
+List<SmartContextMenuItem> styledRowItems(ValueNotifier<Color> tagColor) => [
+  SmartContextMenuItem.row(
+    children: [
+      _inboxItem(unread: 3),
+      _action('Flag', CupertinoIcons.flag),
+      SmartContextMenuRowFlex(
+        flex: 2,
+        child: _action('Mark as Read', CupertinoIcons.envelope_open),
+      ),
+    ],
+  ),
+  // Built-in cells instead of the own buttons of Custom content: they are
+  // highlighted and picked by drag-to-select like other items.
+  SmartContextMenuItem.row(
+    size: SmartContextMenuRowSize.small,
+    dividersBetweenChildren: false,
+    padding: const EdgeInsets.all(4),
+    children: [
+      for (final MapEntry(key: name, value: color) in _tagColors.entries)
+        SmartContextMenuItem.listenable(
+          listenable: tagColor,
+          builder: () => SmartContextMenuItem.simple(
+            title: name,
+            leading: Icon(
+              tagColor.value == color
+                  ? CupertinoIcons.checkmark_circle_fill
+                  : CupertinoIcons.circle_fill,
+            ),
+            tintColor: readableTint(color),
+            closeOnTap: false,
+            onTap: () => tagColor.value = color,
+          ),
+        ),
+    ],
+  ),
+  _action('Move', CupertinoIcons.folder),
+  _action('Delete', CupertinoIcons.delete, isDestructive: true),
+];
+
+/// An item with the number of [unread] messages next to its icon, in a
+/// cell or in the list.
+SmartContextMenuSimpleItem _inboxItem({required int unread}) {
+  const icon = Icon(CupertinoIcons.tray);
+  final badge = CountBadge(count: unread);
+
+  return SmartContextMenuItem.simple(
+    title: 'Inbox',
+    onTap: () => DemoNotice.show('Inbox (demo only)'),
+    customBuilder: (context, state) {
+      final title = Text(
+        'Inbox',
+        textAlign: state.rowSize == null ? TextAlign.start : TextAlign.center,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: SmartContextMenuDefaults.titleStyle
+            .merge(state.rowSize == null ? null : styledRowStyle.titleStyle)
+            .copyWith(color: state.foregroundColor),
+      );
+      final iconWithBadge = Stack(
+        clipBehavior: Clip.none,
+        children: [
+          icon,
+          PositionedDirectional(top: -6, start: 14, child: badge),
+        ],
+      );
+
+      return IconTheme.merge(
+        data: IconThemeData(color: state.foregroundColor),
+        child: switch (state.rowSize) {
+          null => Row(
+            children: [
+              icon,
+              const SizedBox(width: SmartContextMenuDefaults.itemChildrenGap),
+              Expanded(child: title),
+              badge,
+            ],
+          ),
+          // Only the built-in content is centered in its cell, at the top.
+          SmartContextMenuRowSize.small => Align(
+            alignment: Alignment.topCenter,
+            heightFactor: 1,
+            // The built-in content labels an icon without a title, own
+            // content labels itself.
+            child: Semantics(label: 'Inbox', child: iconWithBadge),
+          ),
+          SmartContextMenuRowSize.medium => Align(
+            alignment: Alignment.topCenter,
+            heightFactor: 1,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                iconWithBadge,
+                const SizedBox(
+                  height: SmartContextMenuDefaults.rowItemChildrenGap,
+                ),
+                title,
+              ],
+            ),
+          ),
+        },
+      );
+    },
+  );
+}
+
+const drawingToolActions = <AppearanceAction>[
+  (title: 'Pen', icon: CupertinoIcons.pencil),
+  (title: 'Brush', icon: CupertinoIcons.paintbrush),
+  (title: 'Scribble', icon: CupertinoIcons.scribble),
+  (title: 'Lasso', icon: CupertinoIcons.lasso),
+  (title: 'Text', icon: CupertinoIcons.textformat),
+  (title: 'Eyedropper', icon: CupertinoIcons.eyedropper),
+];
+
+const shapeActions = <AppearanceAction>[
+  (title: 'Square', icon: CupertinoIcons.square),
+  (title: 'Circle', icon: CupertinoIcons.circle),
+  (title: 'Triangle', icon: CupertinoIcons.triangle),
+  (title: 'Hexagon', icon: CupertinoIcons.hexagon),
+  (title: 'Star', icon: CupertinoIcons.star),
+];
+
+/// Seven small cells in one row of a wider menu, see [wideRowMenuWidth],
+/// and a submenu of one row of medium cells.
+List<SmartContextMenuItem> wideRowItems() => [
+  SmartContextMenuItem.row(
+    size: SmartContextMenuRowSize.small,
+    children: [
+      for (final (:title, :icon) in drawingToolActions) _action(title, icon),
+      SmartContextMenuItem.submenu(
+        title: 'Shapes',
+        leading: const Icon(CupertinoIcons.square_on_circle),
+        children: [
+          SmartContextMenuItem.row(
+            children: [
+              for (final (:title, :icon) in shapeActions) _action(title, icon),
+            ],
+          ),
+        ],
+      ),
+    ],
   ),
 ];
 

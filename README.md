@@ -9,79 +9,97 @@
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![live demo](https://img.shields.io/badge/demo-live-8b5cf6)](https://thenothingworks.dev/demo/smart-context-menu/)
 
-A powerful, fully customizable iOS-style context menu for Flutter: smart positioning,
-fluid animations, drag-to-select, rich submenus (async, paginated) and your own content
-above the widget.
+Right click on your desktop, long press on your phone, tap on your button: a single widget provides your Flutter app with a context menu that is styled and animated like the one in iOS. 
 
-<img src="doc/gifs/open_and_select_themes.gif" width="600" alt="File and chat menus open in light and dark themes; a finger drags across their items, with a reactions bar above the chat message">
+It takes your own widgets as menu items and above the preview (e.g. a reactions bar), and it has no third-party dependencies. 
+
+You can build it in many ways: a simple list of items, a compact row of the most used actions, or a complex mix of rows, dynamic submenus and live items. 
+
+Not into the iOS design? [Make your own](#appearance): customize colors, shapes, blur, items and more, and keep the sweet animations.
+
+Requires Flutter 3.32 or later (Dart 3.8). **[Get started →](#getting-started)**
+
+<img src="doc/gifs/open_and_select_themes.gif" width="600" alt="File and chat menus open in light and dark themes; a finger drags across their items, from the row of the file menu down its list, and down the chat menu under a reactions bar">
+
+<img src="doc/gifs/wide_row.gif" width="600" alt="A menu of one row of seven tools, its left half in the light theme and its right half in the dark theme; Shapes opens a submenu of one row of shapes, and Back returns to the tools">
 
 <br>
 
 **[Try the live demo in your browser →](https://thenothingworks.dev/demo/smart-context-menu/)** 
-**[Watch the 56-second overview →](https://youtube.com/shorts/NIzPK4mWpc8?feature=share)**
+
+**[Watch the 90-second overview →](https://youtube.com/shorts/8x6S-AkH4R8)**
 
 ## Features
 
-**Opening**
+**On every platform**
 
-- **Lifted preview**: Preview lifted over a blurred background. Tap it to trigger 
-  the main action of the widget (eg. open a message).
-- **From code**: Use `SmartContextMenuController` to open and close the menu 
-  (eg. on a "⋯" button). You can also disable the long press gesture in config, 
-  if you need.
-- **Drag-to-select**: Long press to start. Then, once you've slided your finger, 
-  drag over the menu items. Release to select on the item you want.
-- **`Hero` support**: If the widget has a `Hero` (eg. a photo), the `Hero` remains 
-  active on tap of the preview, transitioning smoothly from its position to full screen.
-
-**Positioning**
-
-- **The widget stays in place**: In presence of enough space, the preview stays put 
-  and moves only as needed. A widget that is too tall scrolls with the menu.
-- **Long menus** scroll internally, up to a specific part of the screen you choose.
+- **Mobile, desktop and web**: a long press on a touch screen, a right click with a mouse
+  or a two-finger click on a trackpad opens the same menu. No platform code needed.
+- **Cursor hover**: on desktop and the web, items highlight under the pointer, as in
+  native menus. Click to select.
+- **Drag-to-select**: once the menu is open, put your finger on it and slide across the
+  items, rows included. Lift it on the one you want.
+- **Open from a button or from code**: any widget inside the wrapped one, such as
+  a button, opens and closes its menu with `SmartContextMenu.of(context)`, no controller
+  needed. A `SmartContextMenuController` does the same from anywhere else, and the
+  gestures can be turned off.
 
 **Motion**
 
-- **Alive under the finger**: as you slides over menu items, the menu stretches towards
-  your finger and the preview follows. Both return to their original position when 
-  you release.
-- **No jumps**: the menu smoothly transitions in height as a submenu opens or when
-  items are being fetched. If there's not enough space, the preview and menu both
-  smoothly glide upwards, leaving space in the process.
-- **Swipe back** drags the submenu with your finger while the menu smoothly adjusts its
-  height to the parent menu being revealed.
+- **Alive under the finger**: as you slide over the items, the menu stretches towards
+  your finger and the preview follows. Both spring back when you lift it.
+- **No jumps**: the menu smoothly changes its height as a submenu opens or items load.
+  If there's not enough space, the preview and the menu glide up together to make room.
+- **Swipe back** drags the submenu with your finger while the menu smoothly takes the
+  height of the parent menu.
 
 You can find all these effects in [Animations](#animations).
 
 **Content**
 
-- **Actions** with icons, destructive and tinted colors, disabled items, separators
-  and dividers.
-- **Custom items**:  use any widget as an item's content. This widget can have its own
-  buttons, while still get highlighted and tapped correctly.
-- **Submenus** can be static, or loaded asynchronously or paginated. They have a back
-  navigation item, and support swipe back.
+- **Actions** with icons, destructive and tinted colors, disabled items, separators,
+  section titles and dividers.
+- **Rows** put the most used actions side by side, as the compact menus of iOS do: icons
+  with titles or icons alone, mixed with the usual items. Drag-to-select glides across the
+  cells and on into the list.
+- **Custom items**: any widget can be the content of an item, for a look entirely your
+  own. It knows whether the item is pressed or hovered, can have its own buttons, and the
+  item still highlights and handles taps correctly.
+- **Submenus** can be static, loaded asynchronously or paginated. They have a back item
+  and support swipe back.
 - **RTL submenus**: transitions, swipe back and the default navigation chevrons follow
   the reading direction. The example app has an RTL layout switch to try them.
-- **Async items** can have loading, error and empty states, and can be retried on
-  failure. All these elements have the same appearance throughout the menu.
-- **Lazy lists**: items are only built as they appear on scroll. Async items only start
-  loading in the moment. This ensures long menus perform well.
-- **Listenable items** can rebuild based on app state while the menu is open. Such as
-  toggles, counters and actions in progress (eg. download progress).
-- **Custom widgets above the preview**. Place Slivers (eg. reactions bar) above the
-  preview, animated along with the menu. These can be pinned to the top, optionally.
+- **Async items** can show loading, error and empty states and be retried on failure,
+  with the same look throughout the menu.
+- **Lazy lists**: items are built only as they scroll into view, and async items start
+  loading only then, so long menus stay fast.
+- **Listenable items** rebuild from app state while the menu is open: toggles, counters
+  and actions in progress, such as a download.
+- **Custom widgets above the preview**: slivers, such as a reactions bar, above the
+  preview, animated with the menu and optionally pinned to the top.
+
+**Preview**
+
+- **Lifted preview**: the widget lifts over a blurred background. A tap on it runs the
+  main action of the widget, for example opens a message.
+- **`Hero` support**: a photo that opens full screen keeps its `Hero` and flies from its
+  place after a tap on the preview.
+
+**Positioning**
+
+- **The widget stays in place**: if there is enough space, the preview stays put and
+  moves only as much as needed. A widget that is too tall scrolls with the menu.
+- **Long menus** scroll inside, up to the part of the screen you choose.
 
 **Appearance**
 
 - **Light and dark themes** out of the box. Colors given as `CupertinoDynamicColor`s
-  adopt to the theme of the app (see [Item style](#item-style)).
-- **Customizable**: size, colors, text, icons, blur, shadows and labels7 All of these
-  and more can be set once for the whole app with a global theme or in each individual
-  menu. Also you can customize individual items in the menu.
+  adapt to the theme of the app (see [Item style](#item-style)).
+- **Customizable**: size, colors, text, icons, blur, shadows and labels. Set them once
+  for the whole app with a theme, for a single menu, or for a single item.
 
-The [example app](example/) shows every feature of all of the above. It includes a files
-app, a chat, a gallery of styles and a lab of edge cases. 
+The [example app](example/) shows all of the above: a files app, a chat, a gallery of
+styles and a lab of edge cases.
 
 ## Contents
 
@@ -99,46 +117,49 @@ app, a chat, a gallery of styles and a lab of edge cases.
     - [Error item](#error-item)
     - [Empty item](#empty-item)
     - [Separator](#separator)
+    - [Row](#row)
   - [Opening from code](#opening-from-code)
   - [Header slivers](#header-slivers)
   - [Hero widgets](#hero-widgets)
   - [Configuration](#configuration)
     - [Theme and config](#theme-and-config)
     - [Localization](#localization)
+    - [Apps on `cupertino_ui`](#apps-on-cupertino_ui)
   - [Appearance](#appearance)
     - [Item style](#item-style)
     - [Dividers](#dividers)
+    - [Back item style](#back-item-style)
+    - [Status style](#status-style)
+    - [Row style](#row-style)
     - [Custom item content](#custom-item-content)
+  - [Design guidelines](#design-guidelines)
 - [Animations](#animations)
 - [Coming soon](#coming-soon)
 - [Additional information](#additional-information)
 
 ## Why not `CupertinoContextMenu`?
 
-`CupertinoContextMenu` from Flutter opens a list of actions on a long press.
-This package keeps the long-press gesture and introduces features commonly 
-required by apps:
+`CupertinoContextMenu` from Flutter opens a list of actions on a long press only.
+This package keeps the long press and adds what apps usually need:
 
-- Submenus (either asynchronous or paginated).
+- A right click, a two-finger click on a trackpad and cursor hover on desktop and the web.
+- Submenus: static, async or paginated, with swipe back.
+- Rows of compact actions side by side, as in the menus of iOS.
 - Drag-to-select across the items.
-- Visual connection between the menu and the preview with a liquid stretching effect 
-  under the user's finger.
-- A smooth height animation and a smooth upward gliding animation for the preview as 
-  the menu is opened.
-- Ability to place **custom slivers** above the widget (e.g. a reactions bar).
-- Ability to open and close the widget programmatically.
-- Full control over the appearance: a unified theme for all menus (also for specific
-  menus) and a style for the colors, text, blur, shadows. Defining styles for items. 
-  And custom item content.
-- Full control over the interaction with the menu with control of the menu's width and
-  height, distance to the widget and screen edges, haptic feedback and opening or
-  closing on tap outside or a swipe back gesture.
+- A liquid stretch that ties the menu to the preview under your finger.
+- Smooth height changes, and the preview gliding up to make room as the menu opens.
+- Your own slivers above the widget, such as a reactions bar.
+- Opening from a button in the widget or from code.
+- Full control over the look: one theme for all menus or a config per menu, a style for
+  the colors, text, blur and shadows, styles for items and your own item content.
+- Full control over the behavior: the width and height of the menu, its distance to the
+  widget and the screen edges, haptics, and closing on a tap outside or with swipe back.
+
+[↑ Back to contents](#contents)
 
 ## Getting started
 
-Requires Flutter 3.32 or later (Dart 3.8). Works on all platforms, including [the web](https://thenothingworks.dev/demo/smart-context-menu/).
-On desktop and the web, the menu opens with a long press of the mouse or from code,
-for example from a button (see [Opening from code](#opening-from-code)); haptics do nothing there.
+Add the package:
 
 ```sh
 flutter pub add smart_context_menu
@@ -148,20 +169,16 @@ Or add it to `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  smart_context_menu: ^1.0.4
+  smart_context_menu: ^1.1.0
 ```
+
+Import it:
 
 ```dart
 import 'package:smart_context_menu/smart_context_menu.dart';
 ```
 
-In debug builds, the first openings of the menu and its transitions may stutter while
-the code is compiled; release builds are smooth from the start. The iOS Simulator runs only
-debug builds, so check smoothness on a device or in a release build on macOS.
-
-## Usage
-
-Wrap a widget with `SmartContextMenu` and pass the items. The menu opens on long press.
+Wrap your widget with `SmartContextMenu` and pass the items:
 
 ```dart
 SmartContextMenu(
@@ -182,7 +199,47 @@ SmartContextMenu(
 )
 ```
 
-Only the long press is taken from the child: its taps, drags and other gestures keep working.
+That's it: a long press, a right click or a two-finger click on a trackpad opens the menu.
+See [Usage](#usage) for everything else.
+
+**Good to know**
+
+- Requires Flutter 3.32 or later (Dart 3.8).
+- On desktop and the web, a long press of the mouse opens the menu too, and haptics
+  do nothing.
+- On the web, the browser shows its own context menu on a right click as well. To hide
+  it, call `BrowserContextMenu.disableContextMenu()` in your app. This affects the whole
+  page, including text fields, so the package leaves that choice to the app:
+
+  ```dart
+  import 'package:flutter/foundation.dart' show kIsWeb;
+  import 'package:flutter/services.dart' show BrowserContextMenu;
+
+  Future<void> main() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    if (kIsWeb) await BrowserContextMenu.disableContextMenu();
+    runApp(const MyApp());
+  }
+  ```
+
+- In debug builds, the first openings of the menu and its transitions may stutter while
+  the code is compiled; release builds are smooth from the start. The iOS Simulator runs
+  only debug builds, so check smoothness on a device or in a release build on macOS.
+
+[↑ Back to contents](#contents)
+
+## Usage
+
+Wrap a widget with `SmartContextMenu` and pass the items, as in [Getting started](#getting-started).
+The menu takes only the long press from the child: its taps, drags and other gestures keep working.
+The child's secondary pointer-down handler also runs. A secondary tap handler that
+waits for release can be canceled as the menu opens. Use `manual` and open the menu
+from the child's handler with `SmartContextMenu.of(context).open()` when you need to
+coordinate them.
+
+Menus can be nested, for example a photo with its own menu inside a card with a menu.
+A long press or a right click on the photo opens only its menu, and anywhere else
+on the card opens the menu of the card.
 
 The preview above the open menu is a snapshot of the child, so its own buttons do not
 work there. To run the main action of the child when the preview is tapped, for example
@@ -204,11 +261,13 @@ SmartContextMenu(
 | `child` | The widget that opens the menu on long press and is shown as the preview. |
 | `items` | The items of the menu, see [Item types](#item-types). |
 | `config` | The settings of this menu, see [Configuration](#configuration). |
-| `controller` | Opens and closes the menu from code, see [Opening from code](#opening-from-code). |
+| `controller` | Opens and closes the menu from outside the child, see [Opening from code](#opening-from-code). |
 | `onPreviewTap` | Runs the main action of the child once the menu has closed after a tap on the preview. |
 | `headerSliversBuilder` | Builds your slivers above the widget, see [Header slivers](#header-slivers). |
 | `fadeHeaderSlivers` | Whether the slivers fade in and out with the menu, `true` by default. |
 | `headerSliversDelay` | Shows the slivers later than the menu, no delay by default. |
+
+[↑ Back to contents](#contents)
 
 ### Positioning
 
@@ -244,6 +303,8 @@ The menu [configuration](#configuration) also takes two parameters specifying sp
 
 When the menu is opened, the positions of the widget and the snapshot are stored. If the screen size changes while the menu is open (for instance because the phone is turned or the window is resized), the menu will close, without triggering an action. This is consistent with how the system menu in iOS works.
 
+[↑ Back to contents](#contents)
+
 ### Item types
 
 Create items with the method that matches what the item does:
@@ -260,6 +321,7 @@ Create items with the method that matches what the item does:
 | `SmartContextMenuItem.error` | Shows a failed load; tapping it retries when it is the `error` of an async item or an async or paginated submenu. |
 | `SmartContextMenuItem.empty` | Shows a submenu without items. |
 | `SmartContextMenuItem.separator` | Separates groups of items. |
+| `SmartContextMenuItem.row` | Shows other items as compact cells side by side in one line. |
 
 Async items and async or paginated submenus load their data themselves: the menu calls
 the loader, shows the loading and error states, and keeps the result until it closes.
@@ -275,7 +337,7 @@ Simple items and submenus share these settings:
 | --- | --- |
 | `title` | The text of the item, in up to `titleMaxLines` lines of the style. |
 | `leading` | A widget before the title, usually an icon. |
-| `trailing` | A widget after the title; a submenu shows it before its chevron. |
+| `trailing` | A widget after the title; a submenu shows it before its chevron. Not shown in a [row](#row). |
 | `isDestructive` | Tints the item with `destructiveColor` of the style. |
 | `tintColor` | Tints the item with its own color, see [Item style](#item-style). |
 | `isDisabled` | Dims the item; it ignores taps. |
@@ -296,13 +358,15 @@ by it until the menu closes, so ids you set must be unique across the menu and i
 A failed load is not cached: the item loads again when it shows up again, for example after
 returning from a submenu, and the submenu loads again when it opens again.
 
+[↑ Back to contents](#contents)
+
 #### Submenu
 
 <img src="doc/gifs/submenu.gif" width="300" alt="Share opens a submenu with an async submenu inside, the back item and a swipe right go back, in the dark theme">
 
 *In the dark theme: Share is a submenu, and Messages inside it loads when it opens. The back
 item and a swipe right go back. [Code in the
-example](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/files/ui/files_page.dart#L197-L235).*
+example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/files/ui/files_page.dart#L187-L225).*
 
 ```dart
 SmartContextMenuItem.submenu(
@@ -323,12 +387,14 @@ to the parent menu.
 The submenu follows the finger and slides back in place if the swipe is short.
 To turn the swipe off, set `enableSwipeBack: false` in `SmartContextMenuConfig`.
 
+[↑ Back to contents](#contents)
+
 #### Async submenu
 
 <img src="doc/gifs/async_submenu.gif" width="300" alt="Move to shows an activity indicator, then the folders, with the folder of the file disabled, in the light theme">
 
 *In the light theme: Move to loads the folders when it opens; Work, the folder of the file, is
-disabled. [Code in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/files/ui/files_page.dart#L237-L255).*
+disabled. [Code in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/files/ui/files_page.dart#L227-L245).*
 
 The items are loaded when the submenu opens and cached until the menu closes.
 While loading, the submenu shows an activity indicator in the middle; pass a
@@ -355,16 +421,19 @@ SmartContextMenuItem.asyncSubmenu(
 )
 ```
 
+[↑ Back to contents](#contents)
+
 #### Paginated submenu
 
 <img src="doc/gifs/paginated_submenu.gif" width="300" alt="The Reactions submenu loads the first page of people, then the next page when it scrolls to the end, in the light theme">
 
 *In the light theme: Reactions loads the first page of people when it opens and the next page
-when it scrolls to the end. [Code in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/chat/ui/chat_page.dart#L290-L321).*
+when it scrolls to the end. [Code in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/chat/ui/chat_page.dart#L296-L327).*
 
-The first page is loaded with `initialMetadata`. The last item of each page, a `simple` item or
-a separator, carries the metadata of the next page in `pagingMetadata`; the next page is loaded
-when the user scrolls to the end. Leave it `null` on the last page. While a page loads, the
+The first page is loaded with `initialMetadata`. The last item of each page, a `simple` item,
+a separator or a [row](#row), carries the metadata of the next page in `pagingMetadata`; the next
+page is loaded when the user scrolls to the end. Leave it `null` on the last page. A row carries
+its own `pagingMetadata`: the metadata of its cells does not describe the next page. While a page loads, the
 submenu shows `loading` after the loaded items, as an async submenu does. If a page fails to
 load or takes longer than `timeout` (10 seconds by default), the submenu shows `error` after
 the loaded items, and tapping it loads the page again. If the first page is empty, the submenu
@@ -393,6 +462,8 @@ SmartContextMenuItem.pagingSubmenu(
 `SmartContextMenuPagingMetadata` also has `nextCursor` for cursor-based APIs and
 `extra` for custom parameters.
 
+[↑ Back to contents](#contents)
+
 #### Async item
 
 <img src="doc/gifs/async_item.gif" width="300" alt="Seen by loads in the open menu of a message and turns into a regular submenu with the people who saw it, in the light theme">
@@ -400,7 +471,7 @@ SmartContextMenuItem.pagingSubmenu(
 *In the light theme: Seen by is an async item whose loader returns a regular submenu. Unlike an
 async submenu, it loads as the menu opens, before a tap, so the count is seen at once; after
 going back, the loaded item stays. [Code in the
-example](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/chat/ui/chat_page.dart#L323-L347).*
+example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/chat/ui/chat_page.dart#L329-L353).*
 
 The placeholder loads its item as soon as it appears. While loading, it shows `loading`,
 a `SmartContextMenuItem.loading` with the loading label by default. If loading fails or takes
@@ -447,13 +518,15 @@ SmartContextMenuItem.async(
 )
 ```
 
+[↑ Back to contents](#contents)
+
 #### Listenable item
 
 <img src="doc/gifs/listenable_item.gif" width="300" alt="Download turns into a progress that grows in the open menu, then into Remove Download, in the dark theme">
 
 *In the dark theme: after a tap, Download shows its progress in the open menu and turns into
 Remove Download when it is done. [Code in the
-example](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/files/ui/files_page.dart#L279-L307).*
+example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/files/ui/files_page.dart#L269-L297).*
 
 Use it when the state of an item lives in your app and can change while the menu is open:
 a toggle that keeps the menu open, a counter, or an action that is already running.
@@ -531,6 +604,8 @@ final class StreamListenable extends ChangeNotifier {
 
 Create the adapter next to the state it listens to and dispose it there as well.
 
+[↑ Back to contents](#contents)
+
 #### Loading item
 
 A loading item shows its `title` (the loading label by default) with `leading` and an activity
@@ -578,12 +653,14 @@ SmartContextMenuItem.listenable(
 )
 ```
 
+[↑ Back to contents](#contents)
+
 #### Error item
 
 <img src="doc/gifs/error_and_empty.gif" width="300" alt="Shared files fails to load, a tap retries it and shows the files, and Archive shows its empty item, in the dark theme">
 
 *In the dark theme: Shared files fails to load, and a tap on the row loads it again; Archive
-has no items. [Code in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/lab/domain/lab_items.dart#L131-L186).*
+has no items. [Code in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/lab/domain/lab_items.dart#L132-L187).*
 
 An error item shows a failed load: its `title` (the error label by default) with the error icon.
 As the `error` of an async item, an async or a paginated submenu, it loads again on tap and shows
@@ -613,6 +690,8 @@ An error item is shown for a load that throws. For an error your loader recogniz
 such as missing access, catch it and return an item yourself: an `error` item that ignores taps,
 or a `simple` item with its own action.
 
+[↑ Back to contents](#contents)
+
 #### Empty item
 
 The GIF in [Error item](#error-item) ends with Archive, a submenu without items.
@@ -631,6 +710,8 @@ SmartContextMenuItem.asyncSubmenu(
 )
 ```
 
+[↑ Back to contents](#contents)
+
 #### Separator
 
 <img src="doc/gifs/separators.png" width="300" alt="A menu with a gray band between Pin and Share, and a thin line with the title Danger zone above Delete, in the light theme">
@@ -639,12 +720,15 @@ SmartContextMenuItem.asyncSubmenu(
 titles the last group.*
 
 A separator splits the items into groups. It has no actions and no press highlight,
-and drag-to-select passes over it. By default it is a band set by `separatorHeight`
+and drag-to-select passes over it. By default it is a band set by `separatorThickness`
 and `separatorColor` in the style; `child` replaces it, for example with a section title.
+The old name `separatorHeight` is deprecated; use `separatorThickness` instead.
 
-Separators at the start or the end of a menu are not shown, and several separators
-in a row show as one. So a menu whose items depend on the user or the content
-needs no extra checks:
+A band is shown only between items: not at the start or the end of a menu, and several
+bands in a row show as one. A separator with a `child` titles the items after it, so it is
+also shown at the start of a menu or a submenu, but not at the end. Of several separators
+next to each other, the last one with a `child` is shown, or else the first band. So a menu
+whose items depend on the user or the content needs no extra checks:
 
 ```dart
 [
@@ -663,45 +747,224 @@ needs no extra checks:
 ]
 ```
 
-For a thin line instead of a band, set a small `separatorHeight` and the
+For a thin line instead of a band, set a small `separatorThickness` and the
 `dividerColor` as `separatorColor`. To draw lines between all items, see
 [Dividers](#dividers).
 
+[↑ Back to contents](#contents)
+
+#### Row
+
+<img src="doc/gifs/rows.png" width="800" alt="The Quick actions, Only rows and Wide row menus of the example and the Shapes submenu of Wide row, in the light theme above and the dark theme below">
+
+*Menus from the example, in the light and dark themes: a row above the list, a menu of rows
+only, seven tools in a wider menu, and its Shapes submenu of one row. [Code in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/domain/appearance_items.dart#L147-L366).*
+
+A row puts the most used actions side by side, as the compact menus of iOS do. Its cells
+are items of the other types: actions, submenus, async and listenable items, loading, error
+and empty items, and separators. They keep their actions, colors, ids and rules of closing
+the menu; the row only makes them compact. Rows and other items can be mixed, and a menu
+can consist of rows only.
+
+```dart
+[
+  SmartContextMenuItem.row(
+    children: [
+      SmartContextMenuItem.simple(
+        title: 'Copy',
+        leading: const Icon(CupertinoIcons.doc_on_doc),
+        onTap: () => copy(),
+      ),
+      SmartContextMenuItem.submenu(
+        title: 'Share',
+        leading: const Icon(CupertinoIcons.share),
+        children: shareItems,
+      ),
+      SmartContextMenuItem.simple(
+        title: 'Delete',
+        leading: const Icon(CupertinoIcons.delete),
+        isDestructive: true,
+        onTap: () => delete(),
+      ),
+    ],
+  ),
+  SmartContextMenuItem.simple(
+    title: 'Pin',
+    leading: const Icon(CupertinoIcons.pin),
+    onTap: () => pin(),
+  ),
+]
+```
+
+`size` sets the look of the cells:
+
+- `SmartContextMenuRowSize.medium`, the default, shows the `leading` above the `title`.
+- `SmartContextMenuRowSize.small` shows only the `leading`, and the `title` is what a screen
+  reader says. A cell without a `leading` shows its `title`, for example `0.5×`, `1×`, `2×`.
+
+A row is one line and does not wrap: for six cells in two lines, make two rows of three.
+The Only rows menu of the example has eight small cells in two rows and a row of medium cells:
+
+```dart
+[
+  SmartContextMenuItem.row(
+    size: SmartContextMenuRowSize.small,
+    children: [bold, italic, underline, strikethrough],
+  ),
+  SmartContextMenuItem.row(
+    size: SmartContextMenuRowSize.small,
+    children: [alignLeft, center, alignRight, justify],
+  ),
+  SmartContextMenuItem.separator(),
+  SmartContextMenuItem.row(children: [cut, copy, paste]),
+]
+```
+
+Every kind of item works as a cell:
+
+- A cell that opens a submenu shows a small submenu icon in its top corner. The submenu shows
+  its items as usual, and it can have rows of its own.
+- Async and listenable cells stay compact while they load and after. Loading, error and empty
+  cells show the sign of their state, with short titles from the
+  [labels](#localization).
+- Disabled, destructive and tinted cells look as they do in the list.
+- The `trailing` of a cell is not shown; a [`customBuilder`](#custom-item-content) can draw it.
+
+The width of the row is divided between its cells, equally by default.
+`SmartContextMenuRowFlex` gives a cell a larger share, and the id and the action stay on its
+`child`. The width of a cell does not change with its content. The row is as tall as its
+tallest cell, and each cell is pressed and highlighted over its full share of the width and
+the full height of the row. Content wider than its cell is clipped, text gets an ellipsis,
+and in RTL the cells go from right to left.
+
+```dart
+SmartContextMenuItem.row(
+  children: [
+    inbox,
+    flag,
+    // Twice as wide as the other cells.
+    SmartContextMenuRowFlex(flex: 2, child: markAsRead),
+  ],
+)
+```
+
+A row with fewer cells than the row above it still divides its whole width, so a single cell
+takes the full width of the menu. To keep the cells as wide as in the other row, fill the rest
+with empty cells: a simple item without `title`, `leading` and `onTap`, and with
+`closeOnTap: false`, is not highlighted and ignores taps. Add one empty cell for each missing
+cell rather than one `SmartContextMenuRowFlex`, so that the gaps match too, and turn off the
+dividers of the row. If the other row draws dividers, the widths differ by their thickness.
+A separator does not work as a spacer: it is not shown at the end of a row.
+
+```dart
+[
+  SmartContextMenuItem.row(
+    size: SmartContextMenuRowSize.small,
+    children: [undo, redo, cut, copy],
+  ),
+  SmartContextMenuItem.row(
+    size: SmartContextMenuRowSize.small,
+    dividersBetweenChildren: false,
+    children: [
+      paste,
+      for (var i = 0; i < 3; i++)
+        SmartContextMenuItem.simple(closeOnTap: false),
+    ],
+  ),
+]
+```
+
+As in the list, a separator in a row is a band, vertical here, and the same rules apply: a band
+is shown only between cells, a separator with a `child` also at the start of the row, for
+example as a label before the cells, and of several separators next to each other only one is
+shown. A row without cells, or with separators only, is not shown, so cells shown on condition
+need no extra checks.
+`dividersBetweenChildren` draws vertical lines between the cells; if it is `null`, it follows
+`dividersBetweenItems` of the style. `padding` and `childrenGap` set the space around and between
+the cells of this row; the gap belongs to no cell, so a finger over it removes the highlight.
+The look of all rows is set by the [row style](#row-style).
+
+<img src="doc/gifs/row_drag_to_select.gif" width="300" alt="A finger slides across the cells of a row and on into the items of the list below, in the light theme">
+
+*In the light theme: the highlight follows the finger from cell to cell and on into the list.*
+
+Drag-to-select works across the cells as over other items, and a release selects the cell
+under the finger. In a submenu, a horizontal drag that starts on a row selects its cells
+instead of going back; with `enableSwipeBack: true`, the drag goes back, as on other items.
+Outside the row and on the back item, swipe back always works.
+
+`children` takes `SmartContextMenuRowEntry`: every item type and `SmartContextMenuRowFlex`,
+but not a row, so a row cannot contain another row. A helper that returns a cell should
+return its own item type, such as `SmartContextMenuSimpleItem` or
+`SmartContextMenuAsyncSubmenuItem`, rather than `SmartContextMenuItem`, and a list of cells
+built in advance needs its type: `<SmartContextMenuRowEntry>[...]`.
+
+Keep cells wide enough to tap, see [Design guidelines](#design-guidelines).
+
+[↑ Back to contents](#contents)
+
 ### Opening from code
 
-Create a `SmartContextMenuController()` and pass it to the menu to open and close
-it from code.
-To open the menu only from code, set the activation mode to `manual`. In this mode
-the controller is required: without it, an assert fails in debug builds.
+A button inside the child opens the menu with `SmartContextMenu.of(context)`. It returns
+the controller of the nearest menu around `context`, so the button needs no setup:
+
+```dart
+SmartContextMenu(
+  items: items,
+  child: Row(
+    children: [
+      const Expanded(child: Text('Report.pdf')),
+      Builder(
+        builder: (context) => CupertinoButton(
+          onPressed: () => SmartContextMenu.of(context).open(),
+          child: const Icon(CupertinoIcons.ellipsis_circle),
+        ),
+      ),
+    ],
+  ),
+)
+```
+
+The `Builder` gives the button a `context` inside the menu. A button in a widget of its
+own, such as a list row, uses the `context` of that widget. The items of the open menu
+are not inside the child, so `of` does not find the menu from them.
+`SmartContextMenu.maybeOf(context)` returns `null` where there is no menu.
+
+To open the menu from outside the child, for example on a double tap next to a message,
+create a `SmartContextMenuController()` and pass it to the menu:
 
 ```dart
 final controller = SmartContextMenuController();
 
 SmartContextMenu(
   controller: controller,
-  config: const SmartContextMenuConfig(
-    activationMode: SmartContextMenuActivationMode.manual,
-  ),
   items: items,
   child: child,
 );
 
-IconButton(
-  icon: const Icon(CupertinoIcons.ellipsis),
-  onPressed: controller.open,
+GestureDetector(
+  onDoubleTap: controller.open,
+  child: background,
 );
 ```
 
-The controller notifies its listeners when the menu opens or closes, see `isOpen`.
+To open the menu only from code, set the activation mode to `manual`: the long press and
+the right click then stay with the child. The menu opens from `SmartContextMenu.of` in the
+child or from its controller, so without either of them it never opens.
+
+`SmartContextMenu.of` returns the controller passed to the menu, or the menu's own one.
+A controller notifies its listeners when the menu opens or closes, see `isOpen`.
 `open()` completes when the menu has closed, so `await controller.open()` waits for it.
-Dispose the controller when it is no longer needed.
+Dispose a controller you create when it is no longer needed; the menu disposes its own.
+
+[↑ Back to contents](#contents)
 
 ### Header slivers
 
 <img src="doc/gifs/header_slivers.gif" width="300" alt="A reactions bar above a photo in a chat, in the dark theme">
 
 *In the dark theme: a reactions bar above the message; a tap on a reaction closes the menu.
-[Code in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/chat/ui/chat_page.dart#L216-L241).*
+[Code in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/chat/ui/chat_page.dart#L222-L247).*
 
 To show your own content above the widget while the menu is open, pass `headerSliversBuilder`.
 It returns a list of slivers, which fade in and out with the menu and move with the widget
@@ -787,13 +1050,15 @@ SmartContextMenu(
 )
 ```
 
+[↑ Back to contents](#contents)
+
 ### Hero widgets
 
 <img src="doc/gifs/hero.gif" width="300" alt="A tap on the preview opens the photo full screen with its own Hero, in the light theme">
 
 *In the light theme: a double tap next to the photo opens the menu from code; a tap on the
 preview opens the photo with its own `Hero`. [Code in the
-example](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/chat/ui/chat_page.dart#L149-L214).*
+example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/chat/ui/chat_page.dart#L155-L220).*
 
 The widget can have its own `Hero`, for example a photo in a chat that opens full screen.
 The menu flies the preview with a `Hero` too, but never puts it around your widget: it adds
@@ -821,6 +1086,8 @@ SmartContextMenu(
 
 Here `openPhoto` pushes a page with a `Hero` of the same tag.
 
+[↑ Back to contents](#contents)
+
 ### Configuration
 
 Settings shared by menus live in `SmartContextMenuConfig`. Every field has a default, so set only
@@ -836,7 +1103,7 @@ const menuConfig = SmartContextMenuConfig(
 
 | Field | What it sets | Default |
 | --- | --- | --- |
-| `activationMode` | Opens the menu on long press or only from code, see [Opening from code](#opening-from-code). | `longPress` |
+| `activationMode` | Opens the menu on long press or right click, or only from code, see [Opening from code](#opening-from-code). | `longPress` |
 | `enableHaptics` | Plays haptic feedback when the menu opens on long press, an item is highlighted or tapped, the preview is tapped, and a submenu opens or closes. | `true` |
 | `barrierDismissible` | Closes the menu on a tap outside the menu, the widget and the [header slivers](#header-slivers). When `false`, the menu closes only from an item, the preview, the header slivers or the controller. | `true` |
 | `enableSwipeBack` | Returns from a submenu on a swipe right in LTR or left in RTL, see [Submenu](#submenu). | `true` |
@@ -847,6 +1114,8 @@ const menuConfig = SmartContextMenuConfig(
 | `moveBackDown` | Moves the widget back down when the menu gets shorter. | `false` |
 | `labels` | The strings the menu shows itself, see [Localization](#localization). | English |
 | `style` | The look of the menu, see [Appearance](#appearance). | |
+
+[↑ Back to contents](#contents)
 
 #### Theme and config
 
@@ -917,6 +1186,8 @@ SmartContextMenu(
 `SmartContextMenuTheme.of(context)` reads the theme above `context`. If the theme is created
 in the same `build` method, wrap the menu in a `Builder` to read it.
 
+[↑ Back to contents](#contents)
+
 #### Localization
 
 The menu shows a few strings itself: the back item, the retry label and the titles of loading,
@@ -931,19 +1202,79 @@ SmartContextMenuConfig(
     loading: l10n.loading,
     error: l10n.couldNotLoad,
     empty: l10n.noItems,
+    rowLoading: l10n.loadingShort,
+    rowError: l10n.error,
+    rowRetry: l10n.retryShort,
+    rowEmpty: l10n.noItems,
   ),
 )
 ```
 
+Cells of a [row](#row) are narrow, so loading, error and empty cells use short titles of their
+own: `rowLoading`, `rowError`, `rowRetry` and `rowEmpty`.
+
+[↑ Back to contents](#contents)
+
+#### Apps on `cupertino_ui`
+
+Since Flutter 3.50, `flutter/cupertino.dart` is deprecated in favor of the
+[`cupertino_ui`](https://pub.dev/packages/cupertino_ui) package. Until 2.0.0, the menu uses
+`flutter/cupertino.dart`, so it does not see the theme and the localizations of a
+`CupertinoApp` from `cupertino_ui`: it follows the system brightness, and the screen reader
+label of its barrier is in English. Put `CupertinoUiCompatibilityBridge` of `cupertino_ui` in
+the `builder` of the app. The menu opens over the whole app, so a bridge around one screen or
+widget does not change its theme.
+
+```dart
+CupertinoApp(
+  theme: const CupertinoThemeData(brightness: Brightness.dark),
+  builder: (context, child) => CupertinoUiCompatibilityBridge(child: child!),
+  home: const HomePage(),
+)
+```
+
+The menu resolves only the `CupertinoDynamicColor`s of `flutter/cupertino.dart`, such as its
+defaults. A `CupertinoDynamicColor` of `cupertino_ui` in the style keeps its light color, so
+resolve it in the `builder`, where the theme of the app is known:
+
+```dart
+builder: (context, child) => CupertinoUiCompatibilityBridge(
+  child: SmartContextMenuTheme(
+    config: SmartContextMenuConfig(
+      style: SmartContextMenuStyle(
+        menuColor: CupertinoDynamicColor.resolve(brandMenuColor, context),
+      ),
+    ),
+    child: child!,
+  ),
+),
+```
+
+The bridge is marked deprecated as a temporary migration utility, so the analyzer reports its
+use. Version 2.0.0 of this package moves to `cupertino_ui`, and the bridge will not be needed.
+
+[↑ Back to contents](#contents)
+
 ### Appearance
 
-<img src="doc/gifs/appearance.png" width="600" alt="The Brand, Solid and Custom content menus of the example, in the light and dark themes">
+<img src="doc/gifs/appearance.png" width="800" alt="The Brand, Solid, Custom content and Styled rows menus of the example, in the light theme above and the dark theme below">
 
-*Three styles from the example, in the light and dark themes: brand colors with only dimming
-behind the menu, an opaque menu, and items with their own content.*
+*Four styles from the example, in the light and dark themes: brand colors with only dimming
+behind the menu, an opaque menu, items with their own content, and rows in their own style
+with a badge and colors to pick.*
+
+<img src="doc/gifs/themes.png" width="800" alt="Eight menus in alternating light and dark themes, with Terminal, Tiny, Glow and Editing rows above Paper, Colorful, Indigo and Drawing toolbar.">
+
+*Eight presets from the example in alternating light and dark themes. The top row shows
+monospaced Terminal, compact Tiny, cyan Glow and Editing rows with formatting and clipboard
+actions. Below are warm Paper with a serif font, Colorful with icons in colored squares,
+Indigo with a row of shortcuts and Drawing toolbar with seven tools. [Code in the
+example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/ui/theme_styles.dart).*
 
 The look of the menu is set by `SmartContextMenuStyle`, the `style` of the config.
-Its fields have defaults too:
+The Back item, the loading, error and empty items, and rows have their own parts of it:
+[`backButtonStyle`](#back-item-style), [`statusStyle`](#status-style) and
+[`rowStyle`](#row-style). All fields have defaults:
 
 ```dart
 const menuStyle = SmartContextMenuStyle(
@@ -956,14 +1287,14 @@ const menuStyle = SmartContextMenuStyle(
 
 `menuShadows` replaces the default shadows under the menu; pass an empty list to remove them.
 
-`menuDecoration` replaces the menu's default background and border. In a submenu, the pinned
-Back item uses `menuColor` and `backButtonBlur` over the scrolling items. With a gradient,
-a partially transparent version of its top color lets the gradient show through the Back
-item and can make the boundary less noticeable:
+`menuDecoration` replaces the menu's default background and border. The pinned Back item does
+not inherit it: by default, that item uses `menuColor` and the `borderRadius` of
+`backButtonStyle`. Its `decoration` gives the Back item its own background. The decoration's
+shape also clips the blur of the Back item; a transparent decoration lets the menu gradient and
+blurred scrolling items show through:
 
 ```dart
 const style = SmartContextMenuStyle(
-  menuColor: Color(0xB33634A3),
   menuDecoration: BoxDecoration(
     borderRadius: BorderRadius.all(Radius.circular(16)),
     gradient: LinearGradient(
@@ -972,11 +1303,20 @@ const style = SmartContextMenuStyle(
       colors: [Color(0xFF3634A3), Color(0xFF18165F)],
     ),
   ),
+  backButtonStyle: SmartContextMenuBackButtonStyle(
+    decoration: BoxDecoration(
+      color: Color(0x00000000),
+      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+    ),
+  ),
 );
 ```
 
-The Back item does not continue the gradient itself. Scrolled items may be faintly visible
-through a translucent `menuColor`; adjust its opacity if needed.
+The Back item does not copy the gradient; it shows the menu behind it. Give the decoration a
+translucent color if the scrolling items show through too strongly. Its border radius controls
+the clip; the `borderRadius` of `backButtonStyle` applies only without a `decoration`.
+
+[↑ Back to contents](#contents)
 
 #### Item style
 
@@ -994,9 +1334,7 @@ const style = SmartContextMenuStyle(
   destructiveColor: Color(0xFFFF453A),
   highlightColor: Color(0x1FFFFFFF),
   dividerColor: Color(0x999E9E9E),
-  backButtonColor: Color(0xFF0A84FF),
   submenuIcon: Icons.arrow_forward_ios,
-  backIcon: Icons.arrow_back_ios_new,
   itemPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
   itemChildrenGap: 10,
 );
@@ -1005,9 +1343,8 @@ const style = SmartContextMenuStyle(
 The color of `titleStyle` is used for enabled items that are not destructive; disabled
 and destructive items use `disabledForegroundColor` and `destructiveColor`. A pressed item
 is highlighted with a translucent title color, or with `highlightColor` if it is set.
-The style also sets the back item of submenus, the number of title lines, and the icons,
-alignment and loading indicator of loading, error and empty items; `loadingIndicator` is used
-at its own size, so size it to fit an item row. See
+The style also sets the number of title lines; the Back item and the loading, error and empty
+items have their own [Back item style](#back-item-style) and [Status style](#status-style). See
 [`SmartContextMenuStyle`](https://pub.dev/documentation/smart_context_menu/latest/smart_context_menu/SmartContextMenuStyle-class.html)
 for all fields.
 
@@ -1046,9 +1383,11 @@ SmartContextMenuItem.simple(
 )
 ```
 
-Colors may be `CupertinoDynamicColor`s: they follow the light and dark theme.
+Color fields may be `CupertinoDynamicColor`s: they follow the light and dark theme.
 A plain `Color` is used as is in both themes. The default values are available
 in `SmartContextMenuDefaults`.
+
+[↑ Back to contents](#contents)
 
 #### Dividers
 
@@ -1074,13 +1413,128 @@ const style = SmartContextMenuStyle(
 
 To split items into groups, use a [separator](#separator).
 
+[↑ Back to contents](#contents)
+
+#### Back item style
+
+`SmartContextMenuBackButtonStyle`, the `backButtonStyle` of the style, sets the look of the
+Back item pinned to the top of a submenu:
+
+| Field | What it does | Default |
+| --- | --- | --- |
+| `decoration` | The background of the Back item. Its shape also clips the blur. | `null`: `menuColor` with `borderRadius` |
+| `blur` | The blur of the submenu items that scroll under the Back item; `null` turns it off. | `SmartContextMenuBlur.strong` |
+| `borderRadius` | The corners of the default background; ignored with a `decoration`. | 16 px at the top |
+| `foregroundColor` | The color of the title and the icon. | `null`: the colors of the menu |
+| `titleStyle` | The style of the title, merged over the `titleStyle` of the menu. | semibold |
+| `icon` | The icon before the title. The default one points the other way in right-to-left text. | `CupertinoIcons.chevron_back` |
+
+The padding, the press highlight and the icon size come from the menu style, and a line is
+always drawn below the Back item.
+
+```dart
+const style = SmartContextMenuStyle(
+  backButtonStyle: SmartContextMenuBackButtonStyle(
+    foregroundColor: Color(0xFF0A84FF),
+    icon: Icons.arrow_back_ios_new,
+  ),
+);
+```
+
+Before 1.1.0, these fields were in the style itself: `backButtonBlur`, `backButtonColor`,
+`backIcon` and others. The old names still work until 2.0.0 and are deprecated; pass either
+`backButtonStyle` or the old names, not both.
+
+[↑ Back to contents](#contents)
+
+#### Status style
+
+`SmartContextMenuStatusStyle`, the `statusStyle` of the style, sets the look of the
+[loading](#loading-item), [error](#error-item) and [empty](#empty-item) items, and of the
+indicator of a loading submenu or page:
+
+| Field | What it does | Default |
+| --- | --- | --- |
+| `titleAlign` | The alignment of the title between the leading and the trailing. | `TextAlign.center` |
+| `errorIcon` | The icon after the title of an error item. | `CupertinoIcons.exclamationmark_triangle` |
+| `retryIcon` | The icon of an error item that retries a failed load. | `CupertinoIcons.refresh` |
+| `emptyIcon` | The icon after the title of an empty item. | `CupertinoIcons.tray` |
+| `loadingIndicator` | The indicator of loading items and of a loading submenu or page, shown at its own size. | `null`: `CupertinoActivityIndicator` |
+| `loaderVerticalPadding` | The space above and below the indicator of a loading submenu or page. | `12` |
+
+The own `trailing` of an item replaces its icon or indicator. Size `loadingIndicator` to fit an
+item row. The Status items menu of the example puts the titles at the start and uses a Material
+indicator and other icons ([code in the
+example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/ui/appearance_styles.dart#L61-L78)):
+
+```dart
+const style = SmartContextMenuStyle(
+  statusStyle: SmartContextMenuStatusStyle(
+    loadingIndicator: SizedBox.square(
+      dimension: 18,
+      child: CircularProgressIndicator(
+        strokeWidth: 2,
+        color: CupertinoColors.systemOrange,
+      ),
+    ),
+    errorIcon: CupertinoIcons.wifi_exclamationmark,
+    retryIcon: CupertinoIcons.arrow_clockwise,
+    emptyIcon: CupertinoIcons.tray,
+    titleAlign: TextAlign.start,
+  ),
+);
+```
+
+Before 1.1.0, these fields were in the style itself, and `titleAlign` was called
+`statusTitleAlign`. The old names still work until 2.0.0 and are deprecated; pass either
+`statusStyle` or the old names, not both.
+
+[↑ Back to contents](#contents)
+
+#### Row style
+
+`SmartContextMenuRowStyle`, the `rowStyle` of the style, sets the look of all [rows](#row):
+
+| Field | What it does | Default |
+| --- | --- | --- |
+| `padding` | The padding around the cells of a row. | `EdgeInsets.zero` |
+| `childrenGap` | The gap between the cells; it belongs to no cell. | `0` |
+| `smallItemPadding` | The padding of small cells. The whole cell is pressed and highlighted. | 4 horizontal, 14 vertical |
+| `mediumItemPadding` | The padding of medium cells. | 4 horizontal, 10 vertical |
+| `itemChildrenGap` | The gap between the leading and the title of medium cells. | `4` |
+| `titleStyle` | The style of the titles of the cells, merged over the title style of the item or of the menu. | 12 px |
+| `dividerIndent` | The space above the vertical dividers between the cells. | `0` |
+| `dividerEndIndent` | The space below the vertical dividers. | `0` |
+
+The own `padding` and `childrenGap` of a row, and the `padding` and `childrenGap` of an item
+in a cell, take precedence. Colors, icons, `titleMaxLines`, separators and dividers of rows
+come from the menu style. The Styled rows menu of the example sets bolder titles, gaps between
+the cells and dividers that stop short of the edges ([code in the
+example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/ui/appearance_styles.dart#L80-L87)):
+
+```dart
+const style = SmartContextMenuStyle(
+  dividersBetweenItems: true,
+  rowStyle: SmartContextMenuRowStyle(
+    // Replaces the default, so it sets the size too.
+    titleStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+    childrenGap: 4,
+    dividerIndent: 12,
+    dividerEndIndent: 12,
+  ),
+);
+```
+
+[↑ Back to contents](#contents)
+
 #### Custom item content
 
 `customBuilder` replaces the content of an item. The item padding and press highlight
 are kept, and taps work as usual. Interactive widgets inside, such as
 buttons, handle their own taps: the item is not triggered over them. The builder
 receives the item state, including `foregroundColor`: the color of the title and icons
-for the current state and theme.
+for the current state and theme. `isPressed` and `isHovered` tell a press from cursor
+hover, so the content can react to each in its own way.
 
 ```dart
 SmartContextMenuItem.simple(
@@ -1095,13 +1549,89 @@ SmartContextMenuItem.simple(
 )
 ```
 
+In a [row](#row), `state.rowSize` is the size of the cell, and `null` in the list, so one
+builder can fit both. The cell keeps its padding and highlight, but only the built-in content
+is centered in it: align your own content yourself. In a small cell, also label it with
+`Semantics`, as the built-in content is labeled with the `title`. For example, an icon with
+a badge, as Inbox in the Styled rows menu of the example ([code in the
+example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/domain/appearance_items.dart#L263-L327)):
+
+```dart
+SmartContextMenuItem.simple(
+  title: 'Inbox',
+  onTap: () => openInbox(),
+  customBuilder: (context, state) {
+    final color = state.foregroundColor;
+    final icon = Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Icon(CupertinoIcons.tray, color: color),
+        const PositionedDirectional(
+          top: -6,
+          start: 14,
+          child: CountBadge(count: 3),
+        ),
+      ],
+    );
+    return switch (state.rowSize) {
+      null => Row(
+        children: [
+          icon,
+          const SizedBox(width: 12),
+          Text('Inbox', style: TextStyle(color: color)),
+        ],
+      ),
+      SmartContextMenuRowSize.small => Align(
+        alignment: Alignment.topCenter,
+        heightFactor: 1,
+        child: Semantics(label: 'Inbox', child: icon),
+      ),
+      SmartContextMenuRowSize.medium => Align(
+        alignment: Alignment.topCenter,
+        heightFactor: 1,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            icon,
+            const SizedBox(height: 4),
+            Text('Inbox', style: TextStyle(fontSize: 12, color: color)),
+          ],
+        ),
+      ),
+    };
+  },
+)
+```
+
+[↑ Back to contents](#contents)
+
+### Design guidelines
+
+The defaults follow the menus of iOS, such as the menu width of 250. A few choices stay
+with you:
+
+- **Cells wide enough to tap.** The Apple Human Interface Guidelines ask for touch targets of
+  at least 44 × 44 points, and Material Design for 48 × 48. A [row](#row) divides the width of
+  the menu between its cells, so at the default width use up to five cells, 50 points each.
+  For more, widen the menu with `menuWidth`: the Wide row menu of the example fits seven cells
+  of 48 into 336. On a screen narrower than the menu and its `screenPadding`, the menu gets
+  narrower, so check it on the narrowest phone you support. With a mouse, narrower cells are
+  easy to hit too.
+- **A title for every cell.** Give each cell a `title` and a `leading`: a small cell shows only
+  the icon, and its title is what a screen reader says. Keep small cells for icons people know
+  without a label, such as text formatting, and use medium cells for the rest.
+- **The most used actions first.** A row at the top of the menu keeps them a short reach away,
+  and the rest of the actions stay in the list below.
+
+[↑ Back to contents](#contents)
+
 ## Animations
 
 <img src="doc/gifs/liquid_stretch.gif" width="400" alt="Close-up of the menu of a chat message that stretches towards the finger while the message and the reactions bar drift after it, in the light theme">
 
 *In the light theme, close up: as the finger slides over the items and past the edges,
 the menu stretches towards it, and the message and the reactions bar drift after it. [Code
-in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/chat/ui/chat_page.dart#L149-L214).*
+in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/chat/ui/chat_page.dart#L155-L220).*
 
 The menu and the preview move as one. Nothing appears, resizes or moves without an animation,
 and while a finger is on the menu, both respond to every movement of it.
@@ -1127,24 +1657,29 @@ and while a finger is on the menu, both respond to every movement of it.
 
 *In the dark theme: Backup.zip is low on the screen, so it glides up together with the menu
 just enough to fit it; Share and the back item change the height of the menu smoothly. [Code
-in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/files/ui/files_page.dart#L152-L169).*
+in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/files/ui/files_page.dart#L139-L152).*
 
 <img src="doc/gifs/swipe_back.gif" width="300" alt="The Messages submenu follows a swipe right while the height of the menu flows towards Share, in the light theme">
 
 *In the light theme: a slow swipe right from Messages drags it after the finger while
 the height of the menu flows towards Share; after a short swipe, Messages slides back,
-and a long one finishes on its own. [Code in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/files/ui/files_page.dart#L197-L235).*
+and a long one finishes on its own. [Code in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/files/ui/files_page.dart#L187-L225).*
+
+[↑ Back to contents](#contents)
 
 ## Coming soon
 
-Planned for the next minor version:
+Planned for the next versions:
 
+- A full accessibility pass with VoiceOver and TalkBack: opening the menu, every item type,
+  rows and submenus, and announcements of loading and errors.
 - `SmartContextMenuItem.listenableSubmenu`: a submenu that rebuilds from the state of your app
   while it is open, for example the people who liked a post, updated as new likes come in.
-- `SmartContextMenuItem.row`: several actions in one row of icons, as in the compact menus of iOS.
 
-Both are new item types, so keep a `_` case when you switch on items, see
+`listenableSubmenu` is a new item type, so keep a `_` case when you switch on items, see
 [Item types](#item-types).
+
+[↑ Back to contents](#contents)
 
 ## Additional information
 
@@ -1165,3 +1700,5 @@ Found a bug or have a feature request? Open an issue on
 Licensed under the [MIT License](LICENSE).
 
 Made by [The NothingWorks](https://thenothingworks.dev).
+
+[↑ Back to contents](#contents)

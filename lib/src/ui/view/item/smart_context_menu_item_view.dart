@@ -10,11 +10,14 @@ import '../../../core/ui/motion/transitions/tricky_transition.dart';
 import '../../../domain/smart_context_menu_config.dart';
 import '../../../domain/smart_context_menu_item.dart';
 import '../../../domain/smart_context_menu_item_state.dart';
+import '../../../domain/smart_context_menu_row_size.dart';
 import '../../../domain/smart_context_menu_style.dart';
+import '../../extensions/render_object_ext.dart';
 import '../../keys/item_content_key.dart';
 import '../../keys/service_item_key.dart';
 import '../../state/smart_context_menu_hover_controller.dart';
 import '../../theme/smart_context_menu_item_colors.dart';
+import 'smart_context_menu_item_cell.dart';
 import 'smart_context_menu_item_row.dart';
 import 'smart_context_menu_status_content.dart';
 
@@ -27,12 +30,16 @@ final class SmartContextMenuItemView extends StatefulWidget {
   final ValueChanged<SmartContextMenuItem>? onTap;
   final SmartContextMenuHoverController? hoverController;
 
+  /// The size of the cell if the item is shown in a row, or null in a list.
+  final SmartContextMenuRowSize? rowSize;
+
   const SmartContextMenuItemView({
     super.key,
     required this.item,
     required this.config,
     this.onTap,
     this.hoverController,
+    this.rowSize,
   }) : cachedItem = null,
        onLoaded = null,
        onRetry = null;
@@ -45,6 +52,7 @@ final class SmartContextMenuItemView extends StatefulWidget {
     required this.onLoaded,
     this.cachedItem,
     this.hoverController,
+    this.rowSize,
   }) : onRetry = null;
 
   const SmartContextMenuItemView.error({
@@ -53,6 +61,7 @@ final class SmartContextMenuItemView extends StatefulWidget {
     required this.config,
     required this.onRetry,
     this.hoverController,
+    this.rowSize,
   }) : onTap = null,
        cachedItem = null,
        onLoaded = null;
@@ -64,13 +73,15 @@ final class SmartContextMenuItemView extends StatefulWidget {
 
 final class _SmartContextMenuItemViewState
     extends State<SmartContextMenuItemView> {
-  bool _isHighlight = false;
+  bool _isPressed = false;
+  bool _isHovered = false;
+  bool get _isHighlight => _isPressed || _isHovered;
 
-  /// Runs from the moment the item is highlighted: a tapped item stays
-  /// highlighted until it ends, so even a quick tap shows the highlight.
+  /// Runs from the moment the item is pressed: a tapped item stays
+  /// pressed until it ends, so even a quick tap shows the highlight.
   Timer? _minHighlightTimer;
 
-  /// Whether the item is tapped and keeps the highlight until
+  /// Whether the item is tapped and stays pressed until
   /// [_minHighlightTimer] ends.
   bool _isTapHighlightHeld = false;
 
@@ -100,7 +111,8 @@ final class _SmartContextMenuItemViewState
         SmartContextMenuAsyncItem() => true,
         SmartContextMenuListenableItem() ||
         SmartContextMenuStatusItem() ||
-        SmartContextMenuSeparatorItem() => false,
+        SmartContextMenuSeparatorItem() ||
+        SmartContextMenuRowItem() => false,
       };
   SmartContextMenuItem get _item => _resolvedItem ?? widget.item;
   SmartContextMenuConfig get _config => widget.config;
@@ -108,7 +120,7 @@ final class _SmartContextMenuItemViewState
 
   // A failed load keeps the padding of the loading item, so the item does
   // not change its size.
-  EdgeInsetsGeometry get _padding =>
+  EdgeInsets get _padding =>
       switch (_item) {
         SmartContextMenuContentItem(:final padding) ||
         SmartContextMenuStatusItem(:final padding) => padding,
@@ -119,7 +131,11 @@ final class _SmartContextMenuItemViewState
           loading.padding,
         _ => null,
       } ??
-      _style.itemPadding;
+      switch (widget.rowSize) {
+        null => _style.itemPadding,
+        SmartContextMenuRowSize.small => _style.rowStyle.smallItemPadding,
+        SmartContextMenuRowSize.medium => _style.rowStyle.mediumItemPadding,
+      };
 
   static Listenable? _listenableOf(SmartContextMenuItem item) => switch (item) {
     SmartContextMenuListenableItem(:final listenable) => listenable,
@@ -173,6 +189,7 @@ final class _SmartContextMenuItemViewState
   void dispose() {
     _minHighlightTimer?.cancel();
     widget.hoverController?.removeListener(_handleGlobalPointer);
+    widget.hoverController?.forget(this);
     _listenableOf(widget.item)?.removeListener(_onListenableChanged);
     super.dispose();
   }
@@ -196,13 +213,15 @@ final class _SmartContextMenuItemViewState
       _ => (false, false),
     };
     final itemState = SmartContextMenuItemState(
-      isPressed: _isHighlight,
+      isPressed: _isPressed,
+      isHovered: _isHovered,
       isDisabled: isDisabled,
       isDestructive: isDestructive,
       foregroundColor: colors.foreground,
+      rowSize: widget.rowSize,
     );
 
-    return MetaData(
+    final item = MetaData(
       metaData: widget.key,
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
@@ -213,18 +232,53 @@ final class _SmartContextMenuItemViewState
           duration: MotionDurations.fast,
           transitionBuilder: (child, animation) =>
               TrickyTransition(animation: animation, child: child),
+          // A cell lower than its row keeps its content at the top.
+          layoutBuilder: widget.rowSize == null
+              ? AnimatedSwitcher.defaultLayoutBuilder
+              : (currentChild, previousChildren) => Stack(
+                  alignment: Alignment.topCenter,
+                  children: [...previousChildren, ?currentChild],
+                ),
           child: _buildContent(itemState),
         ),
       ),
     );
+    if (widget.hoverController == null) return item;
+
+    // The mouse tracker updates the regions after every frame, so the hover
+    // follows the item under a stationary cursor as the menu changes.
+    return MouseRegion(
+      onEnter: _onCursor,
+      onHover: _onCursor,
+      onExit: (_) => widget.hoverController?.unhover(this),
+      child: item,
+    );
   }
 
+  /// An interactive child of the item handles the cursor itself.
+  void _onCursor(PointerEvent event) {
+    final controller = widget.hoverController;
+    final key = widget.key;
+    if (controller == null || key == null) return;
+    final keyAt = context.findRenderObject()?.findMenuItemKeyAt(event.position);
+    if (keyAt == key) {
+      controller.hover(this, key);
+    } else {
+      controller.unhover(this);
+    }
+  }
+
+  // A row stretches its separators to its height.
   Widget _buildSeparator(SmartContextMenuSeparatorItem item) {
-    return item.child ??
-        Container(
-          height: _style.separatorHeight,
-          color: CupertinoDynamicColor.resolve(_style.separatorColor, context),
-        );
+    if (item.child case final child?) return child;
+    final color = CupertinoDynamicColor.resolve(_style.separatorColor, context);
+    if (widget.rowSize != null) {
+      return SizedBox(
+        width: _style.separatorThickness,
+        child: ColoredBox(color: color),
+      );
+    }
+    return Container(height: _style.separatorThickness, color: color);
   }
 
   Widget _buildContent(SmartContextMenuItemState state) {
@@ -240,22 +294,33 @@ final class _SmartContextMenuItemViewState
         foregroundColor: state.foregroundColor,
         // The menu retries the failed load on tap.
         retries: _error != null,
+        rowSize: widget.rowSize,
       ),
       SmartContextMenuContentItem item => KeyedSubtree(
         key: ItemContentKey.content,
         child:
             item.customBuilder?.call(context, state) ??
-            SmartContextMenuItemRow.content(
-              item: item,
-              style: _style,
-              foregroundColor: state.foregroundColor,
-            ),
+            switch (widget.rowSize) {
+              null => SmartContextMenuItemRow.content(
+                item: item,
+                style: _style,
+                foregroundColor: state.foregroundColor,
+              ),
+              final size => SmartContextMenuItemCell.content(
+                item: item,
+                size: size,
+                padding: _padding,
+                style: _style,
+                foregroundColor: state.foregroundColor,
+              ),
+            },
       ),
       // Async and listenable items show the item they load or build, and
-      // a separator is built without the item frame.
+      // a separator and a row are built without the item frame.
       SmartContextMenuAsyncItem() ||
       SmartContextMenuListenableItem() ||
-      SmartContextMenuSeparatorItem() => const SizedBox.shrink(),
+      SmartContextMenuSeparatorItem() ||
+      SmartContextMenuRowItem() => const SizedBox.shrink(),
     };
   }
 
@@ -306,36 +371,47 @@ final class _SmartContextMenuItemViewState
 
   void _buildListenableItem(SmartContextMenuListenableItem item) {
     _resolvedItem = item.builder();
-    _isHighlight = widget.hoverController?.value == widget.key && !_isDisabled;
+    final (:isPressed, :isHovered) = _pointerState;
+    _isPressed = isPressed;
+    _isHovered = isHovered;
+    _isTapHighlightHeld = false;
+  }
+
+  /// The pointer state of the item in [widget.hoverController].
+  ({bool isPressed, bool isHovered}) get _pointerState {
+    final controller = widget.hoverController;
+    if (controller == null || controller.value != widget.key || _isDisabled) {
+      return (isPressed: false, isHovered: false);
+    }
+    return (
+      isPressed: !controller.isPointerHover,
+      isHovered: controller.isCursor,
+    );
   }
 
   void _handleGlobalPointer() {
-    final activeKey = widget.hoverController?.value;
     final bool isReleased = widget.hoverController?.isPointerReleased ?? false;
-    final myKey = widget.key;
+    final bool wasHighlight = _isHighlight;
+    final (isPressed: isPointerPressed, :isHovered) = _pointerState;
 
-    final bool isMeHovered = activeKey == myKey;
-    final bool shouldHighlight = isMeHovered && !_isDisabled;
-
-    if (_isTapHighlightHeld) {
-      if (!shouldHighlight) return;
-      // Pressed again before the highlight of the tap ended.
+    if (isPointerPressed && (!_isPressed || _isTapHighlightHeld)) {
+      // Pressed, or pressed again before the highlight of the tap ended.
       _isTapHighlightHeld = false;
       _startMinHighlightTimer();
     }
+    final isPressed = isPointerPressed || _isTapHighlightHeld;
 
-    if (shouldHighlight != _isHighlight) {
-      if (shouldHighlight) _startMinHighlightTimer();
-      setState(() => _isHighlight = shouldHighlight);
-      _generateFeedback(shouldHighlight);
+    if (isPressed != _isPressed || isHovered != _isHovered) {
+      setState(() {
+        _isPressed = isPressed;
+        _isHovered = isHovered;
+      });
+      if (!wasHighlight && isPressed) _generateFeedback();
     }
 
-    if (isReleased) {
-      if (_isHighlight && !_isDisabled) {
-        _handleTap();
-      }
-      if (_isHighlight) _clearHighlightAfterTap();
-      return;
+    if (isReleased && isPointerPressed) {
+      _handleTap();
+      _clearHighlightAfterTap();
     }
   }
 
@@ -348,19 +424,17 @@ final class _SmartContextMenuItemViewState
     if (_minHighlightTimer?.isActive ?? false) {
       _isTapHighlightHeld = true;
     } else {
-      setState(() => _isHighlight = false);
+      setState(() => _isPressed = false);
     }
   }
 
   void _onMinHighlightEnd() {
     if (!_isTapHighlightHeld || !mounted) return;
     _isTapHighlightHeld = false;
-    setState(() => _isHighlight = false);
+    setState(() => _isPressed = false);
   }
 
-  void _generateFeedback(bool shouldHighlight) {
-    if (shouldHighlight && _config.enableHaptics) {
-      HapticFeedback.selectionClick();
-    }
+  void _generateFeedback() {
+    if (_config.enableHaptics) HapticFeedback.selectionClick();
   }
 }

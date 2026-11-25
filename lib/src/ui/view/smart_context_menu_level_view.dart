@@ -9,12 +9,16 @@ import '../../core/ui/styles/smart_context_menu_defaults.dart';
 import '../../domain/smart_context_menu_config.dart';
 import '../../domain/smart_context_menu_item.dart';
 import '../../domain/smart_context_menu_level.dart';
+import '../../domain/smart_context_menu_row_size.dart';
 import '../keys/service_item_key.dart';
+import '../layout/smart_context_menu_separator_rule.dart';
 import '../state/smart_context_menu_hover_controller.dart';
 import '../widgets/smart_context_menu_back_item.dart';
 import '../widgets/smart_context_menu_divider.dart';
 import '../widgets/smart_context_menu_pagination_trigger.dart';
 import '../widgets/smart_context_menu_retry_row.dart';
+import '../widgets/smart_context_menu_row_layout.dart';
+import '../widgets/smart_context_menu_swipe_back_exclusion.dart';
 import 'item/smart_context_menu_item_view.dart';
 
 /// The content of a menu [level]: its items, the back item of a submenu
@@ -163,10 +167,10 @@ final class SmartContextMenuLevelView extends StatelessWidget {
 
   // A row after the items is divided from them as they are from each other.
   Widget _dividedFromItems(Widget row) {
-    final items = level.items;
+    final last = level.items.where((item) => !_isHidden(item)).lastOrNull;
     if (!config.style.dividersBetweenItems ||
-        items.isEmpty ||
-        items.last is SmartContextMenuSeparatorItem) {
+        last == null ||
+        last is SmartContextMenuSeparatorItem) {
       return row;
     }
     return Column(
@@ -179,13 +183,14 @@ final class SmartContextMenuLevelView extends StatelessWidget {
   }
 
   SmartContextMenuLoadingItem _defaultLoadingItem() {
+    final statusStyle = config.style.statusStyle;
     return SmartContextMenuItem.loading(
       padding: EdgeInsets.symmetric(
-        vertical: config.style.loaderVerticalPadding,
+        vertical: statusStyle.loaderVerticalPadding,
       ),
       child: Center(
         child:
-            config.style.loadingIndicator ??
+            statusStyle.loadingIndicator ??
             const CupertinoActivityIndicator(
               radius: SmartContextMenuDefaults.loaderIndicatorRadius,
             ),
@@ -199,22 +204,33 @@ final class SmartContextMenuLevelView extends StatelessWidget {
     }
 
     final item = level.items[relativeIndex];
-    if (item is SmartContextMenuSeparatorItem &&
-        !_showsSeparatorAt(relativeIndex)) {
+    if (_isHidden(item) ||
+        item is SmartContextMenuSeparatorItem &&
+            !SmartContextMenuSeparatorRule.showsAt(
+              level.items,
+              relativeIndex,
+              isHidden: _isHidden,
+            )) {
       return const SizedBox.shrink();
     }
 
-    final itemView = _buildItemView(item);
+    final itemView = switch (item) {
+      SmartContextMenuRowItem() => _buildRow(item),
+      _ => _buildItemView(item),
+    };
     if (!config.style.dividersBetweenItems) return itemView;
 
     // The item stays the first child, so it keeps its state when the divider
     // appears, for example after the next page loads.
+    final next = level.items
+        .skip(relativeIndex + 1)
+        .where((item) => !_isHidden(item))
+        .firstOrNull;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         itemView,
-        if (relativeIndex < itemsCount - 1 &&
-            _needsDividerBetween(item, level.items[relativeIndex + 1]))
+        if (next != null && _needsDividerBetween(item, next))
           SmartContextMenuDivider(style: config.style),
       ],
     );
@@ -227,24 +243,75 @@ final class SmartContextMenuLevelView extends StatelessWidget {
       item is! SmartContextMenuSeparatorItem &&
       next is! SmartContextMenuSeparatorItem;
 
-  // A separator is shown only between items: not at the start or the end
-  // of the level, and only the first one of several in a row. Items shown
-  // on condition can keep their separators without extra checks.
-  bool _showsSeparatorAt(int index) {
-    final items = level.items;
-    if (index > 0 && items[index - 1] is SmartContextMenuSeparatorItem) {
-      return false;
-    }
-    final hasItemBefore = items
-        .take(index)
-        .any((item) => item is! SmartContextMenuSeparatorItem);
-    final hasItemAfter = items
-        .skip(index + 1)
-        .any((item) => item is! SmartContextMenuSeparatorItem);
-    return hasItemBefore && hasItemAfter;
+  // A row without cells to show is left out, like a separator at the edge.
+  static bool _isHidden(SmartContextMenuItem item) =>
+      item is SmartContextMenuRowItem && _cellsOf(item).isEmpty;
+
+  /// The items of [row] with their flex, without the separators that are
+  /// not shown: the same rules apply as in a level.
+  static List<(SmartContextMenuItem, int?)> _cellsOf(
+    SmartContextMenuRowItem row,
+  ) {
+    final entries = row.children.map(_unwrap).toList();
+    final items = [for (final (item, _) in entries) item];
+    return [
+      for (var i = 0; i < entries.length; i++)
+        if (items[i] is! SmartContextMenuSeparatorItem)
+          entries[i]
+        else if (SmartContextMenuSeparatorRule.showsAt(items, i))
+          (items[i], null),
+    ];
   }
 
-  Widget _buildItemView(SmartContextMenuItem item) {
+  static (SmartContextMenuItem, int?) _unwrap(SmartContextMenuRowEntry entry) {
+    return switch (entry) {
+      SmartContextMenuRowFlex(:final flex, :final child) => (
+        _unwrap(child).$1,
+        flex,
+      ),
+      SmartContextMenuItem item => (item, null),
+    };
+  }
+
+  // The row is not an item for drag-to-select and hover: its cells are.
+  Widget _buildRow(SmartContextMenuRowItem row) {
+    final style = config.style;
+    final cells = _cellsOf(row);
+    final hasDividers =
+        row.dividersBetweenChildren ?? style.dividersBetweenItems;
+    final children = <Widget>[];
+    for (var i = 0; i < cells.length; i++) {
+      final (item, flex) = cells[i];
+      final isSeparator = item is SmartContextMenuSeparatorItem;
+      // No divider next to a separator.
+      if (hasDividers &&
+          i > 0 &&
+          !isSeparator &&
+          cells[i - 1].$1 is! SmartContextMenuSeparatorItem) {
+        children.add(SmartContextMenuRowDivider(style: style));
+      }
+      final view = _buildItemView(item, rowSize: row.size);
+      children.add(
+        isSeparator
+            ? view
+            : SmartContextMenuRowCell(flex: flex ?? 1, child: view),
+      );
+    }
+    return SmartContextMenuSwipeBackExclusion(
+      key: ValueKey(row.id),
+      excludes: !row.enableSwipeBack,
+      child: SmartContextMenuRowLayout(
+        padding: row.padding ?? style.rowStyle.padding,
+        childrenGap: row.childrenGap ?? style.rowStyle.childrenGap,
+        children: children,
+      ),
+    );
+  }
+
+  Widget _buildItemView(
+    SmartContextMenuItem item, {
+    SmartContextMenuRowSize? rowSize,
+  }) {
     if (item is SmartContextMenuAsyncItem) {
       final parentId = item.id;
       return SmartContextMenuItemView.async(
@@ -255,6 +322,7 @@ final class SmartContextMenuLevelView extends StatelessWidget {
         cachedItem: controller.cache.resolvedItems[parentId],
         onLoaded: (item) => controller.cache.resolvedItems[parentId] = item,
         hoverController: hoverController,
+        rowSize: rowSize,
       );
     }
     return SmartContextMenuItemView(
@@ -263,6 +331,7 @@ final class SmartContextMenuLevelView extends StatelessWidget {
       item: item,
       config: config,
       hoverController: hoverController,
+      rowSize: rowSize,
     );
   }
 }

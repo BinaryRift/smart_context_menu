@@ -45,6 +45,58 @@ void main() {
     expect(itemTitles(childLevel.items), ['Grandchild']);
   });
 
+  test('a row with metadata at the end of a page continues it', () async {
+    final requested = <int>[];
+    final paging = SmartContextMenuItem.pagingSubmenu(
+      initialMetadata: const SmartContextMenuPagingMetadata(),
+      asyncPagingChildren: (metadata) async {
+        requested.add(metadata.page);
+        return [
+          SmartContextMenuItem.row(
+            pagingMetadata: metadata.page == 1
+                ? metadata.copyWith(page: 2)
+                : null,
+            children: [
+              SmartContextMenuItem.simple(title: 'Page ${metadata.page}'),
+            ],
+          ),
+        ];
+      },
+    );
+    final controller = overlayController([paging]);
+
+    controller.handleItemTap(paging);
+    await pumpEventQueue();
+    final level = controller.currentLevel;
+    expect(level.hasPaging, isTrue);
+
+    await controller.handlePagination(level);
+    expect(requested, [1, 2]);
+    expect(level.hasPaging, isFalse);
+  });
+
+  test('the metadata of the last cell does not continue a page', () async {
+    final paging = SmartContextMenuItem.pagingSubmenu(
+      initialMetadata: const SmartContextMenuPagingMetadata(),
+      asyncPagingChildren: (metadata) async => [
+        SmartContextMenuItem.row(
+          children: [
+            SmartContextMenuItem.simple(
+              title: 'Page ${metadata.page}',
+              pagingMetadata: metadata.copyWith(page: metadata.page + 1),
+            ),
+          ],
+        ),
+      ],
+    );
+    final controller = overlayController([paging]);
+
+    controller.handleItemTap(paging);
+    await pumpEventQueue();
+
+    expect(controller.currentLevel.hasPaging, isFalse);
+  });
+
   test('does nothing after the last page', () async {
     final requested = <int>[];
     final paging = SmartContextMenuItem.pagingSubmenu(

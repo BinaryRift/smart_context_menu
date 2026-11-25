@@ -61,19 +61,36 @@ const insetDividersStyle = SmartContextMenuStyle(
 /// Own signs of loading, error and empty items, with the titles at the
 /// start rather than in the middle: a Material progress indicator instead
 /// of the Cupertino one, and other icons.
-const statusStyle = SmartContextMenuStyle(
-  loadingIndicator: SizedBox.square(
-    dimension: 18,
-    child: CircularProgressIndicator(
-      strokeWidth: 2,
-      color: CupertinoColors.systemOrange,
+const statusItemsStyle = SmartContextMenuStyle(
+  statusStyle: SmartContextMenuStatusStyle(
+    loadingIndicator: SizedBox.square(
+      dimension: 18,
+      child: CircularProgressIndicator(
+        strokeWidth: 2,
+        color: CupertinoColors.systemOrange,
+      ),
     ),
+    errorIcon: CupertinoIcons.wifi_exclamationmark,
+    retryIcon: CupertinoIcons.arrow_clockwise,
+    emptyIcon: CupertinoIcons.tray,
+    titleAlign: TextAlign.start,
   ),
-  errorIcon: CupertinoIcons.wifi_exclamationmark,
-  retryIcon: CupertinoIcons.arrow_clockwise,
-  emptyIcon: CupertinoIcons.tray,
-  statusTitleAlign: TextAlign.start,
 );
+
+/// Bolder titles in the cells, gaps between them and vertical lines that
+/// stop short of the edges of the row.
+const styledRowStyle = SmartContextMenuRowStyle(
+  titleStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+  childrenGap: 4,
+  dividerIndent: 12,
+  dividerEndIndent: 12,
+);
+
+/// Wide enough for seven small cells of 48, the touch target of Material
+/// and more than the 44 of iOS. A screen narrower than the menu with its
+/// screen padding makes the menu narrower: a phone of 360 still leaves
+/// about 47 for a cell.
+const wideRowMenuWidth = 336.0;
 
 /// The strings the menu shows itself, in Russian.
 const russianLabels = SmartContextMenuLabels(
@@ -82,4 +99,8 @@ const russianLabels = SmartContextMenuLabels(
   loading: 'Загрузка…',
   error: 'Не удалось загрузить',
   empty: 'Пусто',
+  rowLoading: 'Загрузка…',
+  rowError: 'Ошибка',
+  rowRetry: 'Повторить',
+  rowEmpty: 'Пусто',
 );

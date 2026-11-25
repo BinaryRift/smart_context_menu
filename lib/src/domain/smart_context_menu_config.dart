@@ -52,8 +52,8 @@ final class SmartContextMenuConfig {
 
   /// How the menu opens.
   ///
-  /// With [SmartContextMenuActivationMode.manual], the menu opens only via
-  /// [SmartContextMenu.controller], which is then required.
+  /// With [SmartContextMenuActivationMode.manual], the menu opens only from
+  /// code, see [SmartContextMenu.of] and [SmartContextMenu.controller].
   /// Defaults to [SmartContextMenuActivationMode.longPress].
   final SmartContextMenuActivationMode activationMode;
 

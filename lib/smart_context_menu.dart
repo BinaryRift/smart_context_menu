@@ -9,10 +9,11 @@
 /// * [SmartContextMenu] attaches a menu to a widget.
 /// * [SmartContextMenuItem] is an entry of the menu: an action, a submenu,
 ///   an async or paginated submenu, an item loaded on the fly, an item
-///   rebuilt from the state of the app while the menu is open, or a loading,
-///   error or empty state.
+///   rebuilt from the state of the app while the menu is open, a loading,
+///   error or empty state, or a row of compact cells.
 /// * [SmartContextMenuConfig] sets the behavior and appearance of the menu.
-/// * [SmartContextMenuStyle] sets the appearance, as part of the config.
+/// * [SmartContextMenuStyle] sets the appearance, as part of the config;
+///   [SmartContextMenuRowStyle] sets the appearance of rows in it.
 /// * [SmartContextMenuTheme] sets the config for the menus below it.
 /// * [SmartContextMenuController] opens and closes the menu from code.
 ///
@@ -22,6 +23,9 @@
 /// * [SmartContextMenuBlur] sets the strength of the blurs.
 /// * [SmartContextMenuPagingMetadata] describes a page of a paginated
 ///   submenu.
+/// * [SmartContextMenuRowFlex] sets the share of a cell in a row,
+///   [SmartContextMenuRowSize] the size of the cells.
+///   [SmartContextMenuRowEntry] is a cell of a row: any item but a row.
 /// * The subtypes of [SmartContextMenuItem], one for each way to create
 ///   an item, such as [SmartContextMenuSimpleItem]. Switch on an item to
 ///   read the fields of its type. [SmartContextMenuContentItem] is the base
@@ -39,6 +43,7 @@ library;
 export 'src/controllers/smart_context_menu_controller.dart';
 export 'src/core/ui/styles/smart_context_menu_defaults.dart';
 export 'src/domain/smart_context_menu_activation_mode.dart';
+export 'src/domain/smart_context_menu_back_button_style.dart';
 export 'src/domain/smart_context_menu_blur.dart';
 export 'src/domain/smart_context_menu_config.dart';
 export 'src/domain/smart_context_menu_header_details.dart';
@@ -46,6 +51,9 @@ export 'src/domain/smart_context_menu_item.dart';
 export 'src/domain/smart_context_menu_item_state.dart';
 export 'src/domain/smart_context_menu_labels.dart';
 export 'src/domain/smart_context_menu_paging_metadata.dart';
+export 'src/domain/smart_context_menu_row_size.dart';
+export 'src/domain/smart_context_menu_row_style.dart';
+export 'src/domain/smart_context_menu_status_style.dart';
 export 'src/domain/smart_context_menu_style.dart';
 export 'src/ui/theme/smart_context_menu_theme.dart';
 export 'src/ui/view/smart_context_menu.dart';

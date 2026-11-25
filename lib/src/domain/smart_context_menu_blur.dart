@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart' show immutable;
 ///
 /// Used by [SmartContextMenuStyle.backgroundBlur],
 /// [SmartContextMenuStyle.menuBlur] and
-/// [SmartContextMenuStyle.backButtonBlur]. Pick a preset or create your own:
+/// [SmartContextMenuBackButtonStyle.blur]. Pick a preset or create your own:
 ///
 /// ```dart
 /// const SmartContextMenuStyle(menuBlur: SmartContextMenuBlur(10))

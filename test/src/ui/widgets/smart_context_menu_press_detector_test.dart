@@ -1,3 +1,6 @@
+import 'dart:ui' show PointerDeviceKind;
+
+import 'package:flutter/gestures.dart' show kSecondaryButton;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu/src/core/ui/motion/tokens/motion_scales.dart';
@@ -11,6 +14,7 @@ void main() {
     bool enabled = true,
     bool isMenuActive = false,
     VoidCallback? onLongPress,
+    VoidCallback? onSecondaryClick,
   }) {
     return tester.pumpWidget(
       Directionality(
@@ -20,6 +24,7 @@ void main() {
             enabled: enabled,
             isMenuActive: isMenuActive,
             onLongPress: onLongPress ?? () {},
+            onSecondaryClick: onSecondaryClick ?? () {},
             child: const SizedBox(
               key: target,
               width: 100,
@@ -75,6 +80,23 @@ void main() {
     expect(scaleOnLongPress, MotionScale.none.value);
   });
 
+  testWidgets('opens on secondary button down without shrinking the child', (
+    tester,
+  ) async {
+    var clicks = 0;
+    await pumpDetector(tester, onSecondaryClick: () => clicks++);
+
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.byKey(target)),
+      kind: PointerDeviceKind.mouse,
+      buttons: kSecondaryButton,
+    );
+
+    expect(clicks, 1);
+    expect(scale(tester), MotionScale.none.value);
+    await gesture.up();
+  });
+
   testWidgets('returns the child as is when disabled', (tester) async {
     var longPresses = 0;
     await pumpDetector(
@@ -109,5 +131,25 @@ void main() {
     await gesture.up();
     await tester.pumpAndSettle();
     expect(longPresses, 0);
+  });
+
+  testWidgets('ignores secondary clicks while the menu is active', (
+    tester,
+  ) async {
+    var clicks = 0;
+    await pumpDetector(
+      tester,
+      isMenuActive: true,
+      onSecondaryClick: () => clicks++,
+    );
+
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.byKey(target)),
+      kind: PointerDeviceKind.mouse,
+      buttons: kSecondaryButton,
+    );
+    await gesture.up();
+
+    expect(clicks, 0);
   });
 }

@@ -2,7 +2,7 @@ name: smart_context_menu_example
 description: "Example app demonstrating the smart_context_menu package."
 publish_to: 'none'
 
-version: 1.0.4+4
+version: 1.1.0+5
 
 environment:
   sdk: ^3.8.0
@@ -27,3 +27,13 @@ flutter:
 
   assets:
     - assets/images/
+
+  # Latin subsets of two fonts under the SIL Open Font License, for the
+  # Terminal and Paper cards of Appearance: system fonts differ by platform.
+  fonts:
+    - family: JetBrains Mono
+      fonts:
+        - asset: assets/fonts/JetBrainsMono-Regular.ttf
+    - family: Literata
+      fonts:
+        - asset: assets/fonts/Literata-Regular.ttf

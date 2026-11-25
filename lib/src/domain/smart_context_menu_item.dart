@@ -5,12 +5,15 @@ import 'package:flutter/widgets.dart'
 import '../core/ui/styles/smart_context_menu_defaults.dart';
 import 'smart_context_menu_item_state.dart';
 import 'smart_context_menu_paging_metadata.dart';
+import 'smart_context_menu_row_size.dart';
 
 part 'items/smart_context_menu_async_item.dart';
 part 'items/smart_context_menu_async_submenu_item.dart';
 part 'items/smart_context_menu_content_item.dart';
 part 'items/smart_context_menu_listenable_item.dart';
 part 'items/smart_context_menu_paging_submenu_item.dart';
+part 'items/smart_context_menu_row_entry.dart';
+part 'items/smart_context_menu_row_item.dart';
 part 'items/smart_context_menu_separator_item.dart';
 part 'items/smart_context_menu_simple_item.dart';
 part 'items/smart_context_menu_status_item.dart';
@@ -61,6 +64,11 @@ sealed class SmartContextMenuAsyncResult implements SmartContextMenuItem {}
 sealed class SmartContextMenuListenableResult
     implements SmartContextMenuAsyncResult {}
 
+// Makes SmartContextMenuItem deeper in the type hierarchy than
+// SmartContextMenuRowEntry, so a list of items is inferred as
+// List<SmartContextMenuItem>, not List<Object>.
+abstract interface class _MenuNode {}
+
 /// An entry of a [SmartContextMenu].
 ///
 /// Create items with the method that matches what the item does. Each one
@@ -88,6 +96,8 @@ sealed class SmartContextMenuListenableResult
 ///   a [SmartContextMenuEmptyItem].
 /// * [SmartContextMenuItem.separator] separates groups of items,
 ///   a [SmartContextMenuSeparatorItem].
+/// * [SmartContextMenuItem.row] shows items as compact cells side by side
+///   in one line, a [SmartContextMenuRowItem].
 ///
 /// New item types may be added in minor versions, so keep a `_` case when
 /// you switch on items.
@@ -112,7 +122,7 @@ sealed class SmartContextMenuListenableResult
 ///   ],
 /// )
 /// ```
-sealed class SmartContextMenuItem {
+sealed class SmartContextMenuItem implements _MenuNode {
   static int _nextId = 0;
   static String _generateId() => "smart_context_menu_item_${_nextId++}";
 
@@ -205,7 +215,7 @@ sealed class SmartContextMenuItem {
   ///
   /// [timeout] defaults to [SmartContextMenuDefaults.loadingTimeout].
   /// Without its own title and trailing, [error] shows
-  /// [SmartContextMenuLabels.retry] and [SmartContextMenuStyle.retryIcon].
+  /// [SmartContextMenuLabels.retry] and [SmartContextMenuStatusStyle.retryIcon].
   ///
   /// ```dart
   /// SmartContextMenuItem.asyncSubmenu(
@@ -259,12 +269,14 @@ sealed class SmartContextMenuItem {
   /// Creates an item that opens a submenu with items loaded page by page.
   ///
   /// [asyncPagingChildren] is called with [initialMetadata] when the item
-  /// is tapped. The [SmartContextMenuSimpleItem.pagingMetadata] of the last
-  /// item of each page describes the next page, which is loaded when the
-  /// user scrolls to the end of the submenu. A page that is empty or whose
-  /// last item has no metadata is the last one. While a page loads, the
-  /// submenu shows [loading], a [SmartContextMenuItem.loading], or by
-  /// default an activity indicator in the middle, after the loaded items.
+  /// is tapped. The `pagingMetadata` of the last item of each page,
+  /// a [SmartContextMenuItem.simple], a [SmartContextMenuItem.separator] or
+  /// a [SmartContextMenuItem.row], describes the next page, which is loaded
+  /// when the user scrolls to the end of the submenu. A page that is empty
+  /// or whose last item has no metadata is the last one. While a page
+  /// loads, the submenu shows [loading], a [SmartContextMenuItem.loading],
+  /// or by default an activity indicator in the middle, after the loaded
+  /// items.
   ///
   /// If a page fails to load or takes longer than [timeout], the submenu
   /// shows [error], a [SmartContextMenuItem.error], after the loaded items,
@@ -274,7 +286,7 @@ sealed class SmartContextMenuItem {
   ///
   /// [timeout] defaults to [SmartContextMenuDefaults.loadingTimeout].
   /// Without its own title and trailing, [error] shows
-  /// [SmartContextMenuLabels.retry] and [SmartContextMenuStyle.retryIcon].
+  /// [SmartContextMenuLabels.retry] and [SmartContextMenuStatusStyle.retryIcon].
   ///
   /// ```dart
   /// SmartContextMenuItem.pagingSubmenu(
@@ -340,16 +352,21 @@ sealed class SmartContextMenuItem {
   ///
   /// A separator has no actions and no press highlight, and drag-to-select
   /// passes over it. By default it is a band of
-  /// [SmartContextMenuStyle.separatorHeight] in
+  /// [SmartContextMenuStyle.separatorThickness] in
   /// [SmartContextMenuStyle.separatorColor];
   /// [child] replaces the band, for example with a section title.
   ///
-  /// A separator at the start or the end of a menu level is not shown, and
-  /// of several separators in a row only the first one is. So items shown
-  /// on condition can keep their separators without extra checks. A separator
-  /// at the end of a loaded page appears when the next page loads; set
-  /// [pagingMetadata] on it if it is the last item of a page, see
-  /// [SmartContextMenuItem.pagingSubmenu].
+  /// A band is shown only between items: not at the start or the end of
+  /// a menu level. A separator with a [child] titles the items after it, so
+  /// it is also shown at the start of a level, below the back item of
+  /// a submenu, but not at the end. Of several separators next to each
+  /// other, the last one with a [child] is shown, or else the first band.
+  /// So items shown on condition can keep their separators without extra
+  /// checks. A separator at the end of a loaded page appears when the next
+  /// page loads; set [pagingMetadata] on it if it is the last item of
+  /// a page, see [SmartContextMenuItem.pagingSubmenu]. In
+  /// a [SmartContextMenuItem.row] the band is vertical and [pagingMetadata]
+  /// must be null.
   ///
   /// ```dart
   /// [
@@ -387,7 +404,7 @@ sealed class SmartContextMenuItem {
   /// [timeout] defaults to [SmartContextMenuDefaults.loadingTimeout].
   ///
   /// Without its own title and trailing, [error] shows
-  /// [SmartContextMenuLabels.retry] and [SmartContextMenuStyle.retryIcon].
+  /// [SmartContextMenuLabels.retry] and [SmartContextMenuStatusStyle.retryIcon].
   /// Without its own padding, it keeps the padding of [loading]; the loaded
   /// item uses its own.
   ///
@@ -511,7 +528,7 @@ sealed class SmartContextMenuItem {
   /// Creates an item that shows a failed load.
   ///
   /// The item shows [title] (or [SmartContextMenuLabels.error]) with
-  /// [leading] and [SmartContextMenuStyle.errorIcon], and does not
+  /// [leading] and [SmartContextMenuStatusStyle.errorIcon], and does not
   /// respond to taps. [trailing] replaces the icon. Pass [child] to replace
   /// this content; text and icons in it take the color of the item.
   /// Interactive widgets in [child], such as buttons, handle their own taps.
@@ -561,7 +578,7 @@ sealed class SmartContextMenuItem {
   /// Creates an item that shows that there are no items.
   ///
   /// The item shows [title] (or [SmartContextMenuLabels.empty]) with
-  /// [leading] and [SmartContextMenuStyle.emptyIcon], and does not
+  /// [leading] and [SmartContextMenuStatusStyle.emptyIcon], and does not
   /// respond to taps. [trailing] replaces the icon. Pass [child] to replace
   /// this content; text and icons in it take the color of the item.
   ///
@@ -602,4 +619,123 @@ sealed class SmartContextMenuItem {
     padding: padding,
     childrenGap: childrenGap,
   );
+
+  /// Creates a row that shows [children] as compact cells side by side in
+  /// one line.
+  ///
+  /// The cells are items of the other types: actions, submenus, async and
+  /// listenable items, loading, error and empty items and separators. They
+  /// keep their actions, states, colors, ids and rules of closing the menu.
+  /// A row is one item of its menu level: rows and other items can be mixed,
+  /// and a menu can consist of rows only.
+  ///
+  /// [size] sets the look of the cells, [SmartContextMenuRowSize.medium] by
+  /// default:
+  ///
+  /// * [SmartContextMenuRowSize.medium] shows the `leading` of a cell above
+  ///   its `title`.
+  /// * [SmartContextMenuRowSize.small] shows only the `leading`, or the
+  ///   `title` if there is no `leading`.
+  ///
+  /// Give each cell a `title` and a `leading`: in a small row the title is
+  /// read by screen readers. The `trailing` of a cell is not shown; a
+  /// `customBuilder` can draw it. Loading, error and empty cells show the
+  /// sign of their state instead of their `leading` and `trailing`. Async
+  /// and listenable cells stay compact while they load and after. A cell
+  /// that opens a submenu shows a small icon in its top corner; the submenu
+  /// shows its items as usual.
+  ///
+  /// The width of the row is divided between the cells by their flex, 1 by
+  /// default, see [SmartContextMenuRowFlex]. The width of a cell does not
+  /// change with its content. The row is as tall as its tallest cell, and
+  /// each cell is pressed and highlighted over its full share of the width
+  /// and the full height of the row. Content wider than its cell is clipped,
+  /// and text is truncated with an ellipsis. The cells follow the
+  /// [Directionality]: from right to left in RTL.
+  ///
+  /// The number of cells is not limited, and the row does not wrap: split
+  /// more cells into several rows. A cell narrower than 44 pixels, the
+  /// minimum touch target in the Apple Human Interface Guidelines, is hard
+  /// to tap, so at the default menu width use up to five cells.
+  ///
+  /// A separator in a row is a vertical band of
+  /// [SmartContextMenuStyle.separatorThickness]; its `child` replaces the
+  /// band and takes the height of the row. The same rules apply as in a menu
+  /// level: a band is shown only between cells, a separator with a child
+  /// also at the start of the row, and of several separators next to each
+  /// other only one is shown. A row without
+  /// cells, or with separators only, is not shown, so cells shown on
+  /// condition need no extra checks.
+  ///
+  /// [dividersBetweenChildren] draws vertical lines between the cells; if
+  /// null, it follows [SmartContextMenuStyle.dividersBetweenItems]. No line
+  /// is drawn next to a separator.
+  ///
+  /// [padding] is the padding around the cells and [childrenGap] the gap
+  /// between them. If null, [SmartContextMenuRowStyle.padding] and
+  /// [SmartContextMenuRowStyle.childrenGap] are used. The gap belongs to no
+  /// cell: a finger over it removes the highlight.
+  ///
+  /// With [enableSwipeBack] false, the default, a horizontal drag that
+  /// starts on the row selects the cells under the finger. If true, it
+  /// returns to the parent menu, as on other items. Outside the row and on
+  /// the back item the gesture always works. Has no effect without
+  /// [SmartContextMenuConfig.enableSwipeBack].
+  ///
+  /// Set [pagingMetadata] only on rows returned by a
+  /// [SmartContextMenuPageLoader], see [SmartContextMenuItem.pagingSubmenu].
+  /// The metadata of the cells does not describe the next page.
+  ///
+  /// ```dart
+  /// SmartContextMenuItem.row(
+  ///   children: [
+  ///     SmartContextMenuItem.simple(
+  ///       title: 'Copy',
+  ///       leading: const Icon(CupertinoIcons.doc_on_doc),
+  ///       onTap: () => debugPrint('Copy'),
+  ///     ),
+  ///     SmartContextMenuItem.simple(
+  ///       title: 'Share',
+  ///       leading: const Icon(CupertinoIcons.share),
+  ///       onTap: () => debugPrint('Share'),
+  ///     ),
+  ///     SmartContextMenuItem.simple(
+  ///       title: 'Delete',
+  ///       leading: const Icon(CupertinoIcons.delete),
+  ///       isDestructive: true,
+  ///       onTap: () => debugPrint('Delete'),
+  ///     ),
+  ///   ],
+  /// )
+  /// ```
+  static SmartContextMenuRowItem row({
+    required List<SmartContextMenuRowEntry> children,
+    String? id,
+    SmartContextMenuRowSize size = SmartContextMenuRowSize.medium,
+    bool? dividersBetweenChildren,
+    bool enableSwipeBack = false,
+    EdgeInsets? padding,
+    double? childrenGap,
+    SmartContextMenuPagingMetadata? pagingMetadata,
+  }) {
+    assert(
+      !children.any(
+        (child) =>
+            child is SmartContextMenuSeparatorItem &&
+            child.pagingMetadata != null,
+      ),
+      'The pagingMetadata of a separator in a row has no effect. '
+      'Set it on the row.',
+    );
+    return SmartContextMenuRowItem._(
+      id: id ?? _generateId(),
+      children: children,
+      size: size,
+      dividersBetweenChildren: dividersBetweenChildren,
+      enableSwipeBack: enableSwipeBack,
+      padding: padding,
+      childrenGap: childrenGap,
+      pagingMetadata: pagingMetadata,
+    );
+  }
 }

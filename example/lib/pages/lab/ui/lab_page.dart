@@ -6,6 +6,7 @@ import '../../../core/data/demo_loader.dart';
 import '../../../core/ui/demo_notice.dart';
 import '../../../core/ui/demo_card.dart';
 import '../../../core/ui/reactions_bar.dart';
+import '../../../resources/assets/app_images.dart';
 import '../../settings/ui/widgets/settings_button.dart';
 import '../domain/lab_items.dart';
 import 'widgets/tap_empty_area.dart';
@@ -117,10 +118,16 @@ final class _LabPageState extends State<LabPage> {
                     items: statusItems(),
                   ),
                   _buildMenu(
+                    title: 'Rows',
+                    subtitle: 'Small and medium cells, Copy Link has flex 2',
+                    items: rowItems(loader: _loader, favorite: _favorite),
+                  ),
+                  _buildMenu(
                     title: 'Nested levels',
                     subtitle: 'Share → Messages',
                     items: nestedLevels(),
                   ),
+                  _buildMenuInsideMenu(),
                   _buildMenu(
                     title: 'Short root, long submenu',
                     subtitle: 'The submenu scrolls vertically',
@@ -259,6 +266,38 @@ final class _LabPageState extends State<LabPage> {
         headerSliversBuilder: _headerBuilder(title),
         headerSliversDelay: _delayHeader ? _headerDelay : Duration.zero,
         child: DemoCard(title: title, subtitle: subtitle, height: height),
+      ),
+    );
+  }
+
+  /// A card with a menu and a photo inside it with a menu of its own:
+  /// a long press or a right click opens only the menu of the photo.
+  Widget _buildMenuInsideMenu() {
+    const title = 'Menu inside a menu';
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      child: SmartContextMenu(
+        items: outerCardItems(),
+        onPreviewTap: () => DemoNotice.show('$title preview tapped'),
+        headerSliversBuilder: _headerBuilder(title),
+        headerSliversDelay: _delayHeader ? _headerDelay : Duration.zero,
+        child: DemoCard(
+          title: title,
+          subtitle: 'The photo has its own menu',
+          trailing: SmartContextMenu(
+            items: innerPhotoItems(),
+            onPreviewTap: () => DemoNotice.show('Photo preview tapped'),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                AppImages.lake.path,
+                width: 72,
+                height: 48,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

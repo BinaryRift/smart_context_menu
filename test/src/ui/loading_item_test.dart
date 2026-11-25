@@ -114,7 +114,9 @@ void main() {
     await tester.pumpMenu(
       items: [SmartContextMenuItem.loading(title: 'Syncing')],
       config: const SmartContextMenuConfig(
-        style: SmartContextMenuStyle(statusTitleAlign: TextAlign.start),
+        style: SmartContextMenuStyle(
+          statusStyle: SmartContextMenuStatusStyle(titleAlign: TextAlign.start),
+        ),
       ),
     );
     await tester.openMenu();
@@ -147,7 +149,9 @@ void main() {
   group('with the loading indicator of the style', () {
     const config = SmartContextMenuConfig(
       style: SmartContextMenuStyle(
-        loadingIndicator: Icon(CupertinoIcons.hourglass),
+        statusStyle: SmartContextMenuStatusStyle(
+          loadingIndicator: Icon(CupertinoIcons.hourglass),
+        ),
       ),
     );
 

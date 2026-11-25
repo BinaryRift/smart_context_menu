@@ -40,7 +40,9 @@ void main() {
       config: const SmartContextMenuConfig(
         style: SmartContextMenuStyle(
           submenuIcon: Icons.arrow_forward_ios,
-          backIcon: Icons.arrow_back_ios_new,
+          backButtonStyle: SmartContextMenuBackButtonStyle(
+            icon: Icons.arrow_back_ios_new,
+          ),
         ),
       ),
     );
@@ -65,9 +67,11 @@ void main() {
       ],
       config: const SmartContextMenuConfig(
         style: SmartContextMenuStyle(
-          errorIcon: Icons.error,
-          retryIcon: Icons.refresh,
-          emptyIcon: Icons.inbox,
+          statusStyle: SmartContextMenuStatusStyle(
+            errorIcon: Icons.error,
+            retryIcon: Icons.refresh,
+            emptyIcon: Icons.inbox,
+          ),
         ),
       ),
     );

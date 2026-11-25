@@ -1,3 +1,52 @@
+## 1.1.0
+
+* `SmartContextMenuItem.row` shows items side by side as compact cells in one line, as in the
+  compact menus of iOS. The cells are items of the other types and keep their actions, states
+  and colors. `SmartContextMenuRowSize.medium`, the default, shows the icon above the title,
+  and `SmartContextMenuRowSize.small` the icon only. `SmartContextMenuRowFlex` gives a cell a
+  larger share of the width. Drag-to-select and cursor hover work across the cells. In a
+  submenu, a horizontal drag that starts on a row selects its cells unless `enableSwipeBack`
+  is set. A row returned by a page loader carries its own `pagingMetadata`. This is a new item
+  type, so keep a `_` case when you switch on items.
+* `SmartContextMenuRowStyle`, the `rowStyle` of the style, sets the padding, the gaps, the title
+  style and the divider indents of rows. `dividersBetweenChildren` of a row draws vertical
+  lines between its cells.
+* `SmartContextMenuItemState.rowSize` lets a `customBuilder` fit its content to a cell.
+* `SmartContextMenuLabels` has short titles for loading, error and empty cells: `rowLoading`,
+  `rowError`, `rowRetry` and `rowEmpty`.
+* The menu opens on a right click or a two-finger click on a trackpad in the default
+  `longPress` activation mode. Of nested menus, only the innermost one opens. A secondary
+  pointer-down handler on the child also runs; a secondary tap handler waiting for release
+  can be canceled as the menu opens.
+* Menu items highlight on cursor hover on desktop and web, without selecting an action. The
+  highlight follows the item under a stationary cursor as the menu scrolls, switches levels
+  or resizes. Items are selected with the primary mouse button only.
+  `SmartContextMenuItemState.isHovered` tells hover from a press in `customBuilder`.
+* `SmartContextMenu.of(context)` opens the menu from its child, for example from a "⋯" button
+  in a list row, without a controller. It returns the controller passed to the menu or the
+  menu's own one; `SmartContextMenu.maybeOf(context)` returns `null` outside a menu. The
+  `manual` activation mode no longer requires a controller.
+* `SmartContextMenuBackButtonStyle`, the `backButtonStyle` of the style, sets the look of the
+  pinned Back item. Its new `decoration` sets the background and clips the blur to the
+  decoration's shape, and `foregroundColor` colors the title and the icon. The fields
+  `backButtonBlur`, `backButtonBorderRadius`, `backButtonColor`, `backButtonTitleStyle` and
+  `backIcon` of the style remain as deprecated aliases until 2.0.0.
+* `SmartContextMenuStatusStyle`, the `statusStyle` of the style, sets the look of loading, error
+  and empty items: `titleAlign`, `errorIcon`, `retryIcon`, `emptyIcon`, `loadingIndicator` and
+  `loaderVerticalPadding`. The same fields of the style, with `statusTitleAlign` for
+  `titleAlign`, remain as deprecated aliases until 2.0.0. A group and its deprecated fields
+  cannot be set together.
+* `separatorThickness` sets the thickness of a separator band. The old `separatorHeight` name
+  remains as a deprecated alias until 2.0.0, in the style and in `SmartContextMenuDefaults`.
+* Dynamic colors in `menuShadows` now follow the theme.
+* Fixed nested menus: a press on the inner menu no longer shrinks the outer widget too.
+* Fixed section titles: a separator with a `child` at the start of a menu, a submenu or a row
+  is now shown, since it titles the items after it. Of several separators next to each other,
+  the last one with a `child` is shown instead of the first separator. Bands without a `child`
+  are shown as before.
+* Fixed a controller passed to another menu: it no longer stops working when the menu it
+  was passed to before is removed or rebuilt without it.
+
 ## 1.0.4
 
 * Fixed static analysis on Flutter 3.50: the package no longer reports the deprecated

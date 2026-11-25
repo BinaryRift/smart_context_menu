@@ -1,5 +1,9 @@
 import 'package:flutter/gestures.dart'
-    show GestureBinding, LongPressGestureRecognizer, TapGestureRecognizer;
+    show
+        GestureBinding,
+        LongPressGestureRecognizer,
+        TapGestureRecognizer,
+        kSecondaryButton;
 import 'package:flutter/widgets.dart';
 
 import '../../core/ui/motion/tokens/motion_curves.dart';
@@ -7,7 +11,9 @@ import '../../core/ui/motion/tokens/motion_durations.dart';
 import '../../core/ui/motion/tokens/motion_scales.dart';
 
 /// Shrinks [child] while it is pressed and calls [onLongPress] after
-/// a long press, once [child] is back to its size.
+/// a long press, once [child] is back to its size. A secondary click calls
+/// [onSecondaryClick] immediately, without shrinking [child]. Of nested
+/// detectors, only the innermost one handles a press.
 ///
 /// The long press wins over the gestures of [child]. When disabled,
 /// [child] is returned as is.
@@ -19,6 +25,7 @@ final class SmartContextMenuPressDetector extends StatefulWidget {
   final bool isMenuActive;
 
   final VoidCallback onLongPress;
+  final VoidCallback onSecondaryClick;
   final Widget child;
 
   const SmartContextMenuPressDetector({
@@ -26,6 +33,7 @@ final class SmartContextMenuPressDetector extends StatefulWidget {
     required this.enabled,
     required this.isMenuActive,
     required this.onLongPress,
+    required this.onSecondaryClick,
     required this.child,
   });
 
@@ -39,12 +47,20 @@ final class _SmartContextMenuPressDetectorState
     with SingleTickerProviderStateMixin {
   static const Duration _pressDuration = MotionDurations.medium;
 
+  /// The pointer-down event that a detector already took. Listeners get
+  /// the event from the innermost detector outward, so the outer ones
+  /// skip it.
+  static PointerEvent? _takenDown;
+
   late final LongPressGestureRecognizer _longPressRecognizer;
   late final TapGestureRecognizer _tapRecognizer;
   late final AnimationController _scaleController;
   late final CurvedAnimation _scaleCurve;
   late final Animation<double> _scaleAnimation;
   int? _activePointer;
+
+  /// Whether this detector took the current press, see [_takenDown].
+  bool _isPressTaken = false;
 
   @override
   void initState() {
@@ -141,7 +157,7 @@ final class _SmartContextMenuPressDetectorState
   }
 
   void _startScale() {
-    if (!widget.isMenuActive) _scaleController.forward();
+    if (_isPressTaken && !widget.isMenuActive) _scaleController.forward();
   }
 
   void _stopScale() {
@@ -168,5 +184,10 @@ final class _SmartContextMenuPressDetectorState
 
   void _handlePointerDown(PointerDownEvent event) {
     _activePointer = event.pointer;
+    final original = event.original ?? event;
+    _isPressTaken = !widget.isMenuActive && !identical(original, _takenDown);
+    if (!_isPressTaken) return;
+    _takenDown = original;
+    if (event.buttons == kSecondaryButton) widget.onSecondaryClick();
   }
 }

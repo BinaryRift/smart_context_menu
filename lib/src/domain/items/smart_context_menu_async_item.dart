@@ -4,7 +4,8 @@ part of '../smart_context_menu_item.dart';
 /// the item loaded by [asyncItem].
 ///
 /// Create it with [SmartContextMenuItem.async].
-final class SmartContextMenuAsyncItem extends SmartContextMenuItem {
+final class SmartContextMenuAsyncItem extends SmartContextMenuItem
+    implements SmartContextMenuRowEntry {
   /// Loads the item shown in place of this placeholder.
   final SmartContextMenuItemLoader asyncItem;
 
@@ -18,7 +19,7 @@ final class SmartContextMenuAsyncItem extends SmartContextMenuItem {
   ///
   /// Tapping it retries loading. Without its own title and trailing, it
   /// shows [SmartContextMenuLabels.retry] and
-  /// [SmartContextMenuStyle.retryIcon]. Without its own padding, it keeps
+  /// [SmartContextMenuStatusStyle.retryIcon]. Without its own padding, it keeps
   /// the padding of [loading].
   final SmartContextMenuErrorItem error;
 

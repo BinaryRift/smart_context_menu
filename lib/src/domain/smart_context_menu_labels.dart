@@ -43,6 +43,33 @@ final class SmartContextMenuLabels {
   /// Defaults to `'No items'`.
   final String empty;
 
+  /// The title of a loading cell of a [SmartContextMenuItem.row] without its
+  /// own title, instead of [loading].
+  ///
+  /// Shown in a [SmartContextMenuRowSize.medium] row. Defaults to
+  /// `'Loading…'`.
+  final String rowLoading;
+
+  /// The title of an error cell of a [SmartContextMenuItem.row] without its
+  /// own title, instead of [error].
+  ///
+  /// Shown in a [SmartContextMenuRowSize.medium] row. Defaults to `'Error'`.
+  final String rowError;
+
+  /// The title of a cell of a [SmartContextMenuItem.row] that retries
+  /// a failed load, instead of [retry].
+  ///
+  /// Shown in a [SmartContextMenuRowSize.medium] row, unless the error item
+  /// has its own title. Defaults to `'Retry'`.
+  final String rowRetry;
+
+  /// The title of an empty cell of a [SmartContextMenuItem.row] without its
+  /// own title, instead of [empty].
+  ///
+  /// Shown in a [SmartContextMenuRowSize.medium] row. Defaults to
+  /// `'No items'`.
+  final String rowEmpty;
+
   /// Creates the strings of the menu.
   const SmartContextMenuLabels({
     this.back = "Back",
@@ -50,5 +77,9 @@ final class SmartContextMenuLabels {
     this.loading = "Loading…",
     this.error = "Could not load",
     this.empty = "No items",
+    this.rowLoading = "Loading…",
+    this.rowError = "Error",
+    this.rowRetry = "Retry",
+    this.rowEmpty = "No items",
   });
 }

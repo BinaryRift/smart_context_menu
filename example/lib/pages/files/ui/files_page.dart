@@ -38,18 +38,10 @@ final class _FilesPageState extends State<FilesPage> {
   final _favorites = FileFavorites();
   final _downloads = FileDownloads();
 
-  /// Open the menus of the rows from their buttons.
-  final _rowMenus = {
-    for (final file in documents) file: SmartContextMenuController(),
-  };
-
   @override
   void dispose() {
     _favorites.dispose();
     _downloads.dispose();
-    for (final controller in _rowMenus.values) {
-      controller.dispose();
-    }
     super.dispose();
   }
 
@@ -66,7 +58,7 @@ final class _FilesPageState extends State<FilesPage> {
           slivers: [
             _buildHeader(
               'Recent',
-              hint: 'Press and hold a file to open its menu',
+              hint: 'Long press or right-click a file to open its menu',
             ),
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -83,15 +75,9 @@ final class _FilesPageState extends State<FilesPage> {
                 separatorBuilder: (context, index) => const SizedBox(height: 8),
                 itemBuilder: (context, index) {
                   final file = documents[index];
-                  final menu = _rowMenus[file]!;
                   return _buildMenu(
                     file,
-                    controller: menu,
-                    child: FileRow(
-                      file: file,
-                      favorites: _favorites,
-                      onMore: menu.open,
-                    ),
+                    child: FileRow(file: file, favorites: _favorites),
                   );
                 },
               ),
@@ -150,14 +136,10 @@ final class _FilesPageState extends State<FilesPage> {
     );
   }
 
-  /// A tap on [child] opens [file]; a long press or [controller] opens its menu.
-  Widget _buildMenu(
-    DemoFile file, {
-    required Widget child,
-    SmartContextMenuController? controller,
-  }) {
+  /// A tap on [child] opens [file]; a long press or secondary click opens
+  /// its menu.
+  Widget _buildMenu(DemoFile file, {required Widget child}) {
     return SmartContextMenu(
-      controller: controller,
       items: _menuItems(file),
       // A tap on the lifted file opens it, like a tap on the file itself.
       onPreviewTap: () => _open(file),
@@ -170,22 +152,29 @@ final class _FilesPageState extends State<FilesPage> {
   }
 
   List<SmartContextMenuItem> _menuItems(DemoFile file) => [
-    SmartContextMenuItem.simple(
-      title: 'Open',
-      leading: const Icon(CupertinoIcons.arrow_up_right_square),
-      // Runs when the menu is almost closed, so it can open a page.
-      onTap: () => _open(file),
+    // The most frequent actions side by side, as in the menus of iOS. Share
+    // opens its submenu from a cell, and Rename is a disabled cell in
+    // a read-only file.
+    SmartContextMenuItem.row(
+      children: [
+        SmartContextMenuItem.simple(
+          title: 'Open',
+          leading: const Icon(CupertinoIcons.arrow_up_right_square),
+          // Runs when the menu is almost closed, so it can open a page.
+          onTap: () => _open(file),
+        ),
+        _shareItem(file),
+        SmartContextMenuItem.simple(
+          title: 'Rename',
+          leading: const Icon(CupertinoIcons.pencil),
+          isDisabled: file.isReadOnly,
+          onTap: () => _notice('Rename ${file.name} (demo only)'),
+        ),
+      ],
     ),
-    _shareItem(file),
     _moveToItem(file),
     _favoriteItem(file),
     _downloadItem(file),
-    SmartContextMenuItem.simple(
-      title: 'Rename',
-      leading: const Icon(CupertinoIcons.pencil),
-      isDisabled: file.isReadOnly,
-      onTap: () => _notice('Rename ${file.name} (demo only)'),
-    ),
     SmartContextMenuItem.separator(),
     SmartContextMenuItem.simple(
       title: 'Delete',
@@ -196,7 +185,7 @@ final class _FilesPageState extends State<FilesPage> {
   ];
 
   /// A static submenu with an async submenu inside.
-  SmartContextMenuItem _shareItem(DemoFile file) {
+  SmartContextMenuSubmenuItem _shareItem(DemoFile file) {
     return SmartContextMenuItem.submenu(
       title: 'Share',
       leading: const Icon(CupertinoIcons.share),

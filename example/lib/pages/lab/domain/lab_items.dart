@@ -186,6 +186,118 @@ List<SmartContextMenuItem> statusItems() {
   ];
 }
 
+/// Rows of both sizes mixed with ordinary items: a wider cell, a separator,
+/// disabled and destructive cells, cells loaded on the fly or built from the
+/// state of the app, a row of statuses, and a submenu with rows that keep
+/// a horizontal drag for selection or let it go back.
+List<SmartContextMenuItem> rowItems({
+  required DemoLoader loader,
+  required DemoFavorite favorite,
+}) => [
+  SmartContextMenuItem.row(
+    children: [
+      _action('Copy', icon: CupertinoIcons.doc_on_doc),
+      _action('Share', icon: CupertinoIcons.share),
+      _action('Delete', icon: CupertinoIcons.delete, isDestructive: true),
+    ],
+  ),
+  SmartContextMenuItem.row(
+    size: SmartContextMenuRowSize.small,
+    children: [
+      _action('Bold', icon: CupertinoIcons.bold),
+      _action('Italic', icon: CupertinoIcons.italic),
+      _action('Underline', icon: CupertinoIcons.underline, isDisabled: true),
+      SmartContextMenuItem.separator(),
+      SmartContextMenuItem.submenu(
+        title: 'Swipe back',
+        leading: const Icon(CupertinoIcons.ellipsis),
+        children: _swipeBackRows(),
+      ),
+    ],
+  ),
+  _action('Reply', icon: CupertinoIcons.reply),
+  SmartContextMenuItem.row(
+    children: [
+      SmartContextMenuRowFlex(
+        flex: 2,
+        child: _action('Copy Link · flex 2', icon: CupertinoIcons.link),
+      ),
+      SmartContextMenuItem.async(
+        asyncItem: () async {
+          await loader.load('Pin');
+          return _action('Pin', icon: CupertinoIcons.pin);
+        },
+      ),
+      SmartContextMenuItem.listenable(
+        listenable: favorite,
+        builder: () {
+          if (favorite.isSaving) return SmartContextMenuItem.loading();
+          return SmartContextMenuItem.simple(
+            title: 'Favorite',
+            leading: Icon(
+              favorite.isFavorite
+                  ? CupertinoIcons.heart_fill
+                  : CupertinoIcons.heart,
+            ),
+            closeOnTap: false,
+            onTap: favorite.toggle,
+          );
+        },
+      ),
+    ],
+  ),
+  SmartContextMenuItem.separator(),
+  SmartContextMenuItem.row(
+    children: [
+      SmartContextMenuItem.loading(),
+      SmartContextMenuItem.error(),
+      SmartContextMenuItem.empty(),
+    ],
+  ),
+];
+
+/// A row that keeps a horizontal drag for selecting its cells, the default,
+/// and a row where the drag goes back, as on other items.
+List<SmartContextMenuItem> _swipeBackRows() => [
+  _caption('Swipe back is off: a drag across the row selects'),
+  SmartContextMenuItem.row(
+    size: SmartContextMenuRowSize.small,
+    children: [_action('0.5×'), _action('1×'), _action('2×')],
+  ),
+  _caption('Swipe back is on: a drag goes back'),
+  SmartContextMenuItem.row(
+    size: SmartContextMenuRowSize.small,
+    enableSwipeBack: true,
+    children: [
+      _action('Undo', icon: CupertinoIcons.arrow_uturn_left),
+      _action('Redo', icon: CupertinoIcons.arrow_uturn_right),
+    ],
+  ),
+  _action('Reset', icon: CupertinoIcons.arrow_counterclockwise),
+];
+
+/// A caption above a row: a section title, shown at the start of a level
+/// too.
+SmartContextMenuSeparatorItem _caption(String text) {
+  return SmartContextMenuItem.separator(
+    child: Padding(
+      padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
+      child: Builder(
+        builder: (context) => Text(
+          text,
+          style: TextStyle(
+            fontSize: 13,
+            color: CupertinoDynamicColor.resolve(
+              CupertinoColors.secondaryLabel,
+              context,
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
 /// Every kind of submenu: static, async, paginated and nested.
 List<SmartContextMenuItem> allSubmenuTypes(DemoLoader loader) => [
   _action('Reply', icon: CupertinoIcons.reply),
@@ -211,6 +323,20 @@ List<SmartContextMenuItem> nestedLevels() => [
   _share(),
   SmartContextMenuItem.separator(),
   _action('Delete', icon: CupertinoIcons.delete, isDestructive: true),
+];
+
+/// The menu of a card with a photo that has a menu of its own.
+List<SmartContextMenuItem> outerCardItems() => [
+  _action('Pin', icon: CupertinoIcons.pin),
+  _action('Share card', icon: CupertinoIcons.share),
+  SmartContextMenuItem.separator(),
+  _action('Delete card', icon: CupertinoIcons.delete, isDestructive: true),
+];
+
+/// The menu of the photo inside the card of [outerCardItems].
+List<SmartContextMenuItem> innerPhotoItems() => [
+  _action('Save photo', icon: CupertinoIcons.arrow_down_to_line),
+  _action('Copy photo', icon: CupertinoIcons.doc_on_doc),
 ];
 
 /// A short root with a long scrollable submenu.
