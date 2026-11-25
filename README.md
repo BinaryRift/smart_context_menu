@@ -169,7 +169,7 @@ Or add it to `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  smart_context_menu: ^1.0.4
+  smart_context_menu: ^1.1.0
 ```
 
 Import it:
@@ -366,7 +366,7 @@ returning from a submenu, and the submenu loads again when it opens again.
 
 *In the dark theme: Share is a submenu, and Messages inside it loads when it opens. The back
 item and a swipe right go back. [Code in the
-example](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/files/ui/files_page.dart#L197-L235).*
+example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/files/ui/files_page.dart#L187-L225).*
 
 ```dart
 SmartContextMenuItem.submenu(
@@ -394,7 +394,7 @@ To turn the swipe off, set `enableSwipeBack: false` in `SmartContextMenuConfig`.
 <img src="doc/gifs/async_submenu.gif" width="300" alt="Move to shows an activity indicator, then the folders, with the folder of the file disabled, in the light theme">
 
 *In the light theme: Move to loads the folders when it opens; Work, the folder of the file, is
-disabled. [Code in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/files/ui/files_page.dart#L237-L255).*
+disabled. [Code in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/files/ui/files_page.dart#L227-L245).*
 
 The items are loaded when the submenu opens and cached until the menu closes.
 While loading, the submenu shows an activity indicator in the middle; pass a
@@ -428,7 +428,7 @@ SmartContextMenuItem.asyncSubmenu(
 <img src="doc/gifs/paginated_submenu.gif" width="300" alt="The Reactions submenu loads the first page of people, then the next page when it scrolls to the end, in the light theme">
 
 *In the light theme: Reactions loads the first page of people when it opens and the next page
-when it scrolls to the end. [Code in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/chat/ui/chat_page.dart#L290-L321).*
+when it scrolls to the end. [Code in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/chat/ui/chat_page.dart#L296-L327).*
 
 The first page is loaded with `initialMetadata`. The last item of each page, a `simple` item,
 a separator or a [row](#row), carries the metadata of the next page in `pagingMetadata`; the next
@@ -471,7 +471,7 @@ SmartContextMenuItem.pagingSubmenu(
 *In the light theme: Seen by is an async item whose loader returns a regular submenu. Unlike an
 async submenu, it loads as the menu opens, before a tap, so the count is seen at once; after
 going back, the loaded item stays. [Code in the
-example](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/chat/ui/chat_page.dart#L323-L347).*
+example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/chat/ui/chat_page.dart#L329-L353).*
 
 The placeholder loads its item as soon as it appears. While loading, it shows `loading`,
 a `SmartContextMenuItem.loading` with the loading label by default. If loading fails or takes
@@ -526,7 +526,7 @@ SmartContextMenuItem.async(
 
 *In the dark theme: after a tap, Download shows its progress in the open menu and turns into
 Remove Download when it is done. [Code in the
-example](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/files/ui/files_page.dart#L279-L307).*
+example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/files/ui/files_page.dart#L269-L297).*
 
 Use it when the state of an item lives in your app and can change while the menu is open:
 a toggle that keeps the menu open, a counter, or an action that is already running.
@@ -660,7 +660,7 @@ SmartContextMenuItem.listenable(
 <img src="doc/gifs/error_and_empty.gif" width="300" alt="Shared files fails to load, a tap retries it and shows the files, and Archive shows its empty item, in the dark theme">
 
 *In the dark theme: Shared files fails to load, and a tap on the row loads it again; Archive
-has no items. [Code in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/lab/domain/lab_items.dart#L131-L186).*
+has no items. [Code in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/lab/domain/lab_items.dart#L132-L187).*
 
 An error item shows a failed load: its `title` (the error label by default) with the error icon.
 As the `error` of an async item, an async or a paginated submenu, it loads again on tap and shows
@@ -964,7 +964,7 @@ Dispose a controller you create when it is no longer needed; the menu disposes i
 <img src="doc/gifs/header_slivers.gif" width="300" alt="A reactions bar above a photo in a chat, in the dark theme">
 
 *In the dark theme: a reactions bar above the message; a tap on a reaction closes the menu.
-[Code in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/chat/ui/chat_page.dart#L216-L241).*
+[Code in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/chat/ui/chat_page.dart#L222-L247).*
 
 To show your own content above the widget while the menu is open, pass `headerSliversBuilder`.
 It returns a list of slivers, which fade in and out with the menu and move with the widget
@@ -1058,7 +1058,7 @@ SmartContextMenu(
 
 *In the light theme: a double tap next to the photo opens the menu from code; a tap on the
 preview opens the photo with its own `Hero`. [Code in the
-example](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/chat/ui/chat_page.dart#L149-L214).*
+example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/chat/ui/chat_page.dart#L155-L220).*
 
 The widget can have its own `Hero`, for example a photo in a chat that opens full screen.
 The menu flies the preview with a `Hero` too, but never puts it around your widget: it adds
@@ -1631,7 +1631,7 @@ with you:
 
 *In the light theme, close up: as the finger slides over the items and past the edges,
 the menu stretches towards it, and the message and the reactions bar drift after it. [Code
-in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/chat/ui/chat_page.dart#L149-L214).*
+in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/chat/ui/chat_page.dart#L155-L220).*
 
 The menu and the preview move as one. Nothing appears, resizes or moves without an animation,
 and while a finger is on the menu, both respond to every movement of it.
@@ -1657,13 +1657,13 @@ and while a finger is on the menu, both respond to every movement of it.
 
 *In the dark theme: Backup.zip is low on the screen, so it glides up together with the menu
 just enough to fit it; Share and the back item change the height of the menu smoothly. [Code
-in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/files/ui/files_page.dart#L152-L169).*
+in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/files/ui/files_page.dart#L139-L152).*
 
 <img src="doc/gifs/swipe_back.gif" width="300" alt="The Messages submenu follows a swipe right while the height of the menu flows towards Share, in the light theme">
 
 *In the light theme: a slow swipe right from Messages drags it after the finger while
 the height of the menu flows towards Share; after a short swipe, Messages slides back,
-and a long one finishes on its own. [Code in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.0.2/example/lib/pages/files/ui/files_page.dart#L197-L235).*
+and a long one finishes on its own. [Code in the example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/files/ui/files_page.dart#L187-L225).*
 
 [↑ Back to contents](#contents)
 
