@@ -54,11 +54,11 @@ final class SmartContextMenuStyle {
   /// Defaults to [SmartContextMenuDefaults.borderColor].
   final Color borderColor;
 
-  /// Whether the standard menu border has a directional highlight.
+  /// Whether the standard menu border has an edge highlight.
   ///
   /// Defaults to true. A transparent [borderColor] hides the highlight along
   /// with the border. A custom [menuDecoration] supplies its own outline.
-  final bool showDirectionalHighlight;
+  final bool showEdgeHighlight;
 
   /// The corner radius of the menu.
   ///
@@ -339,7 +339,7 @@ final class SmartContextMenuStyle {
   const SmartContextMenuStyle({
     this.menuColor = SmartContextMenuDefaults.menuColor,
     this.borderColor = SmartContextMenuDefaults.borderColor,
-    this.showDirectionalHighlight = true,
+    this.showEdgeHighlight = true,
     this.borderRadius = SmartContextMenuDefaults.borderRadius,
     this.menuDecoration,
     this.menuBlur,
@@ -455,7 +455,7 @@ final class SmartContextMenuStyle {
   SmartContextMenuStyle copyWith({
     Color? menuColor,
     Color? borderColor,
-    bool? showDirectionalHighlight,
+    bool? showEdgeHighlight,
     BorderRadiusGeometry? borderRadius,
     Decoration? menuDecoration,
     SmartContextMenuBlur? menuBlur,
@@ -527,8 +527,7 @@ final class SmartContextMenuStyle {
     return SmartContextMenuStyle(
       menuColor: menuColor ?? this.menuColor,
       borderColor: borderColor ?? this.borderColor,
-      showDirectionalHighlight:
-          showDirectionalHighlight ?? this.showDirectionalHighlight,
+      showEdgeHighlight: showEdgeHighlight ?? this.showEdgeHighlight,
       borderRadius: borderRadius ?? this.borderRadius,
       menuDecoration: menuDecoration ?? this.menuDecoration,
       menuBlur: menuBlur ?? this.menuBlur,

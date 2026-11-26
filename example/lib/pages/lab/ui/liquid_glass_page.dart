@@ -109,7 +109,7 @@ final class _LiquidGlassPageState extends State<LiquidGlassPage> {
         ),
         if (_surface == _Surface.standard)
           CupertinoListTile.notched(
-            title: const Text('Directional highlight'),
+            title: const Text('Edge highlight'),
             trailing: CupertinoSwitch(
               value: _highlightStandard,
               onChanged: (value) => setState(() => _highlightStandard = value),
@@ -132,8 +132,7 @@ final class _LiquidGlassPageState extends State<LiquidGlassPage> {
       config: theme.copyWith(
         style: SmartContextMenuStyle(
           menuBlur: SmartContextMenuBlur.small,
-          showDirectionalHighlight:
-              _surface == _Surface.glass || _highlightStandard,
+          showEdgeHighlight: _surface == _Surface.glass || _highlightStandard,
           borderRadius: const BorderRadius.all(Radius.circular(20)),
           backgroundColor: _useSoftBackground ? _halfDimming : _standardDimming,
           backgroundBlur: _useSoftBackground

@@ -66,7 +66,7 @@ void main() {
     await tester.pumpAndSettle();
 
     final toggle = find.descendant(
-      of: find.widgetWithText(CupertinoListTile, 'Directional highlight'),
+      of: find.widgetWithText(CupertinoListTile, 'Edge highlight'),
       matching: find.byType(CupertinoSwitch),
     );
     expect(toggle, findsNothing);

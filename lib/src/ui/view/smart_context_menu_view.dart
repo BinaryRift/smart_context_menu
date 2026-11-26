@@ -162,9 +162,7 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
       clipBehavior: Clip.antiAlias,
       child: levels,
     );
-    if (style.showDirectionalHighlight &&
-        borderColor != null &&
-        borderColor.a > 0) {
+    if (style.showEdgeHighlight && borderColor != null && borderColor.a > 0) {
       surface = CustomPaint(
         foregroundPainter: SmartContextMenuHighlightPainter(
           borderRadius: style.borderRadius.resolve(Directionality.of(context)),
