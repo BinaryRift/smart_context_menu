@@ -41,4 +41,30 @@ void main() {
     expect(clip.brRadius, Radius.zero);
     expect(clip.blRadius, const Radius.circular(9));
   });
+
+  test('turns invalid radius components into a finite contour', () {
+    const clipper = SmartContextMenuGlassClipper(
+      BorderRadius.only(
+        topLeft: Radius.elliptical(-12, 30),
+        topRight: Radius.circular(double.nan),
+        bottomRight: Radius.circular(double.infinity),
+        bottomLeft: Radius.elliptical(double.negativeInfinity, 8),
+      ),
+    );
+
+    final radius = clipper.radiusFor(const Size(200, 60));
+    expect(radius.topLeft, Radius.zero);
+    expect(radius.topRight, Radius.zero);
+    expect(radius.bottomRight, const Radius.circular(30));
+    expect(radius.bottomLeft, Radius.zero);
+  });
+
+  test('keeps every corner at zero on an empty or unbounded size', () {
+    const clipper = SmartContextMenuGlassClipper(
+      BorderRadius.all(Radius.circular(20)),
+    );
+
+    expect(clipper.radiusFor(Size.zero), BorderRadius.zero);
+    expect(clipper.radiusFor(Size.infinite), BorderRadius.zero);
+  });
 }

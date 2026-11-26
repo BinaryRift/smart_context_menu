@@ -66,11 +66,16 @@ final class SmartContextMenuGlassClipper extends CustomClipper<RRect> {
 
   const SmartContextMenuGlassClipper(this.borderRadius);
 
+  /// Uses the smaller component of each elliptical radius and limits every
+  /// corner to half of the shorter side. Negative and non-finite components
+  /// become zero, except positive infinity, which takes the limit.
   BorderRadius radiusFor(Size size) {
     // The shader's distance field assumes each corner stays in its quadrant.
-    final limit = size.shortestSide / 2;
+    final shortestSide = size.shortestSide;
+    final limit = shortestSide.isFinite ? math.max(0.0, shortestSide / 2) : 0.0;
+    double component(double value) => value.isNaN ? 0 : value.clamp(0.0, limit);
     Radius circular(Radius radius) =>
-        Radius.circular(math.min(radius.x, radius.y).clamp(0.0, limit));
+        Radius.circular(math.min(component(radius.x), component(radius.y)));
     return BorderRadius.only(
       topLeft: circular(borderRadius.topLeft),
       topRight: circular(borderRadius.topRight),
@@ -85,6 +90,44 @@ final class SmartContextMenuGlassClipper extends CustomClipper<RRect> {
   @override
   bool shouldReclip(SmartContextMenuGlassClipper oldClipper) =>
       borderRadius != oldClipper.borderRadius;
+}
+
+const _transformTolerance = 1e-6;
+
+/// Maps local logical pixels to physical backdrop pixels.
+///
+/// Returns null unless [size] and [pixelRatio] are finite and positive and
+/// [transform] only translates and scales each axis by a positive factor.
+@visibleForTesting
+({Offset origin, Offset scale})? glassBackdropMapping(
+  Matrix4 transform,
+  Size size,
+  double pixelRatio,
+) {
+  if (!size.isFinite || size.width <= 0 || size.height <= 0) return null;
+  if (!pixelRatio.isFinite || pixelRatio <= 0) return null;
+
+  final m = transform.storage;
+  bool near(double value, double target) =>
+      (value - target).abs() <= _transformTolerance;
+  // Rotation, skew and perspective would bend the panel away from the
+  // axis-aligned contour the shader draws.
+  if (!near(m[1], 0) ||
+      !near(m[4], 0) ||
+      !near(m[3], 0) ||
+      !near(m[7], 0) ||
+      !near(m[15], 1)) {
+    return null;
+  }
+  // Rejects collapsed and mirrored axes.
+  if (!(m[0] > _transformTolerance) || !(m[5] > _transformTolerance)) {
+    return null;
+  }
+
+  final origin = Offset(m[12], m[13]) * pixelRatio;
+  final scale = Offset(m[0], m[5]) * pixelRatio;
+  if (!origin.isFinite || !scale.isFinite) return null;
+  return (origin: origin, scale: scale);
 }
 
 final class _GlassBackdrop extends SingleChildRenderObjectWidget {
@@ -139,21 +182,25 @@ final class _RenderGlassBackdrop extends RenderProxyBox {
     context.pushLayer(backdrop, super.paint, offset);
   }
 
-  ui.ImageFilter _filter(double opacity) {
-    // Menu scale and stretch are axis-aligned. Read their final transform
-    // here because a retained ancestor layer can move without repainting us.
-    final transform = getTransformTo(null).storage;
-    final pixelRatio = _settings.pixelRatio;
+  ui.ImageFilter? _filter(double opacity) {
+    // Read the final transform here because a retained ancestor layer can
+    // move without repainting us.
+    final mapping = glassBackdropMapping(
+      getTransformTo(null),
+      size,
+      _settings.pixelRatio,
+    );
+    if (mapping == null) return null;
     final tint = _settings.tint;
     final radius = _settings.clipper.radiusFor(size);
 
     // Impeller provides the texture size (floats 0–1) and sampler 0.
     // The remaining slots follow smart_context_menu_glass.frag.
     _shader
-      ..setFloat(2, transform[12] * pixelRatio)
-      ..setFloat(3, transform[13] * pixelRatio)
-      ..setFloat(4, transform[0] * pixelRatio)
-      ..setFloat(5, transform[5] * pixelRatio)
+      ..setFloat(2, mapping.origin.dx)
+      ..setFloat(3, mapping.origin.dy)
+      ..setFloat(4, mapping.scale.dx)
+      ..setFloat(5, mapping.scale.dy)
       ..setFloat(6, size.width)
       ..setFloat(7, size.height)
       ..setFloat(8, radius.topLeft.x)
@@ -188,8 +235,15 @@ final class _GlassLayer extends ContainerLayer {
     final opacity = backdrop._settings.opacity.value;
     if (opacity <= 0 || backdrop.size.isEmpty) return;
 
+    final filter = backdrop._filter(opacity);
+    if (filter == null) {
+      // Keep the content visible and resume the glass on a later frame.
+      engineLayer = null;
+      addChildrenToScene(builder);
+      return;
+    }
     engineLayer = builder.pushBackdropFilter(
-      backdrop._filter(opacity),
+      filter,
       oldLayer: engineLayer as ui.BackdropFilterEngineLayer?,
     );
     addChildrenToScene(builder);
