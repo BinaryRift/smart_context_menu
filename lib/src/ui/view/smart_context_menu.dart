@@ -14,6 +14,7 @@ import '../../domain/smart_context_menu_config.dart';
 import '../../domain/smart_context_menu_header_details.dart';
 import '../../domain/smart_context_menu_item.dart';
 import '../routes/smart_context_menu_route.dart';
+import '../state/smart_context_menu_glass_shader.dart';
 import '../state/smart_context_menu_session.dart';
 import '../theme/smart_context_menu_theme.dart';
 import '../widgets/smart_context_menu_anchor.dart';
@@ -188,12 +189,15 @@ final class SmartContextMenu extends StatefulWidget {
 }
 
 final class _SmartContextMenuState extends State<SmartContextMenu> {
+  static final _glassShader = SmartContextMenuGlassShader();
+
   final GlobalKey _previewKey = GlobalKey();
   final GlobalKey _persistentKey = GlobalKey();
   late final String _heroTag;
 
   late final SmartContextMenuSession _session;
   late SmartContextMenuConfig _config;
+  bool _glassEnabled = false;
 
   /// Used when [SmartContextMenu.controller] is null.
   SmartContextMenuController? _ownController;
@@ -217,6 +221,11 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _resolveConfig();
+    final glassEnabled = SmartContextMenuGlassScope.isEnabledOf(context);
+    if (glassEnabled && !_glassEnabled) {
+      unawaited(_glassShader.prepare());
+    }
+    _glassEnabled = glassEnabled;
   }
 
   @override
@@ -311,7 +320,11 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
 
   Future<void> _runOpenSession(int sessionId) async {
     final navigator = Navigator.of(context, rootNavigator: true);
-    final glass = SmartContextMenuGlassScope.maybeOf(context);
+    // Keep the selected surface until the route closes.
+    final glassProgram = _glassEnabled ? _glassShader.program : null;
+    if (_glassEnabled) {
+      unawaited(_glassShader.prepare());
+    }
     // An app without Cupertino localizations, such as a bare WidgetsApp,
     // gets the English label.
     final localizations =
@@ -344,7 +357,7 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
       heroTag: _heroTag,
       items: widget.items,
       config: _config,
-      glass: glass,
+      glassProgram: glassProgram,
       onPreviewTap: widget.onPreviewTap,
       headerSliversBuilder: widget.headerSliversBuilder,
       fadeHeaderSlivers: widget.fadeHeaderSlivers,

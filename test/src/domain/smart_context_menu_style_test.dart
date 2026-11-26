@@ -30,6 +30,7 @@ void main() {
     const original = SmartContextMenuStyle(
       menuColor: Color(0xFF000001),
       borderColor: Color(0xFF000002),
+      showDirectionalHighlight: false,
       borderRadius: BorderRadius.all(Radius.circular(1)),
       menuDecoration: BoxDecoration(color: Color(0xFF000003)),
       menuBlur: SmartContextMenuBlur(1),
@@ -62,6 +63,7 @@ void main() {
     final fields = <String, Object? Function(SmartContextMenuStyle)>{
       'menuColor': (s) => s.menuColor,
       'borderColor': (s) => s.borderColor,
+      'showDirectionalHighlight': (s) => s.showDirectionalHighlight,
       'borderRadius': (s) => s.borderRadius,
       'menuDecoration': (s) => s.menuDecoration,
       'menuBlur': (s) => s.menuBlur,
@@ -102,6 +104,10 @@ void main() {
     final changes = <String, (Object, SmartContextMenuStyle Function())>{
       'menuColor': (color, () => original.copyWith(menuColor: color)),
       'borderColor': (color, () => original.copyWith(borderColor: color)),
+      'showDirectionalHighlight': (
+        true,
+        () => original.copyWith(showDirectionalHighlight: true),
+      ),
       'borderRadius': (radius, () => original.copyWith(borderRadius: radius)),
       'menuDecoration': (
         decoration,

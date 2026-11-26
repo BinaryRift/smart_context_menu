@@ -2,11 +2,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
+import 'package:smart_context_menu/src/ui/widgets/smart_context_menu_highlight.dart';
 
 import '../../../helpers/appearance_tester.dart';
 import '../../../helpers/menu_tester.dart';
 
 void main() {
+  final highlight = find.byWidgetPredicate(
+    (widget) =>
+        widget is CustomPaint &&
+        widget.foregroundPainter is SmartContextMenuHighlightPainter,
+  );
+
   List<Decoration> foregroundsOf(WidgetTester tester) => [
     for (final container in tester.widgetList<Container>(
       find.byType(Container),
@@ -28,6 +35,7 @@ void main() {
       border.top.color,
       isSameColorAs(light(SmartContextMenuDefaults.borderColor)),
     );
+    expect(highlight, findsOneWidget);
   });
 
   testWidgets('is not added to a custom decoration', (tester) async {
@@ -42,5 +50,18 @@ void main() {
     await tester.openMenu();
 
     expect(foregroundsOf(tester), isEmpty);
+    expect(highlight, findsNothing);
+  });
+
+  testWidgets('keeps a transparent border invisible', (tester) async {
+    await tester.pumpMenu(
+      items: appearanceItems(),
+      config: const SmartContextMenuConfig(
+        style: SmartContextMenuStyle(borderColor: Color(0x00FF0000)),
+      ),
+    );
+    await tester.openMenu();
+
+    expect(highlight, findsNothing);
   });
 }

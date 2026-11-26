@@ -1,24 +1,22 @@
-import 'dart:ui' show FragmentProgram;
-
 import 'package:flutter/widgets.dart';
 
-/// Supplies the Lab's glass shader to the anchor before it pushes its route.
+/// Enables the internal glass style for the Lab.
 final class SmartContextMenuGlassScope extends InheritedWidget {
-  static const shaderAsset =
-      'packages/smart_context_menu/lib/src/ui/shaders/smart_context_menu_glass.frag';
-
-  final FragmentProgram program;
+  final bool enabled;
 
   const SmartContextMenuGlassScope({
     super.key,
-    required this.program,
+    required this.enabled,
     required super.child,
   });
 
-  static SmartContextMenuGlassScope? maybeOf(BuildContext context) =>
-      context.getInheritedWidgetOfExactType<SmartContextMenuGlassScope>();
+  static bool isEnabledOf(BuildContext context) =>
+      context
+          .dependOnInheritedWidgetOfExactType<SmartContextMenuGlassScope>()
+          ?.enabled ??
+      false;
 
   @override
   bool updateShouldNotify(SmartContextMenuGlassScope oldWidget) =>
-      program != oldWidget.program;
+      enabled != oldWidget.enabled;
 }

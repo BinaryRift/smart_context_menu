@@ -1,5 +1,8 @@
+import 'dart:ui' show FragmentProgram;
+
 // ignore: deprecated_member_use
-import 'package:flutter/cupertino.dart' show CupertinoDynamicColor;
+import 'package:flutter/cupertino.dart'
+    show CupertinoDynamicColor, CupertinoTheme;
 import 'package:flutter/widgets.dart';
 
 import '../../core/ui/motion/tokens/motion_curves.dart';
@@ -13,8 +16,8 @@ import '../extensions/animation_ext.dart';
 import '../state/smart_context_menu_hover_controller.dart';
 import '../state/smart_context_menu_stretch_controller.dart';
 import '../widgets/smart_context_menu_blur_box.dart';
-import '../widgets/smart_context_menu_glass_scope.dart';
 import '../widgets/smart_context_menu_glass_surface.dart';
+import '../widgets/smart_context_menu_highlight.dart';
 import '../widgets/smart_context_menu_level_switcher.dart';
 import '../widgets/smart_context_menu_pointer_tracker.dart';
 import 'smart_context_menu_level_view.dart';
@@ -28,7 +31,7 @@ final class SmartContextMenuView extends StatefulWidget {
   final SmartContextMenuConfig config;
   final ValueNotifier<double> heightNotifier;
   final ValueNotifier<Offset> previewMotionNotifier;
-  final SmartContextMenuGlassScope? glass;
+  final FragmentProgram? glassProgram;
   final Animation<double> glassOpacity;
 
   const SmartContextMenuView({
@@ -37,7 +40,7 @@ final class SmartContextMenuView extends StatefulWidget {
     required this.config,
     required this.heightNotifier,
     required this.previewMotionNotifier,
-    this.glass,
+    this.glassProgram,
     required this.glassOpacity,
   });
 
@@ -57,15 +60,6 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
   BoxDecoration get _defaultDecoration => BoxDecoration(
     color: CupertinoDynamicColor.resolve(_config.style.menuColor, context),
     borderRadius: _config.style.borderRadius,
-  );
-
-  // The border is painted over the levels, so the back item does not
-  // cover it while a level slides.
-  BoxDecoration get _defaultBorder => BoxDecoration(
-    borderRadius: _config.style.borderRadius,
-    border: Border.all(
-      color: CupertinoDynamicColor.resolve(_config.style.borderColor, context),
-    ),
   );
 
   @override
@@ -104,9 +98,9 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-    final glass = widget.glass;
+    final glassProgram = widget.glassProgram;
     late final tint = CupertinoDynamicColor.resolve(_glassTint, context);
-    final backItemGlassTint = glass == null ? null : tint;
+    final backItemGlassTint = glassProgram == null ? null : tint;
     final levels = ConstrainedBox(
       constraints: BoxConstraints(
         maxHeight: screenHeight * _config.menuHeightFactor,
@@ -142,42 +136,64 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
           transform: _stretchController.transform,
           child: child,
         ),
-        child: glass == null
+        child: glassProgram == null
             ? _buildStandardSurface(levels)
-            : _buildGlassSurface(glass, tint, levels),
+            : _buildGlassSurface(glassProgram, tint, levels),
       ),
     );
   }
 
   Widget _buildStandardSurface(Widget levels) {
-    return SmartContextMenuShadowBox(
-      borderRadius: _config.style.borderRadius,
-      shadows: _config.style.menuShadows,
-      child: SmartContextMenuBlurBox(
-        blur: _config.style.menuBlur,
-        borderRadius: _config.style.borderRadius,
-        child: Container(
-          width: _config.menuWidth,
-          decoration: _config.style.menuDecoration ?? _defaultDecoration,
-          foregroundDecoration: _config.style.menuDecoration == null
-              ? _defaultBorder
-              : null,
-          clipBehavior: Clip.antiAlias,
-          child: levels,
+    final style = _config.style;
+    final decoration = style.menuDecoration;
+    final borderColor = decoration == null
+        ? CupertinoDynamicColor.resolve(style.borderColor, context)
+        : null;
+    // The outline is painted over the levels, including the pinned back row.
+    Widget surface = Container(
+      width: _config.menuWidth,
+      decoration: decoration ?? _defaultDecoration,
+      foregroundDecoration: borderColor == null
+          ? null
+          : BoxDecoration(
+              borderRadius: style.borderRadius,
+              border: Border.all(color: borderColor),
+            ),
+      clipBehavior: Clip.antiAlias,
+      child: levels,
+    );
+    if (style.showDirectionalHighlight &&
+        borderColor != null &&
+        borderColor.a > 0) {
+      surface = CustomPaint(
+        foregroundPainter: SmartContextMenuHighlightPainter(
+          borderRadius: style.borderRadius.resolve(Directionality.of(context)),
+          borderOpacity: borderColor.a,
+          brightness: CupertinoTheme.brightnessOf(context),
         ),
+        child: surface,
+      );
+    }
+    return SmartContextMenuShadowBox(
+      borderRadius: style.borderRadius,
+      shadows: style.menuShadows,
+      child: SmartContextMenuBlurBox(
+        blur: style.menuBlur,
+        borderRadius: style.borderRadius,
+        child: surface,
       ),
     );
   }
 
   Widget _buildGlassSurface(
-    SmartContextMenuGlassScope glass,
+    FragmentProgram program,
     Color tint,
     Widget levels,
   ) {
     return SizedBox(
       width: _config.menuWidth,
       child: SmartContextMenuGlassSurface(
-        program: glass.program,
+        program: program,
         opacity: widget.glassOpacity,
         borderRadius: _config.style.borderRadius,
         shadows: _config.style.menuShadows,

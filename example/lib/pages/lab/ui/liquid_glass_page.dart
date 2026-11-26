@@ -1,5 +1,3 @@
-import 'dart:ui' show FragmentProgram, ImageFilter;
-
 // ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
@@ -30,17 +28,9 @@ final class _LiquidGlassPageState extends State<LiquidGlassPage> {
     ),
   );
 
-  late final Future<FragmentProgram>? _program;
   _Surface _surface = _Surface.glass;
+  bool _highlightStandard = true;
   bool _useSoftBackground = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _program = ImageFilter.isShaderFilterSupported
-        ? FragmentProgram.fromAsset(SmartContextMenuGlassScope.shaderAsset)
-        : null;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,37 +41,34 @@ final class _LiquidGlassPageState extends State<LiquidGlassPage> {
         trailing: SettingsButton(),
       ),
       child: SafeArea(
-        child: FutureBuilder<FragmentProgram>(
-          future: _program,
-          builder: (context, snapshot) => CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(child: _buildOptions(snapshot)),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
-                  child: Semantics(
-                    header: true,
-                    child: Text(
-                      'Preview',
-                      style: CupertinoTheme.of(
-                        context,
-                      ).textTheme.navTitleTextStyle,
-                    ),
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(child: _buildOptions()),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
+                child: Semantics(
+                  header: true,
+                  child: Text(
+                    'Preview',
+                    style: CupertinoTheme.of(
+                      context,
+                    ).textTheme.navTitleTextStyle,
                   ),
                 ),
               ),
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: _buildPreview(context, snapshot.data),
-              ),
-            ],
-          ),
+            ),
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: _buildPreview(context),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildPreview(BuildContext context, FragmentProgram? program) {
+  Widget _buildPreview(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
       child: ClipRRect(
@@ -94,7 +81,7 @@ final class _LiquidGlassPageState extends State<LiquidGlassPage> {
               padding: const EdgeInsets.all(16),
               child: Align(
                 alignment: AlignmentDirectional.topEnd,
-                child: _buildMenu(context, program),
+                child: _buildMenu(context),
               ),
             ),
           ),
@@ -103,27 +90,14 @@ final class _LiquidGlassPageState extends State<LiquidGlassPage> {
     );
   }
 
-  Widget _buildOptions(AsyncSnapshot<FragmentProgram> snapshot) {
-    final glassAvailable = snapshot.hasData;
-    final String? status = glassAvailable
-        ? null
-        : _program == null
-        ? 'Liquid Glass requires Impeller.'
-        : snapshot.hasError
-        ? 'Could not load the glass shader.'
-        : 'Loading the glass shader…';
-
+  Widget _buildOptions() {
     return CupertinoListSection.insetGrouped(
       header: const Text('Options'),
-      footer: status == null ? null : Text(status),
       children: [
         CupertinoListTile.notched(
           title: const Text('Surface'),
           trailing: CupertinoSlidingSegmentedControl<_Surface>(
-            groupValue: glassAvailable ? _surface : _Surface.standard,
-            disabledChildren: glassAvailable
-                ? const {}
-                : const {_Surface.glass},
+            groupValue: _surface,
             onValueChanged: (value) {
               if (value != null) setState(() => _surface = value);
             },
@@ -133,6 +107,14 @@ final class _LiquidGlassPageState extends State<LiquidGlassPage> {
             },
           ),
         ),
+        if (_surface == _Surface.standard)
+          CupertinoListTile.notched(
+            title: const Text('Directional highlight'),
+            trailing: CupertinoSwitch(
+              value: _highlightStandard,
+              onChanged: (value) => setState(() => _highlightStandard = value),
+            ),
+          ),
         CupertinoListTile.notched(
           title: const Text('Half dimming + blur'),
           trailing: CupertinoSwitch(
@@ -144,12 +126,14 @@ final class _LiquidGlassPageState extends State<LiquidGlassPage> {
     );
   }
 
-  Widget _buildMenu(BuildContext context, FragmentProgram? program) {
+  Widget _buildMenu(BuildContext context) {
     final theme = SmartContextMenuTheme.of(context);
     final menu = SmartContextMenu(
       config: theme.copyWith(
         style: SmartContextMenuStyle(
           menuBlur: SmartContextMenuBlur.small,
+          showDirectionalHighlight:
+              _surface == _Surface.glass || _highlightStandard,
           borderRadius: const BorderRadius.all(Radius.circular(20)),
           backgroundColor: _useSoftBackground ? _halfDimming : _standardDimming,
           backgroundBlur: _useSoftBackground
@@ -188,8 +172,10 @@ final class _LiquidGlassPageState extends State<LiquidGlassPage> {
       ),
     );
 
-    if (program == null || _surface == _Surface.standard) return menu;
-    return SmartContextMenuGlassScope(program: program, child: menu);
+    return SmartContextMenuGlassScope(
+      enabled: _surface == _Surface.glass,
+      child: menu,
+    );
   }
 
   SmartContextMenuItem _command(String title, IconData icon) =>
