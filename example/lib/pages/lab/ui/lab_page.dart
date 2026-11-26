@@ -80,9 +80,11 @@ final class _LabPageState extends State<LabPage> {
               child: ListView(
                 children: [
                   CupertinoListSection.insetGrouped(
+                    header: const Text('Rendering'),
                     children: [
                       CupertinoListTile.notched(
-                        title: const Text('Liquid Glass prototype'),
+                        title: const Text('Liquid Glass'),
+                        subtitle: const Text('Compare menu surfaces'),
                         trailing: const CupertinoListTileChevron(),
                         onTap: () => Navigator.of(context).push<void>(
                           CupertinoPageRoute<void>(

@@ -18,7 +18,7 @@ import '../layout/smart_context_menu_horizontal_layout.dart';
 import '../layout/smart_context_menu_vertical_layout.dart';
 import '../state/smart_context_menu_header_animation.dart';
 import '../widgets/smart_context_menu_background.dart';
-import '../widgets/smart_context_menu_glass_prototype.dart';
+import '../widgets/smart_context_menu_glass_scope.dart';
 import '../widgets/smart_context_menu_header.dart';
 import '../widgets/smart_context_menu_preview.dart';
 import 'smart_context_menu_view.dart';
@@ -30,7 +30,7 @@ final class SmartContextMenuOverlay extends StatefulWidget {
   final String heroTag;
   final List<SmartContextMenuItem> items;
   final SmartContextMenuConfig config;
-  final SmartContextMenuGlassPrototype? glass;
+  final SmartContextMenuGlassScope? glass;
   final FutureOr<void> Function()? onPreviewTap;
   final SmartContextMenuHeaderBuilder? headerSliversBuilder;
   final bool fadeHeaderSlivers;
@@ -289,9 +289,9 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
       child: ScaleTransition(
         alignment: Alignment.center,
         scale: _menuAnimation,
-        child: glass != null && !glass.fadeWholeMenu
-            ? menu
-            : FadeTransition(opacity: widget.routeAnimation, child: menu),
+        child: glass == null
+            ? FadeTransition(opacity: widget.routeAnimation, child: menu)
+            : menu,
       ),
     );
   }

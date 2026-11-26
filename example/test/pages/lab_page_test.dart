@@ -5,6 +5,31 @@ import 'package:smart_context_menu_example/core/ui/reactions_bar.dart';
 import '../helpers/menu_tester.dart';
 
 void main() {
+  testWidgets('Liquid Glass opens a comparison with a scrollable submenu', (
+    tester,
+  ) async {
+    await tester.pumpPhoneApp();
+    await tester.tap(find.text('Lab'));
+    await tester.pumpAndSettle();
+    expect(find.text('Rendering'), findsOneWidget);
+
+    await tester.tap(find.text('Liquid Glass'));
+    await tester.pumpAndSettle();
+    expect(find.text('Preview'), findsOneWidget);
+    expect(find.text('Standard'), findsOneWidget);
+
+    await tester.tap(find.text('Open menu'));
+    await tester.settleMenu();
+    await tester.tap(find.text('Browse folders'));
+    await tester.pumpAndSettle();
+    expect(find.text('Project 1'), findsOneWidget);
+    expect(find.text('Project 18').hitTestable(), findsNothing);
+
+    await tester.fling(find.text('Project 1'), const Offset(0, -420), 1300);
+    await tester.pumpAndSettle();
+    expect(find.text('Project 18').hitTestable(), findsOneWidget);
+  });
+
   testWidgets('a reaction in the Lab shows feedback immediately', (
     tester,
   ) async {

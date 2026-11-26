@@ -13,7 +13,7 @@ import '../extensions/animation_ext.dart';
 import '../state/smart_context_menu_hover_controller.dart';
 import '../state/smart_context_menu_stretch_controller.dart';
 import '../widgets/smart_context_menu_blur_box.dart';
-import '../widgets/smart_context_menu_glass_prototype.dart';
+import '../widgets/smart_context_menu_glass_scope.dart';
 import '../widgets/smart_context_menu_glass_surface.dart';
 import '../widgets/smart_context_menu_level_switcher.dart';
 import '../widgets/smart_context_menu_pointer_tracker.dart';
@@ -28,7 +28,7 @@ final class SmartContextMenuView extends StatefulWidget {
   final SmartContextMenuConfig config;
   final ValueNotifier<double> heightNotifier;
   final ValueNotifier<Offset> previewMotionNotifier;
-  final SmartContextMenuGlassPrototype? glass;
+  final SmartContextMenuGlassScope? glass;
   final Animation<double> glassOpacity;
 
   const SmartContextMenuView({
@@ -170,19 +170,15 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
   }
 
   Widget _buildGlassSurface(
-    SmartContextMenuGlassPrototype glass,
+    SmartContextMenuGlassScope glass,
     Color tint,
     Widget levels,
   ) {
-    final opacity = glass.fadeWholeMenu
-        ? kAlwaysCompleteAnimation
-        : widget.glassOpacity;
-
     return SizedBox(
       width: _config.menuWidth,
       child: SmartContextMenuGlassSurface(
         program: glass.program,
-        opacity: opacity,
+        opacity: widget.glassOpacity,
         borderRadius: _config.style.borderRadius,
         shadows: _config.style.menuShadows,
         tint: tint,
