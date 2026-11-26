@@ -46,6 +46,7 @@ const float kRimBaseLight = 0.10;
 const float kRimBaseDark = 0.035;
 const float kRimStrengthLight = 0.78;
 const float kRimStrengthDark = 0.45;
+const float kRimDarkTint = 0.20;
 const float kSecondaryArc = 0.42;
 const vec2 kLightDirection = vec2(-0.6, -0.8);
 
@@ -187,7 +188,10 @@ void main() {
     highlight += shoulderStrength * shoulder * arc * (0.35 + 0.65 * fresnel);
   }
 
-  glass = mix(glass, vec3(1.0), clamp(highlight * u_edgeHighlight, 0.0, 1.0));
+  // Let reflections inherit part of the dark material's tint.
+  vec3 reflectionColor = mix(vec3(1.0), u_tint.rgb, darkMaterial * kRimDarkTint);
+  glass = mix(glass, reflectionColor,
+              clamp(highlight * u_edgeHighlight, 0.0, 1.0));
 
   // Premultiplied RGBA output for an opaque input backdrop. The external
   // clip defines coverage; u_opacity scales both RGB and alpha.

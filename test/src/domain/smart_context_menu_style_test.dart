@@ -36,8 +36,8 @@ void main() {
     );
 
     expect(defaultStyle.surface, defaultGlass);
-    expect(defaultGlassStyle.blur.sigmaX, 3);
-    expect(defaultGlassStyle.blur.sigmaY, 3);
+    expect(defaultGlassStyle.blur.sigmaX, 2);
+    expect(defaultGlassStyle.blur.sigmaY, 2);
     final style = defaultStyle.copyWith(surface: customGlass);
     expect(
       style.copyWith(menuBlur: SmartContextMenuBlur.small).surface,
@@ -70,7 +70,10 @@ void main() {
     final withoutBlur = copy.copyWith(blur: SmartContextMenuBlur.none);
     expect(withoutBlur.blur.sigmaX, 0);
     expect(withoutBlur, isNot(style));
-    expect(withoutBlur.copyWith(blur: SmartContextMenuBlur(3)), style);
+    expect(
+      withoutBlur.copyWith(blur: SmartContextMenuBlur(style.blur.sigmaX)),
+      style,
+    );
     final withoutHighlight = copy.copyWith(edgeHighlight: 0);
     expect(withoutHighlight.tint, tint);
     expect(withoutHighlight.refraction, 2);

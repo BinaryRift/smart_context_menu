@@ -17,7 +17,7 @@ final class SmartContextMenuGlassStyle {
 
   /// The blur applied to the backdrop inside the glass before refraction.
   ///
-  /// Defaults to a Gaussian sigma of 3. Use [SmartContextMenuBlur.none] to
+  /// Defaults to a Gaussian sigma of 2. Use [SmartContextMenuBlur.none] to
   /// disable it. Non-finite strengths are treated as zero.
   final SmartContextMenuBlur blur;
 
@@ -38,7 +38,7 @@ final class SmartContextMenuGlassStyle {
   /// Creates a Liquid Glass style.
   const SmartContextMenuGlassStyle({
     this.tint = SmartContextMenuDefaults.glassTint,
-    this.blur = const SmartContextMenuBlur(3),
+    this.blur = const SmartContextMenuBlur(2),
     this.refraction = 1,
     this.edgeHighlight = 1,
   });
