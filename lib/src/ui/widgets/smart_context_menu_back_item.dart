@@ -126,6 +126,10 @@ final class SmartContextMenuBackItem extends StatelessWidget {
           decoration ??
           BoxDecoration(
             color:
+                CupertinoDynamicColor.maybeResolve(
+                  backStyle.backgroundColor,
+                  context,
+                ) ??
                 glassTint?.withValues(alpha: 0.14) ??
                 CupertinoDynamicColor.resolve(style.menuColor, context),
             borderRadius: borderRadius,

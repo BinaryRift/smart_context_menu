@@ -8,6 +8,7 @@ void main() {
     const style = SmartContextMenuBackButtonStyle();
 
     expect(style.decoration, isNull);
+    expect(style.backgroundColor, isNull);
     expect(style.blur, SmartContextMenuBlur.strong);
     expect(style.borderRadius, SmartContextMenuDefaults.backButtonBorderRadius);
     expect(style.foregroundColor, isNull);
@@ -18,6 +19,7 @@ void main() {
   group('copyWith', () {
     const original = SmartContextMenuBackButtonStyle(
       decoration: BoxDecoration(color: Color(0xFF000001)),
+      backgroundColor: Color(0x66000003),
       blur: SmartContextMenuBlur(1),
       borderRadius: BorderRadius.all(Radius.circular(1)),
       foregroundColor: Color(0xFF000002),
@@ -27,6 +29,7 @@ void main() {
 
     final fields = <String, Object? Function(SmartContextMenuBackButtonStyle)>{
       'decoration': (s) => s.decoration,
+      'backgroundColor': (s) => s.backgroundColor,
       'blur': (s) => s.blur,
       'borderRadius': (s) => s.borderRadius,
       'foregroundColor': (s) => s.foregroundColor,
@@ -44,6 +47,10 @@ void main() {
           'decoration': (
             decoration,
             () => original.copyWith(decoration: decoration),
+          ),
+          'backgroundColor': (
+            color,
+            () => original.copyWith(backgroundColor: color),
           ),
           'blur': (blur, () => original.copyWith(blur: blur)),
           'borderRadius': (
@@ -73,6 +80,13 @@ void main() {
       for (final MapEntry(key: name, value: get) in fields.entries) {
         expect(get(copy), get(original), reason: name);
       }
+    });
+
+    test('preserves the background color when passed null', () {
+      expect(
+        original.copyWith(backgroundColor: null).backgroundColor,
+        original.backgroundColor,
+      );
     });
 
     for (final MapEntry(key: changed, value: (value, copyWith))

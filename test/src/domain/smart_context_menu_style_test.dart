@@ -8,6 +8,7 @@ import 'package:smart_context_menu/smart_context_menu.dart';
 /// The fields of a back item style, comparable by value.
 Object backFields(SmartContextMenuBackButtonStyle s) => (
   s.decoration,
+  s.backgroundColor,
   s.blur,
   s.borderRadius,
   s.foregroundColor,
@@ -141,7 +142,10 @@ void main() {
     const blur = SmartContextMenuBlur(9);
     const decoration = BoxDecoration(color: color);
     const titleStyle = TextStyle(fontSize: 19);
-    const backButtonStyle = SmartContextMenuBackButtonStyle(blur: blur);
+    const backButtonStyle = SmartContextMenuBackButtonStyle(
+      backgroundColor: Color(0x660A84FF),
+      blur: blur,
+    );
     const rowStyle = SmartContextMenuRowStyle(childrenGap: 9);
     const statusStyle = SmartContextMenuStatusStyle(loaderVerticalPadding: 9);
     final changes = <String, (Object, SmartContextMenuStyle Function())>{

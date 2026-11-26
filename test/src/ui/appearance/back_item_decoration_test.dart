@@ -8,6 +8,7 @@ import 'package:smart_context_menu/src/ui/keys/service_item_key.dart';
 import 'package:smart_context_menu/src/ui/state/smart_context_menu_hover_controller.dart';
 import 'package:smart_context_menu/src/ui/view/smart_context_menu_level_view.dart';
 import 'package:smart_context_menu/src/ui/widgets/smart_context_menu_back_item.dart';
+import 'package:smart_context_menu/src/ui/widgets/smart_context_menu_divider.dart';
 
 import '../../../helpers/appearance_tester.dart';
 import '../../../helpers/menu_tester.dart';
@@ -35,11 +36,13 @@ void main() {
 
   Future<void> openSubmenu(
     WidgetTester tester,
-    SmartContextMenuStyle style,
-  ) async {
+    SmartContextMenuStyle style, {
+    Brightness? brightness,
+  }) async {
     await tester.pumpMenu(
       config: SmartContextMenuConfig(style: style),
       items: submenuItems(),
+      brightness: brightness,
     );
     await tester.openSubmenu();
   }
@@ -67,7 +70,39 @@ void main() {
     expect(clip.borderRadius, radius);
   });
 
-  testWidgets('uses the custom decoration for paint and blur clip', (
+  testWidgets('uses the resolved background color on Standard', (tester) async {
+    const color = CupertinoDynamicColor.withBrightness(
+      color: Color(0x60123456),
+      darkColor: Color(0x80654321),
+    );
+    const radius = BorderRadius.only(topLeft: Radius.circular(18));
+    await openSubmenu(
+      tester,
+      const SmartContextMenuStyle(
+        surface: SmartContextMenuSurface.standard,
+        backButtonStyle: SmartContextMenuBackButtonStyle(
+          backgroundColor: color,
+          borderRadius: radius,
+        ),
+      ),
+      brightness: Brightness.dark,
+    );
+
+    final decorations = find.descendant(
+      of: visibleBack(),
+      matching: find.byType(DecoratedBox),
+    );
+    final fill = tester.widget<DecoratedBox>(decorations.first);
+    final background = fill.decoration as BoxDecoration;
+    expect(background.color, isSameColorAs(color.darkColor));
+    expect(background.borderRadius, radius);
+    expect(
+      find.descendant(of: visibleBack(), matching: find.byType(BackdropFilter)),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('gives the decoration priority for paint and blur clip', (
     tester,
   ) async {
     const decoration = BoxDecoration(
@@ -79,6 +114,7 @@ void main() {
       const SmartContextMenuStyle(
         menuColor: Color(0xFFABCDEF),
         backButtonStyle: SmartContextMenuBackButtonStyle(
+          backgroundColor: Color(0xFFAABBCC),
           borderRadius: BorderRadius.zero,
           decoration: decoration,
         ),
@@ -145,9 +181,10 @@ void main() {
     );
   });
 
-  testWidgets('animates glass back blur in both scroll directions', (
+  testWidgets('keeps the glass rim and animates blur with a custom fill', (
     tester,
   ) async {
+    const color = Color(0x552387BA);
     final controller = SmartContextMenuOverlayController(
       navigator: FakeMenuNavigator(),
       initialItems: [],
@@ -171,7 +208,13 @@ void main() {
                 ],
               ),
               controller: controller,
-              config: const SmartContextMenuConfig(),
+              config: const SmartContextMenuConfig(
+                style: SmartContextMenuStyle(
+                  backButtonStyle: SmartContextMenuBackButtonStyle(
+                    backgroundColor: color,
+                  ),
+                ),
+              ),
               hoverController: hoverController,
               glassTint: const Color(0x92F7FAFF),
             ),
@@ -180,6 +223,20 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
+
+    expect(
+      backgroundWith(
+        const BoxDecoration(color: color, borderRadius: BorderRadius.zero),
+      ),
+      findsOneWidget,
+    );
+    final divider = tester.widget<SmartContextMenuDivider>(
+      find.descendant(
+        of: visibleBack(),
+        matching: find.byType(SmartContextMenuDivider),
+      ),
+    );
+    expect(divider.color, isNotNull);
 
     final back = find.byKey(ServiceItemKey.back);
     final backElement = tester.element(back);
