@@ -4,6 +4,8 @@ import 'package:flutter/cupertino.dart'
     show CupertinoDynamicColor, CupertinoIcons;
 import 'package:flutter/widgets.dart';
 
+import '../../core/ui/motion/tokens/motion_curves.dart';
+import '../../core/ui/motion/tokens/motion_durations.dart';
 import '../../core/ui/styles/smart_context_menu_defaults.dart';
 import '../../domain/smart_context_menu_blur.dart';
 import '../../domain/smart_context_menu_config.dart';
@@ -129,31 +131,23 @@ final class SmartContextMenuBackItem extends StatelessWidget {
     final blur = backStyle.blur;
     final Widget decoratedItem;
     if (decoration case final decoration?) {
-      decoratedItem = ClipPath(
-        clipper: _BackItemDecorationClipper(
-          decoration: decoration,
-          textDirection: Directionality.of(context),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: blur == null
-            ? background
-            : BackdropFilter(
-                filter: ImageFilter.blur(
-                  sigmaX: blur.sigmaX,
-                  sigmaY: blur.sigmaY,
-                ),
-                child: background,
-              ),
+      decoratedItem = _buildCustomBackground(
+        context,
+        decoration: decoration,
+        blur: blur,
+        child: background,
       );
-    } else {
-      decoratedItem = SmartContextMenuBlurBox(
+    } else if (glassTint != null && blur == SmartContextMenuBlur.strong) {
+      decoratedItem = _buildAnimatedGlassBackground(
+        context,
         blur: blur,
         borderRadius: borderRadius,
-        // Keep the shared optics clear until the list paints beneath the row.
-        enabled:
-            glassTint == null ||
-            hasItemsUnderBack ||
-            blur != SmartContextMenuBlur.strong,
+        child: background,
+      );
+    } else {
+      decoratedItem = _buildDefaultBackground(
+        blur: blur,
+        borderRadius: borderRadius,
         child: background,
       );
     }
@@ -162,6 +156,65 @@ final class SmartContextMenuBackItem extends StatelessWidget {
       onPanStart: (_) {},
       behavior: HitTestBehavior.opaque,
       child: decoratedItem,
+    );
+  }
+
+  Widget _buildCustomBackground(
+    BuildContext context, {
+    required Decoration decoration,
+    required SmartContextMenuBlur? blur,
+    required Widget child,
+  }) {
+    return ClipPath(
+      clipper: _BackItemDecorationClipper(
+        decoration: decoration,
+        textDirection: Directionality.of(context),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: blur == null
+          ? child
+          : BackdropFilter(
+              filter: ImageFilter.blur(
+                sigmaX: blur.sigmaX,
+                sigmaY: blur.sigmaY,
+              ),
+              child: child,
+            ),
+    );
+  }
+
+  Widget _buildAnimatedGlassBackground(
+    BuildContext context, {
+    required SmartContextMenuBlur? blur,
+    required BorderRadiusGeometry borderRadius,
+    required Widget child,
+  }) {
+    final targetStrength = hasItemsUnderBack ? 1.0 : 0.0;
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: targetStrength, end: targetStrength),
+      duration: MediaQuery.disableAnimationsOf(context)
+          ? Duration.zero
+          : MotionDurations.fast,
+      curve: MotionCurves.standard,
+      builder: (context, strength, child) => SmartContextMenuBlurBox(
+        blur: blur,
+        borderRadius: borderRadius,
+        strength: strength,
+        child: child!,
+      ),
+      child: child,
+    );
+  }
+
+  Widget _buildDefaultBackground({
+    required SmartContextMenuBlur? blur,
+    required BorderRadiusGeometry borderRadius,
+    required Widget child,
+  }) {
+    return SmartContextMenuBlurBox(
+      blur: blur,
+      borderRadius: borderRadius,
+      child: child,
     );
   }
 }

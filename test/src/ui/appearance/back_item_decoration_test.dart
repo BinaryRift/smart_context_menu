@@ -145,7 +145,7 @@ void main() {
     );
   });
 
-  testWidgets('glass back blur follows scrolling beneath the pinned item', (
+  testWidgets('animates glass back blur in both scroll directions', (
     tester,
   ) async {
     final controller = SmartContextMenuOverlayController(
@@ -188,19 +188,39 @@ void main() {
       of: visibleBack(),
       matching: find.byType(BackdropFilter),
     );
-    expect(tester.widget<BackdropFilter>(blur).enabled, isFalse);
-
-    await tester.drag(find.byType(ListView), const Offset(0, -100));
-    await tester.pumpAndSettle();
-    expect(tester.widget<BackdropFilter>(blur).enabled, isTrue);
-    expect(tester.element(back), same(backElement));
-    expect(tester.getRect(back), pinnedBounds);
-
     final scrollPosition = tester
         .state<ScrollableState>(find.byType(Scrollable))
         .position;
-    scrollPosition.jumpTo(scrollPosition.minScrollExtent);
+    BackdropFilter backdrop() => tester.widget<BackdropFilter>(blur);
+
+    final clearFilter = backdrop().filter;
+    expect(backdrop().enabled, isFalse);
+
+    scrollPosition.jumpTo(100);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(backdrop().enabled, isTrue);
+    final rampingInFilter = backdrop().filter;
+    expect(rampingInFilter, isNot(clearFilter));
+    expect(tester.element(back), same(backElement));
+    expect(tester.getRect(back), pinnedBounds);
+
     await tester.pumpAndSettle();
-    expect(tester.widget<BackdropFilter>(blur).enabled, isFalse);
+    final fullFilter = backdrop().filter;
+    expect(fullFilter, isNot(rampingInFilter));
+    expect(backdrop().enabled, isTrue);
+
+    scrollPosition.jumpTo(scrollPosition.minScrollExtent);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(backdrop().enabled, isTrue);
+    expect(backdrop().filter, isNot(fullFilter));
+    expect(backdrop().filter, isNot(clearFilter));
+    expect(tester.element(back), same(backElement));
+    expect(tester.getRect(back), pinnedBounds);
+
+    await tester.pumpAndSettle();
+    expect(backdrop().enabled, isFalse);
+    expect(backdrop().filter, clearFilter);
   });
 }
