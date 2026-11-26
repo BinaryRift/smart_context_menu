@@ -13,6 +13,8 @@ import '../extensions/animation_ext.dart';
 import '../state/smart_context_menu_hover_controller.dart';
 import '../state/smart_context_menu_stretch_controller.dart';
 import '../widgets/smart_context_menu_blur_box.dart';
+import '../widgets/smart_context_menu_glass_prototype.dart';
+import '../widgets/smart_context_menu_glass_surface.dart';
 import '../widgets/smart_context_menu_level_switcher.dart';
 import '../widgets/smart_context_menu_pointer_tracker.dart';
 import 'smart_context_menu_level_view.dart';
@@ -26,6 +28,8 @@ final class SmartContextMenuView extends StatefulWidget {
   final SmartContextMenuConfig config;
   final ValueNotifier<double> heightNotifier;
   final ValueNotifier<Offset> previewMotionNotifier;
+  final SmartContextMenuGlassPrototype? glass;
+  final Animation<double> glassOpacity;
 
   const SmartContextMenuView({
     super.key,
@@ -33,6 +37,8 @@ final class SmartContextMenuView extends StatefulWidget {
     required this.config,
     required this.heightNotifier,
     required this.previewMotionNotifier,
+    this.glass,
+    required this.glassOpacity,
   });
 
   @override
@@ -98,8 +104,31 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
+    final levels = ConstrainedBox(
+      constraints: BoxConstraints(
+        maxHeight: screenHeight * _config.menuHeightFactor,
+      ),
+      child: SmartContextMenuPointerTracker(
+        hoverController: _hoverController,
+        isSwiping: _isSwiping,
+        onDrag: _setMenuEffect,
+        onRelease: _resetMenuEffect,
+        child: SmartContextMenuLevelSwitcher(
+          isForward: _controller.isForward,
+          enableSwipeBack: _config.enableSwipeBack,
+          isSwiping: _isSwiping,
+          onSwipeBack: _controller.popSubmenu,
+          previous: _buildPreviousLevel(),
+          child: _buildLevel(
+            _controller.currentLevel,
+            depth: _controller.stackLength,
+          ),
+        ),
+      ),
+    );
+    final glass = widget.glass;
 
-    // The stretch moves the shadow and the blur together with the menu.
+    // The stretch moves the surface and its shadow together with the menu.
     return WidgetSizeListener(
       onSizeChanged: _onSizeChanged,
       child: ListenableBuilder(
@@ -111,47 +140,59 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
           transform: _stretchController.transform,
           child: child,
         ),
-        child: SmartContextMenuShadowBox(
-          borderRadius: _config.style.borderRadius,
-          shadows: _config.style.menuShadows,
-          child: SmartContextMenuBlurBox(
-            blur: _config.style.menuBlur,
-            borderRadius: _config.style.borderRadius,
-            child: Container(
-              width: _config.menuWidth,
-              decoration: _config.style.menuDecoration ?? _defaultDecoration,
-              foregroundDecoration: _config.style.menuDecoration == null
-                  ? _defaultBorder
-                  : null,
-              clipBehavior: Clip.antiAlias,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxHeight: screenHeight * _config.menuHeightFactor,
-                ),
-                child: SmartContextMenuPointerTracker(
-                  hoverController: _hoverController,
-                  isSwiping: _isSwiping,
-                  onDrag: _setMenuEffect,
-                  onRelease: _resetMenuEffect,
-                  child: SmartContextMenuLevelSwitcher(
-                    isForward: _controller.isForward,
-                    enableSwipeBack: _config.enableSwipeBack,
-                    isSwiping: _isSwiping,
-                    onSwipeBack: _controller.popSubmenu,
-                    previous: _buildPreviousLevel(),
-                    child: _buildLevel(
-                      _controller.currentLevel,
-                      depth: _controller.stackLength,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
+        child: glass == null
+            ? _buildStandardSurface(levels)
+            : _buildGlassSurface(context, glass, levels),
+      ),
+    );
+  }
+
+  Widget _buildStandardSurface(Widget levels) {
+    return SmartContextMenuShadowBox(
+      borderRadius: _config.style.borderRadius,
+      shadows: _config.style.menuShadows,
+      child: SmartContextMenuBlurBox(
+        blur: _config.style.menuBlur,
+        borderRadius: _config.style.borderRadius,
+        child: Container(
+          width: _config.menuWidth,
+          decoration: _config.style.menuDecoration ?? _defaultDecoration,
+          foregroundDecoration: _config.style.menuDecoration == null
+              ? _defaultBorder
+              : null,
+          clipBehavior: Clip.antiAlias,
+          child: levels,
         ),
       ),
     );
   }
+
+  Widget _buildGlassSurface(
+    BuildContext context,
+    SmartContextMenuGlassPrototype glass,
+    Widget levels,
+  ) {
+    final opacity = glass.fadeWholeMenu
+        ? kAlwaysCompleteAnimation
+        : widget.glassOpacity;
+
+    return SizedBox(
+      width: _config.menuWidth,
+      child: SmartContextMenuGlassSurface(
+        program: glass.program,
+        opacity: opacity,
+        borderRadius: _config.style.borderRadius,
+        shadows: _config.style.menuShadows,
+        tint: CupertinoDynamicColor.resolve(_glassTint, context),
+        child: levels,
+      ),
+    );
+  }
+
+  static const _glassTint = CupertinoDynamicColor.withBrightness(
+    color: Color(0x92F7FAFF),
+    darkColor: Color(0x9C161B24),
+  );
 
   Widget? _buildPreviousLevel() {
     final level = _controller.previousLevel;

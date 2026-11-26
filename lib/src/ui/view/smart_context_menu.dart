@@ -17,6 +17,7 @@ import '../routes/smart_context_menu_route.dart';
 import '../state/smart_context_menu_session.dart';
 import '../theme/smart_context_menu_theme.dart';
 import '../widgets/smart_context_menu_anchor.dart';
+import '../widgets/smart_context_menu_glass_prototype.dart';
 import '../widgets/smart_context_menu_press_detector.dart';
 
 /// Shows an iOS-style context menu for [child] on long press or secondary click.
@@ -310,6 +311,7 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
 
   Future<void> _runOpenSession(int sessionId) async {
     final navigator = Navigator.of(context, rootNavigator: true);
+    final glass = SmartContextMenuGlassPrototype.maybeOf(context);
     // An app without Cupertino localizations, such as a bare WidgetsApp,
     // gets the English label.
     final localizations =
@@ -342,6 +344,7 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
       heroTag: _heroTag,
       items: widget.items,
       config: _config,
+      glass: glass,
       onPreviewTap: widget.onPreviewTap,
       headerSliversBuilder: widget.headerSliversBuilder,
       fadeHeaderSlivers: widget.fadeHeaderSlivers,

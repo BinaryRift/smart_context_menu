@@ -9,6 +9,7 @@ import '../../../core/ui/reactions_bar.dart';
 import '../../../resources/assets/app_images.dart';
 import '../../settings/ui/widgets/settings_button.dart';
 import '../domain/lab_items.dart';
+import 'liquid_glass_page.dart';
 import 'widgets/tap_empty_area.dart';
 
 /// Content shown above the preview.
@@ -78,6 +79,19 @@ final class _LabPageState extends State<LabPage> {
             Expanded(
               child: ListView(
                 children: [
+                  CupertinoListSection.insetGrouped(
+                    children: [
+                      CupertinoListTile.notched(
+                        title: const Text('Liquid Glass prototype'),
+                        trailing: const CupertinoListTileChevron(),
+                        onTap: () => Navigator.of(context).push<void>(
+                          CupertinoPageRoute<void>(
+                            builder: (_) => const LiquidGlassPage(),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                   _buildSettings(),
                   _buildMenu(
                     title: 'All submenu types',
