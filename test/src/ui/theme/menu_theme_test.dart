@@ -2,6 +2,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
+import 'package:smart_context_menu/src/ui/view/smart_context_menu_overlay.dart';
+import 'package:smart_context_menu/src/ui/widgets/smart_context_menu_glass_surface.dart';
 
 import '../../../helpers/menu_tester.dart';
 
@@ -109,6 +111,53 @@ void main() {
     await tester.openMenu();
 
     expect(titleColor(tester), isSameColorAs(configColor));
+  });
+
+  testWidgets('keeps the surface selected before capturing the preview', (
+    tester,
+  ) async {
+    const glass = SmartContextMenuSurface.glass(
+      SmartContextMenuGlassStyle(refraction: 2),
+    );
+    const style = SmartContextMenuStyle(surface: glass);
+    const theme = SmartContextMenuConfig(style: style);
+    final controller = SmartContextMenuController();
+    addTearDown(controller.dispose);
+
+    SmartContextMenuOverlay activeMenu() =>
+        tester.widget(find.byType(SmartContextMenuOverlay));
+    Widget app({SmartContextMenuConfig? config}) => CupertinoApp(
+      home: Builder(
+        builder: (context) => MediaQuery(
+          data: MediaQuery.of(context).copyWith(highContrast: true),
+          child: SmartContextMenuTheme(
+            config: theme,
+            child: buildMenu(config: config, controller: controller),
+          ),
+        ),
+      ),
+    );
+
+    await tester.pumpWidget(app());
+    final firstOpening = controller.open();
+    await tester.pumpWidget(
+      app(
+        config: theme.copyWith(
+          style: style.copyWith(surface: SmartContextMenuSurface.standard),
+        ),
+      ),
+    );
+    await tester.settleMenu();
+    expect(activeMenu().config.style.surface, glass);
+    expect(find.byType(SmartContextMenuGlassSurface), findsNothing);
+
+    final closing = controller.close();
+    await tester.settleMenu();
+    await closing;
+    await firstOpening;
+    await tester.openMenu();
+    expect(activeMenu().config.style.surface, SmartContextMenuSurface.standard);
+    expect(find.byType(SmartContextMenuGlassSurface), findsNothing);
   });
 
   testWidgets('manual activation of the theme turns off the long press', (

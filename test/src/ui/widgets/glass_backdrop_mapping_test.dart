@@ -8,8 +8,8 @@ void main() {
   const size = Size(250, 120);
 
   test('maps translation and per-axis scale to backdrop pixels', () {
-    final transform = Matrix4.translationValues(30, 40, 0)
-      ..scaleByDouble(1.5, 0.75, 1, 1);
+    final transform = Matrix4.diagonal3Values(1.5, 0.75, 1)
+      ..setTranslationRaw(30, 40, 0);
 
     final mapping = glassBackdropMapping(transform, size, 2)!;
     expect(mapping.origin, const Offset(60, 80));
