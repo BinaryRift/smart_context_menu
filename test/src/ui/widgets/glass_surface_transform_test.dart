@@ -54,7 +54,7 @@ void main() {
     expect(largest, greaterThan(3.4e38));
   });
 
-  testWidgets('paints content without glass under a rotation and resumes', (
+  testWidgets('keeps content visible when a filter cannot be applied', (
     tester,
   ) async {
     final program = await tester.runAsync(
@@ -87,14 +87,9 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.text('Content'), findsOneWidget);
 
+    // Mounting the surface directly bypasses the loader's support check.
     await tester.pumpWidget(build(0));
-    // The test engine rejects shader filters, so the error shows that the
-    // glass is requested again.
-    final error = tester.takeException();
-    if (ui.ImageFilter.isShaderFilterSupported) {
-      expect(error, isNull);
-    } else {
-      expect(error, isUnsupportedError);
-    }
+    expect(tester.takeException(), isNull);
+    expect(find.text('Content'), findsOneWidget);
   });
 }

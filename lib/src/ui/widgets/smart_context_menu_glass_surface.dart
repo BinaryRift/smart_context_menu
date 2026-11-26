@@ -229,12 +229,14 @@ final class _RenderGlassBackdrop extends RenderProxyBox {
   @override
   Rect describeApproximatePaintClip(RenderObject child) => Offset.zero & size;
 
-  ui.ImageFilter _filter(
+  ui.ImageFilter? _filter(
     double opacity,
     Offset origin,
     Offset scale,
     RRect clip,
   ) {
+    if (!ui.ImageFilter.isShaderFilterSupported) return null;
+
     final style = _settings.style;
     final tint = style.tint;
 
@@ -292,6 +294,9 @@ final class _GlassLayer extends ContainerLayer {
       settings.pixelRatio,
     );
     final clip = settings.clipper.getClip(backdrop.size);
+    final filter = mapping == null
+        ? null
+        : backdrop._filter(opacity, mapping.origin, mapping.scale, clip);
     final captureClip = mapping == null
         ? clip
         : glassBackdropClip(clip, origin: mapping.origin, scale: mapping.scale);
@@ -301,7 +306,7 @@ final class _GlassLayer extends ContainerLayer {
       oldLayer: engineLayer as ui.ClipRRectEngineLayer?,
     );
 
-    if (mapping == null) {
+    if (filter == null) {
       // Keep the content visible and resume the glass on a later frame.
       _blurEngineLayer?.dispose();
       _blurEngineLayer = null;
@@ -330,7 +335,7 @@ final class _GlassLayer extends ContainerLayer {
 
     final oldShaderLayer = _shaderEngineLayer;
     _shaderEngineLayer = builder.pushBackdropFilter(
-      backdrop._filter(opacity, mapping.origin, mapping.scale, clip),
+      filter,
       oldLayer: oldShaderLayer,
     );
     oldShaderLayer?.dispose();
