@@ -2,11 +2,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
+import 'package:smart_context_menu/src/controllers/smart_context_menu_overlay_controller.dart';
+import 'package:smart_context_menu/src/domain/smart_context_menu_level.dart';
 import 'package:smart_context_menu/src/ui/keys/service_item_key.dart';
+import 'package:smart_context_menu/src/ui/state/smart_context_menu_hover_controller.dart';
+import 'package:smart_context_menu/src/ui/view/smart_context_menu_level_view.dart';
 import 'package:smart_context_menu/src/ui/widgets/smart_context_menu_back_item.dart';
 
 import '../../../helpers/appearance_tester.dart';
 import '../../../helpers/menu_tester.dart';
+import '../../../helpers/overlay_controller_tester.dart';
 
 void main() {
   Finder backItem(Key key) => find.ancestor(
@@ -138,5 +143,64 @@ void main() {
       tester.getSize(visibleBack()).height,
       tester.getSize(backItem(ServiceItemKey.backPlaceholder)).height,
     );
+  });
+
+  testWidgets('glass back blur follows scrolling beneath the pinned item', (
+    tester,
+  ) async {
+    final controller = SmartContextMenuOverlayController(
+      navigator: FakeMenuNavigator(),
+      initialItems: [],
+      enableHaptics: false,
+    );
+    addTearDown(controller.dispose);
+    final hoverController = SmartContextMenuHoverController();
+    addTearDown(hoverController.dispose);
+    await tester.pumpWidget(
+      CupertinoApp(
+        home: Center(
+          child: SizedBox(
+            width: 250,
+            height: 190,
+            child: SmartContextMenuLevelView(
+              level: SmartMenuLevel(
+                parentId: 'submenu',
+                items: [
+                  for (var i = 1; i <= 10; i++)
+                    SmartContextMenuItem.simple(title: 'Item $i'),
+                ],
+              ),
+              controller: controller,
+              config: const SmartContextMenuConfig(),
+              hoverController: hoverController,
+              glassTint: const Color(0x92F7FAFF),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final back = find.byKey(ServiceItemKey.back);
+    final backElement = tester.element(back);
+    final pinnedBounds = tester.getRect(back);
+    final blur = find.descendant(
+      of: visibleBack(),
+      matching: find.byType(BackdropFilter),
+    );
+    expect(tester.widget<BackdropFilter>(blur).enabled, isFalse);
+
+    await tester.drag(find.byType(ListView), const Offset(0, -100));
+    await tester.pumpAndSettle();
+    expect(tester.widget<BackdropFilter>(blur).enabled, isTrue);
+    expect(tester.element(back), same(backElement));
+    expect(tester.getRect(back), pinnedBounds);
+
+    final scrollPosition = tester
+        .state<ScrollableState>(find.byType(Scrollable))
+        .position;
+    scrollPosition.jumpTo(scrollPosition.minScrollExtent);
+    await tester.pumpAndSettle();
+    expect(tester.widget<BackdropFilter>(blur).enabled, isFalse);
   });
 }

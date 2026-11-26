@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart'
 import 'package:flutter/widgets.dart';
 
 import '../../core/ui/styles/smart_context_menu_defaults.dart';
+import '../../domain/smart_context_menu_blur.dart';
 import '../../domain/smart_context_menu_config.dart';
 import '../../domain/smart_context_menu_item.dart';
 import '../keys/service_item_key.dart';
@@ -15,22 +16,29 @@ import 'smart_context_menu_divider.dart';
 
 /// The item that returns to the parent menu level.
 final class SmartContextMenuBackItem extends StatelessWidget {
+  static const _glassDividerColor = CupertinoDynamicColor.withBrightness(
+    color: Color(0x2E000000),
+    darkColor: Color(0x38FFFFFF),
+  );
+
   final SmartContextMenuConfig config;
   final SmartContextMenuHoverController hoverController;
   final VoidCallback onTap;
+  final Color? glassTint;
+  final bool hasItemsUnderBack;
   final bool _isPlaceholder;
 
   /// The back item pinned to the top of a submenu.
   ///
-  /// Has the menu background or
-  /// [SmartContextMenuBackButtonStyle.decoration] and
-  /// [SmartContextMenuBackButtonStyle.blur], and keeps drags on it from
-  /// scrolling the items below.
+  /// Draws the back item background and keeps drags on it from scrolling
+  /// the items below.
   const SmartContextMenuBackItem({
     super.key,
     required this.config,
     required this.hoverController,
     required this.onTap,
+    this.glassTint,
+    this.hasItemsUnderBack = false,
   }) : _isPlaceholder = false;
 
   /// The invisible copy that reserves the space of the pinned back item
@@ -40,12 +48,16 @@ final class SmartContextMenuBackItem extends StatelessWidget {
     required this.config,
     required this.hoverController,
     required this.onTap,
-  }) : _isPlaceholder = true;
+  }) : glassTint = null,
+       hasItemsUnderBack = false,
+       _isPlaceholder = true;
 
   @override
   Widget build(BuildContext context) {
     final style = config.style;
     final backStyle = style.backButtonStyle;
+    final decoration = backStyle.decoration;
+    final glassTint = decoration == null ? this.glassTint : null;
     final item = SmartContextMenuItemView(
       key: _isPlaceholder
           ? ServiceItemKey.backPlaceholder
@@ -77,7 +89,14 @@ final class SmartContextMenuBackItem extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         item,
-        SmartContextMenuDivider(style: style),
+        SmartContextMenuDivider(
+          style: style,
+          color:
+              glassTint != null &&
+                  style.dividerColor == SmartContextMenuDefaults.dividerColor
+              ? _glassDividerColor
+              : null,
+        ),
       ],
     );
 
@@ -88,20 +107,28 @@ final class SmartContextMenuBackItem extends StatelessWidget {
       );
     }
 
-    final decoration = backStyle.decoration;
+    // The glass surface already clips the top corners of the default row.
+    final borderRadius =
+        glassTint != null &&
+            backStyle.borderRadius ==
+                SmartContextMenuDefaults.backButtonBorderRadius
+        ? BorderRadius.zero
+        : backStyle.borderRadius;
     final background = DecoratedBox(
       decoration:
           decoration ??
           BoxDecoration(
-            color: CupertinoDynamicColor.resolve(style.menuColor, context),
-            borderRadius: backStyle.borderRadius,
+            color:
+                glassTint?.withValues(alpha: 0.14) ??
+                CupertinoDynamicColor.resolve(style.menuColor, context),
+            borderRadius: borderRadius,
           ),
       child: itemWithDivider,
     );
 
+    final blur = backStyle.blur;
     final Widget decoratedItem;
     if (decoration case final decoration?) {
-      final blur = backStyle.blur;
       decoratedItem = ClipPath(
         clipper: _BackItemDecorationClipper(
           decoration: decoration,
@@ -120,8 +147,13 @@ final class SmartContextMenuBackItem extends StatelessWidget {
       );
     } else {
       decoratedItem = SmartContextMenuBlurBox(
-        blur: backStyle.blur,
-        borderRadius: backStyle.borderRadius,
+        blur: blur,
+        borderRadius: borderRadius,
+        // Keep the shared optics clear until the list paints beneath the row.
+        enabled:
+            glassTint == null ||
+            hasItemsUnderBack ||
+            blur != SmartContextMenuBlur.strong,
         child: background,
       );
     }

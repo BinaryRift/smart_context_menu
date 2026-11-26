@@ -10,12 +10,14 @@ import '../../domain/smart_context_menu_blur.dart';
 final class SmartContextMenuBlurBox extends StatelessWidget {
   final SmartContextMenuBlur? blur;
   final BorderRadiusGeometry borderRadius;
+  final bool enabled;
   final Widget child;
 
   const SmartContextMenuBlurBox({
     super.key,
     required this.blur,
     required this.borderRadius,
+    this.enabled = true,
     required this.child,
   });
 
@@ -27,6 +29,7 @@ final class SmartContextMenuBlurBox extends StatelessWidget {
     return ClipRRect(
       borderRadius: borderRadius,
       child: BackdropFilter(
+        enabled: enabled,
         filter: ImageFilter.blur(sigmaX: blur.sigmaX, sigmaY: blur.sigmaY),
         child: child,
       ),

@@ -8,8 +8,9 @@ import '../../domain/smart_context_menu_style.dart';
 /// The divider of a menu item, drawn as set by [SmartContextMenuStyle].
 final class SmartContextMenuDivider extends StatelessWidget {
   final SmartContextMenuStyle style;
+  final Color? color;
 
-  const SmartContextMenuDivider({super.key, required this.style});
+  const SmartContextMenuDivider({super.key, required this.style, this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +28,7 @@ final class SmartContextMenuDivider extends StatelessWidget {
             border: Border(
               bottom: BorderSide(
                 color: CupertinoDynamicColor.resolve(
-                  style.dividerColor,
+                  color ?? style.dividerColor,
                   context,
                 ),
                 width: thickness,

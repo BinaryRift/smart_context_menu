@@ -138,6 +138,14 @@ final class _LiquidGlassPageState extends State<LiquidGlassPage> {
             _command('Downloads', CupertinoIcons.arrow_down_circle),
           ],
         ),
+        SmartContextMenuItem.submenu(
+          title: 'Browse folders',
+          leading: const Icon(CupertinoIcons.folder_open),
+          children: [
+            for (var i = 1; i <= 18; i++)
+              _command('Project $i', CupertinoIcons.folder),
+          ],
+        ),
       ],
       child: Builder(
         builder: (context) => CupertinoButton.filled(

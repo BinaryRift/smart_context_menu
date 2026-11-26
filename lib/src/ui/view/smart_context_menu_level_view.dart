@@ -23,15 +23,12 @@ import 'item/smart_context_menu_item_view.dart';
 
 /// The content of a menu [level]: its items, the back item of a submenu
 /// and the loading, retry and paging rows.
-final class SmartContextMenuLevelView extends StatelessWidget {
-  // Covers the gap between the menu border and the pinned back item that
-  // shows while the items scroll under it.
-  static const double _backItemOverlap = 0.5;
-
+final class SmartContextMenuLevelView extends StatefulWidget {
   final SmartMenuLevel level;
   final SmartContextMenuOverlayController controller;
   final SmartContextMenuConfig config;
   final SmartContextMenuHoverController hoverController;
+  final Color? glassTint;
 
   const SmartContextMenuLevelView({
     super.key,
@@ -39,7 +36,26 @@ final class SmartContextMenuLevelView extends StatelessWidget {
     required this.controller,
     required this.config,
     required this.hoverController,
+    this.glassTint,
   });
+
+  @override
+  State<SmartContextMenuLevelView> createState() =>
+      _SmartContextMenuLevelViewState();
+}
+
+final class _SmartContextMenuLevelViewState
+    extends State<SmartContextMenuLevelView> {
+  // Covers the gap between the menu border and the pinned back item that
+  // shows while the items scroll under it.
+  static const double _backItemOverlap = 0.5;
+
+  bool _hasItemsUnderBack = false;
+
+  SmartMenuLevel get level => widget.level;
+  SmartContextMenuOverlayController get controller => widget.controller;
+  SmartContextMenuConfig get config => widget.config;
+  SmartContextMenuHoverController get hoverController => widget.hoverController;
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +65,7 @@ final class SmartContextMenuLevelView extends StatelessWidget {
     final int itemsCount = level.items.length;
     final int headerOffset = hasBack ? 1 : 0;
 
-    return Stack(
+    final stack = Stack(
       children: [
         ListView.builder(
           shrinkWrap: true,
@@ -74,10 +90,33 @@ final class SmartContextMenuLevelView extends StatelessWidget {
               config: config,
               hoverController: hoverController,
               onTap: controller.popSubmenu,
+              glassTint: widget.glassTint,
+              hasItemsUnderBack: _hasItemsUnderBack,
             ),
           ),
       ],
     );
+    return hasBack && widget.glassTint != null
+        ? NotificationListener<Notification>(
+            onNotification: _updateBackItem,
+            child: stack,
+          )
+        : stack;
+  }
+
+  bool _updateBackItem(Notification notification) {
+    final metrics = switch (notification) {
+      ScrollNotification(depth: 0, :final metrics) => metrics,
+      ScrollMetricsNotification(depth: 0, :final metrics) => metrics,
+      _ => null,
+    };
+    if (metrics != null) {
+      final hasItemsUnderBack = metrics.pixels > metrics.minScrollExtent;
+      if (hasItemsUnderBack != _hasItemsUnderBack) {
+        setState(() => _hasItemsUnderBack = hasItemsUnderBack);
+      }
+    }
+    return false;
   }
 
   Widget _routeItem({
