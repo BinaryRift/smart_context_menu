@@ -188,6 +188,35 @@ void main() {
       of: visibleBack(),
       matching: find.byType(BackdropFilter),
     );
+    final innerClip = find.byWidgetPredicate(
+      (widget) => widget is ClipRRect && widget.clipper != null,
+    );
+    final filterClip = find.ancestor(of: blur, matching: innerClip);
+    final clipSize = tester.getSize(filterClip);
+    final clip = tester
+        .widget<ClipRRect>(filterClip)
+        .clipper!
+        .getClip(clipSize);
+    expect(clip.left, 2);
+    expect(clip.top, 2);
+    expect(clip.right, clipSize.width - 2);
+    expect(clip.tlRadius, const Radius.circular(14));
+    expect(clip.trRadius, const Radius.circular(14));
+    expect(find.ancestor(of: back, matching: innerClip), findsNothing);
+
+    final listClip = find.ancestor(
+      of: find.byType(ListView),
+      matching: find.byType(ClipPath),
+    );
+    final listPath = tester
+        .widget<ClipPath>(listClip)
+        .clipper!
+        .getClip(tester.getSize(listClip));
+    expect(listPath.contains(const Offset(125, 1)), isFalse);
+    expect(listPath.contains(const Offset(125, 10)), isTrue);
+    expect(listPath.contains(const Offset(1, 22)), isFalse);
+    expect(listPath.contains(Offset(1, pinnedBounds.height + 1)), isTrue);
+
     final scrollPosition = tester
         .state<ScrollableState>(find.byType(Scrollable))
         .position;

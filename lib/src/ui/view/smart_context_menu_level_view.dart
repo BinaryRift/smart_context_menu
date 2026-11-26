@@ -20,10 +20,11 @@ import '../widgets/smart_context_menu_retry_row.dart';
 import '../widgets/smart_context_menu_row_layout.dart';
 import '../widgets/smart_context_menu_swipe_back_exclusion.dart';
 import 'item/smart_context_menu_item_view.dart';
+import 'smart_context_menu_submenu_view.dart';
 
 /// The content of a menu [level]: its items, the back item of a submenu
 /// and the loading, retry and paging rows.
-final class SmartContextMenuLevelView extends StatefulWidget {
+final class SmartContextMenuLevelView extends StatelessWidget {
   final SmartMenuLevel level;
   final SmartContextMenuOverlayController controller;
   final SmartContextMenuConfig config;
@@ -40,24 +41,6 @@ final class SmartContextMenuLevelView extends StatefulWidget {
   });
 
   @override
-  State<SmartContextMenuLevelView> createState() =>
-      _SmartContextMenuLevelViewState();
-}
-
-final class _SmartContextMenuLevelViewState
-    extends State<SmartContextMenuLevelView> {
-  // Covers the gap between the menu border and the pinned back item that
-  // shows while the items scroll under it.
-  static const double _backItemOverlap = 0.5;
-
-  bool _hasItemsUnderBack = false;
-
-  SmartMenuLevel get level => widget.level;
-  SmartContextMenuOverlayController get controller => widget.controller;
-  SmartContextMenuConfig get config => widget.config;
-  SmartContextMenuHoverController get hoverController => widget.hoverController;
-
-  @override
   Widget build(BuildContext context) {
     final bool hasBack = level.hasBack;
     final bool hasPaging = level.hasPaging;
@@ -65,58 +48,28 @@ final class _SmartContextMenuLevelViewState
     final int itemsCount = level.items.length;
     final int headerOffset = hasBack ? 1 : 0;
 
-    final stack = Stack(
-      children: [
-        ListView.builder(
-          shrinkWrap: true,
-          padding: EdgeInsets.zero,
-          physics: const BouncingScrollPhysics(),
-          itemCount: level.rowCount,
-          itemBuilder: (context, index) => _routeItem(
-            index: index,
-            hasBack: hasBack,
-            headerOffset: headerOffset,
-            itemsCount: itemsCount,
-            hasPaging: hasPaging,
-            hasError: hasError,
-          ),
-        ),
-        if (hasBack)
-          Positioned(
-            top: -_backItemOverlap,
-            left: 0,
-            right: 0,
-            child: SmartContextMenuBackItem(
-              config: config,
-              hoverController: hoverController,
-              onTap: controller.popSubmenu,
-              glassTint: widget.glassTint,
-              hasItemsUnderBack: _hasItemsUnderBack,
-            ),
-          ),
-      ],
+    final list = ListView.builder(
+      shrinkWrap: true,
+      padding: EdgeInsets.zero,
+      physics: const BouncingScrollPhysics(),
+      itemCount: level.rowCount,
+      itemBuilder: (context, index) => _routeItem(
+        index: index,
+        hasBack: hasBack,
+        headerOffset: headerOffset,
+        itemsCount: itemsCount,
+        hasPaging: hasPaging,
+        hasError: hasError,
+      ),
     );
-    return hasBack && widget.glassTint != null
-        ? NotificationListener<Notification>(
-            onNotification: _updateBackItem,
-            child: stack,
-          )
-        : stack;
-  }
-
-  bool _updateBackItem(Notification notification) {
-    final metrics = switch (notification) {
-      ScrollNotification(depth: 0, :final metrics) => metrics,
-      ScrollMetricsNotification(depth: 0, :final metrics) => metrics,
-      _ => null,
-    };
-    if (metrics != null) {
-      final hasItemsUnderBack = metrics.pixels > metrics.minScrollExtent;
-      if (hasItemsUnderBack != _hasItemsUnderBack) {
-        setState(() => _hasItemsUnderBack = hasItemsUnderBack);
-      }
-    }
-    return false;
+    if (!hasBack) return list;
+    return SmartContextMenuSubmenuView(
+      list: list,
+      config: config,
+      hoverController: hoverController,
+      onBack: controller.popSubmenu,
+      glassTint: glassTint,
+    );
   }
 
   Widget _routeItem({

@@ -13,6 +13,9 @@ final class SmartContextMenuBlurBox extends StatelessWidget {
 
   /// Multiplier applied to both blur sigmas.
   final double strength;
+
+  /// Optional clip for the backdrop filter alone.
+  final CustomClipper<RRect>? backdropClipper;
   final Widget child;
 
   const SmartContextMenuBlurBox({
@@ -20,6 +23,7 @@ final class SmartContextMenuBlurBox extends StatelessWidget {
     required this.blur,
     required this.borderRadius,
     this.strength = 1,
+    this.backdropClipper,
     required this.child,
   });
 
@@ -27,17 +31,29 @@ final class SmartContextMenuBlurBox extends StatelessWidget {
   Widget build(BuildContext context) {
     final blur = this.blur;
     if (blur == null) return child;
+    final clipper = backdropClipper;
+    final filter = BackdropFilter(
+      enabled: strength > 0,
+      filter: ImageFilter.blur(
+        sigmaX: blur.sigmaX * strength,
+        sigmaY: blur.sigmaY * strength,
+      ),
+      child: clipper == null ? child : const SizedBox.expand(),
+    );
 
     return ClipRRect(
       borderRadius: borderRadius,
-      child: BackdropFilter(
-        enabled: strength > 0,
-        filter: ImageFilter.blur(
-          sigmaX: blur.sigmaX * strength,
-          sigmaY: blur.sigmaY * strength,
-        ),
-        child: child,
-      ),
+      child: clipper == null
+          ? filter
+          : Stack(
+              fit: StackFit.passthrough,
+              children: [
+                Positioned.fill(
+                  child: ClipRRect(clipper: clipper, child: filter),
+                ),
+                child,
+              ],
+            ),
     );
   }
 }
