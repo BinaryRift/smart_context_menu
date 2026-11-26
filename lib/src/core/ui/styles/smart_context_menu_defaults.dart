@@ -97,6 +97,13 @@ abstract final class SmartContextMenuDefaults {
         darkColor: Color(0xB324252A),
       );
 
+  /// The default tint of the Liquid Glass surface.
+  static const CupertinoDynamicColor glassTint =
+      CupertinoDynamicColor.withBrightness(
+        color: Color(0x92F7FAFF),
+        darkColor: Color(0x9C161B24),
+      );
+
   /// The menu border, the default of [SmartContextMenuStyle.borderColor].
   static const CupertinoDynamicColor borderColor =
       CupertinoDynamicColor.withBrightness(

@@ -1,5 +1,5 @@
 import 'dart:async' show FutureOr;
-import 'dart:ui' as ui show FragmentProgram, Image;
+import 'dart:ui' as ui show Image;
 import 'package:flutter/widgets.dart'
     show
         PageRoute,
@@ -14,6 +14,7 @@ import '../../core/ui/motion/tokens/motion_durations.dart';
 import '../../domain/smart_context_menu_config.dart';
 import '../../domain/smart_context_menu_header_details.dart';
 import '../../domain/smart_context_menu_item.dart';
+import '../state/smart_context_menu_glass_shader.dart';
 import '../view/smart_context_menu_overlay.dart';
 
 final class SmartContextMenuRoute extends PageRoute<void> {
@@ -22,7 +23,7 @@ final class SmartContextMenuRoute extends PageRoute<void> {
   final String heroTag;
   final List<SmartContextMenuItem> items;
   final SmartContextMenuConfig config;
-  final ui.FragmentProgram? glassProgram;
+  final SmartContextMenuResolvedGlass? glass;
   final FutureOr<void> Function()? onPreviewTap;
   final SmartContextMenuHeaderBuilder? headerSliversBuilder;
   final bool fadeHeaderSlivers;
@@ -37,7 +38,7 @@ final class SmartContextMenuRoute extends PageRoute<void> {
     required this.heroTag,
     required this.items,
     required this.config,
-    this.glassProgram,
+    this.glass,
     this.onPreviewTap,
     this.headerSliversBuilder,
     this.fadeHeaderSlivers = true,
@@ -79,7 +80,7 @@ final class SmartContextMenuRoute extends PageRoute<void> {
       heroTag: heroTag,
       items: items,
       config: config,
-      glassProgram: glassProgram,
+      glass: glass,
       snapshot: snapshot,
       onPreviewTap: onPreviewTap,
       headerSliversBuilder: headerSliversBuilder,

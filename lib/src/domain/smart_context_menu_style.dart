@@ -15,6 +15,7 @@ import 'smart_context_menu_back_button_style.dart';
 import 'smart_context_menu_blur.dart';
 import 'smart_context_menu_row_style.dart';
 import 'smart_context_menu_status_style.dart';
+import 'smart_context_menu_surface.dart';
 
 /// The appearance of a [SmartContextMenu]: colors, blurs, radii, text
 /// and icons.
@@ -30,6 +31,7 @@ import 'smart_context_menu_status_style.dart';
 /// ```dart
 /// const menuConfig = SmartContextMenuConfig(
 ///   style: SmartContextMenuStyle(
+///     surface: SmartContextMenuSurface.standard,
 ///     menuBlur: SmartContextMenuBlur.small,
 ///     titleStyle: TextStyle(fontSize: 15, color: Color(0xFF1C1C1E)),
 ///   ),
@@ -38,7 +40,16 @@ import 'smart_context_menu_status_style.dart';
 final class SmartContextMenuStyle {
   // Menu
 
-  /// The background color of the menu and the back item of submenus.
+  /// The surface of the menu. Defaults to [SmartContextMenuSurface.glass].
+  ///
+  /// The surface and its settings are taken from this style when the menu
+  /// opens, whether this style is set on the menu or in [SmartContextMenuTheme].
+  final SmartContextMenuSurface surface;
+
+  /// The background color of the standard panel and its back item.
+  ///
+  /// Also applies when Glass falls back to Standard. To tint the glass,
+  /// set [SmartContextMenuGlassStyle.tint].
   ///
   /// Ignored for the menu itself when [menuDecoration] is set, and for the
   /// back item when [SmartContextMenuBackButtonStyle.decoration] is set.
@@ -48,13 +59,14 @@ final class SmartContextMenuStyle {
   /// Defaults to [SmartContextMenuDefaults.menuColor].
   final Color menuColor;
 
-  /// The color of the menu border.
+  /// The color of the standard panel border, including during fallback.
   ///
   /// Ignored when [menuDecoration] is set.
   /// Defaults to [SmartContextMenuDefaults.borderColor].
   final Color borderColor;
 
-  /// Whether the standard menu border has an edge highlight.
+  /// Whether the standard menu border has an edge highlight, including during
+  /// fallback. Use [SmartContextMenuGlassStyle.edgeHighlight] for Glass.
   ///
   /// Defaults to true. A transparent [borderColor] hides the highlight along
   /// with the border. A custom [menuDecoration] supplies its own outline.
@@ -63,10 +75,12 @@ final class SmartContextMenuStyle {
   /// The corner radius of the menu.
   ///
   /// Applied to the default decoration, [menuShadows] and [menuBlur].
+  /// Liquid Glass takes the smaller component of each elliptical radius
+  /// and caps each corner at half the shorter side of the panel.
   /// Defaults to [SmartContextMenuDefaults.borderRadius].
   final BorderRadiusGeometry borderRadius;
 
-  /// The decoration of the menu.
+  /// The decoration of the standard panel, including during fallback.
   ///
   /// Replaces the default decoration built from [menuColor], [borderColor]
   /// and [borderRadius]. The pinned back item of a submenu is painted
@@ -75,10 +89,10 @@ final class SmartContextMenuStyle {
   /// inherit this decoration.
   final Decoration? menuDecoration;
 
-  /// The blur behind the menu.
+  /// The blur behind the standard panel, including during fallback.
   ///
   /// If null, which is the default, the content behind the menu is not
-  /// blurred.
+  /// blurred. [backgroundBlur] can blur the screen behind either surface.
   final SmartContextMenuBlur? menuBlur;
 
   /// The shadows under the menu.
@@ -336,6 +350,7 @@ final class SmartContextMenuStyle {
   /// [statusStyle] and the deprecated status fields. With a group, the
   /// deprecated fields would be ignored, so a debug assert fails.
   const SmartContextMenuStyle({
+    this.surface = const SmartContextMenuSurface.glass(),
     this.menuColor = SmartContextMenuDefaults.menuColor,
     this.borderColor = SmartContextMenuDefaults.borderColor,
     this.showEdgeHighlight = true,
@@ -452,6 +467,7 @@ final class SmartContextMenuStyle {
   /// and status fields replace the fields of [backButtonStyle] and
   /// [statusStyle]; pass either a group or its deprecated fields.
   SmartContextMenuStyle copyWith({
+    SmartContextMenuSurface? surface,
     Color? menuColor,
     Color? borderColor,
     bool? showEdgeHighlight,
@@ -524,6 +540,7 @@ final class SmartContextMenuStyle {
       'errorIcon, not both.',
     );
     return SmartContextMenuStyle(
+      surface: surface ?? this.surface,
       menuColor: menuColor ?? this.menuColor,
       borderColor: borderColor ?? this.borderColor,
       showEdgeHighlight: showEdgeHighlight ?? this.showEdgeHighlight,

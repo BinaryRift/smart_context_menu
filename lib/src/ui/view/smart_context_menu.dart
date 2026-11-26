@@ -13,18 +13,18 @@ import '../../domain/smart_context_menu_activation_mode.dart';
 import '../../domain/smart_context_menu_config.dart';
 import '../../domain/smart_context_menu_header_details.dart';
 import '../../domain/smart_context_menu_item.dart';
+import '../../domain/smart_context_menu_surface.dart';
 import '../routes/smart_context_menu_route.dart';
 import '../state/smart_context_menu_glass_shader.dart';
 import '../state/smart_context_menu_session.dart';
 import '../theme/smart_context_menu_theme.dart';
 import '../widgets/smart_context_menu_anchor.dart';
-import '../widgets/smart_context_menu_glass_scope.dart';
 import '../widgets/smart_context_menu_press_detector.dart';
 
 /// Shows an iOS-style context menu for [child] on long press or secondary click.
 ///
 /// During a long press, [child] shrinks slightly. When the menu opens, [child]
-/// is lifted above the blurred screen and the menu with [items] appears
+/// is lifted above the dimmed screen and the menu with [items] appears
 /// next to it. The preview is a snapshot of [child] taken at the moment
 /// of opening, so it does not update while the menu is open. If the screen
 /// size changes, for example when the device turns, the menu closes without
@@ -197,7 +197,7 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
 
   late final SmartContextMenuSession _session;
   late SmartContextMenuConfig _config;
-  bool _glassEnabled = false;
+  bool _canPreloadGlass = false;
 
   /// Used when [SmartContextMenu.controller] is null.
   SmartContextMenuController? _ownController;
@@ -221,11 +221,6 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _resolveConfig();
-    final glassEnabled = SmartContextMenuGlassScope.isEnabledOf(context);
-    if (glassEnabled && !_glassEnabled) {
-      unawaited(_glassShader.prepare());
-    }
-    _glassEnabled = glassEnabled;
   }
 
   @override
@@ -276,6 +271,13 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
 
   void _resolveConfig() {
     _config = widget.config ?? SmartContextMenuTheme.of(context);
+    final canPreloadGlass =
+        _config.style.surface.glassStyle != null &&
+        !(MediaQuery.maybeHighContrastOf(context) ?? false);
+    if (canPreloadGlass && !_canPreloadGlass) {
+      unawaited(_glassShader.prepare());
+    }
+    _canPreloadGlass = canPreloadGlass;
   }
 
   void _bindController() {
@@ -320,11 +322,13 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
 
   Future<void> _runOpenSession(int sessionId) async {
     final navigator = Navigator.of(context, rootNavigator: true);
-    // Keep the selected surface until the route closes.
-    final glassProgram = _glassEnabled ? _glassShader.program : null;
-    if (_glassEnabled) {
-      unawaited(_glassShader.prepare());
-    }
+    // Capture one config and surface for this opening, before the preview.
+    final config = _config;
+    final glass = _glassShader.select(
+      config.style.surface,
+      context,
+      highContrast: MediaQuery.maybeHighContrastOf(context) ?? false,
+    );
     // An app without Cupertino localizations, such as a bare WidgetsApp,
     // gets the English label.
     final localizations =
@@ -356,8 +360,8 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
       snapshot: _session.snapshot,
       heroTag: _heroTag,
       items: widget.items,
-      config: _config,
-      glassProgram: glassProgram,
+      config: config,
+      glass: glass,
       onPreviewTap: widget.onPreviewTap,
       headerSliversBuilder: widget.headerSliversBuilder,
       fadeHeaderSlivers: widget.fadeHeaderSlivers,

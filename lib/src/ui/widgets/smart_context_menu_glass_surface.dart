@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
+import '../../domain/smart_context_menu_glass_style.dart';
 import 'smart_context_menu_shadow_box.dart';
 
 /// Clips the shared surface for the entire level switcher.
@@ -12,7 +13,7 @@ final class SmartContextMenuGlassSurface extends StatelessWidget {
   final Animation<double> opacity;
   final BorderRadiusGeometry borderRadius;
   final List<BoxShadow> shadows;
-  final Color tint;
+  final SmartContextMenuGlassStyle style;
   final Widget child;
 
   const SmartContextMenuGlassSurface({
@@ -21,7 +22,7 @@ final class SmartContextMenuGlassSurface extends StatelessWidget {
     required this.opacity,
     required this.borderRadius,
     required this.shadows,
-    required this.tint,
+    required this.style,
     required this.child,
   });
 
@@ -50,7 +51,7 @@ final class SmartContextMenuGlassSurface extends StatelessWidget {
             program: program,
             opacity: opacity,
             clipper: clipper,
-            tint: tint,
+            style: style,
             pixelRatio: View.of(context).devicePixelRatio,
             child: FadeTransition(opacity: opacity, child: child),
           ),
@@ -93,6 +94,14 @@ final class SmartContextMenuGlassClipper extends CustomClipper<RRect> {
 }
 
 const _transformTolerance = 1e-6;
+const _maxFloat32 = 3.4028234663852886e38;
+
+/// Converts a style multiplier to a finite, non-negative shader uniform.
+@visibleForTesting
+double glassShaderMultiplier(double value) {
+  if (!value.isFinite || value <= 0) return 0;
+  return math.min(value, _maxFloat32);
+}
 
 /// Maps local logical pixels to physical backdrop pixels.
 ///
@@ -134,14 +143,14 @@ final class _GlassBackdrop extends SingleChildRenderObjectWidget {
   final ui.FragmentProgram program;
   final Animation<double> opacity;
   final SmartContextMenuGlassClipper clipper;
-  final Color tint;
+  final SmartContextMenuGlassStyle style;
   final double pixelRatio;
 
   const _GlassBackdrop({
     required this.program,
     required this.opacity,
     required this.clipper,
-    required this.tint,
+    required this.style,
     required this.pixelRatio,
     required super.child,
   });
@@ -191,7 +200,8 @@ final class _RenderGlassBackdrop extends RenderProxyBox {
       _settings.pixelRatio,
     );
     if (mapping == null) return null;
-    final tint = _settings.tint;
+    final style = _settings.style;
+    final tint = style.tint;
     final radius = _settings.clipper.radiusFor(size);
 
     // Impeller provides the texture size (floats 0–1) and sampler 0.
@@ -211,7 +221,9 @@ final class _RenderGlassBackdrop extends RenderProxyBox {
       ..setFloat(13, tint.r)
       ..setFloat(14, tint.g)
       ..setFloat(15, tint.b)
-      ..setFloat(16, tint.a);
+      ..setFloat(16, tint.a)
+      ..setFloat(17, glassShaderMultiplier(style.refraction))
+      ..setFloat(18, glassShaderMultiplier(style.edgeHighlight));
     return ui.ImageFilter.shader(_shader);
   }
 

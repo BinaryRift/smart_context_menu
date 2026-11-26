@@ -1,5 +1,5 @@
 import 'dart:async' show FutureOr;
-import 'dart:ui' as ui show FragmentProgram, Image;
+import 'dart:ui' as ui show Image;
 // ignore: deprecated_member_use
 import 'package:flutter/material.dart' show Material, MaterialType;
 import 'package:flutter/widgets.dart';
@@ -16,6 +16,7 @@ import '../extensions/animation_ext.dart';
 import '../extensions/render_object_ext.dart';
 import '../layout/smart_context_menu_horizontal_layout.dart';
 import '../layout/smart_context_menu_vertical_layout.dart';
+import '../state/smart_context_menu_glass_shader.dart';
 import '../state/smart_context_menu_header_animation.dart';
 import '../widgets/smart_context_menu_background.dart';
 import '../widgets/smart_context_menu_header.dart';
@@ -29,7 +30,7 @@ final class SmartContextMenuOverlay extends StatefulWidget {
   final String heroTag;
   final List<SmartContextMenuItem> items;
   final SmartContextMenuConfig config;
-  final ui.FragmentProgram? glassProgram;
+  final SmartContextMenuResolvedGlass? glass;
   final FutureOr<void> Function()? onPreviewTap;
   final SmartContextMenuHeaderBuilder? headerSliversBuilder;
   final bool fadeHeaderSlivers;
@@ -43,7 +44,7 @@ final class SmartContextMenuOverlay extends StatefulWidget {
     required this.heroTag,
     required this.items,
     required this.config,
-    this.glassProgram,
+    this.glass,
     this.onPreviewTap,
     this.headerSliversBuilder,
     this.fadeHeaderSlivers = true,
@@ -267,7 +268,7 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
   }
 
   Widget _buildMenu() {
-    final glassProgram = widget.glassProgram;
+    final glass = widget.glass;
     final menu = Padding(
       padding: _horizontalLayout.menuPadding,
       child: GestureDetector(
@@ -278,7 +279,7 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
           initialItems: widget.items,
           heightNotifier: _currentMenuHeight,
           previewMotionNotifier: _previewMotion,
-          glassProgram: glassProgram,
+          glass: glass,
           glassOpacity: widget.routeAnimation,
         ),
       ),
@@ -288,7 +289,7 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
       child: ScaleTransition(
         alignment: Alignment.center,
         scale: _menuAnimation,
-        child: glassProgram == null
+        child: glass == null
             ? FadeTransition(opacity: widget.routeAnimation, child: menu)
             : menu,
       ),

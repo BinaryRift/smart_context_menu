@@ -1,5 +1,3 @@
-import 'dart:ui' show FragmentProgram;
-
 // ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart'
     show CupertinoDynamicColor, CupertinoTheme;
@@ -13,6 +11,7 @@ import '../../controllers/smart_context_menu_overlay_controller.dart';
 import '../../domain/smart_context_menu_level.dart';
 import '../../domain/smart_context_menu_navigator.dart';
 import '../extensions/animation_ext.dart';
+import '../state/smart_context_menu_glass_shader.dart';
 import '../state/smart_context_menu_hover_controller.dart';
 import '../state/smart_context_menu_stretch_controller.dart';
 import '../widgets/smart_context_menu_blur_box.dart';
@@ -31,7 +30,7 @@ final class SmartContextMenuView extends StatefulWidget {
   final SmartContextMenuConfig config;
   final ValueNotifier<double> heightNotifier;
   final ValueNotifier<Offset> previewMotionNotifier;
-  final FragmentProgram? glassProgram;
+  final SmartContextMenuResolvedGlass? glass;
   final Animation<double> glassOpacity;
 
   const SmartContextMenuView({
@@ -40,7 +39,7 @@ final class SmartContextMenuView extends StatefulWidget {
     required this.config,
     required this.heightNotifier,
     required this.previewMotionNotifier,
-    this.glassProgram,
+    this.glass,
     required this.glassOpacity,
   });
 
@@ -98,9 +97,8 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-    final glassProgram = widget.glassProgram;
-    late final tint = CupertinoDynamicColor.resolve(_glassTint, context);
-    final backItemGlassTint = glassProgram == null ? null : tint;
+    final glass = widget.glass;
+    final backItemGlassTint = glass?.style.tint;
     final levels = ConstrainedBox(
       constraints: BoxConstraints(
         maxHeight: screenHeight * _config.menuHeightFactor,
@@ -136,9 +134,9 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
           transform: _stretchController.transform,
           child: child,
         ),
-        child: glassProgram == null
+        child: glass == null
             ? _buildStandardSurface(levels)
-            : _buildGlassSurface(glassProgram, tint, levels),
+            : _buildGlassSurface(glass, levels),
       ),
     );
   }
@@ -184,27 +182,21 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
   }
 
   Widget _buildGlassSurface(
-    FragmentProgram program,
-    Color tint,
+    SmartContextMenuResolvedGlass glass,
     Widget levels,
   ) {
     return SizedBox(
       width: _config.menuWidth,
       child: SmartContextMenuGlassSurface(
-        program: program,
+        program: glass.program,
         opacity: widget.glassOpacity,
         borderRadius: _config.style.borderRadius,
         shadows: _config.style.menuShadows,
-        tint: tint,
+        style: glass.style,
         child: levels,
       ),
     );
   }
-
-  static const _glassTint = CupertinoDynamicColor.withBrightness(
-    color: Color(0x92F7FAFF),
-    darkColor: Color(0x9C161B24),
-  );
 
   Widget? _buildPreviousLevel(Color? glassTint) {
     final level = _controller.previousLevel;

@@ -24,6 +24,8 @@ uniform vec2 u_size;         // 6-7: surface dimensions in logical pixels.
 uniform vec4 u_radii;
 uniform float u_opacity;     // 12: overall surface opacity in [0, 1].
 uniform vec4 u_tint;         // 13-16: unpremultiplied RGBA tint in [0, 1].
+uniform float u_refraction;  // 17: refraction and magnification multiplier.
+uniform float u_edgeHighlight; // 18: edge reflection multiplier.
 uniform sampler2D u_backdrop; // Sampler 0: input backdrop texture.
 
 out vec4 fragColor;
@@ -131,12 +133,16 @@ void main() {
 
     // Taper displacement to zero at the flat interior and limit travel
     // relative to bevel width to reduce sampling-map distortion.
-    float travel = min(kTravelDepth, bevel * kMaxTravelToBevel);
+    float maxTravel = bevel * kMaxTravelToBevel;
+    // Bound the multiplier before multiplying, even for extreme uniforms.
+    float travel = min(kTravelDepth * min(u_refraction, maxTravel / kTravelDepth),
+                       maxTravel);
     refractionShift = ray * travel * (1.0 - h * h);
   }
 
   // Combine local optical offsets and convert to backdrop texture coordinates.
-  vec2 magnificationShift = p / kMagnification - p;
+  float magnification = 1.0 + (kMagnification - 1.0) * u_refraction;
+  vec2 magnificationShift = p / magnification - p;
   vec2 samplePosition = fragment + (magnificationShift + refractionShift) * u_scale;
   vec2 uv = samplePosition / u_backdropSize;
 
@@ -181,7 +187,7 @@ void main() {
     highlight += shoulderStrength * shoulder * arc * (0.35 + 0.65 * fresnel);
   }
 
-  glass = mix(glass, vec3(1.0), clamp(highlight, 0.0, 1.0));
+  glass = mix(glass, vec3(1.0), clamp(highlight * u_edgeHighlight, 0.0, 1.0));
 
   // Premultiplied RGBA output for an opaque input backdrop. The external
   // clip defines coverage; u_opacity scales both RGB and alpha.
