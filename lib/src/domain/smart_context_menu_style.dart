@@ -90,8 +90,8 @@ final class SmartContextMenuStyle {
 
   /// The blur behind the standard panel, including during fallback.
   ///
-  /// If null, which is the default, the content behind the menu is not
-  /// blurred. [backgroundBlur] can blur the screen behind either surface.
+  /// Defaults to null. Glass uses [SmartContextMenuGlassStyle.blur].
+  /// [backgroundBlur] can blur the screen behind either surface.
   final SmartContextMenuBlur? menuBlur;
 
   /// The shadows under the menu.

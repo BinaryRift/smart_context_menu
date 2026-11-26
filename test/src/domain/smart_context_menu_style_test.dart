@@ -29,12 +29,15 @@ Object statusFields(SmartContextMenuStatusStyle s) => (
 void main() {
   test('defaults to Liquid Glass and replaces the whole surface', () {
     const defaultStyle = SmartContextMenuStyle();
-    const defaultGlass = SmartContextMenuSurface.glass();
+    const defaultGlassStyle = SmartContextMenuGlassStyle();
+    const defaultGlass = SmartContextMenuSurface.glass(defaultGlassStyle);
     const customGlass = SmartContextMenuSurface.glass(
       SmartContextMenuGlassStyle(refraction: 2),
     );
 
     expect(defaultStyle.surface, defaultGlass);
+    expect(defaultGlassStyle.blur.sigmaX, 3);
+    expect(defaultGlassStyle.blur.sigmaY, 3);
     final style = defaultStyle.copyWith(surface: customGlass);
     expect(
       style.copyWith(menuBlur: SmartContextMenuBlur.small).surface,
@@ -64,6 +67,10 @@ void main() {
     expect(surface, isNot(SmartContextMenuSurface.standard));
     expect(copy.copyWith(tint: const Color(0x00FFFFFF)), isNot(style));
     expect(copy.copyWith(refraction: 0), isNot(style));
+    final withoutBlur = copy.copyWith(blur: SmartContextMenuBlur.none);
+    expect(withoutBlur.blur.sigmaX, 0);
+    expect(withoutBlur, isNot(style));
+    expect(withoutBlur.copyWith(blur: SmartContextMenuBlur(3)), style);
     final withoutHighlight = copy.copyWith(edgeHighlight: 0);
     expect(withoutHighlight.tint, tint);
     expect(withoutHighlight.refraction, 2);

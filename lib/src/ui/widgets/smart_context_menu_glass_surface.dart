@@ -236,6 +236,7 @@ final class _RenderGlassBackdrop extends RenderProxyBox {
 
 final class _GlassLayer extends ContainerLayer {
   final _RenderGlassBackdrop backdrop;
+  ui.BackdropFilterEngineLayer? _blurEngineLayer;
 
   _GlassLayer(this.backdrop);
 
@@ -251,14 +252,39 @@ final class _GlassLayer extends ContainerLayer {
     if (filter == null) {
       // Keep the content visible and resume the glass on a later frame.
       engineLayer = null;
+      _blurEngineLayer?.dispose();
+      _blurEngineLayer = null;
       addChildrenToScene(builder);
       return;
     }
+
+    final sigma = backdrop._settings.style.blur.sigmaX * opacity;
+    final oldBlurLayer = _blurEngineLayer;
+    _blurEngineLayer = sigma.isFinite && sigma > 0
+        ? builder.pushBackdropFilter(
+            ui.ImageFilter.blur(
+              sigmaX: sigma,
+              sigmaY: sigma,
+              tileMode: ui.TileMode.clamp,
+            ),
+            oldLayer: oldBlurLayer,
+          )
+        : null;
+    oldBlurLayer?.dispose();
+    // Finish the blur pass so refraction samples the blurred backdrop.
+    if (_blurEngineLayer != null) builder.pop();
+
     engineLayer = builder.pushBackdropFilter(
       filter,
       oldLayer: engineLayer as ui.BackdropFilterEngineLayer?,
     );
     addChildrenToScene(builder);
     builder.pop();
+  }
+
+  @override
+  void dispose() {
+    _blurEngineLayer?.dispose();
+    super.dispose();
   }
 }

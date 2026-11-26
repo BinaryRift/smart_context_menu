@@ -82,6 +82,7 @@ void main() {
     );
     const style = SmartContextMenuGlassStyle(
       tint: tint,
+      blur: SmartContextMenuBlur(5),
       refraction: 2,
       edgeHighlight: 0,
     );
@@ -134,6 +135,7 @@ void main() {
     final selected = shader.select(surface, anchor, highContrast: false)!;
     expect(selected.program, same(program));
     expect(selected.style.tint, isSameColorAs(tint.darkColor));
+    expect(selected.style.blur, same(style.blur));
     expect(selected.style.refraction, style.refraction);
     expect(selected.style.edgeHighlight, style.edgeHighlight);
     expect(loadCount, 1);

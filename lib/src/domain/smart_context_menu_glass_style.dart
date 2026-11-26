@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart' show Color, immutable;
 
 import '../core/ui/styles/smart_context_menu_defaults.dart';
+import 'smart_context_menu_blur.dart';
 
 /// The tint and optical effects of the Liquid Glass menu surface.
 ///
@@ -13,6 +14,12 @@ final class SmartContextMenuGlassStyle {
   /// A `CupertinoDynamicColor` is resolved at the menu anchor when the menu
   /// opens. Defaults to [SmartContextMenuDefaults.glassTint].
   final Color tint;
+
+  /// The blur applied to the backdrop inside the glass before refraction.
+  ///
+  /// Defaults to a Gaussian sigma of 3. Use [SmartContextMenuBlur.none] to
+  /// disable it. Non-finite strengths are treated as zero.
+  final SmartContextMenuBlur blur;
 
   /// A multiplier for the displacement at the edge and the magnification
   /// through the pane.
@@ -31,6 +38,7 @@ final class SmartContextMenuGlassStyle {
   /// Creates a Liquid Glass style.
   const SmartContextMenuGlassStyle({
     this.tint = SmartContextMenuDefaults.glassTint,
+    this.blur = const SmartContextMenuBlur(3),
     this.refraction = 1,
     this.edgeHighlight = 1,
   });
@@ -38,11 +46,13 @@ final class SmartContextMenuGlassStyle {
   /// Creates a copy with the given fields replaced.
   SmartContextMenuGlassStyle copyWith({
     Color? tint,
+    SmartContextMenuBlur? blur,
     double? refraction,
     double? edgeHighlight,
   }) {
     return SmartContextMenuGlassStyle(
       tint: tint ?? this.tint,
+      blur: blur ?? this.blur,
       refraction: refraction ?? this.refraction,
       edgeHighlight: edgeHighlight ?? this.edgeHighlight,
     );
@@ -53,9 +63,12 @@ final class SmartContextMenuGlassStyle {
       identical(this, other) ||
       other is SmartContextMenuGlassStyle &&
           tint == other.tint &&
+          blur.sigmaX == other.blur.sigmaX &&
+          blur.sigmaY == other.blur.sigmaY &&
           refraction == other.refraction &&
           edgeHighlight == other.edgeHighlight;
 
   @override
-  int get hashCode => Object.hash(tint, refraction, edgeHighlight);
+  int get hashCode =>
+      Object.hash(tint, blur.sigmaX, blur.sigmaY, refraction, edgeHighlight);
 }
