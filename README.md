@@ -1279,11 +1279,19 @@ The Back item, the loading, error and empty items, and rows have their own parts
 ```dart
 const menuStyle = SmartContextMenuStyle(
   menuBlur: SmartContextMenuBlur.small,
-  backgroundBlur: SmartContextMenuBlur(10),
+  backgroundColor: CupertinoDynamicColor.withBrightness(
+    color: Color(0x21000000),
+    darkColor: Color(0x33000000),
+  ),
+  backgroundBlur: SmartContextMenuBlur(1.15),
   borderRadius: BorderRadius.all(Radius.circular(20)),
   menuShadows: [BoxShadow(color: Color(0x33000000), blurRadius: 20)],
 );
 ```
+
+By default, `backgroundColor` dims the screen and `backgroundBlur` is `null`. The example
+above uses the backdrop settings from the Lab's **Half dimming + blur** preset. Set
+`backgroundBlur: SmartContextMenuBlur.medium` to use the same blur as in 1.1.x.
 
 `menuShadows` replaces the default shadows under the menu; pass an empty list to remove them.
 

@@ -3,7 +3,41 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
 import 'package:smart_context_menu/src/ui/widgets/smart_context_menu_background.dart';
 
+import '../../../helpers/menu_tester.dart';
+
 void main() {
+  final menuBackground = find.byType(SmartContextMenuBackground);
+  final screenBlur = find.descendant(
+    of: menuBackground,
+    matching: find.byType(BackdropFilter),
+  );
+
+  testWidgets('dims the screen without a blur by default', (tester) async {
+    await tester.pumpMenu(items: [SmartContextMenuItem.simple(title: 'Item')]);
+    await tester.openMenu();
+
+    final dimming = find.descendant(
+      of: menuBackground,
+      matching: find.byType(FadeTransition),
+    );
+    expect(tester.widget<FadeTransition>(dimming).opacity.value, 1);
+    expect(screenBlur, findsNothing);
+  });
+
+  testWidgets('blurs the screen when the style requests it', (tester) async {
+    await tester.pumpMenu(
+      items: [SmartContextMenuItem.simple(title: 'Item')],
+      config: const SmartContextMenuConfig(
+        style: SmartContextMenuStyle(
+          backgroundBlur: SmartContextMenuBlur.medium,
+        ),
+      ),
+    );
+    await tester.openMenu();
+
+    expect(screenBlur, findsOneWidget);
+  });
+
   Widget background(Animation<double> animation) {
     return Directionality(
       textDirection: TextDirection.ltr,

@@ -96,8 +96,7 @@ final class SmartContextMenuStyle {
 
   /// The blur of the screen behind the menu.
   ///
-  /// If null, the screen is not blurred.
-  /// Defaults to [SmartContextMenuBlur.medium].
+  /// Defaults to null. Set a blur to apply it in addition to [backgroundColor].
   final SmartContextMenuBlur? backgroundBlur;
 
   // Back item
@@ -345,7 +344,7 @@ final class SmartContextMenuStyle {
     this.menuBlur,
     this.menuShadows = SmartContextMenuDefaults.menuShadows,
     this.backgroundColor = SmartContextMenuDefaults.backgroundColor,
-    this.backgroundBlur = SmartContextMenuBlur.medium,
+    this.backgroundBlur,
     SmartContextMenuBackButtonStyle? backButtonStyle,
     @Deprecated('Use backButtonStyle.blur instead.')
     SmartContextMenuBlur? backButtonBlur = SmartContextMenuBlur.strong,

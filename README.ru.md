@@ -1283,11 +1283,19 @@ builder: (context, child) => CupertinoUiCompatibilityBridge(
 ```dart
 const menuStyle = SmartContextMenuStyle(
   menuBlur: SmartContextMenuBlur.small,
-  backgroundBlur: SmartContextMenuBlur(10),
+  backgroundColor: CupertinoDynamicColor.withBrightness(
+    color: Color(0x21000000),
+    darkColor: Color(0x33000000),
+  ),
+  backgroundBlur: SmartContextMenuBlur(1.15),
   borderRadius: BorderRadius.all(Radius.circular(20)),
   menuShadows: [BoxShadow(color: Color(0x33000000), blurRadius: 20)],
 );
 ```
+
+По умолчанию `backgroundColor` затемняет экран, а `backgroundBlur` равен `null`. В примере
+выше настройки фона взяты из пресета **Half dimming + blur** в Lab. Чтобы вернуть размытие
+как в 1.1.x, задайте `backgroundBlur: SmartContextMenuBlur.medium`.
 
 `menuShadows` заменяет стандартные тени под меню; чтобы убрать тени, передайте пустой список.
 
