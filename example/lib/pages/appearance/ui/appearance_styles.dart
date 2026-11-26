@@ -8,6 +8,7 @@ import 'package:smart_context_menu/smart_context_menu.dart';
 /// screen behind the menu is only dimmed with a dark shade of the brand
 /// color.
 const brandStyle = SmartContextMenuStyle(
+  surface: SmartContextMenuSurface.standard,
   backgroundColor: CupertinoDynamicColor.withBrightness(
     color: Color(0x7314133D),
     darkColor: Color(0x9914133D),
@@ -28,6 +29,7 @@ const brandStyle = SmartContextMenuStyle(
 /// The back item of a submenu is filled with the same [menuColor], so it
 /// blends into the menu.
 const solidStyle = SmartContextMenuStyle(
+  surface: SmartContextMenuSurface.standard,
   menuColor: CupertinoDynamicColor.withBrightness(
     color: Color(0xFFF7F7F9),
     darkColor: Color(0xFF2C2C2E),

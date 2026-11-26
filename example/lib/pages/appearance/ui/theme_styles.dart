@@ -5,6 +5,7 @@ import 'package:smart_context_menu/smart_context_menu.dart';
 /// Brand indigo with white text, dividers and bold titles in the cells,
 /// without blur.
 const indigoStyle = SmartContextMenuStyle(
+  surface: SmartContextMenuSurface.standard,
   menuColor: Color(0xFF4338CA),
   borderColor: Color(0x00000000),
   borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -27,6 +28,7 @@ const _terminalGreen = Color(0xFF33FF99);
 /// A terminal in both themes: black, a monospaced font, green text and
 /// a glowing frame with square corners.
 const terminalStyle = SmartContextMenuStyle(
+  surface: SmartContextMenuSurface.standard,
   menuColor: Color(0xFF0B0F0C),
   borderColor: Color(0x9933FF99),
   borderRadius: BorderRadius.all(Radius.circular(4)),
@@ -64,6 +66,7 @@ const tinyMenuWidth = 190.0;
 /// An opaque menu with dividers under the titles and a strong blur behind
 /// it, for icons in colored squares as in the Settings of iOS.
 const colorfulStyle = SmartContextMenuStyle(
+  surface: SmartContextMenuSurface.standard,
   menuColor: CupertinoDynamicColor.withBrightness(
     color: Color(0xFFFFFFFF),
     darkColor: Color(0xFF1C1C1E),
@@ -87,6 +90,7 @@ const _ink = Color(0xFF4A3728);
 
 /// Warm paper in both themes, with a serif font.
 const paperStyle = SmartContextMenuStyle(
+  surface: SmartContextMenuSurface.standard,
   menuColor: Color(0xFFFBF3E4),
   borderColor: Color(0x334A3728),
   borderRadius: BorderRadius.all(Radius.circular(6)),
@@ -111,6 +115,7 @@ const paperStyle = SmartContextMenuStyle(
 /// Glass tinted cyan, with a cyan glow around it; the menu is narrower in
 /// its config.
 const glowStyle = SmartContextMenuStyle(
+  surface: SmartContextMenuSurface.standard,
   menuColor: CupertinoDynamicColor.withBrightness(
     color: Color(0xB3ECFEFF),
     darkColor: Color(0x8C06232B),
@@ -170,6 +175,7 @@ const editingRowsSelectionColor = CupertinoDynamicColor.withBrightness(
 
 /// Sections for formatting and alignment above the clipboard actions.
 const editingRowsStyle = SmartContextMenuStyle(
+  surface: SmartContextMenuSurface.standard,
   menuColor: CupertinoDynamicColor.withBrightness(
     color: Color(0xFFF9FDFA),
     darkColor: Color(0xFF1C2A25),
@@ -241,6 +247,7 @@ const _drawingToolbarLine = CupertinoDynamicColor.withBrightness(
 
 /// Capsules in a wide toolbar and an integrated Back row over the shapes.
 const drawingToolbarStyle = SmartContextMenuStyle(
+  surface: SmartContextMenuSurface.standard,
   menuColor: drawingToolbarSurface,
   borderColor: _drawingToolbarLine,
   borderRadius: BorderRadius.all(Radius.circular(20)),

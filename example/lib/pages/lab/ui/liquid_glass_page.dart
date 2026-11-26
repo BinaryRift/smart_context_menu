@@ -1,9 +1,6 @@
 // ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
-// The Lab opts in before the glass style is available in the public API.
-// ignore: implementation_imports
-import 'package:smart_context_menu/src/ui/widgets/smart_context_menu_glass_scope.dart';
 
 import '../../settings/ui/widgets/settings_button.dart';
 
@@ -128,9 +125,12 @@ final class _LiquidGlassPageState extends State<LiquidGlassPage> {
 
   Widget _buildMenu(BuildContext context) {
     final theme = SmartContextMenuTheme.of(context);
-    final menu = SmartContextMenu(
+    return SmartContextMenu(
       config: theme.copyWith(
         style: SmartContextMenuStyle(
+          surface: _surface == _Surface.glass
+              ? const SmartContextMenuSurface.glass()
+              : SmartContextMenuSurface.standard,
           menuBlur: SmartContextMenuBlur.small,
           showEdgeHighlight: _surface == _Surface.glass || _highlightStandard,
           borderRadius: const BorderRadius.all(Radius.circular(20)),
@@ -169,11 +169,6 @@ final class _LiquidGlassPageState extends State<LiquidGlassPage> {
           child: const Text('Open menu'),
         ),
       ),
-    );
-
-    return SmartContextMenuGlassScope(
-      enabled: _surface == _Surface.glass,
-      child: menu,
     );
   }
 
