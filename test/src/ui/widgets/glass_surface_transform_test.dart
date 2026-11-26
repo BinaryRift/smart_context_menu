@@ -7,6 +7,34 @@ import 'package:smart_context_menu/smart_context_menu.dart';
 import 'package:smart_context_menu/src/ui/widgets/smart_context_menu_glass_surface.dart';
 
 void main() {
+  test('aligns backdrop capture to physical pixels after stretch', () {
+    final clip = RRect.fromRectAndRadius(
+      const Rect.fromLTWH(0, 0, 250, 265),
+      const Radius.circular(16),
+    );
+    const origin = Offset(228.672, 904.147);
+    const scale = Offset(3.0192, 3.0022);
+    final aligned = glassBackdropClip(clip, origin: origin, scale: scale);
+
+    void expectAligned(double original, double adjusted) {
+      final pixel = original.roundToDouble();
+      expect(adjusted, greaterThan(pixel));
+      expect(adjusted, closeTo(pixel, 0.03));
+    }
+
+    expectAligned(origin.dx, origin.dx + aligned.left * scale.dx);
+    expectAligned(origin.dy, origin.dy + aligned.top * scale.dy);
+    expectAligned(
+      origin.dx + clip.right * scale.dx,
+      origin.dx + aligned.right * scale.dx,
+    );
+    expectAligned(
+      origin.dy + clip.bottom * scale.dy,
+      origin.dy + aligned.bottom * scale.dy,
+    );
+    expect(aligned.tlRadius, clip.tlRadius);
+  });
+
   test('glass shader multipliers fit a nonnegative float32', () {
     for (final value in [
       -1.0,

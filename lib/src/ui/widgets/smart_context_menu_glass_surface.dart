@@ -45,16 +45,13 @@ final class SmartContextMenuGlassSurface extends StatelessWidget {
             ),
           ),
         ),
-        ClipRRect(
+        _GlassBackdrop(
+          program: program,
+          opacity: opacity,
           clipper: clipper,
-          child: _GlassBackdrop(
-            program: program,
-            opacity: opacity,
-            clipper: clipper,
-            style: style,
-            pixelRatio: View.of(context).devicePixelRatio,
-            child: FadeTransition(opacity: opacity, child: child),
-          ),
+          style: style,
+          pixelRatio: View.of(context).devicePixelRatio,
+          child: FadeTransition(opacity: opacity, child: child),
         ),
       ],
     );
@@ -139,6 +136,37 @@ double glassShaderMultiplier(double value) {
   return (origin: origin, scale: scale);
 }
 
+/// Aligns the backdrop capture to physical pixels in the filter's local space.
+@visibleForTesting
+RRect glassBackdropClip(
+  RRect clip, {
+  required Offset origin,
+  required Offset scale,
+}) {
+  // Stay just above the pixel boundary so float32 rounding in Impeller
+  // cannot make an integral edge alternate between two capture origins.
+  const pixelBias = 0.02;
+  double align(double edge, double origin, double scale) {
+    final pixel = origin + edge * scale;
+    return (pixel.roundToDouble() + pixelBias - origin) / scale;
+  }
+
+  final rect = Rect.fromLTRB(
+    align(clip.left, origin.dx, scale.dx),
+    align(clip.top, origin.dy, scale.dy),
+    align(clip.right, origin.dx, scale.dx),
+    align(clip.bottom, origin.dy, scale.dy),
+  );
+  if (!rect.isFinite || rect.isEmpty) return clip;
+  return RRect.fromRectAndCorners(
+    rect,
+    topLeft: clip.tlRadius,
+    topRight: clip.trRadius,
+    bottomRight: clip.brRadius,
+    bottomLeft: clip.blRadius,
+  );
+}
+
 final class _GlassBackdrop extends SingleChildRenderObjectWidget {
   final ui.FragmentProgram program;
   final Animation<double> opacity;
@@ -169,6 +197,7 @@ final class _GlassBackdrop extends SingleChildRenderObjectWidget {
 final class _RenderGlassBackdrop extends RenderProxyBox {
   _GlassBackdrop _settings;
   ui.FragmentShader _shader;
+  Offset _paintOffset = Offset.zero;
 
   _RenderGlassBackdrop(this._settings)
     : _shader = _settings.program.fragmentShader();
@@ -187,36 +216,41 @@ final class _RenderGlassBackdrop extends RenderProxyBox {
 
   @override
   void paint(PaintingContext context, Offset offset) {
+    _paintOffset = offset;
     final backdrop = (layer ??= _GlassLayer(this)) as _GlassLayer;
     context.pushLayer(backdrop, super.paint, offset);
   }
 
-  ui.ImageFilter? _filter(double opacity) {
-    // Read the final transform here because a retained ancestor layer can
-    // move without repainting us.
-    final mapping = glassBackdropMapping(
-      getTransformTo(null),
-      size,
-      _settings.pixelRatio,
-    );
-    if (mapping == null) return null;
+  @override
+  bool hitTest(BoxHitTestResult result, {required Offset position}) =>
+      _settings.clipper.getClip(size).contains(position) &&
+      super.hitTest(result, position: position);
+
+  @override
+  Rect describeApproximatePaintClip(RenderObject child) => Offset.zero & size;
+
+  ui.ImageFilter _filter(
+    double opacity,
+    Offset origin,
+    Offset scale,
+    RRect clip,
+  ) {
     final style = _settings.style;
     final tint = style.tint;
-    final radius = _settings.clipper.radiusFor(size);
 
     // Impeller provides the texture size (floats 0–1) and sampler 0.
     // The remaining slots follow smart_context_menu_glass.frag.
     _shader
-      ..setFloat(2, mapping.origin.dx)
-      ..setFloat(3, mapping.origin.dy)
-      ..setFloat(4, mapping.scale.dx)
-      ..setFloat(5, mapping.scale.dy)
+      ..setFloat(2, origin.dx)
+      ..setFloat(3, origin.dy)
+      ..setFloat(4, scale.dx)
+      ..setFloat(5, scale.dy)
       ..setFloat(6, size.width)
       ..setFloat(7, size.height)
-      ..setFloat(8, radius.topLeft.x)
-      ..setFloat(9, radius.topRight.x)
-      ..setFloat(10, radius.bottomRight.x)
-      ..setFloat(11, radius.bottomLeft.x)
+      ..setFloat(8, clip.tlRadiusX)
+      ..setFloat(9, clip.trRadiusX)
+      ..setFloat(10, clip.brRadiusX)
+      ..setFloat(11, clip.blRadiusX)
       ..setFloat(12, opacity)
       ..setFloat(13, tint.r)
       ..setFloat(14, tint.g)
@@ -237,6 +271,7 @@ final class _RenderGlassBackdrop extends RenderProxyBox {
 final class _GlassLayer extends ContainerLayer {
   final _RenderGlassBackdrop backdrop;
   ui.BackdropFilterEngineLayer? _blurEngineLayer;
+  ui.BackdropFilterEngineLayer? _shaderEngineLayer;
 
   _GlassLayer(this.backdrop);
 
@@ -245,20 +280,39 @@ final class _GlassLayer extends ContainerLayer {
 
   @override
   void addToScene(ui.SceneBuilder builder) {
-    final opacity = backdrop._settings.opacity.value;
+    final settings = backdrop._settings;
+    final opacity = settings.opacity.value;
     if (opacity <= 0 || backdrop.size.isEmpty) return;
 
-    final filter = backdrop._filter(opacity);
-    if (filter == null) {
+    // Read the final transform here because a retained ancestor layer can
+    // move without repainting the backdrop.
+    final mapping = glassBackdropMapping(
+      backdrop.getTransformTo(null),
+      backdrop.size,
+      settings.pixelRatio,
+    );
+    final clip = settings.clipper.getClip(backdrop.size);
+    final captureClip = mapping == null
+        ? clip
+        : glassBackdropClip(clip, origin: mapping.origin, scale: mapping.scale);
+    engineLayer = builder.pushClipRRect(
+      captureClip.shift(backdrop._paintOffset),
+      clipBehavior: ui.Clip.antiAlias,
+      oldLayer: engineLayer as ui.ClipRRectEngineLayer?,
+    );
+
+    if (mapping == null) {
       // Keep the content visible and resume the glass on a later frame.
-      engineLayer = null;
       _blurEngineLayer?.dispose();
       _blurEngineLayer = null;
+      _shaderEngineLayer?.dispose();
+      _shaderEngineLayer = null;
       addChildrenToScene(builder);
+      builder.pop();
       return;
     }
 
-    final sigma = backdrop._settings.style.blur.sigmaX * opacity;
+    final sigma = settings.style.blur.sigmaX * opacity;
     final oldBlurLayer = _blurEngineLayer;
     _blurEngineLayer = sigma.isFinite && sigma > 0
         ? builder.pushBackdropFilter(
@@ -274,17 +328,22 @@ final class _GlassLayer extends ContainerLayer {
     // Finish the blur pass so refraction samples the blurred backdrop.
     if (_blurEngineLayer != null) builder.pop();
 
-    engineLayer = builder.pushBackdropFilter(
-      filter,
-      oldLayer: engineLayer as ui.BackdropFilterEngineLayer?,
+    final oldShaderLayer = _shaderEngineLayer;
+    _shaderEngineLayer = builder.pushBackdropFilter(
+      backdrop._filter(opacity, mapping.origin, mapping.scale, clip),
+      oldLayer: oldShaderLayer,
     );
+    oldShaderLayer?.dispose();
     addChildrenToScene(builder);
-    builder.pop();
+    builder
+      ..pop()
+      ..pop();
   }
 
   @override
   void dispose() {
     _blurEngineLayer?.dispose();
+    _shaderEngineLayer?.dispose();
     super.dispose();
   }
 }
