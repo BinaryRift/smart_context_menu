@@ -9,6 +9,7 @@ void main() {
 
     expect(style.decoration, isNull);
     expect(style.backgroundColor, isNull);
+    expect(style.highlightColor, isNull);
     expect(style.blur, SmartContextMenuBlur.strong);
     expect(style.borderRadius, SmartContextMenuDefaults.backButtonBorderRadius);
     expect(style.foregroundColor, isNull);
@@ -20,6 +21,7 @@ void main() {
     const original = SmartContextMenuBackButtonStyle(
       decoration: BoxDecoration(color: Color(0xFF000001)),
       backgroundColor: Color(0x66000003),
+      highlightColor: Color(0x66000004),
       blur: SmartContextMenuBlur(1),
       borderRadius: BorderRadius.all(Radius.circular(1)),
       foregroundColor: Color(0xFF000002),
@@ -30,6 +32,7 @@ void main() {
     final fields = <String, Object? Function(SmartContextMenuBackButtonStyle)>{
       'decoration': (s) => s.decoration,
       'backgroundColor': (s) => s.backgroundColor,
+      'highlightColor': (s) => s.highlightColor,
       'blur': (s) => s.blur,
       'borderRadius': (s) => s.borderRadius,
       'foregroundColor': (s) => s.foregroundColor,
@@ -51,6 +54,10 @@ void main() {
           'backgroundColor': (
             color,
             () => original.copyWith(backgroundColor: color),
+          ),
+          'highlightColor': (
+            color,
+            () => original.copyWith(highlightColor: color),
           ),
           'blur': (blur, () => original.copyWith(blur: blur)),
           'borderRadius': (

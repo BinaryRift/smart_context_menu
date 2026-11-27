@@ -83,7 +83,7 @@ final class _AppearancePageState extends State<AppearancePage> {
             ),
             _buildPreset(
               title: 'Brand',
-              subtitle: 'Indigo palette, rounder corners, no blur',
+              subtitle: 'Indigo, white text and rounder corners',
               config: (app) => app.copyWith(style: brandStyle),
               items: sampleItems(_loader),
             ),
@@ -95,7 +95,7 @@ final class _AppearancePageState extends State<AppearancePage> {
             ),
             _buildPreset(
               title: 'Glow',
-              subtitle: 'Text only, glass tinted cyan, a glow',
+              subtitle: 'Text-only commands and a cyan glow',
               config: (app) =>
                   app.copyWith(menuWidth: glowMenuWidth, style: glowStyle),
               items: glowItems(),

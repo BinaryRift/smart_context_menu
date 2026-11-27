@@ -15,6 +15,8 @@
 * Edge highlights on dark glass inherit some of the glass tint.
 * Keep the backdrop steady when a Liquid Glass menu moves or stretches.
 * Fix Impeller validation errors when animating Liquid Glass shadows.
+* Set `SmartContextMenuBackButtonStyle.highlightColor` to style the pressed and hovered Back
+  row independently.
 * The standard panel draws an edge highlight by default. Set
   `SmartContextMenuStandardStyle(showEdgeHighlight: false)` to use a plain border.
 * `SmartContextMenuStyle.backgroundBlur` is `null` by default. To restore the full-screen

@@ -59,10 +59,15 @@ const compactStyle = SmartContextMenuStyle(
 /// Fits five small cells of 36.
 const compactMenuWidth = 190.0;
 
-/// An opaque menu with dividers under the titles and a strong blur behind
-/// it, for icons in colored squares as in the Settings of iOS.
+/// Neutral surfaces and a soft backdrop for icons in colored squares.
 const colorfulStyle = SmartContextMenuStyle(
-  surface: SmartContextMenuSurface.standard,
+  glassStyle: SmartContextMenuGlassStyle(
+    color: CupertinoDynamicColor.withBrightness(
+      color: Color(0xA6F7FAFF),
+      darkColor: Color(0xB324252B),
+    ),
+    blur: SmartContextMenuBlur.none,
+  ),
   standardStyle: SmartContextMenuStandardStyle(
     color: CupertinoDynamicColor.withBrightness(
       color: Color(0xFFFFFFFF),
@@ -78,7 +83,7 @@ const colorfulStyle = SmartContextMenuStyle(
     color: Color(0x33000000),
     darkColor: Color(0x66000000),
   ),
-  backgroundBlur: SmartContextMenuBlur.extraStrong,
+  // backgroundBlur: SmartContextMenuBlur.extraStrong,
   itemPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
   dividersBetweenItems: true,
   dividerIndent: 52,
@@ -98,7 +103,7 @@ const paperStyle = SmartContextMenuStyle(
     BoxShadow(color: Color(0x404A3728), blurRadius: 18, offset: Offset(0, 8)),
   ],
   backgroundColor: Color(0x404A2E12),
-  backgroundBlur: SmartContextMenuBlur.small,
+  // backgroundBlur: SmartContextMenuBlur.small,
   titleStyle: TextStyle(fontSize: 17, fontFamily: 'Literata', color: _ink),
   disabledForegroundColor: Color(0x664A3728),
   destructiveColor: Color(0xFFB3261E),
@@ -112,32 +117,48 @@ const paperStyle = SmartContextMenuStyle(
   ),
 );
 
-/// Glass tinted cyan, with a cyan glow around it; the menu is narrower in
-/// its config.
+const _glowBorder = BorderSide(
+  color: CupertinoDynamicColor.withBrightness(
+    color: Color(0x8022D3EE),
+    darkColor: Color(0x6622D3EE),
+  ),
+);
+
+/// A narrow cyan menu with a glow inside and around the panel.
 const glowStyle = SmartContextMenuStyle(
-  surface: SmartContextMenuSurface.standard,
+  glassStyle: SmartContextMenuGlassStyle(
+    color: CupertinoDynamicColor.withBrightness(
+      color: Color(0x8CD8FBFF),
+      darkColor: Color(0x73102E37),
+    ),
+    refraction: 1.25,
+    edgeHighlight: 0.55,
+    border: _glowBorder,
+  ),
   standardStyle: SmartContextMenuStandardStyle(
     color: CupertinoDynamicColor.withBrightness(
       color: Color(0xB3ECFEFF),
       darkColor: Color(0x8C06232B),
     ),
-    border: BorderSide(
-      color: CupertinoDynamicColor.withBrightness(
-        color: Color(0x8022D3EE),
-        darkColor: Color(0x6622D3EE),
-      ),
-    ),
+    border: _glowBorder,
     blur: SmartContextMenuBlur.extraStrong,
   ),
   borderRadius: BorderRadius.all(Radius.circular(22)),
   menuShadows: [
-    BoxShadow(color: Color(0x8022D3EE), blurRadius: 48, spreadRadius: 2),
+    BoxShadow(
+      color: CupertinoDynamicColor.withBrightness(
+        color: Color(0x6022D3EE),
+        darkColor: Color(0x7322D3EE),
+      ),
+      blurRadius: 48,
+      spreadRadius: 2,
+    ),
   ],
   backgroundColor: CupertinoDynamicColor.withBrightness(
     color: Color(0x330E7490),
     darkColor: Color(0x99020A0F),
   ),
-  backgroundBlur: SmartContextMenuBlur.strong,
+  // backgroundBlur: SmartContextMenuBlur.strong,
   titleStyle: TextStyle(
     fontSize: 17,
     color: CupertinoDynamicColor.withBrightness(
@@ -169,8 +190,8 @@ const editingRowsAccent = CupertinoDynamicColor.withBrightness(
   darkColor: Color(0xFFDFC7FF),
 );
 const editingRowsSectionColor = CupertinoDynamicColor.withBrightness(
-  color: Color(0xFFEAF2ED),
-  darkColor: Color(0xFF293A33),
+  color: Color(0xB3EAF2ED),
+  darkColor: Color(0xB3293A33),
 );
 const editingRowsSelectionColor = CupertinoDynamicColor.withBrightness(
   color: Color(0xFFE7DDF9),
@@ -179,7 +200,19 @@ const editingRowsSelectionColor = CupertinoDynamicColor.withBrightness(
 
 /// Sections for formatting and alignment above the clipboard actions.
 const editingRowsStyle = SmartContextMenuStyle(
-  surface: SmartContextMenuSurface.standard,
+  glassStyle: SmartContextMenuGlassStyle(
+    color: CupertinoDynamicColor.withBrightness(
+      color: Color(0xACF3FCF6),
+      darkColor: Color(0xB3192D25),
+    ),
+    edgeHighlight: 0.8,
+    border: BorderSide(
+      color: CupertinoDynamicColor.withBrightness(
+        color: Color(0x78708E7E),
+        darkColor: Color(0x8069907E),
+      ),
+    ),
+  ),
   standardStyle: SmartContextMenuStandardStyle(
     color: CupertinoDynamicColor.withBrightness(
       color: Color(0xFFF9FDFA),
@@ -207,7 +240,7 @@ const editingRowsStyle = SmartContextMenuStyle(
     color: Color(0x26517361),
     darkColor: Color(0x66101715),
   ),
-  backgroundBlur: SmartContextMenuBlur.small,
+  // backgroundBlur: SmartContextMenuBlur.small,
   titleStyle: TextStyle(
     fontSize: 17,
     color: CupertinoDynamicColor.withBrightness(
@@ -255,7 +288,19 @@ const _drawingToolbarLine = CupertinoDynamicColor.withBrightness(
 
 /// Capsules in a wide toolbar and an integrated Back row over the shapes.
 const drawingToolbarStyle = SmartContextMenuStyle(
-  surface: SmartContextMenuSurface.standard,
+  glassStyle: SmartContextMenuGlassStyle(
+    color: CupertinoDynamicColor.withBrightness(
+      color: Color(0x78FFF1FA),
+      darkColor: Color(0x80392632),
+    ),
+    edgeHighlight: 0.75,
+    border: BorderSide(
+      color: CupertinoDynamicColor.withBrightness(
+        color: Color(0x66956E91),
+        darkColor: Color(0x80917991),
+      ),
+    ),
+  ),
   standardStyle: SmartContextMenuStandardStyle(
     color: drawingToolbarSurface,
     border: BorderSide(color: _drawingToolbarLine),
@@ -275,13 +320,11 @@ const drawingToolbarStyle = SmartContextMenuStyle(
     color: Color(0x2669495E),
     darkColor: Color(0x66301E2A),
   ),
-  backgroundBlur: SmartContextMenuBlur.small,
+  // backgroundBlur: SmartContextMenuBlur.small,
   titleStyle: TextStyle(fontSize: 14, color: _drawingToolbarForeground),
   defaultIconSize: 16,
-  highlightColor: CupertinoDynamicColor.withBrightness(
-    color: Color(0x1F7040AB),
-    darkColor: Color(0x1FE0C2FF),
-  ),
+  // The tool and shape capsules paint their own highlights.
+  highlightColor: Color(0x00000000),
   dividerColor: _drawingToolbarLine,
   dividerIndent: 8,
   dividerEndIndent: 8,
@@ -289,6 +332,10 @@ const drawingToolbarStyle = SmartContextMenuStyle(
   backButtonStyle: SmartContextMenuBackButtonStyle(
     blur: null,
     foregroundColor: _drawingToolbarForeground,
+    highlightColor: CupertinoDynamicColor.withBrightness(
+      color: Color(0x1F7040AB),
+      darkColor: Color(0x1FE0C2FF),
+    ),
     titleStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
   ),
   rowStyle: SmartContextMenuRowStyle(

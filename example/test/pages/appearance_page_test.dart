@@ -7,6 +7,7 @@ import 'package:smart_context_menu/smart_context_menu.dart';
 // ignore: implementation_imports
 import 'package:smart_context_menu/src/ui/view/smart_context_menu_overlay.dart';
 import 'package:smart_context_menu_example/core/data/demo_loader.dart';
+import 'package:smart_context_menu_example/pages/appearance/ui/appearance_styles.dart';
 import 'package:smart_context_menu_example/pages/appearance/ui/theme_styles.dart';
 
 import '../helpers/menu_tester.dart';
@@ -62,36 +63,43 @@ void main() {
     });
   }
 
-  testWidgets('Terminal switches surfaces and keeps its preset styles', (
-    tester,
-  ) async {
-    await openAppearance(tester);
-    final overlay = find.byType(SmartContextMenuOverlay);
-    SmartContextMenuStyle menuStyle() =>
-        tester.widget<SmartContextMenuOverlay>(overlay).config.style;
+  for (final (name, style) in [
+    ('Colorful', colorfulStyle),
+    ('Brand', brandStyle),
+    ('Terminal', terminalStyle),
+    ('Glow', glowStyle),
+    ('Editing rows', editingRowsStyle),
+    ('Drawing toolbar', drawingToolbarStyle),
+  ]) {
+    testWidgets('$name switches surfaces and keeps its preset styles', (
+      tester,
+    ) async {
+      await openAppearance(tester);
+      final overlay = find.byType(SmartContextMenuOverlay);
 
-    Future<void> chooseSurface(String label) async {
-      await tester.tap(find.byIcon(CupertinoIcons.gear));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text(label));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Done'));
-      await tester.pumpAndSettle();
-    }
-
-    for (final (surface, label) in [
-      (SmartContextMenuSurface.standard, 'Standard'),
-      (SmartContextMenuSurface.glass, 'Glass'),
-    ]) {
-      await chooseSurface(label);
-      await openPreset(tester, 'Terminal');
-      expect(menuStyle().surface, surface);
-      expect(menuStyle().glassStyle, same(terminalStyle.glassStyle));
-      expect(menuStyle().standardStyle, same(terminalStyle.standardStyle));
-      Navigator.of(tester.element(overlay)).pop();
-      await tester.pumpAndSettle();
-    }
-  });
+      for (final (surface, label) in [
+        (SmartContextMenuSurface.standard, 'Standard'),
+        (SmartContextMenuSurface.glass, 'Glass'),
+      ]) {
+        await tester.tap(find.byIcon(CupertinoIcons.gear));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(label));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Done'));
+        await tester.pumpAndSettle();
+        await openPreset(tester, name);
+        final menuStyle = tester
+            .widget<SmartContextMenuOverlay>(overlay)
+            .config
+            .style;
+        expect(menuStyle.surface, surface);
+        expect(menuStyle.glassStyle, same(style.glassStyle));
+        expect(menuStyle.standardStyle, same(style.standardStyle));
+        Navigator.of(tester.element(overlay)).pop();
+        await tester.pumpAndSettle();
+      }
+    });
+  }
 
   testWidgets('Paper uses Standard when the app requests Glass', (
     tester,
@@ -179,7 +187,7 @@ void main() {
     expect(lasso.dx - scribble.dx, greaterThanOrEqualTo(44));
   });
 
-  testWidgets('Shapes in Wide row opens a row of medium cells', (tester) async {
+  testWidgets('Shapes in Wide row opens colored medium cells', (tester) async {
     await openAppearance(tester);
     await openPreset(tester, 'Wide row');
 
@@ -188,6 +196,23 @@ void main() {
 
     expect(find.text('Back'), findsWidgets);
     expect(find.text('Hexagon'), findsOneWidget);
+    final menu = find.byType(SmartContextMenuOverlay);
+    final colors = {
+      for (final icon in [
+        CupertinoIcons.square,
+        CupertinoIcons.circle,
+        CupertinoIcons.triangle,
+        CupertinoIcons.hexagon,
+        CupertinoIcons.star,
+      ])
+        tester
+            .widget<Icon>(
+              find.descendant(of: menu, matching: find.byIcon(icon)),
+            )
+            .color,
+    };
+    expect(colors, hasLength(5));
+    expect(colors, isNot(contains(null)));
   });
 
   testWidgets('editing rows keep independent formatting selections', (
@@ -210,6 +235,54 @@ void main() {
     expect(colorOf(italic), accent);
   });
 
+  testWidgets('Drawing toolbar highlights the capsule and Back separately', (
+    tester,
+  ) async {
+    await openAppearance(tester);
+    await openPreset(tester, 'Drawing toolbar');
+    final pen = find.byIcon(CupertinoIcons.pencil);
+    final capsule = find.ancestor(
+      of: pen,
+      matching: find.byWidgetPredicate(
+        (widget) => switch (widget) {
+          Container(decoration: BoxDecoration(shape: BoxShape.circle)) => true,
+          _ => false,
+        },
+      ),
+    );
+    BoxDecoration capsuleDecoration() =>
+        tester.widget<Container>(capsule).decoration! as BoxDecoration;
+    final resting = capsuleDecoration().color;
+
+    final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await mouse.addPointer(location: tester.getCenter(pen));
+    addTearDown(mouse.removePointer);
+    await tester.pump();
+
+    expect(capsuleDecoration().color, isNot(resting));
+    final cell = tester.widget<AnimatedContainer>(
+      find.ancestor(of: pen, matching: find.byType(AnimatedContainer)).first,
+    );
+    expect((cell.decoration as BoxDecoration).color, const Color(0x00000000));
+
+    await tester.tap(find.byIcon(CupertinoIcons.square_on_circle));
+    await tester.settleMenu();
+    final back = find.text('Back').last;
+    await mouse.moveTo(tester.getCenter(back));
+    await tester.pump();
+
+    final backRow = tester.widget<AnimatedContainer>(
+      find.ancestor(of: back, matching: find.byType(AnimatedContainer)).first,
+    );
+    expect(
+      (backRow.decoration as BoxDecoration).color,
+      CupertinoDynamicColor.resolve(
+        drawingToolbarStyle.backButtonStyle.highlightColor!,
+        tester.element(back),
+      ),
+    );
+  });
+
   for (final (preset, icon, light, dark) in [
     (
       'Editing rows',
@@ -223,6 +296,12 @@ void main() {
       drawingToolbarAccent.color,
       drawingToolbarAccent.darkColor,
     ),
+    (
+      'Wide row',
+      CupertinoIcons.paintbrush,
+      const Color(0xFF225BA9),
+      const Color(0xFF8ABEFF),
+    ),
   ]) {
     testWidgets('$preset follows brightness changes while open', (
       tester,
@@ -233,8 +312,11 @@ void main() {
       await openAppearance(tester);
       await openPreset(tester, preset);
 
-      int iconColor() =>
-          tester.widget<Icon>(find.byIcon(icon)).color!.toARGB32();
+      final menuIcon = find.descendant(
+        of: find.byType(SmartContextMenuOverlay),
+        matching: find.byIcon(icon),
+      );
+      int iconColor() => tester.widget<Icon>(menuIcon).color!.toARGB32();
       expect(iconColor(), light.toARGB32());
 
       dispatcher.platformBrightnessTestValue = Brightness.dark;

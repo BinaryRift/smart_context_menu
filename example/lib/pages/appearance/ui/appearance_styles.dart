@@ -6,7 +6,19 @@ import 'package:smart_context_menu/smart_context_menu.dart';
 
 /// Indigo with white text, rounder corners and a dimmed backdrop.
 const brandStyle = SmartContextMenuStyle(
-  surface: SmartContextMenuSurface.standard,
+  glassStyle: SmartContextMenuGlassStyle(
+    color: CupertinoDynamicColor.withBrightness(
+      color: Color(0xBC4338CA),
+      darkColor: Color(0xA62D248E),
+    ),
+    edgeHighlight: 0.7,
+    border: BorderSide(
+      color: CupertinoDynamicColor.withBrightness(
+        color: Color(0x669E97FF),
+        darkColor: Color(0x808F85FF),
+      ),
+    ),
+  ),
   backgroundColor: CupertinoDynamicColor.withBrightness(
     color: Color(0x7314133D),
     darkColor: Color(0x9914133D),

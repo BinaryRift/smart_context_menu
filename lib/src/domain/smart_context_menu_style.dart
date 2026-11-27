@@ -217,6 +217,9 @@ final class SmartContextMenuStyle {
 
   /// The background of a pressed item, including the back item.
   ///
+  /// [SmartContextMenuBackButtonStyle.highlightColor] takes precedence
+  /// for the back item.
+  ///
   /// Tinted and destructive items keep their own pressed tint. If null,
   /// which is the default, the color of [titleStyle] is used with
   /// [SmartContextMenuDefaults.highlightOpacity] in the light theme and

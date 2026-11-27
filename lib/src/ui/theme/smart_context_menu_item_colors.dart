@@ -22,7 +22,7 @@ final class SmartContextMenuItemColors {
   /// Resolves the colors of [item] with [style].
   ///
   /// [isPressed] is true while a pressed pointer or cursor is over the item.
-  /// [isBack] gives the back item its own highlight in the light theme.
+  /// [isBack] enables the Back-specific highlight settings.
   factory SmartContextMenuItemColors.resolve(
     BuildContext context, {
     required SmartContextMenuItem item,
@@ -70,6 +70,9 @@ final class SmartContextMenuItemColors {
       foreground = resolve(titleStyle?.color ?? baseForeground);
     }
 
+    final highlightColor =
+        (isBack ? style.backButtonStyle.highlightColor : null) ??
+        style.highlightColor;
     final Color overlay;
     if (isDisabled) {
       final disabledBackgroundColor = style.disabledBackgroundColor;
@@ -87,7 +90,7 @@ final class SmartContextMenuItemColors {
       );
     } else if (!isPressed) {
       overlay = const Color(0x00000000);
-    } else if (style.highlightColor case final highlightColor?) {
+    } else if (highlightColor != null) {
       overlay = resolve(highlightColor);
     } else {
       overlay = resolve(baseForeground).withValues(

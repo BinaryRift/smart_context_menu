@@ -103,7 +103,11 @@ void main() {
 
       expect(
         tester.backgroundOf('Enabled'),
-        isSameColorAs(foregroundColor.color.withValues(alpha: 0.06)),
+        isSameColorAs(
+          foregroundColor.color.withValues(
+            alpha: SmartContextMenuDefaults.highlightOpacity,
+          ),
+        ),
       );
       await tester.releaseOutside(gesture);
     });
@@ -118,7 +122,11 @@ void main() {
 
       expect(
         tester.backgroundOf('Enabled'),
-        isSameColorAs(foregroundColor.darkColor.withValues(alpha: 0.1)),
+        isSameColorAs(
+          foregroundColor.darkColor.withValues(
+            alpha: SmartContextMenuDefaults.darkHighlightOpacity,
+          ),
+        ),
       );
       await tester.releaseOutside(gesture);
     });
@@ -139,8 +147,43 @@ void main() {
 
       expect(
         tester.backgroundAt(back),
-        isSameColorAs(foregroundColor.color.withValues(alpha: 0.16)),
+        isSameColorAs(
+          foregroundColor.color.withValues(
+            alpha: SmartContextMenuDefaults.backHighlightOpacity,
+          ),
+        ),
       );
+      await tester.releaseOutside(gesture);
+    });
+
+    testWidgets('gives the Back item priority for its own highlight', (
+      tester,
+    ) async {
+      const transparent = Color(0x00000000);
+      const backColor = CupertinoDynamicColor.withBrightness(
+        color: Color(0x330000FF),
+        darkColor: Color(0x33FFFFFF),
+      );
+      await tester.pumpMenu(
+        items: submenuItems(),
+        brightness: Brightness.dark,
+        config: const SmartContextMenuConfig(
+          style: SmartContextMenuStyle(
+            highlightColor: transparent,
+            backButtonStyle: SmartContextMenuBackButtonStyle(
+              highlightColor: backColor,
+            ),
+          ),
+        ),
+      );
+      await tester.openSubmenu();
+      final gesture = await tester.pressAt(find.text('Child'));
+      expect(tester.backgroundOf('Child'), isSameColorAs(transparent));
+
+      final back = find.text(const SmartContextMenuLabels().back).last;
+      await gesture.moveTo(tester.getCenter(back));
+      await tester.pump();
+      expect(tester.backgroundAt(back), isSameColorAs(backColor.darkColor));
       await tester.releaseOutside(gesture);
     });
 

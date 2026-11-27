@@ -234,48 +234,45 @@ Widget _toolbarTool(
         : action.title,
     selected: selected,
     excludeSemantics: true,
-    child: ColoredBox(
-      color: surface,
-      child: SizedBox(
-        height: 44,
-        width: double.infinity,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            _toolbarIcon(
-              context,
-              action.icon,
-              color,
-              surface,
-              highlighted: highlighted,
+    child: SizedBox(
+      height: 44,
+      width: double.infinity,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          _toolbarIcon(
+            context,
+            action.icon,
+            color,
+            surface,
+            highlighted: highlighted,
+          ),
+          if (opensSubmenu)
+            PositionedDirectional(
+              top: 4,
+              end: 3,
+              child: Icon(
+                Directionality.of(context) == TextDirection.rtl
+                    ? CupertinoIcons.chevron_back
+                    : CupertinoIcons.chevron_forward,
+                size: 9,
+                color: color,
+              ),
             ),
-            if (opensSubmenu)
-              PositionedDirectional(
-                top: 4,
-                end: 3,
-                child: Icon(
-                  Directionality.of(context) == TextDirection.rtl
-                      ? CupertinoIcons.chevron_back
-                      : CupertinoIcons.chevron_forward,
-                  size: 9,
-                  color: color,
+          if (eyedropper)
+            PositionedDirectional(
+              bottom: 5,
+              end: 4,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFFFFB48D),
+                  border: Border.fromBorderSide(BorderSide(color: surface)),
                 ),
+                child: const SizedBox.square(dimension: 9),
               ),
-            if (eyedropper)
-              PositionedDirectional(
-                bottom: 5,
-                end: 4,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: const Color(0xFFFFB48D),
-                    border: Border.fromBorderSide(BorderSide(color: surface)),
-                  ),
-                  child: const SizedBox.square(dimension: 9),
-                ),
-              ),
-          ],
-        ),
+            ),
+        ],
       ),
     ),
   );
@@ -288,32 +285,29 @@ SmartContextMenuSimpleItem _shapeCell(AppearanceAction action) =>
       customBuilder: (context, state) {
         final highlighted = state.isHovered || state.isPressed;
         final surface = drawingToolbarSurface.resolveFrom(context);
-        return ColoredBox(
-          color: surface,
-          child: SizedBox(
-            width: double.infinity,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _toolbarIcon(
-                    context,
-                    action.icon,
-                    drawingToolbarPaint.resolveFrom(context),
-                    surface,
-                    highlighted: highlighted,
-                    size: 34,
-                  ),
-                  const SizedBox(height: 4),
-                  _cellLabel(
-                    action.title,
-                    highlighted
-                        ? drawingToolbarAccent.resolveFrom(context)
-                        : state.foregroundColor,
-                  ),
-                ],
-              ),
+        return SizedBox(
+          width: double.infinity,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _toolbarIcon(
+                  context,
+                  action.icon,
+                  drawingToolbarPaint.resolveFrom(context),
+                  surface,
+                  highlighted: highlighted,
+                  size: 34,
+                ),
+                const SizedBox(height: 4),
+                _cellLabel(
+                  action.title,
+                  highlighted
+                      ? drawingToolbarAccent.resolveFrom(context)
+                      : state.foregroundColor,
+                ),
+              ],
             ),
           ),
         );

@@ -14,9 +14,9 @@ import 'smart_context_menu_blur.dart';
 /// The appearance of the back item pinned to the top of a submenu.
 ///
 /// Set it as [SmartContextMenuStyle.backButtonStyle]. The back item also
-/// takes [SmartContextMenuStyle.titleStyle], the item padding, the press
-/// highlight and [SmartContextMenuStyle.defaultIconSize] of the style, and
-/// always has a divider below it.
+/// takes [SmartContextMenuStyle.titleStyle], the item padding and
+/// [SmartContextMenuStyle.defaultIconSize] of the style, and always has a
+/// divider below it.
 ///
 /// ```dart
 /// const style = SmartContextMenuStyle(
@@ -43,6 +43,13 @@ final class SmartContextMenuBackButtonStyle {
   /// If this color is null, the row uses `standardStyle.color` on Standard
   /// and the glass tint at 14% opacity on Liquid Glass.
   final Color? backgroundColor;
+
+  /// The overlay color when the Back row is pressed or hovered.
+  ///
+  /// Defaults to null, which uses [SmartContextMenuStyle.highlightColor]
+  /// or the built-in Back highlight. A `CupertinoDynamicColor` is resolved
+  /// in the menu.
+  final Color? highlightColor;
 
   /// The blur behind the back item.
   ///
@@ -80,6 +87,7 @@ final class SmartContextMenuBackButtonStyle {
   const SmartContextMenuBackButtonStyle({
     this.decoration,
     this.backgroundColor,
+    this.highlightColor,
     this.blur = SmartContextMenuBlur.strong,
     this.borderRadius = SmartContextMenuDefaults.backButtonBorderRadius,
     this.foregroundColor,
@@ -95,6 +103,7 @@ final class SmartContextMenuBackButtonStyle {
   SmartContextMenuBackButtonStyle copyWith({
     Decoration? decoration,
     Color? backgroundColor,
+    Color? highlightColor,
     SmartContextMenuBlur? blur,
     BorderRadiusGeometry? borderRadius,
     Color? foregroundColor,
@@ -104,6 +113,7 @@ final class SmartContextMenuBackButtonStyle {
     return SmartContextMenuBackButtonStyle(
       decoration: decoration ?? this.decoration,
       backgroundColor: backgroundColor ?? this.backgroundColor,
+      highlightColor: highlightColor ?? this.highlightColor,
       blur: blur ?? this.blur,
       borderRadius: borderRadius ?? this.borderRadius,
       foregroundColor: foregroundColor ?? this.foregroundColor,

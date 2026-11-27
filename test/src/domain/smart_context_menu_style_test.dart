@@ -9,6 +9,7 @@ import 'package:smart_context_menu/smart_context_menu.dart';
 Object backFields(SmartContextMenuBackButtonStyle s) => (
   s.decoration,
   s.backgroundColor,
+  s.highlightColor,
   s.blur,
   s.borderRadius,
   s.foregroundColor,
