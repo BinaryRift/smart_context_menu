@@ -41,7 +41,7 @@ const terminalStyle = SmartContextMenuStyle(
   ),
   standardStyle: SmartContextMenuStandardStyle(
     color: Color(0xFF0D0D0D),
-    border: BorderSide(color: Color(0x333F3F3F)),
+    border: BorderSide(color: Color(0x9933FF99)),
   ),
   borderRadius: BorderRadius.all(Radius.circular(4)),
   menuShadows: [

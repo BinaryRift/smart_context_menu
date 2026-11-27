@@ -3,6 +3,9 @@ import 'dart:ui' show PointerDeviceKind;
 // ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:smart_context_menu/smart_context_menu.dart';
+// ignore: implementation_imports
+import 'package:smart_context_menu/src/ui/view/smart_context_menu_overlay.dart';
 import 'package:smart_context_menu_example/core/data/demo_loader.dart';
 import 'package:smart_context_menu_example/pages/appearance/ui/theme_styles.dart';
 
@@ -62,6 +65,37 @@ void main() {
       await tester.settleMenu();
     });
   }
+
+  testWidgets('Terminal switches surfaces and keeps its preset styles', (
+    tester,
+  ) async {
+    await openAppearance(tester);
+    final overlay = find.byType(SmartContextMenuOverlay);
+    SmartContextMenuStyle menuStyle() =>
+        tester.widget<SmartContextMenuOverlay>(overlay).config.style;
+
+    Future<void> chooseSurface(String label) async {
+      await tester.tap(find.byIcon(CupertinoIcons.gear));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(label));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Done'));
+      await tester.pumpAndSettle();
+    }
+
+    for (final (surface, label) in [
+      (SmartContextMenuSurface.standard, 'Standard'),
+      (SmartContextMenuSurface.glass, 'Glass'),
+    ]) {
+      await chooseSurface(label);
+      await openPreset(tester, 'Terminal');
+      expect(menuStyle().surface, surface);
+      expect(menuStyle().glassStyle, same(terminalStyle.glassStyle));
+      expect(menuStyle().standardStyle, same(terminalStyle.standardStyle));
+      Navigator.of(tester.element(overlay)).pop();
+      await tester.pumpAndSettle();
+    }
+  });
 
   testWidgets('Localized shows the strings of the menu in Russian', (
     tester,

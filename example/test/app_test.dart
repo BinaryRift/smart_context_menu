@@ -57,16 +57,20 @@ void main() {
     expect(config().enableHaptics, isTrue);
     expect(config().enableSwipeBack, isTrue);
     expect(config().moveBackDown, isFalse);
+    expect(config().style.surface, SmartContextMenuSurface.glass);
 
     await openSettings(tester);
     await tester.tap(switchOf('Haptics'));
     await tester.tap(switchOf('Swipe back'));
     await tester.tap(switchOf('Move back down'));
     await tester.pumpAndSettle();
+    await tester.tap(find.text('Standard'));
+    await tester.pumpAndSettle();
 
     expect(config().enableHaptics, isFalse);
     expect(config().enableSwipeBack, isFalse);
     expect(config().moveBackDown, isTrue);
+    expect(config().style.surface, SmartContextMenuSurface.standard);
     // The base config of the app stays.
     expect(config().style.standardStyle.blur, SmartContextMenuBlur.small);
   });

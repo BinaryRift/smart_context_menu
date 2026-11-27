@@ -2,6 +2,7 @@
 import 'package:flutter/cupertino.dart';
 // ignore: deprecated_member_use
 import 'package:flutter/material.dart' show ThemeMode;
+import 'package:smart_context_menu/smart_context_menu.dart';
 
 import '../../../core/settings/settings_scope.dart';
 
@@ -32,8 +33,9 @@ final class SettingsSheet extends StatelessWidget {
       ),
       child: SafeArea(
         top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+        child: ListView(
+          padding: EdgeInsets.zero,
+          shrinkWrap: true,
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 8, 8, 0),
@@ -64,6 +66,20 @@ final class SettingsSheet extends StatelessWidget {
                       ThemeMode.dark: Text('Dark'),
                     },
                   ),
+                ),
+                CupertinoListTile(
+                  title: const Text('Surface'),
+                  trailing:
+                      CupertinoSlidingSegmentedControl<SmartContextMenuSurface>(
+                        groupValue: settings.surface,
+                        onValueChanged: (surface) {
+                          if (surface != null) settings.surface = surface;
+                        },
+                        children: const {
+                          SmartContextMenuSurface.glass: Text('Glass'),
+                          SmartContextMenuSurface.standard: Text('Standard'),
+                        },
+                      ),
                 ),
                 _buildSwitch(
                   title: 'Haptics',

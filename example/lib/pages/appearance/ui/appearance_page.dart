@@ -232,11 +232,19 @@ final class _AppearancePageState extends State<AppearancePage> {
     required List<SmartContextMenuItem> items,
   }) {
     final app = SmartContextMenuTheme.of(context);
+    final preset = config(app);
+    // Keep presets that explicitly use Standard until they have a Glass style.
+    final surface = app.style.surface;
+    final effectiveConfig =
+        surface == SmartContextMenuSurface.standard &&
+            preset.style.surface != surface
+        ? preset.copyWith(style: preset.style.copyWith(surface: surface))
+        : preset;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       child: SmartContextMenuTheme(
-        config: config(app),
+        config: effectiveConfig,
         child: SmartContextMenu(
           items: items,
           child: DemoCard(title: title, subtitle: subtitle),

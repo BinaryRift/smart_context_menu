@@ -1,12 +1,15 @@
 // ignore: deprecated_member_use
-import 'package:flutter/cupertino.dart' show CupertinoListTile, CupertinoSwitch;
+import 'package:flutter/cupertino.dart'
+    show CupertinoIcons, CupertinoListTile, CupertinoSwitch;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:smart_context_menu/smart_context_menu.dart';
 // ignore: implementation_imports
 import 'package:smart_context_menu/src/ui/widgets/smart_context_menu_glass_surface.dart';
 // ignore: implementation_imports
 import 'package:smart_context_menu/src/ui/widgets/smart_context_menu_highlight.dart';
 import 'package:smart_context_menu_example/core/ui/reactions_bar.dart';
+import 'package:smart_context_menu_example/pages/settings/ui/settings_sheet.dart';
 
 import '../helpers/menu_tester.dart';
 
@@ -29,6 +32,25 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Preview'), findsOneWidget);
     expect(find.text('Standard'), findsOneWidget);
+
+    await tester.tap(find.byIcon(CupertinoIcons.gear));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.descendant(
+        of: find.byType(SettingsSheet),
+        matching: find.text('Standard'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Done'));
+    await tester.pumpAndSettle();
+    final preview = tester.element(find.text('Open menu'));
+    final menu = preview.findAncestorWidgetOfExactType<SmartContextMenu>()!;
+    expect(
+      SmartContextMenuTheme.of(preview).style.surface,
+      SmartContextMenuSurface.standard,
+    );
+    expect(menu.config!.style.surface, SmartContextMenuSurface.glass);
 
     await tester.tap(find.text('Open menu'));
     await tester.settleMenu();

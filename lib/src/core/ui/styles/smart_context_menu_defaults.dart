@@ -101,7 +101,7 @@ abstract final class SmartContextMenuDefaults {
   static const CupertinoDynamicColor glassTint =
       CupertinoDynamicColor.withBrightness(
         color: Color(0x92F7FAFF),
-        darkColor: Color(0x801C1B1A),
+        darkColor: Color(0x8C18181A),
       );
 
   /// The default border color of [SmartContextMenuStandardStyle].
