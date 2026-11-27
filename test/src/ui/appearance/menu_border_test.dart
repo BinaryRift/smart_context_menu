@@ -2,6 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
+import 'package:smart_context_menu/src/ui/widgets/smart_context_menu_blur_box.dart';
 import 'package:smart_context_menu/src/ui/widgets/smart_context_menu_highlight.dart';
 
 import '../../../helpers/appearance_tester.dart';
@@ -14,11 +15,11 @@ void main() {
         widget.foregroundPainter is SmartContextMenuHighlightPainter,
   );
 
-  List<Decoration> foregroundsOf(WidgetTester tester) => [
-    for (final container in tester.widgetList<Container>(
-      find.byType(Container),
+  List<DecoratedBox> foregroundsOf(WidgetTester tester) => [
+    for (final box in tester.widgetList<DecoratedBox>(
+      find.byType(DecoratedBox),
     ))
-      ?container.foregroundDecoration,
+      if (box.position == DecorationPosition.foreground) box,
   ];
 
   testWidgets('is painted over the menu content', (tester) async {
@@ -30,7 +31,8 @@ void main() {
 
     final foregrounds = foregroundsOf(tester);
     expect(foregrounds, hasLength(1));
-    final border = (foregrounds.single as BoxDecoration).border! as Border;
+    final border =
+        (foregrounds.single.decoration as BoxDecoration).border! as Border;
     expect(
       border.top.color,
       isSameColorAs(light(SmartContextMenuDefaults.borderColor)),
@@ -38,12 +40,54 @@ void main() {
     expect(highlight, findsOneWidget);
   });
 
+  testWidgets('keeps an outside border above the local blur clip', (
+    tester,
+  ) async {
+    const border = BorderSide(
+      color: Color(0xFF123456),
+      width: 3,
+      strokeAlign: BorderSide.strokeAlignOutside,
+    );
+    await tester.pumpMenu(
+      items: appearanceItems(),
+      config: const SmartContextMenuConfig(
+        style: SmartContextMenuStyle(
+          surface: SmartContextMenuSurface.standard,
+          standardStyle: SmartContextMenuStandardStyle(
+            border: border,
+            blur: SmartContextMenuBlur.small,
+          ),
+        ),
+      ),
+    );
+    await tester.openMenu();
+
+    final outline = foregroundsOf(tester).single;
+    expect(
+      (outline.decoration as BoxDecoration).border,
+      Border.fromBorderSide(border),
+    );
+    expect(outline.child, isA<SmartContextMenuBlurBox>());
+    expect(
+      outline.child,
+      isA<SmartContextMenuBlurBox>().having(
+        (widget) => widget.blur,
+        'blur',
+        SmartContextMenuBlur.small,
+      ),
+    );
+    final painter = tester.widget<CustomPaint>(highlight).foregroundPainter;
+    expect((painter! as SmartContextMenuHighlightPainter).border, border);
+  });
+
   testWidgets('is not added to a custom decoration', (tester) async {
     await tester.pumpMenu(
       items: appearanceItems(),
       config: const SmartContextMenuConfig(
         style: SmartContextMenuStyle(
-          menuDecoration: BoxDecoration(color: Color(0xFF000001)),
+          standardStyle: SmartContextMenuStandardStyle(
+            decoration: BoxDecoration(color: Color(0xFF000001)),
+          ),
         ),
       ),
     );
@@ -57,7 +101,11 @@ void main() {
     await tester.pumpMenu(
       items: appearanceItems(),
       config: const SmartContextMenuConfig(
-        style: SmartContextMenuStyle(borderColor: Color(0x00FF0000)),
+        style: SmartContextMenuStyle(
+          standardStyle: SmartContextMenuStandardStyle(
+            border: BorderSide(color: Color(0x00FF0000)),
+          ),
+        ),
       ),
     );
     await tester.openMenu();

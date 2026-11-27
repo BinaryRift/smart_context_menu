@@ -88,7 +88,11 @@ void main() {
   ) async {
     await tester.pumpMenu(
       config: const SmartContextMenuConfig(
-        style: SmartContextMenuStyle(menuBlur: SmartContextMenuBlur.small),
+        style: SmartContextMenuStyle(
+          standardStyle: SmartContextMenuStandardStyle(
+            blur: SmartContextMenuBlur.small,
+          ),
+        ),
       ),
       items: [
         SmartContextMenuItem.simple(

@@ -27,45 +27,45 @@ Object statusFields(SmartContextMenuStatusStyle s) => (
 );
 
 void main() {
-  test('defaults to Liquid Glass and replaces the whole surface', () {
+  test('defaults to Glass and keeps both styles when changing the surface', () {
     const defaultStyle = SmartContextMenuStyle();
-    const defaultGlassStyle = SmartContextMenuGlassStyle();
-    const defaultGlass = SmartContextMenuSurface.glass(defaultGlassStyle);
-    const customGlass = SmartContextMenuSurface.glass(
-      SmartContextMenuGlassStyle(refraction: 2),
+    const customGlass = SmartContextMenuGlassStyle(refraction: 2);
+    const customStandard = SmartContextMenuStandardStyle(
+      blur: SmartContextMenuBlur.small,
+      showEdgeHighlight: false,
     );
 
-    expect(defaultStyle.surface, defaultGlass);
-    expect(defaultGlassStyle.blur.sigmaX, 2);
-    expect(defaultGlassStyle.blur.sigmaY, 2);
-    final style = defaultStyle.copyWith(surface: customGlass);
-    expect(
-      style.copyWith(menuBlur: SmartContextMenuBlur.small).surface,
-      customGlass,
+    expect(defaultStyle.surface, SmartContextMenuSurface.glass);
+    expect(defaultStyle.glassStyle.blur.sigmaX, 2);
+    expect(defaultStyle.glassStyle.blur.sigmaY, 2);
+    expect(defaultStyle.standardStyle.blur, isNull);
+    expect(defaultStyle.standardStyle.border.width, 1);
+    expect(defaultStyle.standardStyle.showEdgeHighlight, isTrue);
+    final style = defaultStyle.copyWith(
+      glassStyle: customGlass,
+      standardStyle: customStandard,
     );
-    expect(
-      style.copyWith(surface: SmartContextMenuSurface.standard).surface,
-      SmartContextMenuSurface.standard,
-    );
-    expect(style.copyWith(surface: defaultGlass).surface, defaultGlass);
+    final standard = style.copyWith(surface: SmartContextMenuSurface.standard);
+    expect(standard.surface, SmartContextMenuSurface.standard);
+    expect(standard.glassStyle, same(customGlass));
+    expect(standard.standardStyle, same(customStandard));
+    final glass = standard.copyWith(surface: SmartContextMenuSurface.glass);
+    expect(glass.surface, SmartContextMenuSurface.glass);
+    expect(glass.glassStyle, same(customGlass));
+    expect(glass.standardStyle, same(customStandard));
   });
 
-  test('glass styles and surfaces compare by value', () {
+  test('glass styles compare by value', () {
     const tint = Color(0x90778899);
-    const style = SmartContextMenuGlassStyle(tint: tint, refraction: 2);
+    const style = SmartContextMenuGlassStyle(color: tint, refraction: 2);
     final copy = const SmartContextMenuGlassStyle().copyWith(
-      tint: tint,
+      color: tint,
       refraction: 2,
     );
-    final surface = SmartContextMenuSurface.glass(style);
-    final copiedSurface = SmartContextMenuSurface.glass(copy);
 
     expect(copy, style);
     expect(copy.hashCode, style.hashCode);
-    expect(surface, copiedSurface);
-    expect(surface.hashCode, copiedSurface.hashCode);
-    expect(surface, isNot(SmartContextMenuSurface.standard));
-    expect(copy.copyWith(tint: const Color(0x00FFFFFF)), isNot(style));
+    expect(copy.copyWith(color: const Color(0x00FFFFFF)), isNot(style));
     expect(copy.copyWith(refraction: 0), isNot(style));
     final withoutBlur = copy.copyWith(blur: SmartContextMenuBlur.none);
     expect(withoutBlur.blur.sigmaX, 0);
@@ -75,23 +75,38 @@ void main() {
       style,
     );
     final withoutHighlight = copy.copyWith(edgeHighlight: 0);
-    expect(withoutHighlight.tint, tint);
+    expect(withoutHighlight.color, tint);
     expect(withoutHighlight.refraction, 2);
-    expect(SmartContextMenuSurface.glass(withoutHighlight), isNot(surface));
+    expect(withoutHighlight, isNot(style));
 
     expect(copy.border, BorderSide.none);
     const border = BorderSide(color: Color(0x6633FF99), width: 2);
     final withBorder = copy.copyWith(border: border);
     expect(withBorder.border, border);
-    expect(SmartContextMenuSurface.glass(withBorder), isNot(surface));
+    expect(withBorder, isNot(style));
     expect(withBorder.copyWith(border: BorderSide.none), copy);
+  });
+
+  test('legacy Standard setters update a configured Standard style', () {
+    const base = SmartContextMenuStyle(
+      standardStyle: SmartContextMenuStandardStyle(
+        border: BorderSide(width: 3, strokeAlign: BorderSide.strokeAlignCenter),
+        showEdgeHighlight: false,
+      ),
+    );
+    const color = Color(0xFF123456);
+    final copy = base.copyWith(borderColor: color);
+    expect(copy.borderColor, color);
+    expect(copy.standardStyle.border.color, color);
+    expect(copy.standardStyle.border.width, 3);
+    expect(copy.standardStyle.border.strokeAlign, BorderSide.strokeAlignCenter);
+    expect(copy.standardStyle.showEdgeHighlight, isFalse);
   });
 
   group('copyWith', () {
     const original = SmartContextMenuStyle(
       menuColor: Color(0xFF000001),
       borderColor: Color(0xFF000002),
-      showEdgeHighlight: false,
       borderRadius: BorderRadius.all(Radius.circular(1)),
       menuDecoration: BoxDecoration(color: Color(0xFF000003)),
       menuBlur: SmartContextMenuBlur(1),
@@ -124,7 +139,6 @@ void main() {
     final fields = <String, Object? Function(SmartContextMenuStyle)>{
       'menuColor': (s) => s.menuColor,
       'borderColor': (s) => s.borderColor,
-      'showEdgeHighlight': (s) => s.showEdgeHighlight,
       'borderRadius': (s) => s.borderRadius,
       'menuDecoration': (s) => s.menuDecoration,
       'menuBlur': (s) => s.menuBlur,
@@ -168,10 +182,6 @@ void main() {
     final changes = <String, (Object, SmartContextMenuStyle Function())>{
       'menuColor': (color, () => original.copyWith(menuColor: color)),
       'borderColor': (color, () => original.copyWith(borderColor: color)),
-      'showEdgeHighlight': (
-        true,
-        () => original.copyWith(showEdgeHighlight: true),
-      ),
       'borderRadius': (radius, () => original.copyWith(borderRadius: radius)),
       'menuDecoration': (
         decoration,

@@ -79,7 +79,9 @@ void main() {
       config: const SmartContextMenuConfig(
         style: SmartContextMenuStyle(
           menuShadows: shadows,
-          menuDecoration: BoxDecoration(color: Color(0xFF000002)),
+          standardStyle: SmartContextMenuStandardStyle(
+            decoration: BoxDecoration(color: Color(0xFF000002)),
+          ),
         ),
       ),
     );

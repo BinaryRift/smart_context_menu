@@ -116,10 +116,13 @@ void main() {
   testWidgets('keeps the surface selected before capturing the preview', (
     tester,
   ) async {
-    const glass = SmartContextMenuSurface.glass(
-      SmartContextMenuGlassStyle(refraction: 2),
+    const standardDecoration = BoxDecoration(color: configColor);
+    const style = SmartContextMenuStyle(
+      glassStyle: SmartContextMenuGlassStyle(refraction: 2),
+      standardStyle: SmartContextMenuStandardStyle(
+        decoration: standardDecoration,
+      ),
     );
-    const style = SmartContextMenuStyle(surface: glass);
     const theme = SmartContextMenuConfig(style: style);
     final controller = SmartContextMenuController();
     addTearDown(controller.dispose);
@@ -148,8 +151,13 @@ void main() {
       ),
     );
     await tester.settleMenu();
-    expect(activeMenu().config.style.surface, glass);
+    expect(activeMenu().config.style.surface, SmartContextMenuSurface.glass);
     expect(find.byType(SmartContextMenuGlassSurface), findsNothing);
+    final customPanel = find.byWidgetPredicate(
+      (widget) =>
+          widget is Container && widget.decoration == standardDecoration,
+    );
+    expect(customPanel, findsOneWidget);
 
     final closing = controller.close();
     await tester.settleMenu();
@@ -158,6 +166,7 @@ void main() {
     await tester.openMenu();
     expect(activeMenu().config.style.surface, SmartContextMenuSurface.standard);
     expect(find.byType(SmartContextMenuGlassSurface), findsNothing);
+    expect(customPanel, findsOneWidget);
   });
 
   testWidgets('manual activation of the theme turns off the long press', (

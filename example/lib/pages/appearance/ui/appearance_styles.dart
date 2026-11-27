@@ -14,8 +14,10 @@ const brandStyle = SmartContextMenuStyle(
     darkColor: Color(0x9914133D),
   ),
   backgroundBlur: null,
-  menuColor: Color(0xFF3634A3),
-  borderColor: Color(0x00000000),
+  standardStyle: SmartContextMenuStandardStyle(
+    color: Color(0xFF3634A3),
+    border: BorderSide.none,
+  ),
   borderRadius: BorderRadius.all(Radius.circular(20)),
   titleStyle: TextStyle(fontSize: 17, color: CupertinoColors.white),
   disabledForegroundColor: Color(0x80FFFFFF),
@@ -26,13 +28,14 @@ const brandStyle = SmartContextMenuStyle(
 
 /// An opaque menu: its color hides what is behind it, so it needs no blur.
 ///
-/// The back item of a submenu is filled with the same [menuColor], so it
-/// blends into the menu.
+/// The back item of a submenu uses the same color, so it blends into the menu.
 const solidStyle = SmartContextMenuStyle(
   surface: SmartContextMenuSurface.standard,
-  menuColor: CupertinoDynamicColor.withBrightness(
-    color: Color(0xFFF7F7F9),
-    darkColor: Color(0xFF2C2C2E),
+  standardStyle: SmartContextMenuStandardStyle(
+    color: CupertinoDynamicColor.withBrightness(
+      color: Color(0xFFF7F7F9),
+      darkColor: Color(0xFF2C2C2E),
+    ),
   ),
 );
 

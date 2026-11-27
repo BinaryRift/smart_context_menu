@@ -129,10 +129,12 @@ final class _LiquidGlassPageState extends State<LiquidGlassPage> {
       config: theme.copyWith(
         style: SmartContextMenuStyle(
           surface: _surface == _Surface.glass
-              ? const SmartContextMenuSurface.glass()
+              ? SmartContextMenuSurface.glass
               : SmartContextMenuSurface.standard,
-          menuBlur: SmartContextMenuBlur.small,
-          showEdgeHighlight: _surface == _Surface.glass || _highlightStandard,
+          standardStyle: SmartContextMenuStandardStyle(
+            blur: SmartContextMenuBlur.small,
+            showEdgeHighlight: _surface == _Surface.glass || _highlightStandard,
+          ),
           borderRadius: const BorderRadius.all(Radius.circular(20)),
           backgroundColor: _useSoftBackground ? _halfDimming : _standardDimming,
           backgroundBlur: _useSoftBackground

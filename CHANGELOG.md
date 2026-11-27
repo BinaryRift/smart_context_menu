@@ -1,21 +1,22 @@
 ## 1.2.0 (unreleased)
 
 * `SmartContextMenuStyle.surface` selects the surface of the menu. The default,
-  `SmartContextMenuSurface.glass()`, blurs and refracts the backdrop inside the menu on Impeller
+  `SmartContextMenuSurface.glass`, blurs and refracts the backdrop inside the menu on Impeller
   renderers with shader filter support. `SmartContextMenuGlassStyle.blur` defaults to a sigma
   of 2. Set it to `SmartContextMenuBlur.none` to turn off the glass blur.
   When the shader is unavailable or `MediaQuery.highContrast` is
-  enabled at the anchor, the menu opens as `SmartContextMenuSurface.standard`. Glass uses
-  `SmartContextMenuGlassStyle`: `menuColor`, `borderColor`, `menuDecoration`, `menuBlur` and
-  `showEdgeHighlight` apply to the standard surface only. If you set `menuColor` to match
-  your brand, set `tint` of the glass as well, or pass `SmartContextMenuSurface.standard` to keep
-  the standard panel.
+  enabled at the anchor, the menu opens as `SmartContextMenuSurface.standard`.
+* Configure the two surfaces independently with `glassStyle` and `standardStyle`. Both have
+  `color`, `border` and `blur`. Set a `BorderSide` to control the border color, width and
+  stroke alignment. `standardStyle.decoration` replaces the built-in standard finish.
+* Deprecate `SmartContextMenuStyle.menuColor`, `borderColor`, `menuDecoration` and `menuBlur`
+  in favor of `standardStyle`. The getters and arguments still configure or expose Standard,
+  including during fallback.
 * Edge highlights on dark glass inherit some of the glass tint.
-* Set `SmartContextMenuGlassStyle.border` to draw a custom border around the glass.
 * Keep the backdrop steady when a Liquid Glass menu moves or stretches.
 * Fix Impeller validation errors when animating Liquid Glass shadows.
-* The standard panel draws an edge highlight by default. Set `showEdgeHighlight: false`
-  to use a plain border.
+* The standard panel draws an edge highlight by default. Set
+  `SmartContextMenuStandardStyle(showEdgeHighlight: false)` to use a plain border.
 * `SmartContextMenuStyle.backgroundBlur` is `null` by default. To restore the full-screen
   blur from 1.1.x, set `backgroundBlur: SmartContextMenuBlur.medium`.
 

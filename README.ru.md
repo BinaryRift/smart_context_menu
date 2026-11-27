@@ -1184,7 +1184,9 @@ SmartContextMenu(
     activationMode: SmartContextMenuActivationMode.manual,
     style: theme.style.copyWith(
       surface: SmartContextMenuSurface.standard,
-      menuBlur: SmartContextMenuBlur.small,
+      standardStyle: theme.style.standardStyle.copyWith(
+        blur: SmartContextMenuBlur.small,
+      ),
     ),
   ),
   controller: controller,
@@ -1253,7 +1255,9 @@ builder: (context, child) => CupertinoUiCompatibilityBridge(
     config: SmartContextMenuConfig(
       style: SmartContextMenuStyle(
         surface: SmartContextMenuSurface.standard,
-        menuColor: CupertinoDynamicColor.resolve(brandMenuColor, context),
+        standardStyle: SmartContextMenuStandardStyle(
+          color: CupertinoDynamicColor.resolve(brandMenuColor, context),
+        ),
       ),
     ),
     child: child!,
@@ -1290,7 +1294,7 @@ builder: (context, child) => CupertinoUiCompatibilityBridge(
 ```dart
 const menuStyle = SmartContextMenuStyle(
   surface: SmartContextMenuSurface.standard,
-  menuBlur: SmartContextMenuBlur.small,
+  standardStyle: SmartContextMenuStandardStyle(blur: SmartContextMenuBlur.small),
   backgroundColor: CupertinoDynamicColor.withBrightness(
     color: Color(0x21000000),
     darkColor: Color(0x33000000),
@@ -1307,8 +1311,9 @@ const menuStyle = SmartContextMenuStyle(
 
 `menuShadows` заменяет стандартные тени под меню; чтобы убрать тени, передайте пустой список.
 
-`menuDecoration` заменяет фон и рамку Standard. У закреплённого пункта «Назад» свой стиль.
-На Standard он по умолчанию использует заливку `menuColor` и форму из
+`standardStyle.decoration` заменяет штатную заливку, рамку и блик Standard. Форма декорации
+обрезает содержимое панели. У закреплённого пункта «Назад» свой стиль.
+На Standard он по умолчанию использует заливку `standardStyle.color` и форму из
 `backButtonStyle.borderRadius`. Для собственной формы и фона задайте `backButtonStyle.decoration`.
 Форма декорации обрезает и размытие пункта «Назад». Прозрачная декорация позволяет видеть
 градиент меню и размытые прокручиваемые пункты.
@@ -1316,12 +1321,14 @@ const menuStyle = SmartContextMenuStyle(
 ```dart
 const style = SmartContextMenuStyle(
   surface: SmartContextMenuSurface.standard,
-  menuDecoration: BoxDecoration(
-    borderRadius: BorderRadius.all(Radius.circular(16)),
-    gradient: LinearGradient(
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      colors: [Color(0xFF3634A3), Color(0xFF18165F)],
+  standardStyle: SmartContextMenuStandardStyle(
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.all(Radius.circular(16)),
+      gradient: LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [Color(0xFF3634A3), Color(0xFF18165F)],
+      ),
     ),
   ),
   backButtonStyle: SmartContextMenuBackButtonStyle(
@@ -1347,15 +1354,17 @@ const style = SmartContextMenuStyle(
 Чтобы всегда открывать Standard, задайте `surface: SmartContextMenuSurface.standard`.
 
 ```dart
-const glassStyle = SmartContextMenuStyle(
-  surface: SmartContextMenuSurface.glass(
-    SmartContextMenuGlassStyle(
-      tint: Color(0x90E1F5FE),
-      blur: SmartContextMenuBlur(5),
-      refraction: 1.2,
-      edgeHighlight: 0.8,
-      border: BorderSide(color: Color(0x90388AA0), width: 1.5),
-    ),
+const style = SmartContextMenuStyle(
+  glassStyle: SmartContextMenuGlassStyle(
+    color: Color(0x90E1F5FE),
+    blur: SmartContextMenuBlur(5),
+    refraction: 1.2,
+    edgeHighlight: 0.8,
+    border: BorderSide(color: Color(0x90388AA0), width: 1.5),
+  ),
+  standardStyle: SmartContextMenuStandardStyle(
+    color: Color(0xFFE1F5FE),
+    border: BorderSide(color: Color(0x90388AA0), width: 1.5),
   ),
 );
 ```
@@ -1363,11 +1372,18 @@ const glassStyle = SmartContextMenuStyle(
 По умолчанию стекло использует `SmartContextMenuBlur(2)`. Чтобы отключить локальное размытие,
 задайте `SmartContextMenuBlur.none`. Альфа оттенка задаёт его непрозрачность. Множители
 преломления и блика по умолчанию равны `1`. Значение `0` отключает соответствующий эффект.
-`SmartContextMenuGlassStyle.border` задаёт цвет, толщину и положение обводки относительно края.
-По умолчанию используется `BorderSide.none`.
-`menuColor`, `borderColor`, `menuDecoration`, `menuBlur` и
-`showEdgeHighlight` оформляют Standard, в том числе при переключении с Glass на Standard.
-`backgroundColor` и `backgroundBlur` действуют на обе поверхности.
+
+У обеих поверхностей `border` принимает `BorderSide` с цветом, толщиной и положением
+обводки относительно края. У Glass по умолчанию `BorderSide.none`, у Standard рамка
+толщиной 1 логический пиксель и переключатель блика `showEdgeHighlight`.
+`borderRadius` меню задаёт скругление обеих штатных поверхностей. Поле `blur` размывает
+фон внутри контура меню. У Standard локальное размытие по умолчанию выключено.
+`backgroundBlur` размывает весь экран позади любой поверхности.
+
+`standardStyle` оформляет Standard и при переходе с Glass. Устаревшие `menuColor`,
+`borderColor`, `menuDecoration` и `menuBlur` по-прежнему настраивают Standard.
+Для перехода используйте поля `standardStyle` — `color`, `border` (тип `BorderSide`),
+`decoration` и `blur`.
 
 #### Стиль пунктов
 
@@ -1484,7 +1500,7 @@ const style = SmartContextMenuStyle(
 Отступы, подсветка нажатия и размер иконки берутся из стиля меню, а под пунктом «Назад» всегда
 есть линия.
 
-Автоматическая заливка берёт `menuColor` на Standard и оттенок стекла с непрозрачностью 14%
+Автоматическая заливка берёт `standardStyle.color` на Standard и оттенок стекла с непрозрачностью 14%
 на Liquid Glass. Если задан только `backgroundColor`, сохраняются форма, разделитель и
 размытие строки, включая анимацию размытия при прокрутке на Glass. В `copyWith` аргумент
 `null` сохраняет текущий цвет. Чтобы вернуть автоматическую заливку, создайте новый

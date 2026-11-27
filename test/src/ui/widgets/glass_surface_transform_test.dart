@@ -77,7 +77,7 @@ void main() {
                   borderRadius: const BorderRadius.all(Radius.circular(20)),
                   shadows: const [],
                   style: SmartContextMenuGlassStyle(
-                    tint: const Color(0x80FFFFFF),
+                    color: const Color(0x80FFFFFF),
                     border: border,
                   ),
                   child: const Text('Content'),

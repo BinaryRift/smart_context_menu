@@ -47,7 +47,7 @@ void main() {
     await tester.openSubmenu();
   }
 
-  testWidgets('uses menuColor and the border radius by default', (
+  testWidgets('uses the Standard panel color and the Back radius by default', (
     tester,
   ) async {
     const color = Color(0xFF123456);
@@ -55,7 +55,7 @@ void main() {
     await openSubmenu(
       tester,
       const SmartContextMenuStyle(
-        menuColor: color,
+        standardStyle: SmartContextMenuStandardStyle(color: color),
         backButtonStyle: SmartContextMenuBackButtonStyle(borderRadius: radius),
       ),
     );
@@ -112,7 +112,7 @@ void main() {
     await openSubmenu(
       tester,
       const SmartContextMenuStyle(
-        menuColor: Color(0xFFABCDEF),
+        standardStyle: SmartContextMenuStandardStyle(color: Color(0xFFABCDEF)),
         backButtonStyle: SmartContextMenuBackButtonStyle(
           backgroundColor: Color(0xFFAABBCC),
           borderRadius: BorderRadius.zero,

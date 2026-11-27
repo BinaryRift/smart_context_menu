@@ -85,7 +85,7 @@ void main() {
       darkColor: Color(0x9933FF99),
     );
     const style = SmartContextMenuGlassStyle(
-      tint: tint,
+      color: tint,
       blur: SmartContextMenuBlur(5),
       refraction: 2,
       edgeHighlight: 0,
@@ -95,7 +95,8 @@ void main() {
         strokeAlign: BorderSide.strokeAlignCenter,
       ),
     );
-    const surface = SmartContextMenuSurface.glass(style);
+    const glass = SmartContextMenuStyle(glassStyle: style);
+    final standard = glass.copyWith(surface: SmartContextMenuSurface.standard);
     final program = await tester.runAsync(
       () => FragmentProgram.fromAsset(_shaderAsset),
     );
@@ -116,34 +117,20 @@ void main() {
     );
     final anchor = tester.element(find.byType(SizedBox));
 
-    expect(shader.select(surface, anchor, highContrast: true), isNull);
-    expect(
-      shader.select(
-        SmartContextMenuSurface.standard,
-        anchor,
-        highContrast: false,
-      ),
-      isNull,
-    );
+    expect(shader.select(glass, anchor, highContrast: true), isNull);
+    expect(shader.select(standard, anchor, highContrast: false), isNull);
     expect(loadCount, 0);
 
-    expect(shader.select(surface, anchor, highContrast: false), isNull);
+    expect(shader.select(glass, anchor, highContrast: false), isNull);
     final ready = shader.prepare();
     load.complete(program!);
     await ready;
 
-    expect(shader.select(surface, anchor, highContrast: true), isNull);
-    expect(
-      shader.select(
-        SmartContextMenuSurface.standard,
-        anchor,
-        highContrast: false,
-      ),
-      isNull,
-    );
-    final selected = shader.select(surface, anchor, highContrast: false)!;
+    expect(shader.select(glass, anchor, highContrast: true), isNull);
+    expect(shader.select(standard, anchor, highContrast: false), isNull);
+    final selected = shader.select(glass, anchor, highContrast: false)!;
     expect(selected.program, same(program));
-    expect(selected.style.tint, isSameColorAs(tint.darkColor));
+    expect(selected.style.color, isSameColorAs(tint.darkColor));
     expect(selected.style.blur, same(style.blur));
     expect(selected.style.refraction, style.refraction);
     expect(selected.style.edgeHighlight, style.edgeHighlight);

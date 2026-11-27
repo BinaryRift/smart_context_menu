@@ -68,7 +68,7 @@ void main() {
     expect(config().enableSwipeBack, isFalse);
     expect(config().moveBackDown, isTrue);
     // The base config of the app stays.
-    expect(config().style.menuBlur, SmartContextMenuBlur.small);
+    expect(config().style.standardStyle.blur, SmartContextMenuBlur.small);
   });
 
   testWidgets('Show touches draws a circle under the finger', (tester) async {

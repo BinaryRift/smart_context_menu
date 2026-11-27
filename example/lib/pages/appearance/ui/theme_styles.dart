@@ -8,8 +8,10 @@ import 'package:smart_context_menu/smart_context_menu.dart';
 /// without blur.
 const indigoStyle = SmartContextMenuStyle(
   surface: SmartContextMenuSurface.standard,
-  menuColor: Color(0xFF4338CA),
-  borderColor: Color(0x00000000),
+  standardStyle: SmartContextMenuStandardStyle(
+    color: Color(0xFF4338CA),
+    border: BorderSide.none,
+  ),
   borderRadius: BorderRadius.all(Radius.circular(20)),
   backgroundColor: Color(0x6614133D),
   backgroundBlur: null,
@@ -29,19 +31,18 @@ const _terminalGreen = Color(0xFF33FF99);
 
 /// A dark terminal with monospaced green text and a green glow in both themes.
 const terminalStyle = SmartContextMenuStyle(
-  surface: SmartContextMenuSurface.glass(
-    SmartContextMenuGlassStyle(
-      tint: CupertinoDynamicColor.withBrightness(
-        color: Color(0x800D0D0D),
-        darkColor: Color(0x400D0D0D),
-      ),
-      edgeHighlight: 0.35,
-      border: BorderSide(color: Color(0x6633FF99)),
+  glassStyle: SmartContextMenuGlassStyle(
+    color: CupertinoDynamicColor.withBrightness(
+      color: Color(0x800D0D0D),
+      darkColor: Color(0x400D0D0D),
     ),
+    edgeHighlight: 0.35,
+    border: BorderSide(color: Color(0x6633FF99)),
   ),
-  // Standard uses these colors when the glass filter is unavailable.
-  menuColor: Color(0xFF0D0D0D),
-  borderColor: Color(0x333F3F3F),
+  standardStyle: SmartContextMenuStandardStyle(
+    color: Color(0xFF0D0D0D),
+    border: BorderSide(color: Color(0x333F3F3F)),
+  ),
   borderRadius: BorderRadius.all(Radius.circular(4)),
   menuShadows: [
     BoxShadow(
@@ -84,11 +85,13 @@ const tinyMenuWidth = 190.0;
 /// it, for icons in colored squares as in the Settings of iOS.
 const colorfulStyle = SmartContextMenuStyle(
   surface: SmartContextMenuSurface.standard,
-  menuColor: CupertinoDynamicColor.withBrightness(
-    color: Color(0xFFFFFFFF),
-    darkColor: Color(0xFF1C1C1E),
+  standardStyle: SmartContextMenuStandardStyle(
+    color: CupertinoDynamicColor.withBrightness(
+      color: Color(0xFFFFFFFF),
+      darkColor: Color(0xFF1C1C1E),
+    ),
+    border: BorderSide.none,
   ),
-  borderColor: Color(0x00000000),
   borderRadius: BorderRadius.all(Radius.circular(18)),
   menuShadows: [
     BoxShadow(color: Color(0x33000000), blurRadius: 40, offset: Offset(0, 16)),
@@ -108,8 +111,10 @@ const _ink = Color(0xFF4A3728);
 /// Warm paper in both themes, with a serif font.
 const paperStyle = SmartContextMenuStyle(
   surface: SmartContextMenuSurface.standard,
-  menuColor: Color(0xFFFBF3E4),
-  borderColor: Color(0x334A3728),
+  standardStyle: SmartContextMenuStandardStyle(
+    color: Color(0xFFFBF3E4),
+    border: BorderSide(color: Color(0x334A3728)),
+  ),
   borderRadius: BorderRadius.all(Radius.circular(6)),
   menuShadows: [
     BoxShadow(color: Color(0x404A3728), blurRadius: 18, offset: Offset(0, 8)),
@@ -133,16 +138,20 @@ const paperStyle = SmartContextMenuStyle(
 /// its config.
 const glowStyle = SmartContextMenuStyle(
   surface: SmartContextMenuSurface.standard,
-  menuColor: CupertinoDynamicColor.withBrightness(
-    color: Color(0xB3ECFEFF),
-    darkColor: Color(0x8C06232B),
-  ),
-  borderColor: CupertinoDynamicColor.withBrightness(
-    color: Color(0x8022D3EE),
-    darkColor: Color(0x6622D3EE),
+  standardStyle: SmartContextMenuStandardStyle(
+    color: CupertinoDynamicColor.withBrightness(
+      color: Color(0xB3ECFEFF),
+      darkColor: Color(0x8C06232B),
+    ),
+    border: BorderSide(
+      color: CupertinoDynamicColor.withBrightness(
+        color: Color(0x8022D3EE),
+        darkColor: Color(0x6622D3EE),
+      ),
+    ),
+    blur: SmartContextMenuBlur.extraStrong,
   ),
   borderRadius: BorderRadius.all(Radius.circular(22)),
-  menuBlur: SmartContextMenuBlur.extraStrong,
   menuShadows: [
     BoxShadow(color: Color(0x8022D3EE), blurRadius: 48, spreadRadius: 2),
   ],
@@ -193,13 +202,17 @@ const editingRowsSelectionColor = CupertinoDynamicColor.withBrightness(
 /// Sections for formatting and alignment above the clipboard actions.
 const editingRowsStyle = SmartContextMenuStyle(
   surface: SmartContextMenuSurface.standard,
-  menuColor: CupertinoDynamicColor.withBrightness(
-    color: Color(0xFFF9FDFA),
-    darkColor: Color(0xFF1C2A25),
-  ),
-  borderColor: CupertinoDynamicColor.withBrightness(
-    color: Color(0xFFD7E3DB),
-    darkColor: Color(0xFF40534A),
+  standardStyle: SmartContextMenuStandardStyle(
+    color: CupertinoDynamicColor.withBrightness(
+      color: Color(0xFFF9FDFA),
+      darkColor: Color(0xFF1C2A25),
+    ),
+    border: BorderSide(
+      color: CupertinoDynamicColor.withBrightness(
+        color: Color(0xFFD7E3DB),
+        darkColor: Color(0xFF40534A),
+      ),
+    ),
   ),
   borderRadius: BorderRadius.all(Radius.circular(20)),
   menuShadows: [
@@ -265,8 +278,10 @@ const _drawingToolbarLine = CupertinoDynamicColor.withBrightness(
 /// Capsules in a wide toolbar and an integrated Back row over the shapes.
 const drawingToolbarStyle = SmartContextMenuStyle(
   surface: SmartContextMenuSurface.standard,
-  menuColor: drawingToolbarSurface,
-  borderColor: _drawingToolbarLine,
+  standardStyle: SmartContextMenuStandardStyle(
+    color: drawingToolbarSurface,
+    border: BorderSide(color: _drawingToolbarLine),
+  ),
   borderRadius: BorderRadius.all(Radius.circular(20)),
   menuShadows: [
     BoxShadow(

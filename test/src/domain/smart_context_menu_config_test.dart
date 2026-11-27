@@ -31,7 +31,11 @@ void main() {
       screenPadding: EdgeInsets.all(8),
       menuGap: 4,
       moveBackDown: true,
-      style: SmartContextMenuStyle(menuBlur: SmartContextMenuBlur.small),
+      style: SmartContextMenuStyle(
+        standardStyle: SmartContextMenuStandardStyle(
+          blur: SmartContextMenuBlur.small,
+        ),
+      ),
     );
 
     final fields = <String, Object? Function(SmartContextMenuConfig)>{
@@ -49,7 +53,11 @@ void main() {
     };
 
     const labels = SmartContextMenuLabels(back: 'Back 2');
-    const style = SmartContextMenuStyle(menuBlur: SmartContextMenuBlur.strong);
+    const style = SmartContextMenuStyle(
+      standardStyle: SmartContextMenuStandardStyle(
+        blur: SmartContextMenuBlur.strong,
+      ),
+    );
     final changes = <String, (Object, SmartContextMenuConfig Function())>{
       'labels': (labels, () => original.copyWith(labels: labels)),
       'enableHaptics': (true, () => original.copyWith(enableHaptics: true)),

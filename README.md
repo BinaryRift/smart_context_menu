@@ -1180,7 +1180,9 @@ SmartContextMenu(
     activationMode: SmartContextMenuActivationMode.manual,
     style: theme.style.copyWith(
       surface: SmartContextMenuSurface.standard,
-      menuBlur: SmartContextMenuBlur.small,
+      standardStyle: theme.style.standardStyle.copyWith(
+        blur: SmartContextMenuBlur.small,
+      ),
     ),
   ),
   controller: controller,
@@ -1249,7 +1251,9 @@ builder: (context, child) => CupertinoUiCompatibilityBridge(
     config: SmartContextMenuConfig(
       style: SmartContextMenuStyle(
         surface: SmartContextMenuSurface.standard,
-        menuColor: CupertinoDynamicColor.resolve(brandMenuColor, context),
+        standardStyle: SmartContextMenuStandardStyle(
+          color: CupertinoDynamicColor.resolve(brandMenuColor, context),
+        ),
       ),
     ),
     child: child!,
@@ -1286,7 +1290,7 @@ The Back item, the loading, error and empty items, and rows have their own parts
 ```dart
 const menuStyle = SmartContextMenuStyle(
   surface: SmartContextMenuSurface.standard,
-  menuBlur: SmartContextMenuBlur.small,
+  standardStyle: SmartContextMenuStandardStyle(blur: SmartContextMenuBlur.small),
   backgroundColor: CupertinoDynamicColor.withBrightness(
     color: Color(0x21000000),
     darkColor: Color(0x33000000),
@@ -1303,8 +1307,9 @@ above uses the backdrop settings from the Lab's **Half dimming + blur** preset. 
 
 `menuShadows` replaces the default shadows under the menu; pass an empty list to remove them.
 
-`menuDecoration` replaces the standard panel's default background and border. The pinned Back
-item has its own style. On Standard, its default fill is `menuColor` and its shape comes from
+`standardStyle.decoration` replaces the standard panel's default fill, border and edge highlight.
+It also clips the panel contents. The pinned Back item has its own style. On Standard, its
+default fill is `standardStyle.color` and its shape comes from
 `backButtonStyle.borderRadius`. Use `backButtonStyle.decoration` to give it a custom shape and
 background. That shape also clips its blur. A transparent decoration lets the menu gradient
 and blurred scrolling items show through.
@@ -1312,12 +1317,14 @@ and blurred scrolling items show through.
 ```dart
 const style = SmartContextMenuStyle(
   surface: SmartContextMenuSurface.standard,
-  menuDecoration: BoxDecoration(
-    borderRadius: BorderRadius.all(Radius.circular(16)),
-    gradient: LinearGradient(
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      colors: [Color(0xFF3634A3), Color(0xFF18165F)],
+  standardStyle: SmartContextMenuStandardStyle(
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.all(Radius.circular(16)),
+      gradient: LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [Color(0xFF3634A3), Color(0xFF18165F)],
+      ),
     ),
   ),
   backButtonStyle: SmartContextMenuBackButtonStyle(
@@ -1342,26 +1349,35 @@ that support shader filters. The menu uses Standard if the shader is unavailable
 anchor requests high contrast. To use Standard everywhere, set `surface: SmartContextMenuSurface.standard`.
 
 ```dart
-const glassStyle = SmartContextMenuStyle(
-  surface: SmartContextMenuSurface.glass(
-    SmartContextMenuGlassStyle(
-      tint: Color(0x90E1F5FE),
-      blur: SmartContextMenuBlur(5),
-      refraction: 1.2,
-      edgeHighlight: 0.8,
-      border: BorderSide(color: Color(0x90388AA0), width: 1.5),
-    ),
+const style = SmartContextMenuStyle(
+  glassStyle: SmartContextMenuGlassStyle(
+    color: Color(0x90E1F5FE),
+    blur: SmartContextMenuBlur(5),
+    refraction: 1.2,
+    edgeHighlight: 0.8,
+    border: BorderSide(color: Color(0x90388AA0), width: 1.5),
+  ),
+  standardStyle: SmartContextMenuStandardStyle(
+    color: Color(0xFFE1F5FE),
+    border: BorderSide(color: Color(0x90388AA0), width: 1.5),
   ),
 );
 ```
 
 The glass blur defaults to `SmartContextMenuBlur(2)`. Use `SmartContextMenuBlur.none` to disable
-it. The tint's alpha sets its opacity. The multipliers for refraction and the edge highlight
-default to `1`. Use `0` to turn either effect off. Set `SmartContextMenuGlassStyle.border` to
-choose the border color, width and stroke alignment. It defaults to `BorderSide.none`.
-`menuColor`, `borderColor`, `menuDecoration`, `menuBlur` and
-`showEdgeHighlight` style Standard, including when Glass falls back to it. `backgroundColor`
-and `backgroundBlur` apply to both surfaces.
+it. The color's alpha sets the tint opacity. The multipliers for refraction and the edge
+highlight default to `1`. Use `0` to turn either effect off.
+
+Both styles use `BorderSide` for the border color, width and stroke alignment. Glass defaults
+to `BorderSide.none`. Standard defaults to a border one logical pixel wide and has a
+`showEdgeHighlight` switch.
+The menu's `borderRadius` sets the corner radius for both built-in surfaces. Each style's
+`blur` applies within the menu outline. Standard defaults to no local blur.
+`backgroundBlur` blurs the whole screen behind either surface.
+
+`standardStyle` also supplies the look when Glass falls back to Standard. The deprecated
+`menuColor`, `borderColor`, `menuDecoration` and `menuBlur` still configure Standard.
+Use `standardStyle.color`, `border` (a `BorderSide`), `decoration` and `blur` to migrate.
 
 #### Item style
 
@@ -1478,7 +1494,7 @@ Back item pinned to the top of a submenu:
 The padding, the press highlight and the icon size come from the menu style, and a line is
 always drawn below the Back item.
 
-The automatic fill uses `menuColor` on Standard and the glass tint at 14% opacity on Liquid
+The automatic fill uses `standardStyle.color` on Standard and the glass tint at 14% opacity on Liquid
 Glass. Setting just `backgroundColor` keeps the row's usual shape, divider and blur, including
 the scroll-driven blur animation on Glass. Passing `null` to `copyWith` keeps the current color.
 Create a new `SmartContextMenuBackButtonStyle` without `backgroundColor` to return to the automatic fill.
