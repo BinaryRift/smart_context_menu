@@ -43,6 +43,8 @@
 - **Открытие по кнопке или из кода**: любой виджет внутри обёрнутого, например кнопка,
   открывает и закрывает его меню через `SmartContextMenu.of(context)`, без контроллера.
   `SmartContextMenuController` делает то же самое откуда угодно ещё, а жесты можно отключить.
+- **Liquid Glass** — поверхность по умолчанию. Если движок не поддерживает эффект стекла
+  или включена высокая контрастность, меню открывается в Standard.
 
 **Анимации**
 
@@ -127,6 +129,7 @@
     - [Локализация](#локализация)
     - [Приложения на `cupertino_ui`](#приложения-на-cupertino_ui)
   - [Внешний вид](#внешний-вид)
+    - [Liquid Glass](#liquid-glass)
     - [Стиль пунктов](#стиль-пунктов)
     - [Линии между пунктами](#линии-между-пунктами)
     - [Стиль пункта «Назад»](#стиль-пункта-назад)
@@ -1179,7 +1182,10 @@ final theme = SmartContextMenuTheme.of(context);
 SmartContextMenu(
   config: theme.copyWith(
     activationMode: SmartContextMenuActivationMode.manual,
-    style: theme.style.copyWith(menuBlur: SmartContextMenuBlur.small),
+    style: theme.style.copyWith(
+      surface: SmartContextMenuSurface.standard,
+      menuBlur: SmartContextMenuBlur.small,
+    ),
   ),
   controller: controller,
   items: items,
@@ -1246,6 +1252,7 @@ builder: (context, child) => CupertinoUiCompatibilityBridge(
   child: SmartContextMenuTheme(
     config: SmartContextMenuConfig(
       style: SmartContextMenuStyle(
+        surface: SmartContextMenuSurface.standard,
         menuColor: CupertinoDynamicColor.resolve(brandMenuColor, context),
       ),
     ),
@@ -1282,6 +1289,7 @@ builder: (context, child) => CupertinoUiCompatibilityBridge(
 
 ```dart
 const menuStyle = SmartContextMenuStyle(
+  surface: SmartContextMenuSurface.standard,
   menuBlur: SmartContextMenuBlur.small,
   backgroundColor: CupertinoDynamicColor.withBrightness(
     color: Color(0x21000000),
@@ -1299,13 +1307,15 @@ const menuStyle = SmartContextMenuStyle(
 
 `menuShadows` заменяет стандартные тени под меню; чтобы убрать тени, передайте пустой список.
 
-`menuDecoration` заменяет стандартный фон и рамку меню. Закреплённый пункт «Назад» не наследует
-её: по умолчанию он использует `menuColor` и `borderRadius` из `backButtonStyle`. Поле
-`decoration` там же задаёт ему отдельный фон. Форма декорации обрезает и размытие пункта
-«Назад»; прозрачная декорация позволяет видеть градиент меню и размытые прокручиваемые пункты:
+`menuDecoration` заменяет фон и рамку Standard. У закреплённого пункта «Назад» свой стиль.
+На Standard он по умолчанию использует заливку `menuColor` и форму из
+`backButtonStyle.borderRadius`. Для собственной формы и фона задайте `backButtonStyle.decoration`.
+Форма декорации обрезает и размытие пункта «Назад». Прозрачная декорация позволяет видеть
+градиент меню и размытые прокручиваемые пункты.
 
 ```dart
 const style = SmartContextMenuStyle(
+  surface: SmartContextMenuSurface.standard,
   menuDecoration: BoxDecoration(
     borderRadius: BorderRadius.all(Radius.circular(16)),
     gradient: LinearGradient(
@@ -1328,6 +1338,36 @@ const style = SmartContextMenuStyle(
 `borderRadius` из `backButtonStyle` действует только без `decoration`.
 
 [↑ К содержанию](#содержание)
+
+#### Liquid Glass
+
+Поверхность по умолчанию размывает и преломляет фон внутри меню на движках Impeller с поддержкой
+шейдерных фильтров.
+При недоступном шейдере или высокой контрастности в месте открытия меню используется Standard.
+Чтобы всегда открывать Standard, задайте `surface: SmartContextMenuSurface.standard`.
+
+```dart
+const glassStyle = SmartContextMenuStyle(
+  surface: SmartContextMenuSurface.glass(
+    SmartContextMenuGlassStyle(
+      tint: Color(0x90E1F5FE),
+      blur: SmartContextMenuBlur(5),
+      refraction: 1.2,
+      edgeHighlight: 0.8,
+      border: BorderSide(color: Color(0x90388AA0), width: 1.5),
+    ),
+  ),
+);
+```
+
+По умолчанию стекло использует `SmartContextMenuBlur(2)`. Чтобы отключить локальное размытие,
+задайте `SmartContextMenuBlur.none`. Альфа оттенка задаёт его непрозрачность. Множители
+преломления и блика по умолчанию равны `1`. Значение `0` отключает соответствующий эффект.
+`SmartContextMenuGlassStyle.border` задаёт цвет, толщину и положение обводки относительно края.
+По умолчанию используется `BorderSide.none`.
+`menuColor`, `borderColor`, `menuDecoration`, `menuBlur` и
+`showEdgeHighlight` оформляют Standard, в том числе при переключении с Glass на Standard.
+`backgroundColor` и `backgroundBlur` действуют на обе поверхности.
 
 #### Стиль пунктов
 
@@ -1433,7 +1473,8 @@ const style = SmartContextMenuStyle(
 
 | Поле | Что делает | По умолчанию |
 | --- | --- | --- |
-| `decoration` | Фон пункта «Назад». Его форма обрезает и размытие. | `null`: `menuColor` и `borderRadius` |
+| `decoration` | Переопределяет `backgroundColor` и `borderRadius`. Её форма обрезает и размытие. | `null` |
+| `backgroundColor` | Заливка пункта «Назад» с указанной прозрачностью. | `null`, заливку задаёт поверхность |
 | `blur` | Размытие пунктов подменю, которые прокручиваются под «Назад»; `null` выключает его. | `SmartContextMenuBlur.strong` |
 | `borderRadius` | Углы стандартного фона; с `decoration` не действует. | 16 px сверху |
 | `foregroundColor` | Цвет текста и иконки. | `null`: цвета меню |
@@ -1443,9 +1484,16 @@ const style = SmartContextMenuStyle(
 Отступы, подсветка нажатия и размер иконки берутся из стиля меню, а под пунктом «Назад» всегда
 есть линия.
 
+Автоматическая заливка берёт `menuColor` на Standard и оттенок стекла с непрозрачностью 14%
+на Liquid Glass. Если задан только `backgroundColor`, сохраняются форма, разделитель и
+размытие строки, включая анимацию размытия при прокрутке на Glass. В `copyWith` аргумент
+`null` сохраняет текущий цвет. Чтобы вернуть автоматическую заливку, создайте новый
+`SmartContextMenuBackButtonStyle` без `backgroundColor`.
+
 ```dart
 const style = SmartContextMenuStyle(
   backButtonStyle: SmartContextMenuBackButtonStyle(
+    backgroundColor: Color(0x330A84FF),
     foregroundColor: Color(0xFF0A84FF),
     icon: Icons.arrow_back_ios_new,
   ),

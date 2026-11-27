@@ -43,6 +43,8 @@ Requires Flutter 3.32 or later (Dart 3.8). **[Get started →](#getting-started)
   a button, opens and closes its menu with `SmartContextMenu.of(context)`, no controller
   needed. A `SmartContextMenuController` does the same from anywhere else, and the
   gestures can be turned off.
+- **Liquid Glass** is the default surface. The menu uses Standard where the renderer
+  cannot run the glass effect or high contrast is enabled.
 
 **Motion**
 
@@ -126,6 +128,7 @@ styles and a lab of edge cases.
     - [Localization](#localization)
     - [Apps on `cupertino_ui`](#apps-on-cupertino_ui)
   - [Appearance](#appearance)
+    - [Liquid Glass](#liquid-glass)
     - [Item style](#item-style)
     - [Dividers](#dividers)
     - [Back item style](#back-item-style)
@@ -1175,7 +1178,10 @@ final theme = SmartContextMenuTheme.of(context);
 SmartContextMenu(
   config: theme.copyWith(
     activationMode: SmartContextMenuActivationMode.manual,
-    style: theme.style.copyWith(menuBlur: SmartContextMenuBlur.small),
+    style: theme.style.copyWith(
+      surface: SmartContextMenuSurface.standard,
+      menuBlur: SmartContextMenuBlur.small,
+    ),
   ),
   controller: controller,
   items: items,
@@ -1242,6 +1248,7 @@ builder: (context, child) => CupertinoUiCompatibilityBridge(
   child: SmartContextMenuTheme(
     config: SmartContextMenuConfig(
       style: SmartContextMenuStyle(
+        surface: SmartContextMenuSurface.standard,
         menuColor: CupertinoDynamicColor.resolve(brandMenuColor, context),
       ),
     ),
@@ -1278,6 +1285,7 @@ The Back item, the loading, error and empty items, and rows have their own parts
 
 ```dart
 const menuStyle = SmartContextMenuStyle(
+  surface: SmartContextMenuSurface.standard,
   menuBlur: SmartContextMenuBlur.small,
   backgroundColor: CupertinoDynamicColor.withBrightness(
     color: Color(0x21000000),
@@ -1295,14 +1303,15 @@ above uses the backdrop settings from the Lab's **Half dimming + blur** preset. 
 
 `menuShadows` replaces the default shadows under the menu; pass an empty list to remove them.
 
-`menuDecoration` replaces the menu's default background and border. The pinned Back item does
-not inherit it: by default, that item uses `menuColor` and the `borderRadius` of
-`backButtonStyle`. Its `decoration` gives the Back item its own background. The decoration's
-shape also clips the blur of the Back item; a transparent decoration lets the menu gradient and
-blurred scrolling items show through:
+`menuDecoration` replaces the standard panel's default background and border. The pinned Back
+item has its own style. On Standard, its default fill is `menuColor` and its shape comes from
+`backButtonStyle.borderRadius`. Use `backButtonStyle.decoration` to give it a custom shape and
+background. That shape also clips its blur. A transparent decoration lets the menu gradient
+and blurred scrolling items show through.
 
 ```dart
 const style = SmartContextMenuStyle(
+  surface: SmartContextMenuSurface.standard,
   menuDecoration: BoxDecoration(
     borderRadius: BorderRadius.all(Radius.circular(16)),
     gradient: LinearGradient(
@@ -1325,6 +1334,34 @@ translucent color if the scrolling items show through too strongly. Its border r
 the clip; the `borderRadius` of `backButtonStyle` applies only without a `decoration`.
 
 [↑ Back to contents](#contents)
+
+#### Liquid Glass
+
+The default surface blurs and refracts the backdrop inside the menu on Impeller renderers
+that support shader filters. The menu uses Standard if the shader is unavailable or the menu's
+anchor requests high contrast. To use Standard everywhere, set `surface: SmartContextMenuSurface.standard`.
+
+```dart
+const glassStyle = SmartContextMenuStyle(
+  surface: SmartContextMenuSurface.glass(
+    SmartContextMenuGlassStyle(
+      tint: Color(0x90E1F5FE),
+      blur: SmartContextMenuBlur(5),
+      refraction: 1.2,
+      edgeHighlight: 0.8,
+      border: BorderSide(color: Color(0x90388AA0), width: 1.5),
+    ),
+  ),
+);
+```
+
+The glass blur defaults to `SmartContextMenuBlur(2)`. Use `SmartContextMenuBlur.none` to disable
+it. The tint's alpha sets its opacity. The multipliers for refraction and the edge highlight
+default to `1`. Use `0` to turn either effect off. Set `SmartContextMenuGlassStyle.border` to
+choose the border color, width and stroke alignment. It defaults to `BorderSide.none`.
+`menuColor`, `borderColor`, `menuDecoration`, `menuBlur` and
+`showEdgeHighlight` style Standard, including when Glass falls back to it. `backgroundColor`
+and `backgroundBlur` apply to both surfaces.
 
 #### Item style
 
@@ -1430,7 +1467,8 @@ Back item pinned to the top of a submenu:
 
 | Field | What it does | Default |
 | --- | --- | --- |
-| `decoration` | The background of the Back item. Its shape also clips the blur. | `null`: `menuColor` with `borderRadius` |
+| `decoration` | Overrides `backgroundColor` and `borderRadius`. Its shape also clips the blur. | `null` |
+| `backgroundColor` | The Back item's fill, with the alpha you supply. | `null`, fill from the surface |
 | `blur` | The blur of the submenu items that scroll under the Back item; `null` turns it off. | `SmartContextMenuBlur.strong` |
 | `borderRadius` | The corners of the default background; ignored with a `decoration`. | 16 px at the top |
 | `foregroundColor` | The color of the title and the icon. | `null`: the colors of the menu |
@@ -1440,9 +1478,15 @@ Back item pinned to the top of a submenu:
 The padding, the press highlight and the icon size come from the menu style, and a line is
 always drawn below the Back item.
 
+The automatic fill uses `menuColor` on Standard and the glass tint at 14% opacity on Liquid
+Glass. Setting just `backgroundColor` keeps the row's usual shape, divider and blur, including
+the scroll-driven blur animation on Glass. Passing `null` to `copyWith` keeps the current color.
+Create a new `SmartContextMenuBackButtonStyle` without `backgroundColor` to return to the automatic fill.
+
 ```dart
 const style = SmartContextMenuStyle(
   backButtonStyle: SmartContextMenuBackButtonStyle(
+    backgroundColor: Color(0x330A84FF),
     foregroundColor: Color(0xFF0A84FF),
     icon: Icons.arrow_back_ios_new,
   ),
