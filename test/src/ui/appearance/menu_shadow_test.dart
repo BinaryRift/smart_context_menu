@@ -1,7 +1,11 @@
+import 'dart:async' show unawaited;
+import 'dart:ui' show ImageFilter;
+
 // ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
+import 'package:smart_context_menu/src/ui/widgets/smart_context_menu_blur_box.dart';
 import 'package:smart_context_menu/src/ui/widgets/smart_context_menu_shadow_box.dart';
 
 import '../../../helpers/appearance_tester.dart';
@@ -100,5 +104,80 @@ void main() {
     await tester.openMenu();
 
     expect(shadowsOf(tester), isEmpty);
+  });
+
+  testWidgets('fades Standard shadows without fading the backdrop layer', (
+    tester,
+  ) async {
+    const blur = SmartContextMenuBlur.extraStrong;
+    const shadow = BoxShadow(color: Color(0x7322D3EE), blurRadius: 48);
+    final controller = SmartContextMenuController();
+    addTearDown(controller.dispose);
+    await tester.pumpMenu(
+      items: appearanceItems(),
+      controller: controller,
+      config: const SmartContextMenuConfig(
+        style: SmartContextMenuStyle(
+          surface: SmartContextMenuSurface.standard,
+          standardStyle: SmartContextMenuStandardStyle(blur: blur),
+          menuShadows: [shadow],
+        ),
+      ),
+    );
+
+    final blurBox = find.byType(SmartContextMenuBlurBox);
+    final backdrop = find.descendant(
+      of: blurBox,
+      matching: find.byType(BackdropFilter),
+    );
+    final shadowFade = find.descendant(
+      of: find.byType(SmartContextMenuShadowBox),
+      matching: find.byType(ColorFiltered),
+    );
+    unawaited(controller.open());
+    for (var i = 0; i < 5 && blurBox.evaluate().isEmpty; i++) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 50)),
+      );
+      await tester.pump();
+    }
+    await tester.pump(const Duration(milliseconds: 120));
+
+    final route = ModalRoute.of(tester.element(backdrop))!;
+    final openingOpacity = route.animation!.value;
+    expect(openingOpacity, allOf(greaterThan(0), lessThan(1)));
+    expect(shadowFade, findsOneWidget);
+    expect(
+      find.ancestor(of: backdrop, matching: find.byType(FadeTransition)),
+      findsNothing,
+    );
+    expect(
+      tester.widget<BackdropFilter>(backdrop).filter,
+      ImageFilter.blur(
+        sigmaX: blur.sigmaX * openingOpacity,
+        sigmaY: blur.sigmaY * openingOpacity,
+      ),
+    );
+
+    await tester.pumpAndSettle();
+    expect(shadowFade, findsNothing);
+    expect(
+      tester.widget<BackdropFilter>(backdrop).filter,
+      ImageFilter.blur(sigmaX: blur.sigmaX, sigmaY: blur.sigmaY),
+    );
+    expect(shadowsOf(tester), [shadow]);
+
+    final closed = controller.close();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    final closingOpacity = route.animation!.value;
+    expect(closingOpacity, allOf(greaterThan(0), lessThan(1)));
+    expect(shadowFade, findsOneWidget);
+    expect(
+      tester.widget<SmartContextMenuBlurBox>(blurBox).strength,
+      closingOpacity,
+    );
+    await tester.pumpAndSettle();
+    await closed;
   });
 }

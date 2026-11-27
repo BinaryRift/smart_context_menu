@@ -35,28 +35,12 @@ final class SmartContextMenuGlassSurface extends StatelessWidget {
     return Stack(
       children: [
         Positioned.fill(
-          child: AnimatedBuilder(
-            animation: opacity,
-            builder: (context, shadow) {
-              final alpha = opacity.value.clamp(0.0, 1.0);
-              if (alpha == 0) return const SizedBox.expand();
-              if (alpha == 1) return shadow!;
-
-              // Impeller's blurred rrect cannot accept inherited opacity.
-              return ColorFiltered(
-                colorFilter: ui.ColorFilter.mode(
-                  const Color(0xFFFFFFFF).withValues(alpha: alpha),
-                  BlendMode.dstIn,
-                ),
-                child: shadow,
-              );
-            },
-            child: LayoutBuilder(
-              builder: (context, constraints) => SmartContextMenuShadowBox(
-                borderRadius: clipper.radiusFor(constraints.biggest),
-                shadows: shadows,
-                child: const SizedBox.expand(),
-              ),
+          child: LayoutBuilder(
+            builder: (context, constraints) => SmartContextMenuShadowBox(
+              borderRadius: clipper.radiusFor(constraints.biggest),
+              shadows: shadows,
+              opacity: opacity,
+              child: const SizedBox.expand(),
             ),
           ),
         ),

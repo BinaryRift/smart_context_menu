@@ -31,7 +31,7 @@ final class SmartContextMenuView extends StatefulWidget {
   final ValueNotifier<double> heightNotifier;
   final ValueNotifier<Offset> previewMotionNotifier;
   final SmartContextMenuResolvedGlass? glass;
-  final Animation<double> glassOpacity;
+  final Animation<double> opacity;
 
   const SmartContextMenuView({
     super.key,
@@ -40,7 +40,7 @@ final class SmartContextMenuView extends StatefulWidget {
     required this.heightNotifier,
     required this.previewMotionNotifier,
     this.glass,
-    required this.glassOpacity,
+    required this.opacity,
   });
 
   @override
@@ -140,21 +140,21 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
     final style = _config.style;
     final standard = style.standardStyle;
     final decoration = standard.decoration;
-    Widget surface = SmartContextMenuBlurBox(
-      blur: standard.blur,
-      borderRadius: style.borderRadius,
-      child: Container(
-        width: _config.menuWidth,
-        decoration:
-            decoration ??
-            BoxDecoration(
-              color: CupertinoDynamicColor.resolve(standard.color, context),
-              borderRadius: style.borderRadius,
-            ),
-        clipBehavior: Clip.antiAlias,
-        child: levels,
-      ),
+    final blur = standard.blur;
+    Widget surface = Container(
+      width: _config.menuWidth,
+      decoration:
+          decoration ??
+          BoxDecoration(
+            color: CupertinoDynamicColor.resolve(standard.color, context),
+            borderRadius: style.borderRadius,
+          ),
+      clipBehavior: Clip.antiAlias,
+      child: levels,
     );
+    if (blur != null) {
+      surface = ClipRRect(borderRadius: style.borderRadius, child: surface);
+    }
     if (decoration == null && standard.border.style != BorderStyle.none) {
       final border = standard.border.copyWith(
         color: CupertinoDynamicColor.resolve(standard.border.color, context),
@@ -183,10 +183,44 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
         }
       }
     }
-    return SmartContextMenuShadowBox(
-      borderRadius: style.borderRadius,
-      shadows: style.menuShadows,
-      child: surface,
+    final opacity = widget.opacity;
+    if (blur == null) {
+      return FadeTransition(
+        opacity: opacity,
+        child: SmartContextMenuShadowBox(
+          borderRadius: style.borderRadius,
+          shadows: style.menuShadows,
+          child: surface,
+        ),
+      );
+    }
+
+    // Keep the backdrop outside the fade's temporary buffer so it samples
+    // the same scene throughout the transition.
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: SmartContextMenuShadowBox(
+            borderRadius: style.borderRadius,
+            shadows: style.menuShadows,
+            opacity: opacity,
+            child: const SizedBox.expand(),
+          ),
+        ),
+        Positioned.fill(
+          child: AnimatedBuilder(
+            animation: opacity,
+            child: const SizedBox.expand(),
+            builder: (context, child) => SmartContextMenuBlurBox(
+              blur: blur,
+              borderRadius: style.borderRadius,
+              strength: opacity.value,
+              child: child!,
+            ),
+          ),
+        ),
+        FadeTransition(opacity: opacity, child: surface),
+      ],
     );
   }
 
@@ -198,7 +232,7 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
       width: _config.menuWidth,
       child: SmartContextMenuGlassSurface(
         program: glass.program,
-        opacity: widget.glassOpacity,
+        opacity: widget.opacity,
         borderRadius: _config.style.borderRadius,
         shadows: _config.style.menuShadows,
         style: glass.style,

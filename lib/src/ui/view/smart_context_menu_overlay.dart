@@ -280,7 +280,7 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
           heightNotifier: _currentMenuHeight,
           previewMotionNotifier: _previewMotion,
           glass: glass,
-          glassOpacity: widget.routeAnimation,
+          opacity: widget.routeAnimation,
         ),
       ),
     );
@@ -289,9 +289,7 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
       child: ScaleTransition(
         alignment: Alignment.center,
         scale: _menuAnimation,
-        child: glass == null
-            ? FadeTransition(opacity: widget.routeAnimation, child: menu)
-            : menu,
+        child: menu,
       ),
     );
   }

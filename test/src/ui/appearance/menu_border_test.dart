@@ -67,14 +67,21 @@ void main() {
       (outline.decoration as BoxDecoration).border,
       Border.fromBorderSide(border),
     );
-    expect(outline.child, isA<SmartContextMenuBlurBox>());
+    expect(outline.child, isA<ClipRRect>());
+    final blurBox = find.byType(SmartContextMenuBlurBox);
     expect(
-      outline.child,
-      isA<SmartContextMenuBlurBox>().having(
-        (widget) => widget.blur,
-        'blur',
-        SmartContextMenuBlur.small,
+      tester.widget<SmartContextMenuBlurBox>(blurBox).blur,
+      SmartContextMenuBlur.small,
+    );
+    final stack = tester
+        .element(blurBox)
+        .findAncestorWidgetOfExactType<Stack>()!;
+    expect(
+      find.descendant(
+        of: find.byWidget(stack.children.last),
+        matching: find.byWidget(outline),
       ),
+      findsOneWidget,
     );
     final painter = tester.widget<CustomPaint>(highlight).foregroundPainter;
     expect((painter! as SmartContextMenuHighlightPainter).border, border);
