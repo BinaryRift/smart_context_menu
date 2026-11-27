@@ -4,9 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show CircularProgressIndicator;
 import 'package:smart_context_menu/smart_context_menu.dart';
 
-/// Brand colors with white text and rounder corners, without blur: the
-/// screen behind the menu is only dimmed with a dark shade of the brand
-/// color.
+/// Indigo with white text, rounder corners and a dimmed backdrop.
 const brandStyle = SmartContextMenuStyle(
   surface: SmartContextMenuSurface.standard,
   backgroundColor: CupertinoDynamicColor.withBrightness(
@@ -15,45 +13,15 @@ const brandStyle = SmartContextMenuStyle(
   ),
   backgroundBlur: null,
   standardStyle: SmartContextMenuStandardStyle(
-    color: Color(0xFF3634A3),
+    color: Color(0xFF4338CA),
     border: BorderSide.none,
   ),
   borderRadius: BorderRadius.all(Radius.circular(20)),
   titleStyle: TextStyle(fontSize: 17, color: CupertinoColors.white),
   disabledForegroundColor: Color(0x80FFFFFF),
-  destructiveColor: Color(0xFFFF6961),
+  destructiveColor: Color(0xFFFF8A8A),
   highlightColor: Color(0x33FFFFFF),
   separatorColor: Color(0x33FFFFFF),
-);
-
-/// An opaque menu: its color hides what is behind it, so it needs no blur.
-///
-/// The back item of a submenu uses the same color, so it blends into the menu.
-const solidStyle = SmartContextMenuStyle(
-  surface: SmartContextMenuSurface.standard,
-  standardStyle: SmartContextMenuStandardStyle(
-    color: CupertinoDynamicColor.withBrightness(
-      color: Color(0xFFF7F7F9),
-      darkColor: Color(0xFF2C2C2E),
-    ),
-  ),
-);
-
-/// Smaller text and tighter items; the menu is narrower in its config.
-const compactStyle = SmartContextMenuStyle(
-  itemPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-  itemChildrenGap: 8,
-  titleStyle: TextStyle(fontSize: 15),
-  defaultIconSize: 16,
-);
-
-const compactMenuWidth = 200.0;
-
-/// Thin lines between items that start under the titles, as in the lists
-/// of iOS: the item padding of 16, the icon of 24 and the gap of 12.
-const dividersStyle = SmartContextMenuStyle(
-  dividersBetweenItems: true,
-  dividerIndent: 52,
 );
 
 /// Thin lines between items with the same space on both sides.

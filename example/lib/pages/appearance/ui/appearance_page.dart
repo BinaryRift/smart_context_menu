@@ -11,11 +11,9 @@ import '../domain/theme_items.dart';
 import 'appearance_styles.dart';
 import 'theme_styles.dart';
 
-/// Cards with menus of different looks, one preset each: styles of the
-/// whole menu, rows of compact cells, then whole themes made of both.
+/// Preset cards for menu styles, row layouts and customization.
 ///
-/// Every card has its own [SmartContextMenuTheme] built from the config of
-/// the app, so the settings of the app apply to all of them.
+/// Each card builds its [SmartContextMenuTheme] from the app configuration.
 final class AppearancePage extends StatefulWidget {
   const AppearancePage({super.key});
 
@@ -63,31 +61,13 @@ final class _AppearancePageState extends State<AppearancePage> {
               items: sampleItems(_loader),
             ),
             _buildPreset(
-              title: 'Brand',
-              subtitle: 'Own colors and corners, no blur',
-              config: (app) => app.copyWith(style: brandStyle),
-              items: sampleItems(_loader),
-            ),
-            _buildPreset(
-              title: 'Solid',
-              subtitle: 'An opaque menu',
-              config: (app) => app.copyWith(style: solidStyle),
-              items: sampleItems(_loader),
-            ),
-            _buildPreset(
               title: 'Compact',
-              subtitle: 'Smaller text, tighter items, a narrower menu',
+              subtitle: 'Five small cells in a narrow menu',
               config: (app) => app.copyWith(
                 menuWidth: compactMenuWidth,
                 style: compactStyle,
               ),
-              items: sampleItems(_loader),
-            ),
-            _buildPreset(
-              title: 'Dividers',
-              subtitle: 'Lines between items, under the titles',
-              config: (app) => app.copyWith(style: dividersStyle),
-              items: sampleItems(_loader),
+              items: compactItems(),
             ),
             _buildPreset(
               title: 'Inset dividers',
@@ -96,25 +76,29 @@ final class _AppearancePageState extends State<AppearancePage> {
               items: sampleItems(_loader),
             ),
             _buildPreset(
-              title: 'Custom content',
-              subtitle: 'Own rows, tinted items, dividers, a titled separator',
-              // Dividers on top of the style of the app, so its blur stays.
-              config: (app) => app.copyWith(
-                style: app.style.copyWith(dividersBetweenItems: true),
-              ),
-              items: customContentItems(_tagColor),
+              title: 'Colorful',
+              subtitle: 'Icons in colored squares, as in Settings',
+              config: (app) => app.copyWith(style: colorfulStyle),
+              items: colorfulItems(),
             ),
             _buildPreset(
-              title: 'Localized',
-              subtitle: 'The strings of the menu in Russian',
-              config: (app) => app.copyWith(labels: russianLabels),
-              items: russianItems(_russianLoader),
+              title: 'Brand',
+              subtitle: 'Indigo palette, rounder corners, no blur',
+              config: (app) => app.copyWith(style: brandStyle),
+              items: sampleItems(_loader),
             ),
             _buildPreset(
-              title: 'Status items',
-              subtitle: 'Own loading, error and empty signs',
-              config: (app) => app.copyWith(style: statusItemsStyle),
-              items: statusItems(_statusLoader),
+              title: 'Terminal',
+              subtitle: 'Monospaced text and a green glow',
+              config: (app) => app.copyWith(style: terminalStyle),
+              items: terminalItems(),
+            ),
+            _buildPreset(
+              title: 'Glow',
+              subtitle: 'Text only, glass tinted cyan, a glow',
+              config: (app) =>
+                  app.copyWith(menuWidth: glowMenuWidth, style: glowStyle),
+              items: glowItems(),
             ),
             _buildGroupHeader('Rows'),
             _buildPreset(
@@ -130,60 +114,10 @@ final class _AppearancePageState extends State<AppearancePage> {
               items: onlyRowItems(),
             ),
             _buildPreset(
-              title: 'Styled rows',
-              subtitle: 'Bold titles, gaps, dividers, a badge, colors',
-              config: (app) => app.copyWith(
-                style: app.style.copyWith(
-                  dividersBetweenItems: true,
-                  rowStyle: styledRowStyle,
-                ),
-              ),
-              items: styledRowItems(_rowTagColor),
-            ),
-            _buildPreset(
               title: 'Wide row',
               subtitle: 'Seven small cells in a wider menu',
               config: (app) => app.copyWith(menuWidth: wideRowMenuWidth),
               items: wideRowItems(),
-            ),
-            _buildGroupHeader('Themes'),
-            _buildPreset(
-              title: 'Indigo',
-              subtitle: 'Brand colors, a row on top, dividers',
-              config: (app) => app.copyWith(style: indigoStyle),
-              items: themeRowItems(),
-            ),
-            _buildPreset(
-              title: 'Terminal',
-              subtitle: 'Monospaced text and a green glow',
-              config: (app) => app.copyWith(style: terminalStyle),
-              items: terminalItems(),
-            ),
-            _buildPreset(
-              title: 'Tiny',
-              subtitle: 'Small cells, tight items, a narrow menu',
-              config: (app) =>
-                  app.copyWith(menuWidth: tinyMenuWidth, style: tinyStyle),
-              items: tinyItems(),
-            ),
-            _buildPreset(
-              title: 'Colorful',
-              subtitle: 'Icons in colored squares, as in Settings',
-              config: (app) => app.copyWith(style: colorfulStyle),
-              items: colorfulItems(),
-            ),
-            _buildPreset(
-              title: 'Paper',
-              subtitle: 'A serif font, warm colors, a row on top',
-              config: (app) => app.copyWith(style: paperStyle),
-              items: themeRowItems(),
-            ),
-            _buildPreset(
-              title: 'Glow',
-              subtitle: 'Text only, glass tinted cyan, a glow',
-              config: (app) =>
-                  app.copyWith(menuWidth: glowMenuWidth, style: glowStyle),
-              items: glowItems(),
             ),
             _buildPreset(
               title: 'Editing rows',
@@ -199,6 +133,44 @@ final class _AppearancePageState extends State<AppearancePage> {
                 style: drawingToolbarStyle,
               ),
               items: drawingToolbarItems(_drawingTool),
+            ),
+            _buildGroupHeader('Customization'),
+            _buildPreset(
+              title: 'Custom content',
+              subtitle: 'Own rows, tinted items, dividers, a titled separator',
+              config: (app) => app.copyWith(
+                style: app.style.copyWith(dividersBetweenItems: true),
+              ),
+              items: customContentItems(_tagColor),
+            ),
+            _buildPreset(
+              title: 'Styled rows',
+              subtitle: 'Bold titles, gaps, dividers, a badge, colors',
+              config: (app) => app.copyWith(
+                style: app.style.copyWith(
+                  dividersBetweenItems: true,
+                  rowStyle: styledRowStyle,
+                ),
+              ),
+              items: styledRowItems(_rowTagColor),
+            ),
+            _buildPreset(
+              title: 'Paper',
+              subtitle: 'Warm colors and a serif font · Standard surface',
+              config: (app) => app.copyWith(style: paperStyle),
+              items: paperItems(),
+            ),
+            _buildPreset(
+              title: 'Localized',
+              subtitle: 'The strings of the menu in Russian',
+              config: (app) => app.copyWith(labels: russianLabels),
+              items: russianItems(_russianLoader),
+            ),
+            _buildPreset(
+              title: 'Status items',
+              subtitle: 'Own loading, error and empty signs',
+              config: (app) => app.copyWith(style: statusItemsStyle),
+              items: statusItems(_statusLoader),
             ),
           ],
         ),
@@ -233,7 +205,7 @@ final class _AppearancePageState extends State<AppearancePage> {
   }) {
     final app = SmartContextMenuTheme.of(context);
     final preset = config(app);
-    // Keep presets that explicitly use Standard until they have a Glass style.
+    // A preset's explicit Standard surface takes precedence.
     final surface = app.style.surface;
     final effectiveConfig =
         surface == SmartContextMenuSurface.standard &&

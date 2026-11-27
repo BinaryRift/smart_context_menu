@@ -4,29 +4,6 @@ import 'dart:ui' as ui show BlurStyle;
 import 'package:flutter/cupertino.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
 
-/// Brand indigo with white text, dividers and bold titles in the cells,
-/// without blur.
-const indigoStyle = SmartContextMenuStyle(
-  surface: SmartContextMenuSurface.standard,
-  standardStyle: SmartContextMenuStandardStyle(
-    color: Color(0xFF4338CA),
-    border: BorderSide.none,
-  ),
-  borderRadius: BorderRadius.all(Radius.circular(20)),
-  backgroundColor: Color(0x6614133D),
-  backgroundBlur: null,
-  titleStyle: TextStyle(fontSize: 17, color: CupertinoColors.white),
-  disabledForegroundColor: Color(0x80FFFFFF),
-  destructiveColor: Color(0xFFFF8A8A),
-  highlightColor: Color(0x33FFFFFF),
-  separatorColor: Color(0x33000000),
-  dividersBetweenItems: true,
-  dividerColor: Color(0x33FFFFFF),
-  rowStyle: SmartContextMenuRowStyle(
-    titleStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-  ),
-);
-
 const _terminalGreen = Color(0xFF33FF99);
 
 /// A dark terminal with monospaced green text and a green glow in both themes.
@@ -69,7 +46,7 @@ const terminalStyle = SmartContextMenuStyle(
 
 /// Small text, tight items and dividers; the menu is narrower in its
 /// config.
-const tinyStyle = SmartContextMenuStyle(
+const compactStyle = SmartContextMenuStyle(
   borderRadius: BorderRadius.all(Radius.circular(12)),
   itemPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 7),
   itemChildrenGap: 8,
@@ -80,7 +57,7 @@ const tinyStyle = SmartContextMenuStyle(
 );
 
 /// Fits five small cells of 36.
-const tinyMenuWidth = 190.0;
+const compactMenuWidth = 190.0;
 
 /// An opaque menu with dividers under the titles and a strong blur behind
 /// it, for icons in colored squares as in the Settings of iOS.

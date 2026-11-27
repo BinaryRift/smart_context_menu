@@ -32,27 +32,23 @@ void main() {
 
   for (final (preset, item) in [
     ('Default', find.text('Copy')),
-    ('Brand', find.text('Copy')),
-    ('Solid', find.text('Copy')),
-    ('Compact', find.text('Copy')),
-    ('Dividers', find.text('Copy')),
+    ('Compact', find.text('Duplicate')),
     ('Inset dividers', find.text('Copy')),
-    ('Custom content', find.text('Organize')),
-    ('Localized', find.text('Копировать')),
-    ('Status items', find.text('Syncing')),
+    ('Colorful', find.text('Favorite')),
+    ('Brand', find.text('Copy')),
+    ('Terminal', find.text('rm -rf')),
+    ('Glow', find.text('Duplicate')),
     ('Quick actions', find.text('Copy')),
     ('Only rows', find.text('Cut')),
-    ('Styled rows', find.text('Inbox')),
     // Small cells show only their icons.
     ('Wide row', find.byIcon(CupertinoIcons.lasso)),
-    ('Indigo', find.text('Rename')),
-    ('Terminal', find.text('rm -rf')),
-    ('Tiny', find.text('Duplicate')),
-    ('Colorful', find.text('Favorite')),
-    ('Paper', find.text('Rename')),
-    ('Glow', find.text('Duplicate')),
     ('Editing rows', find.text('Cut')),
     ('Drawing toolbar', find.byIcon(CupertinoIcons.lasso)),
+    ('Custom content', find.text('Organize')),
+    ('Styled rows', find.text('Inbox')),
+    ('Paper', find.text('Rename')),
+    ('Localized', find.text('Копировать')),
+    ('Status items', find.text('Syncing')),
   ]) {
     testWidgets('$preset opens its menu', (tester) async {
       await openAppearance(tester);
@@ -95,6 +91,19 @@ void main() {
       Navigator.of(tester.element(overlay)).pop();
       await tester.pumpAndSettle();
     }
+  });
+
+  testWidgets('Paper uses Standard when the app requests Glass', (
+    tester,
+  ) async {
+    await openAppearance(tester);
+    await openPreset(tester, 'Paper');
+
+    final overlay = tester.widget<SmartContextMenuOverlay>(
+      find.byType(SmartContextMenuOverlay),
+    );
+    expect(overlay.config.style.surface, SmartContextMenuSurface.standard);
+    expect(overlay.config.style.standardStyle, same(paperStyle.standardStyle));
   });
 
   testWidgets('Localized shows the strings of the menu in Russian', (

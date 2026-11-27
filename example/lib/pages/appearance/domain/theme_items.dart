@@ -4,8 +4,8 @@ import 'package:smart_context_menu/smart_context_menu.dart';
 
 import '../../../core/ui/demo_notice.dart';
 
-/// A row of medium cells above the list, for the themes with a row.
-List<SmartContextMenuItem> themeRowItems() => [
+/// A row of medium cells above the list in the Paper preset.
+List<SmartContextMenuItem> paperItems() => [
   SmartContextMenuItem.row(
     children: [
       _action('Copy', CupertinoIcons.doc_on_doc),
@@ -59,7 +59,7 @@ List<SmartContextMenuItem> glowItems() => [
 ];
 
 /// A row of small cells, icons only, above a short list.
-List<SmartContextMenuItem> tinyItems() => [
+List<SmartContextMenuItem> compactItems() => [
   SmartContextMenuItem.row(
     size: SmartContextMenuRowSize.small,
     children: [
