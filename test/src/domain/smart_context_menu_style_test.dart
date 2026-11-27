@@ -78,6 +78,13 @@ void main() {
     expect(withoutHighlight.tint, tint);
     expect(withoutHighlight.refraction, 2);
     expect(SmartContextMenuSurface.glass(withoutHighlight), isNot(surface));
+
+    expect(copy.border, BorderSide.none);
+    const border = BorderSide(color: Color(0x6633FF99), width: 2);
+    final withBorder = copy.copyWith(border: border);
+    expect(withBorder.border, border);
+    expect(SmartContextMenuSurface.glass(withBorder), isNot(surface));
+    expect(withBorder.copyWith(border: BorderSide.none), copy);
   });
 
   group('copyWith', () {

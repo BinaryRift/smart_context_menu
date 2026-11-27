@@ -1,3 +1,5 @@
+import 'dart:ui' as ui show BlurStyle;
+
 // ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
@@ -25,14 +27,29 @@ const indigoStyle = SmartContextMenuStyle(
 
 const _terminalGreen = Color(0xFF33FF99);
 
-/// A terminal in both themes: black, a monospaced font, green text and
-/// a glowing frame with square corners.
+/// A dark terminal with monospaced green text and a green glow in both themes.
 const terminalStyle = SmartContextMenuStyle(
-  surface: SmartContextMenuSurface.standard,
-  menuColor: Color(0xFF0B0F0C),
-  borderColor: Color(0x9933FF99),
+  surface: SmartContextMenuSurface.glass(
+    SmartContextMenuGlassStyle(
+      tint: CupertinoDynamicColor.withBrightness(
+        color: Color(0x800D0D0D),
+        darkColor: Color(0x400D0D0D),
+      ),
+      edgeHighlight: 0.35,
+      border: BorderSide(color: Color(0x6633FF99)),
+    ),
+  ),
+  // Standard uses these colors when the glass filter is unavailable.
+  menuColor: Color(0xFF0D0D0D),
+  borderColor: Color(0x333F3F3F),
   borderRadius: BorderRadius.all(Radius.circular(4)),
-  menuShadows: [BoxShadow(color: Color(0x5933FF99), blurRadius: 24)],
+  menuShadows: [
+    BoxShadow(
+      color: Color(0x5933FF99),
+      blurRadius: 24,
+      blurStyle: ui.BlurStyle.outer,
+    ),
+  ],
   backgroundColor: Color(0x99000000),
   backgroundBlur: null,
   titleStyle: TextStyle(
@@ -42,8 +59,8 @@ const terminalStyle = SmartContextMenuStyle(
   ),
   disabledForegroundColor: Color(0x6633FF99),
   destructiveColor: Color(0xFFFF5F56),
-  highlightColor: Color(0x2633FF99),
-  separatorColor: Color(0x4D33FF99),
+  highlightColor: Color(0x16FFFFFF),
+  separatorColor: Color(0x29FFFFFF),
   separatorThickness: 1,
   submenuIcon: CupertinoIcons.chevron_right_2,
 );

@@ -48,7 +48,13 @@ final class SmartContextMenuGlassShader {
     if (readyProgram == null) return null;
 
     final tint = CupertinoDynamicColor.resolve(style.tint, anchorContext);
-    return (program: readyProgram, style: style.copyWith(tint: tint));
+    final border = style.border.copyWith(
+      color: CupertinoDynamicColor.resolve(style.border.color, anchorContext),
+    );
+    return (
+      program: readyProgram,
+      style: style.copyWith(tint: tint, border: border),
+    );
   }
 
   Future<void>? prepare() {

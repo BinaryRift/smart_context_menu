@@ -31,6 +31,7 @@ final class SmartContextMenuGlassSurface extends StatelessWidget {
     final clipper = SmartContextMenuGlassClipper(
       borderRadius.resolve(Directionality.of(context)),
     );
+    final border = style.border;
     return Stack(
       children: [
         Positioned.fill(
@@ -53,12 +54,28 @@ final class SmartContextMenuGlassSurface extends StatelessWidget {
           pixelRatio: View.of(context).devicePixelRatio,
           child: FadeTransition(opacity: opacity, child: child),
         ),
+        if (border.style != BorderStyle.none && border.color.a > 0)
+          Positioned.fill(
+            child: IgnorePointer(
+              child: FadeTransition(
+                opacity: opacity,
+                child: LayoutBuilder(
+                  builder: (context, constraints) => DecoratedBox(
+                    decoration: BoxDecoration(
+                      borderRadius: clipper.radiusFor(constraints.biggest),
+                      border: Border.fromBorderSide(border),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
       ],
     );
   }
 }
 
-/// The circular per-corner geometry shared by the glass filter, clip and shadow.
+/// The circular per-corner geometry shared by the glass and its decorations.
 final class SmartContextMenuGlassClipper extends CustomClipper<RRect> {
   final BorderRadius borderRadius;
 

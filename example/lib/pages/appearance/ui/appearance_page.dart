@@ -155,7 +155,7 @@ final class _AppearancePageState extends State<AppearancePage> {
             ),
             _buildPreset(
               title: 'Terminal',
-              subtitle: 'A monospaced font, a glowing frame',
+              subtitle: 'Monospaced text and a green glow',
               config: (app) => app.copyWith(style: terminalStyle),
               items: terminalItems(),
             ),

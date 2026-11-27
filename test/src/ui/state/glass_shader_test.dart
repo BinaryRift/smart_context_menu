@@ -73,18 +73,27 @@ void main() {
     },
   );
 
-  testWidgets('selects ready Glass and resolves its tint at the anchor', (
+  testWidgets('selects ready Glass and resolves colors at the anchor', (
     tester,
   ) async {
     const tint = CupertinoDynamicColor.withBrightness(
       color: Color(0x90FFFFFF),
       darkColor: Color(0x90123456),
     );
+    const borderColor = CupertinoDynamicColor.withBrightness(
+      color: Color(0x6633FF99),
+      darkColor: Color(0x9933FF99),
+    );
     const style = SmartContextMenuGlassStyle(
       tint: tint,
       blur: SmartContextMenuBlur(5),
       refraction: 2,
       edgeHighlight: 0,
+      border: BorderSide(
+        color: borderColor,
+        width: 2,
+        strokeAlign: BorderSide.strokeAlignCenter,
+      ),
     );
     const surface = SmartContextMenuSurface.glass(style);
     final program = await tester.runAsync(
@@ -138,6 +147,9 @@ void main() {
     expect(selected.style.blur, same(style.blur));
     expect(selected.style.refraction, style.refraction);
     expect(selected.style.edgeHighlight, style.edgeHighlight);
+    expect(selected.style.border.color, isSameColorAs(borderColor.darkColor));
+    expect(selected.style.border.width, style.border.width);
+    expect(selected.style.border.strokeAlign, style.border.strokeAlign);
     expect(loadCount, 1);
   });
 }

@@ -1,9 +1,9 @@
-import 'package:flutter/widgets.dart' show Color, immutable;
+import 'package:flutter/widgets.dart' show BorderSide, Color, immutable;
 
 import '../core/ui/styles/smart_context_menu_defaults.dart';
 import 'smart_context_menu_blur.dart';
 
-/// The tint and optical effects of the Liquid Glass menu surface.
+/// The tint, border and optical effects of the Liquid Glass menu surface.
 ///
 /// Pass it to [SmartContextMenuSurface.glass]. The same style can be used for
 /// one menu or shared through [SmartContextMenuTheme].
@@ -35,12 +35,20 @@ final class SmartContextMenuGlassStyle {
   /// strengthen it. Negative and non-finite values are rendered as 0.
   final double edgeHighlight;
 
+  /// The border drawn over the glass and its contents.
+  ///
+  /// Defaults to [BorderSide.none]. Set a [BorderSide] to choose the color,
+  /// width and stroke alignment. A `CupertinoDynamicColor` is resolved at the
+  /// menu anchor when the menu opens.
+  final BorderSide border;
+
   /// Creates a Liquid Glass style.
   const SmartContextMenuGlassStyle({
     this.tint = SmartContextMenuDefaults.glassTint,
     this.blur = const SmartContextMenuBlur(2),
     this.refraction = 1,
     this.edgeHighlight = 1,
+    this.border = BorderSide.none,
   });
 
   /// Creates a copy with the given fields replaced.
@@ -49,12 +57,14 @@ final class SmartContextMenuGlassStyle {
     SmartContextMenuBlur? blur,
     double? refraction,
     double? edgeHighlight,
+    BorderSide? border,
   }) {
     return SmartContextMenuGlassStyle(
       tint: tint ?? this.tint,
       blur: blur ?? this.blur,
       refraction: refraction ?? this.refraction,
       edgeHighlight: edgeHighlight ?? this.edgeHighlight,
+      border: border ?? this.border,
     );
   }
 
@@ -66,9 +76,16 @@ final class SmartContextMenuGlassStyle {
           blur.sigmaX == other.blur.sigmaX &&
           blur.sigmaY == other.blur.sigmaY &&
           refraction == other.refraction &&
-          edgeHighlight == other.edgeHighlight;
+          edgeHighlight == other.edgeHighlight &&
+          border == other.border;
 
   @override
-  int get hashCode =>
-      Object.hash(tint, blur.sigmaX, blur.sigmaY, refraction, edgeHighlight);
+  int get hashCode => Object.hash(
+    tint,
+    blur.sigmaX,
+    blur.sigmaY,
+    refraction,
+    edgeHighlight,
+    border,
+  );
 }

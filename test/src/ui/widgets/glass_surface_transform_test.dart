@@ -62,26 +62,30 @@ void main() {
         'lib/src/ui/shaders/smart_context_menu_glass.frag',
       ),
     );
-    Widget build(double angle) => Directionality(
-      textDirection: TextDirection.ltr,
-      child: Center(
-        child: Transform.rotate(
-          angle: angle,
-          child: SizedBox(
-            width: 200,
-            height: 100,
-            child: SmartContextMenuGlassSurface(
-              program: program!,
-              opacity: const AlwaysStoppedAnimation(1),
-              borderRadius: const BorderRadius.all(Radius.circular(20)),
-              shadows: const [],
-              style: const SmartContextMenuGlassStyle(tint: Color(0x80FFFFFF)),
-              child: const Text('Content'),
+    Widget build(double angle, {BorderSide border = BorderSide.none}) =>
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: Center(
+            child: Transform.rotate(
+              angle: angle,
+              child: SizedBox(
+                width: 200,
+                height: 100,
+                child: SmartContextMenuGlassSurface(
+                  program: program!,
+                  opacity: const AlwaysStoppedAnimation(1),
+                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                  shadows: const [],
+                  style: SmartContextMenuGlassStyle(
+                    tint: const Color(0x80FFFFFF),
+                    border: border,
+                  ),
+                  child: const Text('Content'),
+                ),
+              ),
             ),
           ),
-        ),
-      ),
-    );
+        );
 
     await tester.pumpWidget(build(0.3));
     expect(tester.takeException(), isNull);
@@ -91,5 +95,25 @@ void main() {
     await tester.pumpWidget(build(0));
     expect(tester.takeException(), isNull);
     expect(find.text('Content'), findsOneWidget);
+    final outline = find.byWidgetPredicate(
+      (widget) =>
+          widget is DecoratedBox &&
+          widget.decoration is BoxDecoration &&
+          (widget.decoration as BoxDecoration).border != null,
+    );
+    expect(outline, findsNothing);
+
+    const border = BorderSide(
+      color: Color(0x6633FF99),
+      width: 2,
+      strokeAlign: BorderSide.strokeAlignOutside,
+    );
+    await tester.pumpWidget(build(0, border: border));
+    expect(tester.takeException(), isNull);
+    final decoration =
+        tester.widget<DecoratedBox>(outline).decoration as BoxDecoration;
+    expect(decoration.border, const Border.fromBorderSide(border));
+    expect(decoration.borderRadius, BorderRadius.circular(20));
+    expect(tester.getSize(outline), const Size(200, 100));
   });
 }
