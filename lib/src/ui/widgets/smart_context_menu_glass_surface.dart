@@ -68,7 +68,12 @@ final class SmartContextMenuGlassSurface extends StatelessWidget {
           pixelRatio: View.of(context).devicePixelRatio,
           child: FadeTransition(opacity: opacity, child: child),
         ),
-        if (border.style != BorderStyle.none && border.color.a > 0)
+        if (border.style != BorderStyle.none &&
+            border.color.a > 0 &&
+            border.width >= 0 &&
+            border.width <= _maxFloat32 &&
+            border.strokeInset.abs() <= _maxFloat32 &&
+            border.strokeOutset.abs() <= _maxFloat32)
           Positioned.fill(
             child: IgnorePointer(
               child: FadeTransition(
@@ -124,11 +129,21 @@ final class SmartContextMenuGlassClipper extends CustomClipper<RRect> {
 const _transformTolerance = 1e-6;
 const _maxFloat32 = 3.4028234663852886e38;
 
-/// Converts a style multiplier to a finite, non-negative shader uniform.
+/// Converts a non-negative style value to a finite shader uniform.
 @visibleForTesting
-double glassShaderMultiplier(double value) {
+double glassShaderNonnegativeFloat(double value) {
   if (!value.isFinite || value <= 0) return 0;
   return math.min(value, _maxFloat32);
+}
+
+/// Normalizes the light direction before writing the shader uniform.
+@visibleForTesting
+Offset glassShaderLightDirection(Offset direction) {
+  final scale = math.max(direction.dx.abs(), direction.dy.abs());
+  if (!scale.isFinite || scale == 0) return Offset.zero;
+  // Scale first so computing the length works for any finite input.
+  final scaled = direction / scale;
+  return scaled / scaled.distance;
 }
 
 /// Maps local logical pixels to physical backdrop pixels.
@@ -270,6 +285,7 @@ final class _RenderGlassBackdrop extends RenderProxyBox {
 
     final style = _settings.style;
     final tint = style.color;
+    final light = glassShaderLightDirection(style.lightDirection);
 
     // Impeller provides the texture size (floats 0–1) and sampler 0.
     // The remaining slots follow smart_context_menu_glass.frag.
@@ -289,8 +305,12 @@ final class _RenderGlassBackdrop extends RenderProxyBox {
       ..setFloat(14, tint.g)
       ..setFloat(15, tint.b)
       ..setFloat(16, tint.a)
-      ..setFloat(17, glassShaderMultiplier(style.refraction))
-      ..setFloat(18, glassShaderMultiplier(style.edgeHighlight));
+      ..setFloat(17, glassShaderNonnegativeFloat(style.refraction))
+      ..setFloat(18, glassShaderNonnegativeFloat(style.edgeHighlight))
+      ..setFloat(19, glassShaderNonnegativeFloat(style.rimWidth))
+      ..setFloat(20, glassShaderNonnegativeFloat(style.bevelWidth))
+      ..setFloat(21, light.dx)
+      ..setFloat(22, light.dy);
     return ui.ImageFilter.shader(_shader);
   }
 

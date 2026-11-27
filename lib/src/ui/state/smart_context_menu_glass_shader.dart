@@ -2,7 +2,8 @@ import 'dart:async' show unawaited;
 import 'dart:ui' as ui;
 
 // ignore: deprecated_member_use
-import 'package:flutter/cupertino.dart' show CupertinoDynamicColor;
+import 'package:flutter/cupertino.dart'
+    show CupertinoDynamicColor, CupertinoTheme;
 import 'package:flutter/widgets.dart' show BuildContext;
 
 import '../../domain/smart_context_menu_glass_style.dart';
@@ -50,13 +51,42 @@ final class SmartContextMenuGlassShader {
     if (readyProgram == null) return null;
 
     final style = menuStyle.glassStyle;
-    final color = CupertinoDynamicColor.resolve(style.color, anchorContext);
+    final color = _resolveColor(style.color, anchorContext);
+    final brightness =
+        CupertinoTheme.maybeBrightnessOf(anchorContext) ?? ui.Brightness.light;
     final border = style.border.copyWith(
-      color: CupertinoDynamicColor.resolve(style.border.color, anchorContext),
+      color: _resolveColor(style.border.color, anchorContext),
     );
     return (
       program: readyProgram,
-      style: style.copyWith(color: color, border: border),
+      style: style.copyWith(
+        color: color,
+        border: border,
+        blur: style.resolveBlur(brightness),
+        edgeHighlight: style.resolveEdgeHighlight(brightness),
+      ),
+    );
+  }
+
+  static ui.Color _resolveColor(ui.Color color, BuildContext context) {
+    final resolved = CupertinoDynamicColor.resolve(color, context);
+    double channel(double value) => value.isFinite ? value.clamp(0.0, 1.0) : 0;
+
+    final red = channel(resolved.r);
+    final green = channel(resolved.g);
+    final blue = channel(resolved.b);
+    final alpha = channel(resolved.a);
+    if (red == resolved.r &&
+        green == resolved.g &&
+        blue == resolved.b &&
+        alpha == resolved.a) {
+      return resolved;
+    }
+    return resolved.withValues(
+      red: red,
+      green: green,
+      blue: blue,
+      alpha: alpha,
     );
   }
 

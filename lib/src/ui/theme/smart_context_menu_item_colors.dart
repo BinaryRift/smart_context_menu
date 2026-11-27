@@ -10,7 +10,7 @@ final class SmartContextMenuItemColors {
   /// The color of the title and icons.
   final Color foreground;
 
-  /// The background of the item: the press highlight, the tint of
+  /// The background of the item: the hover or press highlight, the tint of
   /// a tinted or destructive item, or the background of a disabled one.
   final Color overlay;
 
@@ -22,12 +22,14 @@ final class SmartContextMenuItemColors {
   /// Resolves the colors of [item] with [style].
   ///
   /// [isPressed] is true while a pressed pointer or cursor is over the item.
+  /// [isHovered] is true while a cursor is over the item.
   /// [isBack] enables the Back-specific highlight settings.
   factory SmartContextMenuItemColors.resolve(
     BuildContext context, {
     required SmartContextMenuItem item,
     required SmartContextMenuStyle style,
     required bool isPressed,
+    bool isHovered = false,
     bool isBack = false,
   }) {
     Color resolve(Color color) => CupertinoDynamicColor.resolve(color, context);
@@ -73,6 +75,7 @@ final class SmartContextMenuItemColors {
     final highlightColor =
         (isBack ? style.backButtonStyle.highlightColor : null) ??
         style.highlightColor;
+    final isHighlighted = isPressed || isHovered;
     final Color overlay;
     if (isDisabled) {
       final disabledBackgroundColor = style.disabledBackgroundColor;
@@ -81,24 +84,26 @@ final class SmartContextMenuItemColors {
           : resolve(disabledBackgroundColor);
     } else if (tintColor != null) {
       overlay = resolve(tintColor).withValues(
-        alpha: switch ((isPressed, isDark)) {
+        alpha: switch ((isHighlighted, isDark)) {
           (true, true) => SmartContextMenuDefaults.darkTintPressedOpacity,
           (true, false) => SmartContextMenuDefaults.tintPressedOpacity,
           (false, true) => SmartContextMenuDefaults.darkTintOpacity,
           (false, false) => SmartContextMenuDefaults.tintOpacity,
         },
       );
-    } else if (!isPressed) {
+    } else if (!isHighlighted) {
       overlay = const Color(0x00000000);
     } else if (highlightColor != null) {
       overlay = resolve(highlightColor);
     } else {
       overlay = resolve(baseForeground).withValues(
-        alpha: isDark
-            ? SmartContextMenuDefaults.darkHighlightOpacity
-            : isBack
-            ? SmartContextMenuDefaults.backHighlightOpacity
-            : SmartContextMenuDefaults.highlightOpacity,
+        alpha: switch ((isDark, isPressed, isBack)) {
+          (true, true, _) => SmartContextMenuDefaults.darkHighlightOpacity,
+          (true, false, _) =>
+            SmartContextMenuDefaults.darkHoverHighlightOpacity,
+          (false, _, true) => SmartContextMenuDefaults.backHighlightOpacity,
+          (false, _, false) => SmartContextMenuDefaults.highlightOpacity,
+        },
       );
     }
 

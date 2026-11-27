@@ -39,6 +39,9 @@ void main() {
     expect(defaultStyle.surface, SmartContextMenuSurface.glass);
     expect(defaultStyle.glassStyle.blur.sigmaX, 2);
     expect(defaultStyle.glassStyle.blur.sigmaY, 2);
+    expect(defaultStyle.glassStyle.rimWidth, 5.8);
+    expect(defaultStyle.glassStyle.bevelWidth, 24);
+    expect(defaultStyle.glassStyle.lightDirection, const Offset(-0.6, -0.8));
     expect(defaultStyle.standardStyle.blur, isNull);
     expect(defaultStyle.standardStyle.border.width, 1);
     expect(defaultStyle.standardStyle.showEdgeHighlight, isTrue);
@@ -58,9 +61,15 @@ void main() {
 
   test('glass styles compare by value', () {
     const tint = Color(0x90778899);
-    const style = SmartContextMenuGlassStyle(color: tint, refraction: 2);
+    const blur = SmartContextMenuBlur(2);
+    const style = SmartContextMenuGlassStyle(
+      color: tint,
+      blur: blur,
+      refraction: 2,
+    );
     final copy = const SmartContextMenuGlassStyle().copyWith(
       color: tint,
+      blur: blur,
       refraction: 2,
     );
 
@@ -79,6 +88,10 @@ void main() {
     expect(withoutHighlight.color, tint);
     expect(withoutHighlight.refraction, 2);
     expect(withoutHighlight, isNot(style));
+
+    expect(copy.copyWith(rimWidth: 0), isNot(style));
+    expect(copy.copyWith(bevelWidth: 0), isNot(style));
+    expect(copy.copyWith(lightDirection: Offset.zero), isNot(style));
 
     expect(copy.border, BorderSide.none);
     const border = BorderSide(color: Color(0x6633FF99), width: 2);

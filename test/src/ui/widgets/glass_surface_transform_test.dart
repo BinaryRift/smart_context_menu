@@ -35,23 +35,47 @@ void main() {
     expect(aligned.tlRadius, clip.tlRadius);
   });
 
-  test('glass shader multipliers fit a nonnegative float32', () {
+  test('glass shader multipliers and widths fit a nonnegative float32', () {
     for (final value in [
       -1.0,
       double.nan,
       double.infinity,
       double.negativeInfinity,
     ]) {
-      expect(glassShaderMultiplier(value), 0);
+      expect(glassShaderNonnegativeFloat(value), 0);
     }
-    expect(glassShaderMultiplier(0), 0);
-    expect(glassShaderMultiplier(1), 1);
-    expect(glassShaderMultiplier(3), 3);
+    expect(glassShaderNonnegativeFloat(0), 0);
+    expect(glassShaderNonnegativeFloat(1), 1);
+    expect(glassShaderNonnegativeFloat(3), 3);
     final largest = Float32List.fromList([
-      glassShaderMultiplier(double.maxFinite),
+      glassShaderNonnegativeFloat(double.maxFinite),
     ]).single;
     expect(largest.isFinite, isTrue);
     expect(largest, greaterThan(3.4e38));
+  });
+
+  test('normalizes light directions over the finite double range', () {
+    expect(
+      glassShaderLightDirection(const Offset(3, -4)),
+      const Offset(0.6, -0.8),
+    );
+    expect(
+      glassShaderLightDirection(const Offset(double.minPositive, 0)),
+      const Offset(1, 0),
+    );
+    final diagonal = glassShaderLightDirection(
+      const Offset(-double.maxFinite, double.maxFinite),
+    );
+    expect(diagonal.distance, closeTo(1, 1e-12));
+    expect(diagonal.dx, -diagonal.dy);
+
+    for (final direction in [
+      Offset.zero,
+      const Offset(double.nan, 1),
+      const Offset(1, double.infinity),
+    ]) {
+      expect(glassShaderLightDirection(direction), Offset.zero);
+    }
   });
 
   testWidgets('keeps content visible when a filter cannot be applied', (
@@ -115,5 +139,17 @@ void main() {
     expect(decoration.border, const Border.fromBorderSide(border));
     expect(decoration.borderRadius, BorderRadius.circular(20));
     expect(tester.getSize(outline), const Size(200, 100));
+
+    for (final invalid in const [
+      BorderSide(width: double.infinity),
+      BorderSide(width: double.maxFinite),
+      BorderSide(strokeAlign: double.nan),
+      BorderSide(width: 10, strokeAlign: double.maxFinite),
+    ]) {
+      await tester.pumpWidget(build(0, border: invalid));
+      expect(outline, findsNothing);
+      expect(find.text('Content'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    }
   });
 }

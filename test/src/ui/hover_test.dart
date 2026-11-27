@@ -70,6 +70,35 @@ void main() {
     expect(taps, 0);
   });
 
+  testWidgets('uses separate hover and press opacities in the dark theme', (
+    tester,
+  ) async {
+    await tester.pumpMenu(
+      items: appearanceItems(),
+      brightness: Brightness.dark,
+    );
+    await tester.openMenu();
+
+    final foreground = SmartContextMenuDefaults.foregroundColor.darkColor;
+    final target = find.text('Enabled');
+    final mouse = await mouseAt(tester, target);
+    expect(
+      tester.backgroundOf('Enabled'),
+      isSameColorAs(foreground.withValues(alpha: 0.16)),
+    );
+
+    await mouse.down(tester.getCenter(target));
+    await tester.pump();
+    expect(
+      tester.backgroundOf('Enabled'),
+      isSameColorAs(foreground.withValues(alpha: 0.12)),
+    );
+
+    await mouse.moveTo(const Offset(1, 1));
+    await mouse.up();
+    await tester.pump();
+  });
+
   testWidgets('does not highlight disabled or noninteractive items', (
     tester,
   ) async {

@@ -215,15 +215,18 @@ final class SmartContextMenuStyle {
   /// If null, which is the default, disabled items have no background.
   final Color? disabledBackgroundColor;
 
-  /// The background of a pressed item, including the back item.
+  /// The background of a hovered or pressed item, including the back item.
   ///
   /// [SmartContextMenuBackButtonStyle.highlightColor] takes precedence
   /// for the back item.
   ///
-  /// Tinted and destructive items keep their own pressed tint. If null,
-  /// which is the default, the color of [titleStyle] is used with
-  /// [SmartContextMenuDefaults.highlightOpacity] in the light theme and
-  /// [SmartContextMenuDefaults.darkHighlightOpacity] in the dark one.
+  /// Tinted and destructive items keep their own highlight tint. If null,
+  /// which is the default, the highlight uses the color of [titleStyle]. In the
+  /// dark theme it uses [SmartContextMenuDefaults.darkHoverHighlightOpacity]
+  /// while hovered and [SmartContextMenuDefaults.darkHighlightOpacity] while
+  /// pressed. In the light theme it uses
+  /// [SmartContextMenuDefaults.highlightOpacity] for both states and
+  /// [SmartContextMenuDefaults.backHighlightOpacity] for the back item.
   final Color? highlightColor;
 
   /// The color of the dividers, see [dividersBetweenItems].

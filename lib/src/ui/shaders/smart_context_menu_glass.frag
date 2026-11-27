@@ -26,12 +26,14 @@ uniform float u_opacity;     // 12: overall surface opacity in [0, 1].
 uniform vec4 u_tint;         // 13-16: unpremultiplied RGBA tint in [0, 1].
 uniform float u_refraction;  // 17: refraction and magnification multiplier.
 uniform float u_edgeHighlight; // 18: edge reflection multiplier.
+uniform float u_rimWidth;    // 19: rim reflection width in logical pixels.
+uniform float u_bevelWidth;  // 20: maximum bevel width in logical pixels.
+uniform vec2 u_lightDirection; // 21-22: normalized direction in screen space.
 uniform sampler2D u_backdrop; // Sampler 0: input backdrop texture.
 
 out vec4 fragColor;
 
 // Optical parameters. Distances are expressed in local logical pixels.
-const float kBevelWidth = 24.0;
 const float kTravelDepth = 24.0;
 const float kIOR = 1.28;
 const float kMagnification = 1.03;
@@ -41,14 +43,12 @@ const float kMagnification = 1.03;
 const float kMaxTravelToBevel = 1.03;
 
 // Rim lighting: ambient edge reflection and two opposing directional lobes.
-const float kRimWidth = 5.8;
 const float kRimBaseLight = 0.10;
 const float kRimBaseDark = 0.035;
 const float kRimStrengthLight = 0.78;
 const float kRimStrengthDark = 0.45;
 const float kRimDarkTint = 0.20;
 const float kSecondaryArc = 0.42;
-const vec2 kLightDirection = vec2(-0.6, -0.8);
 
 // Fresnel-weighted reflection shoulder within the optical bevel.
 const float kShoulderWidth = 5.0;
@@ -61,8 +61,8 @@ const float kShoulderDark = 0.045;
 float edgeBevel(float position, float halfExtent,
                 float startRadius, float endRadius) {
   float span = 2.0 * halfExtent - startRadius - endRadius;
-  float startBevel = min(kBevelWidth, startRadius);
-  float endBevel = min(kBevelWidth, endRadius);
+  float startBevel = min(u_bevelWidth, startRadius);
+  float endBevel = min(u_bevelWidth, endRadius);
   // Under the half-side radius constraint, a collapsed segment has equal
   // endpoint radii. The epsilon prevents division by zero.
   float t = clamp((position + halfExtent - startRadius) /
@@ -74,7 +74,7 @@ float edgeBevel(float position, float halfExtent,
 
 float opticalBevel(vec2 p, vec2 halfSize, vec4 radii,
                    float radius, vec2 corner, vec2 normal) {
-  float bevel = min(kBevelWidth, radius);
+  float bevel = min(u_bevelWidth, radius);
   // Equal radii use a constant bevel without edge interpolation.
   if (all(equal(radii, vec4(radii.x)))) return bevel;
 
@@ -162,10 +162,14 @@ void main() {
   vec3 glass = mix(backdrop, u_tint.rgb, u_tint.a);
 
   // Fifth-power rim falloff and directional lighting in backdrop space.
-  float rim = pow(clamp(1.0 + (distance + 0.35) / kRimWidth, 0.0, 1.0), 5.0);
+  float rim = 0.0;
+  if (u_rimWidth > 0.0) {
+    float rimWidth = max(u_rimWidth, 1e-4);
+    rim = pow(clamp(1.0 + (distance + 0.35) / rimWidth, 0.0, 1.0), 5.0);
+  }
   vec2 surfaceDirection = normal / u_scale;
   surfaceDirection /= max(length(surfaceDirection), 1e-5);
-  float facing = dot(surfaceDirection, kLightDirection);
+  float facing = dot(surfaceDirection, u_lightDirection);
   float arc = facing * facing * (facing < 0.0 ? kSecondaryArc : 1.0);
   // Estimate material darkness from tint luminance and alpha. The alpha
   // gate prevents a nearly transparent tint from strongly suppressing light.

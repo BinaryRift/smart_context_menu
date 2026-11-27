@@ -205,7 +205,8 @@ final class _SmartContextMenuItemViewState
       context,
       item: _item,
       style: _style,
-      isPressed: _isHighlight,
+      isPressed: _isPressed,
+      isHovered: _isHovered,
       isBack: widget.key == ServiceItemKey.back,
     );
     final (isDisabled, isDestructive) = switch (_item) {
