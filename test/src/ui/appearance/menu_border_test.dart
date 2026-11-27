@@ -104,19 +104,41 @@ void main() {
     expect(highlight, findsNothing);
   });
 
-  testWidgets('keeps a transparent border invisible', (tester) async {
-    await tester.pumpMenu(
-      items: appearanceItems(),
-      config: const SmartContextMenuConfig(
-        style: SmartContextMenuStyle(
-          standardStyle: SmartContextMenuStandardStyle(
-            border: BorderSide(color: Color(0x00FF0000)),
+  for (final (name, border, showHighlight, hasBorder) in const [
+    ('only the highlight with BorderSide.none', BorderSide.none, true, false),
+    (
+      'only the highlight with a transparent border',
+      BorderSide(color: Color(0x00FF0000)),
+      true,
+      false,
+    ),
+    ('only the border when the highlight is off', BorderSide(), false, true),
+    ('no outline when both are off', BorderSide.none, false, false),
+  ]) {
+    testWidgets('paints $name', (tester) async {
+      await tester.pumpMenu(
+        items: appearanceItems(),
+        config: SmartContextMenuConfig(
+          style: SmartContextMenuStyle(
+            surface: SmartContextMenuSurface.standard,
+            standardStyle: SmartContextMenuStandardStyle(
+              border: border,
+              showEdgeHighlight: showHighlight,
+            ),
           ),
         ),
-      ),
-    );
-    await tester.openMenu();
+      );
+      await tester.openMenu();
 
-    expect(highlight, findsNothing);
-  });
+      expect(foregroundsOf(tester), hasLength(hasBorder ? 1 : 0));
+      expect(highlight, showHighlight ? findsOneWidget : findsNothing);
+      if (showHighlight) {
+        final painter =
+            tester.widget<CustomPaint>(highlight).foregroundPainter!
+                as SmartContextMenuHighlightPainter;
+        expect(painter.border.width, 1);
+        expect(painter.border.strokeAlign, BorderSide.strokeAlignInside);
+      }
+    });
+  }
 }

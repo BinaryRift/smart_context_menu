@@ -2,7 +2,7 @@ import 'dart:ui' as ui show Brightness;
 
 import 'package:flutter/widgets.dart';
 
-/// Paints a directional highlight over the standard border.
+/// Paints a directional highlight along the standard panel's outline.
 final class SmartContextMenuHighlightPainter extends CustomPainter {
   final BorderRadius borderRadius;
   final BorderSide border;

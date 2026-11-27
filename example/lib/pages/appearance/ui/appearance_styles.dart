@@ -27,6 +27,7 @@ const brandStyle = SmartContextMenuStyle(
   standardStyle: SmartContextMenuStandardStyle(
     color: Color(0xFF4338CA),
     border: BorderSide.none,
+    showEdgeHighlight: false,
   ),
   borderRadius: BorderRadius.all(Radius.circular(20)),
   titleStyle: TextStyle(fontSize: 17, color: CupertinoColors.white),
@@ -38,6 +39,7 @@ const brandStyle = SmartContextMenuStyle(
 
 /// Thin lines between items with the same space on both sides.
 const insetDividersStyle = SmartContextMenuStyle(
+  standardStyle: SmartContextMenuStandardStyle(border: BorderSide.none),
   dividersBetweenItems: true,
   dividerIndent: 16,
   dividerEndIndent: 16,
@@ -47,6 +49,7 @@ const insetDividersStyle = SmartContextMenuStyle(
 /// start rather than in the middle: a Material progress indicator instead
 /// of the Cupertino one, and other icons.
 const statusItemsStyle = SmartContextMenuStyle(
+  standardStyle: SmartContextMenuStandardStyle(border: BorderSide.none),
   statusStyle: SmartContextMenuStatusStyle(
     loadingIndicator: SizedBox.square(
       dimension: 18,

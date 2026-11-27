@@ -22,10 +22,11 @@ final class SmartContextMenuStandardStyle {
   /// The blur of the backdrop within the panel's outline. Defaults to null.
   final SmartContextMenuBlur? blur;
 
-  /// Whether to draw a directional highlight over the standard border.
+  /// Whether to draw a directional highlight along the panel's outline.
   ///
-  /// Defaults to true. The highlight requires a visible [border] and applies
-  /// to the built-in appearance.
+  /// Defaults to true and applies to the built-in appearance. With a visible
+  /// [border], the highlight uses its width, alignment and opacity. Otherwise
+  /// it draws a one-logical-pixel highlight inside the outline.
   final bool showEdgeHighlight;
 
   /// A complete replacement for the built-in panel fill, border and highlight.

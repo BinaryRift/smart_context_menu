@@ -155,11 +155,12 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
     if (blur != null) {
       surface = ClipRRect(borderRadius: style.borderRadius, child: surface);
     }
-    if (decoration == null && standard.border.style != BorderStyle.none) {
+    if (decoration == null) {
       final border = standard.border.copyWith(
         color: CupertinoDynamicColor.resolve(standard.border.color, context),
       );
-      if (border.color.a > 0) {
+      final hasBorder = border.style != BorderStyle.none && border.color.a > 0;
+      if (hasBorder) {
         // The outline sits above the levels and outside the backdrop clip.
         surface = DecoratedBox(
           position: DecorationPosition.foreground,
@@ -169,18 +170,18 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
           ),
           child: surface,
         );
-        if (standard.showEdgeHighlight) {
-          surface = CustomPaint(
-            foregroundPainter: SmartContextMenuHighlightPainter(
-              borderRadius: style.borderRadius.resolve(
-                Directionality.of(context),
-              ),
-              border: border,
-              brightness: CupertinoTheme.brightnessOf(context),
+      }
+      if (standard.showEdgeHighlight) {
+        surface = CustomPaint(
+          foregroundPainter: SmartContextMenuHighlightPainter(
+            borderRadius: style.borderRadius.resolve(
+              Directionality.of(context),
             ),
-            child: surface,
-          );
-        }
+            border: hasBorder ? border : const BorderSide(),
+            brightness: CupertinoTheme.brightnessOf(context),
+          ),
+          child: surface,
+        );
       }
     }
     final opacity = widget.opacity;

@@ -22,8 +22,8 @@
 * Set `SmartContextMenuBackButtonStyle.highlightColor` to style the pressed and hovered Back
   row independently.
 * Make the default hover highlight more visible in dark mode.
-* The standard panel draws an edge highlight by default. Set
-  `SmartContextMenuStandardStyle(showEdgeHighlight: false)` to use a plain border.
+* The standard panel draws an edge highlight by default. Use `border: BorderSide.none`
+  for the highlight alone and `showEdgeHighlight: false` to switch it off.
 * `SmartContextMenuStyle.backgroundBlur` is `null` by default. To restore the full-screen
   blur from 1.1.x, set `backgroundBlur: SmartContextMenuBlur.medium`.
 

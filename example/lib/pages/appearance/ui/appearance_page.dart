@@ -56,7 +56,7 @@ final class _AppearancePageState extends State<AppearancePage> {
             _buildGroupHeader('Styles'),
             _buildPreset(
               title: 'Default',
-              subtitle: 'The config of the app',
+              subtitle: 'The default menu style',
               config: (app) => app,
               items: sampleItems(_loader),
             ),
@@ -203,7 +203,14 @@ final class _AppearancePageState extends State<AppearancePage> {
     required SmartContextMenuConfig Function(SmartContextMenuConfig app) config,
     required List<SmartContextMenuItem> items,
   }) {
-    final app = SmartContextMenuTheme.of(context);
+    final theme = SmartContextMenuTheme.of(context);
+    final app = theme.copyWith(
+      style: theme.style.copyWith(
+        standardStyle: theme.style.standardStyle.copyWith(
+          border: BorderSide.none,
+        ),
+      ),
+    );
     final preset = config(app);
     // A preset's explicit Standard surface takes precedence.
     final surface = app.style.surface == SmartContextMenuSurface.standard

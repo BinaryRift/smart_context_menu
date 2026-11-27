@@ -19,6 +19,7 @@ const terminalStyle = SmartContextMenuStyle(
   standardStyle: SmartContextMenuStandardStyle(
     color: Color(0xFF0D0D0D),
     border: BorderSide(color: Color(0x9933FF99)),
+    showEdgeHighlight: false,
   ),
   borderRadius: BorderRadius.all(Radius.circular(4)),
   menuShadows: [
@@ -47,6 +48,7 @@ const terminalStyle = SmartContextMenuStyle(
 /// Small text, tight items and dividers; the menu is narrower in its
 /// config.
 const compactStyle = SmartContextMenuStyle(
+  standardStyle: SmartContextMenuStandardStyle(border: BorderSide.none),
   borderRadius: BorderRadius.all(Radius.circular(12)),
   itemPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 7),
   itemChildrenGap: 8,
@@ -74,6 +76,7 @@ const colorfulStyle = SmartContextMenuStyle(
       darkColor: Color(0xFF1C1C1E),
     ),
     border: BorderSide.none,
+    showEdgeHighlight: false,
   ),
   borderRadius: BorderRadius.all(Radius.circular(18)),
   menuShadows: [
@@ -97,6 +100,7 @@ const paperStyle = SmartContextMenuStyle(
   standardStyle: SmartContextMenuStandardStyle(
     color: Color(0xFFFBF3E4),
     border: BorderSide(color: Color(0x334A3728)),
+    showEdgeHighlight: false,
   ),
   borderRadius: BorderRadius.all(Radius.circular(6)),
   menuShadows: [
@@ -142,6 +146,7 @@ const glowStyle = SmartContextMenuStyle(
     ),
     border: _glowBorder,
     blur: SmartContextMenuBlur.extraStrong,
+    showEdgeHighlight: false,
   ),
   borderRadius: BorderRadius.all(Radius.circular(22)),
   menuShadows: [
@@ -224,6 +229,7 @@ const editingRowsStyle = SmartContextMenuStyle(
         darkColor: Color(0xFF40534A),
       ),
     ),
+    showEdgeHighlight: false,
   ),
   borderRadius: BorderRadius.all(Radius.circular(20)),
   menuShadows: [
@@ -304,6 +310,7 @@ const drawingToolbarStyle = SmartContextMenuStyle(
   standardStyle: SmartContextMenuStandardStyle(
     color: drawingToolbarSurface,
     border: BorderSide(color: _drawingToolbarLine),
+    showEdgeHighlight: false,
   ),
   borderRadius: BorderRadius.all(Radius.circular(20)),
   menuShadows: [
