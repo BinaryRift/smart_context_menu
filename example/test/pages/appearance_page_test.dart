@@ -114,6 +114,40 @@ void main() {
     expect(overlay.config.style.standardStyle, same(paperStyle.standardStyle));
   });
 
+  testWidgets('Background blur applies to Glass and Standard presets', (
+    tester,
+  ) async {
+    await openAppearance(tester);
+    await tester.tap(find.byIcon(CupertinoIcons.gear));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.descendant(
+        of: find.widgetWithText(CupertinoListTile, 'Background blur'),
+        matching: find.byType(CupertinoSwitch),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Done'));
+    await tester.pumpAndSettle();
+
+    final overlay = find.byType(SmartContextMenuOverlay);
+    for (final (name, style) in [
+      ('Brand', brandStyle),
+      ('Paper', paperStyle),
+    ]) {
+      await openPreset(tester, name);
+      final menuStyle = tester
+          .widget<SmartContextMenuOverlay>(overlay)
+          .config
+          .style;
+      expect(menuStyle.backgroundBlur, SmartContextMenuBlur.medium);
+      expect(menuStyle.backgroundColor, style.backgroundColor);
+      expect(menuStyle.surface, style.surface);
+      Navigator.of(tester.element(overlay)).pop();
+      await tester.pumpAndSettle();
+    }
+  });
+
   testWidgets('Localized shows the strings of the menu in Russian', (
     tester,
   ) async {

@@ -37,6 +37,12 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(
       find.descendant(
+        of: find.widgetWithText(CupertinoListTile, 'Background blur'),
+        matching: find.byType(CupertinoSwitch),
+      ),
+    );
+    await tester.tap(
+      find.descendant(
         of: find.byType(SettingsSheet),
         matching: find.text('Standard'),
       ),
@@ -46,11 +52,11 @@ void main() {
     await tester.pumpAndSettle();
     final preview = tester.element(find.text('Open menu'));
     final menu = preview.findAncestorWidgetOfExactType<SmartContextMenu>()!;
-    expect(
-      SmartContextMenuTheme.of(preview).style.surface,
-      SmartContextMenuSurface.standard,
-    );
+    final appStyle = SmartContextMenuTheme.of(preview).style;
+    expect(appStyle.surface, SmartContextMenuSurface.standard);
+    expect(appStyle.backgroundBlur, SmartContextMenuBlur.medium);
     expect(menu.config!.style.surface, SmartContextMenuSurface.glass);
+    expect(menu.config!.style.backgroundBlur, isNull);
 
     await tester.tap(find.text('Open menu'));
     await tester.settleMenu();

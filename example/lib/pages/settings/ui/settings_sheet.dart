@@ -82,6 +82,12 @@ final class SettingsSheet extends StatelessWidget {
                       ),
                 ),
                 _buildSwitch(
+                  title: 'Background blur',
+                  subtitle: 'Blur the screen behind open menus',
+                  value: settings.enableBackgroundBlur,
+                  onChanged: (value) => settings.enableBackgroundBlur = value,
+                ),
+                _buildSwitch(
                   title: 'Haptics',
                   value: settings.enableHaptics,
                   onChanged: (value) => settings.enableHaptics = value,

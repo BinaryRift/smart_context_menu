@@ -206,12 +206,15 @@ final class _AppearancePageState extends State<AppearancePage> {
     final app = SmartContextMenuTheme.of(context);
     final preset = config(app);
     // A preset's explicit Standard surface takes precedence.
-    final surface = app.style.surface;
-    final effectiveConfig =
-        surface == SmartContextMenuSurface.standard &&
-            preset.style.surface != surface
-        ? preset.copyWith(style: preset.style.copyWith(surface: surface))
-        : preset;
+    final surface = app.style.surface == SmartContextMenuSurface.standard
+        ? SmartContextMenuSurface.standard
+        : preset.style.surface;
+    final effectiveConfig = preset.copyWith(
+      style: preset.style.copyWith(
+        surface: surface,
+        backgroundBlur: app.style.backgroundBlur,
+      ),
+    );
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
