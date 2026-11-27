@@ -60,8 +60,9 @@ const terminalStyle = SmartContextMenuStyle(
   ),
   disabledForegroundColor: Color(0x6633FF99),
   destructiveColor: Color(0xFFFF5F56),
-  highlightColor: Color(0x16FFFFFF),
-  separatorColor: Color(0x29FFFFFF),
+  highlightColor: Color(0x2633FF99),
+  separatorColor: Color(0x6633FF99),
+  dividerColor: Color(0x6633FF99),
   separatorThickness: 1,
   submenuIcon: CupertinoIcons.chevron_right_2,
 );

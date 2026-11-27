@@ -101,7 +101,7 @@ abstract final class SmartContextMenuDefaults {
   static const CupertinoDynamicColor glassTint =
       CupertinoDynamicColor.withBrightness(
         color: Color(0x92F7FAFF),
-        darkColor: Color(0x9C161B24),
+        darkColor: Color(0x801C1B1A),
       );
 
   /// The default border color of [SmartContextMenuStandardStyle].
@@ -200,11 +200,11 @@ abstract final class SmartContextMenuDefaults {
   ///
   /// A dark highlight stands out more on a light menu, so it is lighter than
   /// [darkHighlightOpacity].
-  static const double highlightOpacity = 0.06;
+  static const double highlightOpacity = 0.1;
 
   /// The opacity of the title color in the press highlight of an item,
   /// including the back item, in the dark theme.
-  static const double darkHighlightOpacity = 0.1;
+  static const double darkHighlightOpacity = 0.12;
 
   /// The opacity of the title color in the press highlight of the back item
   /// in the light theme.
