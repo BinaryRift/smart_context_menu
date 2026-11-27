@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart'
     show
         BorderRadiusGeometry,
+        BorderSide,
         BoxShadow,
         Color,
         Decoration,
@@ -13,7 +14,9 @@ import 'package:flutter/widgets.dart'
 import '../core/ui/styles/smart_context_menu_defaults.dart';
 import 'smart_context_menu_back_button_style.dart';
 import 'smart_context_menu_blur.dart';
+import 'smart_context_menu_glass_style.dart';
 import 'smart_context_menu_row_style.dart';
+import 'smart_context_menu_standard_style.dart';
 import 'smart_context_menu_status_style.dart';
 import 'smart_context_menu_surface.dart';
 
@@ -32,7 +35,9 @@ import 'smart_context_menu_surface.dart';
 /// const menuConfig = SmartContextMenuConfig(
 ///   style: SmartContextMenuStyle(
 ///     surface: SmartContextMenuSurface.standard,
-///     menuBlur: SmartContextMenuBlur.small,
+///     standardStyle: SmartContextMenuStandardStyle(
+///       blur: SmartContextMenuBlur.small,
+///     ),
 ///     titleStyle: TextStyle(fontSize: 15, color: Color(0xFF1C1C1E)),
 ///   ),
 /// );
@@ -46,58 +51,58 @@ final class SmartContextMenuStyle {
   /// opens, whether this style is set on the menu or in [SmartContextMenuTheme].
   final SmartContextMenuSurface surface;
 
-  /// The background color of the standard panel and its back item.
-  ///
-  /// Also applies when Glass falls back to Standard. To tint the glass,
-  /// set [SmartContextMenuGlassStyle.tint].
-  ///
-  /// Ignored for the menu itself when [menuDecoration] is set, and for the
-  /// back item when [SmartContextMenuBackButtonStyle.decoration] or
-  /// [SmartContextMenuBackButtonStyle.backgroundColor] is set.
-  /// For a gradient menu, a partially transparent version of its top color
-  /// can let the gradient show through the back item. The back item does not
-  /// inherit the gradient directly.
-  /// Defaults to [SmartContextMenuDefaults.menuColor].
-  final Color menuColor;
+  /// The appearance of the Liquid Glass panel.
+  final SmartContextMenuGlassStyle glassStyle;
 
-  /// The color of the standard panel border, including during fallback.
-  ///
-  /// Ignored when [menuDecoration] is set.
-  /// Defaults to [SmartContextMenuDefaults.borderColor].
-  final Color borderColor;
+  final SmartContextMenuStandardStyle? _standardStyle;
+  final Color? _menuColor;
+  final Color? _borderColor;
+  final Decoration? _menuDecoration;
+  final SmartContextMenuBlur? _menuBlur;
 
-  /// Whether the standard menu border has an edge highlight, including during
-  /// fallback. Use [SmartContextMenuGlassStyle.edgeHighlight] for Glass.
-  ///
-  /// Defaults to true. A transparent [borderColor] hides the highlight along
-  /// with the border. A custom [menuDecoration] supplies its own outline.
-  final bool showEdgeHighlight;
+  /// The appearance of the standard panel, including during fallback.
+  SmartContextMenuStandardStyle get standardStyle =>
+      _standardStyle ??
+      SmartContextMenuStandardStyle(
+        color: _menuColor ?? SmartContextMenuDefaults.menuColor,
+        border: BorderSide(
+          color: _borderColor ?? SmartContextMenuDefaults.borderColor,
+        ),
+        decoration: _menuDecoration,
+        blur: _menuBlur,
+      );
+
+  /// The standard panel color. See [SmartContextMenuStandardStyle.color].
+  @Deprecated('Use standardStyle.color instead.')
+  Color get menuColor => standardStyle.color;
+
+  /// The standard panel border color. See [SmartContextMenuStandardStyle.border].
+  @Deprecated('Use standardStyle.border.color instead.')
+  Color get borderColor => standardStyle.border.color;
 
   /// The corner radius of the menu.
   ///
-  /// Applied to the default decoration, [menuShadows] and [menuBlur].
+  /// Applied to the built-in surfaces, their borders, [menuShadows] and the
+  /// local blur. A custom [SmartContextMenuStandardStyle.decoration] defines
+  /// the clip for the Standard panel contents.
   /// Liquid Glass takes the smaller component of each elliptical radius
   /// and caps each corner at half the shorter side of the panel.
   /// Defaults to [SmartContextMenuDefaults.borderRadius].
   final BorderRadiusGeometry borderRadius;
 
-  /// The decoration of the standard panel, including during fallback.
-  ///
-  /// Replaces the default decoration built from [menuColor], [borderColor]
-  /// and [borderRadius]. The pinned back item of a submenu is painted
-  /// separately with its own fill, decoration and blur. See [backButtonStyle].
-  final Decoration? menuDecoration;
+  /// The custom Standard decoration. See [SmartContextMenuStandardStyle.decoration].
+  @Deprecated('Use standardStyle.decoration instead.')
+  Decoration? get menuDecoration => standardStyle.decoration;
 
-  /// The blur behind the standard panel, including during fallback.
-  ///
-  /// Defaults to null. Glass uses [SmartContextMenuGlassStyle.blur].
-  /// [backgroundBlur] can blur the screen behind either surface.
-  final SmartContextMenuBlur? menuBlur;
+  /// The local blur for Standard. See [SmartContextMenuStandardStyle.blur].
+  @Deprecated('Use standardStyle.blur instead.')
+  SmartContextMenuBlur? get menuBlur => standardStyle.blur;
 
   /// The shadows under the menu.
   ///
-  /// Drawn with a custom [menuDecoration] too. Pass an empty list to remove
-  /// them. Defaults to [SmartContextMenuDefaults.menuShadows].
+  /// Drawn with a custom [SmartContextMenuStandardStyle.decoration] too.
+  /// Pass an empty list to remove them. Defaults to
+  /// [SmartContextMenuDefaults.menuShadows].
   final List<BoxShadow> menuShadows;
 
   // Background
@@ -344,18 +349,25 @@ final class SmartContextMenuStyle {
 
   /// Creates a menu style.
   ///
+  /// Set [standardStyle] to customize the Standard panel. The deprecated
+  /// Standard fields, such as [menuColor], can be used in place of the group.
+  ///
   /// Set the back item with [backButtonStyle] or with the deprecated back
   /// item fields, such as [backButtonBlur], not both; the same goes for
   /// [statusStyle] and the deprecated status fields. With a group, the
   /// deprecated fields would be ignored, so a debug assert fails.
   const SmartContextMenuStyle({
-    this.surface = const SmartContextMenuSurface.glass(),
-    this.menuColor = SmartContextMenuDefaults.menuColor,
-    this.borderColor = SmartContextMenuDefaults.borderColor,
-    this.showEdgeHighlight = true,
+    this.surface = SmartContextMenuSurface.glass,
+    this.glassStyle = const SmartContextMenuGlassStyle(),
+    SmartContextMenuStandardStyle? standardStyle,
+    @Deprecated('Use standardStyle.color instead.') Color? menuColor,
+    @Deprecated('Use standardStyle.border with a BorderSide instead.')
+    Color? borderColor,
     this.borderRadius = SmartContextMenuDefaults.borderRadius,
-    this.menuDecoration,
-    this.menuBlur,
+    @Deprecated('Use standardStyle.decoration instead.')
+    Decoration? menuDecoration,
+    @Deprecated('Use standardStyle.blur instead.')
+    SmartContextMenuBlur? menuBlur,
     this.menuShadows = SmartContextMenuDefaults.menuShadows,
     this.backgroundColor = SmartContextMenuDefaults.backgroundColor,
     this.backgroundBlur,
@@ -408,6 +420,15 @@ final class SmartContextMenuStyle {
     this.defaultIconColor,
     this.submenuIcon = SmartContextMenuDefaults.submenuIcon,
   }) : assert(
+         standardStyle == null ||
+             (menuColor == null &&
+                 borderColor == null &&
+                 menuDecoration == null &&
+                 menuBlur == null),
+         'Set either standardStyle or the deprecated Standard fields, '
+         'such as menuColor, not both.',
+       ),
+       assert(
          backButtonStyle == null ||
              (identical(backButtonBlur, SmartContextMenuBlur.strong) &&
                  identical(
@@ -440,6 +461,11 @@ final class SmartContextMenuStyle {
          'Set the status items either with statusStyle or with the '
          'deprecated fields, such as errorIcon, not both.',
        ),
+       _standardStyle = standardStyle,
+       _menuColor = menuColor,
+       _borderColor = borderColor,
+       _menuDecoration = menuDecoration,
+       _menuBlur = menuBlur,
        _backButtonStyle = backButtonStyle,
        _backButtonBlur = backButtonBlur,
        _backButtonBorderRadius = backButtonBorderRadius,
@@ -461,17 +487,25 @@ final class SmartContextMenuStyle {
 
   /// Creates a copy of this style with the given fields replaced.
   ///
-  /// Null arguments keep the current values, so nullable fields such as
-  /// [menuBlur] cannot be reset to null with it. The deprecated back item
+  /// Changing [surface] keeps both surface styles. Pass a new [standardStyle]
+  /// to replace the group or use [SmartContextMenuStandardStyle.copyWith] to
+  /// update specific settings. The deprecated Standard arguments can still
+  /// update individual settings when [standardStyle] is omitted.
+  ///
+  /// Null arguments keep the current values. The deprecated back item
   /// and status fields replace the fields of [backButtonStyle] and
   /// [statusStyle]; pass either a group or its deprecated fields.
   SmartContextMenuStyle copyWith({
     SmartContextMenuSurface? surface,
-    Color? menuColor,
+    SmartContextMenuGlassStyle? glassStyle,
+    SmartContextMenuStandardStyle? standardStyle,
+    @Deprecated('Use standardStyle.color instead.') Color? menuColor,
+    @Deprecated('Use standardStyle.border with a BorderSide instead.')
     Color? borderColor,
-    bool? showEdgeHighlight,
     BorderRadiusGeometry? borderRadius,
+    @Deprecated('Use standardStyle.decoration instead.')
     Decoration? menuDecoration,
+    @Deprecated('Use standardStyle.blur instead.')
     SmartContextMenuBlur? menuBlur,
     List<BoxShadow>? menuShadows,
     Color? backgroundColor,
@@ -538,14 +572,34 @@ final class SmartContextMenuStyle {
       'Pass either statusStyle or the deprecated status fields, such as '
       'errorIcon, not both.',
     );
+    assert(
+      standardStyle == null ||
+          (menuColor == null &&
+              borderColor == null &&
+              menuDecoration == null &&
+              menuBlur == null),
+      'Pass either standardStyle or the deprecated Standard fields, '
+      'such as menuColor, not both.',
+    );
+    final currentStandard = this.standardStyle;
+    if (menuColor != null ||
+        borderColor != null ||
+        menuDecoration != null ||
+        menuBlur != null) {
+      standardStyle ??= currentStandard.copyWith(
+        color: menuColor,
+        border: borderColor == null
+            ? null
+            : currentStandard.border.copyWith(color: borderColor),
+        decoration: menuDecoration,
+        blur: menuBlur,
+      );
+    }
     return SmartContextMenuStyle(
       surface: surface ?? this.surface,
-      menuColor: menuColor ?? this.menuColor,
-      borderColor: borderColor ?? this.borderColor,
-      showEdgeHighlight: showEdgeHighlight ?? this.showEdgeHighlight,
+      glassStyle: glassStyle ?? this.glassStyle,
+      standardStyle: standardStyle ?? currentStandard,
       borderRadius: borderRadius ?? this.borderRadius,
-      menuDecoration: menuDecoration ?? this.menuDecoration,
-      menuBlur: menuBlur ?? this.menuBlur,
       menuShadows: menuShadows ?? this.menuShadows,
       backgroundColor: backgroundColor ?? this.backgroundColor,
       backgroundBlur: backgroundBlur ?? this.backgroundBlur,

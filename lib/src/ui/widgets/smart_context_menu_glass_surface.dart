@@ -269,7 +269,7 @@ final class _RenderGlassBackdrop extends RenderProxyBox {
     if (!ui.ImageFilter.isShaderFilterSupported) return null;
 
     final style = _settings.style;
-    final tint = style.tint;
+    final tint = style.color;
 
     // Impeller provides the texture size (floats 0–1) and sampler 0.
     // The remaining slots follow smart_context_menu_glass.frag.

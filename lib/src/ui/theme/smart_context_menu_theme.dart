@@ -15,7 +15,9 @@ import '../../domain/smart_context_menu_config.dart';
 ///     config: const SmartContextMenuConfig(
 ///       style: SmartContextMenuStyle(
 ///         surface: SmartContextMenuSurface.standard,
-///         menuBlur: SmartContextMenuBlur.small,
+///         standardStyle: SmartContextMenuStandardStyle(
+///           blur: SmartContextMenuBlur.small,
+///         ),
 ///       ),
 ///     ),
 ///     child: child!,

@@ -5,7 +5,7 @@ import 'smart_context_menu_blur.dart';
 
 /// The tint, border and optical effects of the Liquid Glass menu surface.
 ///
-/// Pass it to [SmartContextMenuSurface.glass]. The same style can be used for
+/// Pass it to [SmartContextMenuStyle.glassStyle]. The same style can be used for
 /// one menu or shared through [SmartContextMenuTheme].
 @immutable
 final class SmartContextMenuGlassStyle {
@@ -13,7 +13,7 @@ final class SmartContextMenuGlassStyle {
   ///
   /// A `CupertinoDynamicColor` is resolved at the menu anchor when the menu
   /// opens. Defaults to [SmartContextMenuDefaults.glassTint].
-  final Color tint;
+  final Color color;
 
   /// The blur applied to the backdrop inside the glass before refraction.
   ///
@@ -44,7 +44,7 @@ final class SmartContextMenuGlassStyle {
 
   /// Creates a Liquid Glass style.
   const SmartContextMenuGlassStyle({
-    this.tint = SmartContextMenuDefaults.glassTint,
+    this.color = SmartContextMenuDefaults.glassTint,
     this.blur = const SmartContextMenuBlur(2),
     this.refraction = 1,
     this.edgeHighlight = 1,
@@ -53,14 +53,14 @@ final class SmartContextMenuGlassStyle {
 
   /// Creates a copy with the given fields replaced.
   SmartContextMenuGlassStyle copyWith({
-    Color? tint,
+    Color? color,
     SmartContextMenuBlur? blur,
     double? refraction,
     double? edgeHighlight,
     BorderSide? border,
   }) {
     return SmartContextMenuGlassStyle(
-      tint: tint ?? this.tint,
+      color: color ?? this.color,
       blur: blur ?? this.blur,
       refraction: refraction ?? this.refraction,
       edgeHighlight: edgeHighlight ?? this.edgeHighlight,
@@ -72,7 +72,7 @@ final class SmartContextMenuGlassStyle {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is SmartContextMenuGlassStyle &&
-          tint == other.tint &&
+          color == other.color &&
           blur.sigmaX == other.blur.sigmaX &&
           blur.sigmaY == other.blur.sigmaY &&
           refraction == other.refraction &&
@@ -81,7 +81,7 @@ final class SmartContextMenuGlassStyle {
 
   @override
   int get hashCode => Object.hash(
-    tint,
+    color,
     blur.sigmaX,
     blur.sigmaY,
     refraction,

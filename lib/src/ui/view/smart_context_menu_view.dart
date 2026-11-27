@@ -56,11 +56,6 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
 
   SmartContextMenuConfig get _config => widget.config;
 
-  BoxDecoration get _defaultDecoration => BoxDecoration(
-    color: CupertinoDynamicColor.resolve(_config.style.menuColor, context),
-    borderRadius: _config.style.borderRadius,
-  );
-
   @override
   void initState() {
     super.initState();
@@ -98,7 +93,7 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final glass = widget.glass;
-    final backItemGlassTint = glass?.style.tint;
+    final backItemGlassTint = glass?.style.color;
     final levels = ConstrainedBox(
       constraints: BoxConstraints(
         maxHeight: screenHeight * _config.menuHeightFactor,
@@ -143,41 +138,55 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
 
   Widget _buildStandardSurface(Widget levels) {
     final style = _config.style;
-    final decoration = style.menuDecoration;
-    final borderColor = decoration == null
-        ? CupertinoDynamicColor.resolve(style.borderColor, context)
-        : null;
-    // The outline is painted over the levels, including the pinned back row.
-    Widget surface = Container(
-      width: _config.menuWidth,
-      decoration: decoration ?? _defaultDecoration,
-      foregroundDecoration: borderColor == null
-          ? null
-          : BoxDecoration(
+    final standard = style.standardStyle;
+    final decoration = standard.decoration;
+    Widget surface = SmartContextMenuBlurBox(
+      blur: standard.blur,
+      borderRadius: style.borderRadius,
+      child: Container(
+        width: _config.menuWidth,
+        decoration:
+            decoration ??
+            BoxDecoration(
+              color: CupertinoDynamicColor.resolve(standard.color, context),
               borderRadius: style.borderRadius,
-              border: Border.all(color: borderColor),
             ),
-      clipBehavior: Clip.antiAlias,
-      child: levels,
+        clipBehavior: Clip.antiAlias,
+        child: levels,
+      ),
     );
-    if (style.showEdgeHighlight && borderColor != null && borderColor.a > 0) {
-      surface = CustomPaint(
-        foregroundPainter: SmartContextMenuHighlightPainter(
-          borderRadius: style.borderRadius.resolve(Directionality.of(context)),
-          borderOpacity: borderColor.a,
-          brightness: CupertinoTheme.brightnessOf(context),
-        ),
-        child: surface,
+    if (decoration == null && standard.border.style != BorderStyle.none) {
+      final border = standard.border.copyWith(
+        color: CupertinoDynamicColor.resolve(standard.border.color, context),
       );
+      if (border.color.a > 0) {
+        // The outline sits above the levels and outside the backdrop clip.
+        surface = DecoratedBox(
+          position: DecorationPosition.foreground,
+          decoration: BoxDecoration(
+            borderRadius: style.borderRadius,
+            border: Border.fromBorderSide(border),
+          ),
+          child: surface,
+        );
+        if (standard.showEdgeHighlight) {
+          surface = CustomPaint(
+            foregroundPainter: SmartContextMenuHighlightPainter(
+              borderRadius: style.borderRadius.resolve(
+                Directionality.of(context),
+              ),
+              border: border,
+              brightness: CupertinoTheme.brightnessOf(context),
+            ),
+            child: surface,
+          );
+        }
+      }
     }
     return SmartContextMenuShadowBox(
       borderRadius: style.borderRadius,
       shadows: style.menuShadows,
-      child: SmartContextMenuBlurBox(
-        blur: style.menuBlur,
-        borderRadius: style.borderRadius,
-        child: surface,
-      ),
+      child: surface,
     );
   }
 

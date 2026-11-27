@@ -35,12 +35,13 @@ final class SmartContextMenuBackButtonStyle {
   /// A transparent decoration shows the blurred scrolling items underneath.
   final Decoration? decoration;
 
-  /// The fill of the back item when [decoration] is null.
+  /// The fill of the pinned Back row at the top of a submenu.
   ///
-  /// The alpha is used as supplied, and the row keeps its usual shape,
-  /// divider and blur. A `CupertinoDynamicColor` is resolved in the menu.
-  /// Defaults to null, which uses [SmartContextMenuStyle.menuColor] on
-  /// Standard and the glass tint at 14% opacity on Liquid Glass.
+  /// When [decoration] is null, an explicit color uses the supplied alpha
+  /// together with the row's usual shape, divider and blur.
+  /// A `CupertinoDynamicColor` is resolved in the menu.
+  /// If this color is null, the row uses `standardStyle.color` on Standard
+  /// and the glass tint at 14% opacity on Liquid Glass.
   final Color? backgroundColor;
 
   /// The blur behind the back item.

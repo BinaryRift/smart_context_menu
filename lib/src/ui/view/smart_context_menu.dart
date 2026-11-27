@@ -272,7 +272,7 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
   void _resolveConfig() {
     _config = widget.config ?? SmartContextMenuTheme.of(context);
     final canPreloadGlass =
-        _config.style.surface.glassStyle != null &&
+        _config.style.surface == SmartContextMenuSurface.glass &&
         !(MediaQuery.maybeHighContrastOf(context) ?? false);
     if (canPreloadGlass && !_canPreloadGlass) {
       unawaited(_glassShader.prepare());
@@ -325,7 +325,7 @@ final class _SmartContextMenuState extends State<SmartContextMenu> {
     // Capture one config and surface for this opening, before the preview.
     final config = _config;
     final glass = _glassShader.select(
-      config.style.surface,
+      config.style,
       context,
       highContrast: MediaQuery.maybeHighContrastOf(context) ?? false,
     );

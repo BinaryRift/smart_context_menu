@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart' show CupertinoDynamicColor;
 import 'package:flutter/widgets.dart' show BuildContext;
 
 import '../../domain/smart_context_menu_glass_style.dart';
+import '../../domain/smart_context_menu_style.dart';
 import '../../domain/smart_context_menu_surface.dart';
 
 /// The shader program and resolved style for one menu opening.
@@ -36,24 +37,26 @@ final class SmartContextMenuGlassShader {
   /// Selects Glass only if its program is ready when the menu opens.
   /// A load started here can make Glass available on a later opening.
   SmartContextMenuResolvedGlass? select(
-    SmartContextMenuSurface surface,
+    SmartContextMenuStyle menuStyle,
     BuildContext anchorContext, {
     required bool highContrast,
   }) {
-    final style = surface.glassStyle;
-    if (style == null || highContrast) return null;
+    if (menuStyle.surface != SmartContextMenuSurface.glass || highContrast) {
+      return null;
+    }
 
     final readyProgram = program;
     unawaited(prepare());
     if (readyProgram == null) return null;
 
-    final tint = CupertinoDynamicColor.resolve(style.tint, anchorContext);
+    final style = menuStyle.glassStyle;
+    final color = CupertinoDynamicColor.resolve(style.color, anchorContext);
     final border = style.border.copyWith(
       color: CupertinoDynamicColor.resolve(style.border.color, anchorContext),
     );
     return (
       program: readyProgram,
-      style: style.copyWith(tint: tint, border: border),
+      style: style.copyWith(color: color, border: border),
     );
   }
 

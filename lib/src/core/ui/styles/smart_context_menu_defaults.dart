@@ -88,9 +88,9 @@ abstract final class SmartContextMenuDefaults {
 
   // Colors
 
-  /// The menu background, the default of [SmartContextMenuStyle.menuColor].
+  /// The default fill of [SmartContextMenuStandardStyle].
   ///
-  /// Translucent, so [SmartContextMenuStyle.menuBlur] shows through it.
+  /// Translucent, so the Standard panel's local blur shows through it.
   static const CupertinoDynamicColor menuColor =
       CupertinoDynamicColor.withBrightness(
         color: Color(0xB3F2F2F7),
@@ -104,7 +104,7 @@ abstract final class SmartContextMenuDefaults {
         darkColor: Color(0x9C161B24),
       );
 
-  /// The menu border, the default of [SmartContextMenuStyle.borderColor].
+  /// The default border color of [SmartContextMenuStandardStyle].
   static const CupertinoDynamicColor borderColor =
       CupertinoDynamicColor.withBrightness(
         color: Color(0xFF9D9D9F),
