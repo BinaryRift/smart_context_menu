@@ -113,6 +113,33 @@ void main() {
     expect(titleColor(tester), isSameColorAs(configColor));
   });
 
+  testWidgets('inherits Standard and lets a menu explicitly select Glass', (
+    tester,
+  ) async {
+    const standard = SmartContextMenuConfig(
+      style: SmartContextMenuStyle(surface: SmartContextMenuSurface.standard),
+    );
+    const glass = SmartContextMenuConfig(
+      style: SmartContextMenuStyle(
+        surface: SmartContextMenuSurface.glass,
+        glassStyle: SmartContextMenuGlassStyle(refraction: 2),
+      ),
+    );
+    final overlay = find.byType(SmartContextMenuOverlay);
+    SmartContextMenuConfig activeConfig() =>
+        tester.widget<SmartContextMenuOverlay>(overlay).config;
+
+    await tester.pumpWidget(buildApp(theme: standard));
+    await tester.openMenu();
+    expect(activeConfig(), same(standard));
+
+    Navigator.of(tester.element(overlay)).pop();
+    await tester.settleMenu();
+    await tester.pumpWidget(buildApp(theme: standard, config: glass));
+    await tester.openMenu();
+    expect(activeConfig(), same(glass));
+  });
+
   testWidgets('keeps the surface selected before capturing the preview', (
     tester,
   ) async {
