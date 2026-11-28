@@ -1,8 +1,10 @@
 // ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:smart_context_menu/smart_context_menu.dart';
 
 import '../../settings/ui/widgets/settings_button.dart';
+import 'liquid_glass_settings_sheet.dart';
 
 enum _Surface { standard, glass }
 
@@ -28,6 +30,17 @@ final class _LiquidGlassPageState extends State<LiquidGlassPage> {
   _Surface _surface = _Surface.glass;
   bool _highlightStandard = true;
   bool _useSoftBackground = false;
+  var _glassSettings = defaultGlassPreviewSettings;
+
+  Future<void> _editGlass() async {
+    final settings = await showCupertinoModalPopup<GlassPreviewSettings>(
+      context: context,
+      builder: (_) => LiquidGlassSettingsSheet(settings: _glassSettings),
+    );
+    if (mounted && settings != null) {
+      setState(() => _glassSettings = settings);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,6 +103,12 @@ final class _LiquidGlassPageState extends State<LiquidGlassPage> {
   Widget _buildOptions() {
     return CupertinoListSection.insetGrouped(
       header: const Text('Options'),
+      footer: kIsWeb
+          ? const Text(
+              'Liquid Glass is unavailable on the web. '
+              'The preview uses Standard.',
+            )
+          : null,
       children: [
         CupertinoListTile.notched(
           title: const Text('Surface'),
@@ -112,6 +131,12 @@ final class _LiquidGlassPageState extends State<LiquidGlassPage> {
               onChanged: (value) => setState(() => _highlightStandard = value),
             ),
           ),
+        if (_surface == _Surface.glass && !kIsWeb)
+          CupertinoListTile.notched(
+            title: const Text('Glass settings'),
+            trailing: const CupertinoListTileChevron(),
+            onTap: _editGlass,
+          ),
         CupertinoListTile.notched(
           title: const Text('Half dimming + blur'),
           trailing: CupertinoSwitch(
@@ -131,6 +156,10 @@ final class _LiquidGlassPageState extends State<LiquidGlassPage> {
           surface: _surface == _Surface.glass
               ? SmartContextMenuSurface.glass
               : SmartContextMenuSurface.standard,
+          glassStyle: _glassSettings.style.copyWith(
+            blur: _glassSettings.blur,
+            edgeHighlight: _glassSettings.edgeHighlight,
+          ),
           standardStyle: SmartContextMenuStandardStyle(
             blur: SmartContextMenuBlur.small,
             showEdgeHighlight: _surface == _Surface.glass || _highlightStandard,

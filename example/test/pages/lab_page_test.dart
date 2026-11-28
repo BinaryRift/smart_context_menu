@@ -1,6 +1,14 @@
+import 'dart:ui' as ui show Brightness;
+
 // ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart'
-    show CupertinoIcons, CupertinoListTile, CupertinoSwitch;
+    show
+        CupertinoIcons,
+        CupertinoListTile,
+        CupertinoModalPopupRoute,
+        CupertinoSlider,
+        CupertinoSwitch,
+        CupertinoTextField;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
@@ -9,6 +17,7 @@ import 'package:smart_context_menu/src/ui/widgets/smart_context_menu_glass_surfa
 // ignore: implementation_imports
 import 'package:smart_context_menu/src/ui/widgets/smart_context_menu_highlight.dart';
 import 'package:smart_context_menu_example/core/ui/reactions_bar.dart';
+import 'package:smart_context_menu_example/pages/lab/ui/liquid_glass_settings_sheet.dart';
 import 'package:smart_context_menu_example/pages/settings/ui/settings_sheet.dart';
 
 import '../helpers/menu_tester.dart';
@@ -122,6 +131,119 @@ void main() {
     await tester.settleMenu();
     expect(find.text('Browse folders'), findsOneWidget);
     expect(highlight, findsNothing);
+  });
+
+  testWidgets('Glass settings apply to the preview and reset to defaults', (
+    tester,
+  ) async {
+    tester.platformDispatcher.platformBrightnessTestValue = ui.Brightness.light;
+    addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
+    await tester.pumpPhoneApp();
+    await tester.tap(find.text('Lab'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Liquid Glass'));
+    await tester.pumpAndSettle();
+
+    SmartContextMenuGlassStyle previewStyle() {
+      final button = tester.element(find.text('Open menu'));
+      return button
+          .findAncestorWidgetOfExactType<SmartContextMenu>()!
+          .config!
+          .style
+          .glassStyle;
+    }
+
+    final defaults = previewStyle();
+    Future<void> openSettings() async {
+      await tester.tap(find.text('Glass settings'));
+      await tester.pumpAndSettle();
+      final route = ModalRoute.of(tester.element(find.text('Apply')));
+      expect(route, isA<CupertinoModalPopupRoute<dynamic>>());
+      expect(find.text('Open menu'), findsOneWidget);
+      expect(find.text('Open menu').hitTestable(), findsNothing);
+    }
+
+    await openSettings();
+    final slider = find.descendant(
+      of: find.byWidgetPredicate(
+        (widget) =>
+            widget is Semantics && widget.properties.label == 'Refraction',
+      ),
+      matching: find.byType(CupertinoSlider),
+    );
+    expect(tester.widget<CupertinoSlider>(slider).value, defaults.refraction);
+    final size = tester.getSize(slider);
+    await tester.dragFrom(
+      tester.getTopLeft(slider) + Offset(size.width / 3, size.height / 2),
+      const Offset(75, 0),
+    );
+    await tester.pumpAndSettle();
+    final editedRefraction = tester.widget<CupertinoSlider>(slider).value;
+    expect(editedRefraction, greaterThan(defaults.refraction));
+
+    final tint = find.byType(CupertinoTextField);
+    await tester.ensureVisible(tint);
+    int tintRgb() => int.parse(
+      tester.widget<CupertinoTextField>(tint).controller!.text,
+      radix: 16,
+    );
+    final defaultTint = SmartContextMenuDefaults.glassTint;
+    expect(tintRgb(), defaultTint.color.toARGB32() & 0xFFFFFF);
+    tester.platformDispatcher.platformBrightnessTestValue = ui.Brightness.dark;
+    await tester.pumpAndSettle();
+    expect(tintRgb(), defaultTint.darkColor.toARGB32() & 0xFFFFFF);
+
+    await tester.enterText(tint, '2299CC');
+    tester.view.viewInsets = const FakeViewPadding(bottom: 780);
+    await tester.pumpAndSettle();
+    final apply = find.text('Apply').hitTestable();
+    expect(apply, findsOneWidget);
+    await tester.tap(apply);
+    tester.view.resetViewInsets();
+    await tester.pumpAndSettle();
+    expect(previewStyle().refraction, editedRefraction);
+    expect(previewStyle().color.toARGB32() & 0xFFFFFF, 0x2299CC);
+    expect(
+      previewStyle().copyWith(
+        color: defaults.color,
+        refraction: defaults.refraction,
+      ),
+      defaults,
+    );
+
+    await tester.tap(find.text('Standard'));
+    await tester.pumpAndSettle();
+    expect(find.text('Glass settings'), findsNothing);
+    await tester.tap(find.text('Glass'));
+    await tester.pumpAndSettle();
+    expect(previewStyle().refraction, editedRefraction);
+
+    Future<void> resetSettings() async {
+      final reset = find.text('Reset');
+      final scrollable = find
+          .descendant(
+            of: find.byType(LiquidGlassSettingsSheet),
+            matching: find.byType(Scrollable),
+          )
+          .first;
+      await tester.scrollUntilVisible(reset, 150, scrollable: scrollable);
+      await tester.pumpAndSettle();
+      await tester.tap(reset);
+      await tester.pumpAndSettle();
+    }
+
+    await openSettings();
+    await resetSettings();
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(previewStyle().refraction, editedRefraction);
+    expect(previewStyle().color.toARGB32() & 0xFFFFFF, 0x2299CC);
+
+    await openSettings();
+    await resetSettings();
+    await tester.tap(find.text('Apply'));
+    await tester.pumpAndSettle();
+    expect(previewStyle(), defaults);
   });
 
   testWidgets('a reaction in the Lab shows feedback immediately', (
