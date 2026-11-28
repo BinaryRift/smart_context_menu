@@ -25,6 +25,9 @@
 * The standard panel draws an edge highlight by default. Use `border: BorderSide.none`
   for the highlight alone, `standardStyle.lightDirection` to aim it, and
   `showEdgeHighlight: false` to switch it off.
+* `SmartContextMenuPanel` applies the menu's Glass and Standard surfaces to any widget.
+  It can use an explicit style or inherit `SmartContextMenuTheme`. A panel in a menu header
+  can share the menu's selected surface, as the example app's reactions bar does.
 * `SmartContextMenuStyle.backgroundBlur` is `null` by default. To restore the full-screen
   blur from 1.1.x, set `backgroundBlur: SmartContextMenuBlur.medium`.
 

@@ -38,17 +38,24 @@ void main() {
         return load.future;
       },
     );
+    var readyNotifications = 0;
+    final ready = shader.ready.listen((_) => readyNotifications++);
+    final notificationsDone = ready.asFuture<void>();
+    addTearDown(ready.cancel);
 
     final preparation = shader.prepare();
     expect(shader.prepare(), same(preparation));
     expect(shader.program, isNull);
+    expect(readyNotifications, 0);
 
     load.complete(program);
     await preparation;
+    await notificationsDone;
 
     expect(shader.program, same(program));
     expect(shader.prepare(), isNull);
     expect(loads, 1);
+    expect(readyNotifications, 1);
   });
 
   test(

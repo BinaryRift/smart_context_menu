@@ -61,6 +61,8 @@ final class SmartContextMenuHeaderDetails {
   ///
   /// The slivers also fade with the menu unless
   /// [SmartContextMenu.fadeHeaderSlivers] is false.
+  /// For a `SmartContextMenuPanel` in a header, set `fadeHeaderSlivers` to
+  /// false and pass this animation to the panel's `opacity`.
   final Animation<double> animation;
 
   final Future<void> Function() _close;

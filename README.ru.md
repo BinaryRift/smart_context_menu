@@ -1388,6 +1388,24 @@ const style = SmartContextMenuStyle(
 Для перехода используйте поля `standardStyle` — `color`, `border` (тип `BorderSide`),
 `decoration` и `blur`.
 
+`SmartContextMenuPanel` применяет поверхность, скругление и тени меню к любому виджету.
+Если опустить `style`, панель возьмёт стиль из `SmartContextMenuTheme`. Отдельная панель
+использует Standard во время загрузки шейдера и переключается на Glass, когда он готов.
+
+```dart
+SmartContextMenuPanel(
+  style: style,
+  child: const Padding(
+    padding: EdgeInsets.all(12),
+    child: Text('Быстрые действия'),
+  ),
+)
+```
+
+В заголовке меню опустите `style`, чтобы панель использовала поверхность текущего открытия.
+Передайте `header.animation` как `opacity` панели и задайте `fadeHeaderSlivers: false` у меню,
+чтобы эффекты фона анимировались вместе с заголовком.
+
 #### Стиль пунктов
 
 Ещё `SmartContextMenuStyle` задаёт текст, цвета, значки и отступы пунктов, так что меню

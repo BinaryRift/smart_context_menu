@@ -203,6 +203,7 @@ final class _ChatPageState extends State<ChatPage> {
             controller: menu,
             items: _menuItems(message),
             headerSliversBuilder: _reactionsBar(message),
+            fadeHeaderSlivers: false,
             // The photo has a Hero, which flies from its place both after
             // a tap on the photo and after a tap on the preview.
             onPreviewTap: image == null ? null : () => _openPhoto(message),
@@ -233,6 +234,7 @@ final class _ChatPageState extends State<ChatPage> {
             // Grows from the bottom edge, next to the message.
             alignment: Alignment(header.alignment.x, 1),
             child: ReactionsBar(
+              opacity: header.animation,
               onSelected: (reaction) async {
                 _notice('Selected reaction $reaction');
                 await header.close();

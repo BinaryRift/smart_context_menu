@@ -24,6 +24,7 @@
 /// * [SmartContextMenuSurface] selects Liquid Glass or the standard panel.
 ///   [SmartContextMenuGlassStyle] and [SmartContextMenuStandardStyle] set
 ///   the appearance of the two surfaces.
+/// * [SmartContextMenuPanel] applies those surfaces to any child widget.
 /// * [SmartContextMenuPagingMetadata] describes a page of a paginated
 ///   submenu.
 /// * [SmartContextMenuRowFlex] sets the share of a cell in a row,
@@ -63,3 +64,5 @@ export 'src/domain/smart_context_menu_style.dart';
 export 'src/domain/smart_context_menu_surface.dart';
 export 'src/ui/theme/smart_context_menu_theme.dart';
 export 'src/ui/view/smart_context_menu.dart';
+export 'src/ui/widgets/smart_context_menu_panel.dart'
+    show SmartContextMenuPanel;

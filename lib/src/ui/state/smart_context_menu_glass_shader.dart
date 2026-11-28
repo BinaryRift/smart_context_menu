@@ -1,4 +1,4 @@
-import 'dart:async' show unawaited;
+import 'dart:async' show StreamController, unawaited;
 import 'dart:ui' as ui;
 
 // ignore: deprecated_member_use
@@ -16,13 +16,16 @@ typedef SmartContextMenuResolvedGlass = ({
   SmartContextMenuGlassStyle style,
 });
 
-/// Shares the pending load and the resulting program across menu openings.
+/// Shares the pending load and the resulting program across panels.
 final class SmartContextMenuGlassShader {
+  static final shared = SmartContextMenuGlassShader();
+
   static const _asset =
       'packages/smart_context_menu/lib/src/ui/shaders/smart_context_menu_glass.frag';
 
   final bool Function() _isSupported;
   final Future<ui.FragmentProgram> Function() _load;
+  final _ready = StreamController<void>.broadcast();
 
   Future<void>? _pending;
   ui.FragmentProgram? _program;
@@ -35,6 +38,9 @@ final class SmartContextMenuGlassShader {
 
   ui.FragmentProgram? get program => _isSupported() ? _program : null;
 
+  /// Emits once when the program becomes ready, including after a retry.
+  Stream<void> get ready => _ready.stream;
+
   /// Selects Glass only if its program is ready when the menu opens.
   /// A load started here can make Glass available on a later opening.
   SmartContextMenuResolvedGlass? select(
@@ -46,16 +52,24 @@ final class SmartContextMenuGlassShader {
       return null;
     }
 
-    final readyProgram = program;
+    final glass = resolveReady(menuStyle.glassStyle, anchorContext);
     unawaited(prepare());
+    return glass;
+  }
+
+  /// Resolves the glass style if the program is already available.
+  SmartContextMenuResolvedGlass? resolveReady(
+    SmartContextMenuGlassStyle style,
+    BuildContext context,
+  ) {
+    final readyProgram = program;
     if (readyProgram == null) return null;
 
-    final style = menuStyle.glassStyle;
-    final color = _resolveColor(style.color, anchorContext);
+    final color = _resolveColor(style.color, context);
     final brightness =
-        CupertinoTheme.maybeBrightnessOf(anchorContext) ?? ui.Brightness.light;
+        CupertinoTheme.maybeBrightnessOf(context) ?? ui.Brightness.light;
     final border = style.border.copyWith(
-      color: _resolveColor(style.border.color, anchorContext),
+      color: _resolveColor(style.border.color, context),
     );
     return (
       program: readyProgram,
@@ -102,6 +116,10 @@ final class SmartContextMenuGlassShader {
       // The standard menu remains available. Another opening can retry.
     } finally {
       _pending = null;
+    }
+    if (_program != null) {
+      _ready.add(null);
+      unawaited(_ready.close());
     }
   }
 

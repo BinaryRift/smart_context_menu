@@ -1381,6 +1381,24 @@ The menu's `borderRadius` sets the corner radius for both built-in surfaces. Eac
 `menuColor`, `borderColor`, `menuDecoration` and `menuBlur` still configure Standard.
 Use `standardStyle.color`, `border` (a `BorderSide`), `decoration` and `blur` to migrate.
 
+Use `SmartContextMenuPanel` to apply the same surface, corner radius and shadows to a widget.
+The panel uses `SmartContextMenuTheme` when `style` is omitted. A standalone panel uses Standard
+while the shader loads and switches to Glass when it is ready.
+
+```dart
+SmartContextMenuPanel(
+  style: style,
+  child: const Padding(
+    padding: EdgeInsets.all(12),
+    child: Text('Quick actions'),
+  ),
+)
+```
+
+In a menu header, omit `style` to share the surface selected for that opening. Pass
+`header.animation` as the panel's `opacity` and set `fadeHeaderSlivers: false` on the menu
+to animate the panel's backdrop effects with the header.
+
 #### Item style
 
 `SmartContextMenuStyle` also sets the text, colors, icons and spacing of items, so the menu

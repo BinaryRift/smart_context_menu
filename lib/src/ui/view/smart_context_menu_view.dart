@@ -1,6 +1,3 @@
-// ignore: deprecated_member_use
-import 'package:flutter/cupertino.dart'
-    show CupertinoDynamicColor, CupertinoTheme;
 import 'package:flutter/widgets.dart';
 
 import '../../core/ui/motion/tokens/motion_curves.dart';
@@ -14,15 +11,12 @@ import '../extensions/animation_ext.dart';
 import '../state/smart_context_menu_glass_shader.dart';
 import '../state/smart_context_menu_hover_controller.dart';
 import '../state/smart_context_menu_stretch_controller.dart';
-import '../widgets/smart_context_menu_blur_box.dart';
-import '../widgets/smart_context_menu_glass_surface.dart';
-import '../widgets/smart_context_menu_highlight.dart';
 import '../widgets/smart_context_menu_level_switcher.dart';
+import '../widgets/smart_context_menu_panel.dart';
 import '../widgets/smart_context_menu_pointer_tracker.dart';
 import 'smart_context_menu_level_view.dart';
 import '../../domain/smart_context_menu_config.dart';
 import '../../domain/smart_context_menu_item.dart';
-import '../widgets/smart_context_menu_shadow_box.dart';
 import '../widgets/widget_size_listener.dart';
 
 final class SmartContextMenuView extends StatefulWidget {
@@ -129,116 +123,11 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
           transform: _stretchController.transform,
           child: child,
         ),
-        child: glass == null
-            ? _buildStandardSurface(levels)
-            : _buildGlassSurface(glass, levels),
-      ),
-    );
-  }
-
-  Widget _buildStandardSurface(Widget levels) {
-    final style = _config.style;
-    final standard = style.standardStyle;
-    final decoration = standard.decoration;
-    final blur = standard.blur;
-    Widget surface = Container(
-      width: _config.menuWidth,
-      decoration:
-          decoration ??
-          BoxDecoration(
-            color: CupertinoDynamicColor.resolve(standard.color, context),
-            borderRadius: style.borderRadius,
-          ),
-      clipBehavior: Clip.antiAlias,
-      child: levels,
-    );
-    if (blur != null) {
-      surface = ClipRRect(borderRadius: style.borderRadius, child: surface);
-    }
-    if (decoration == null) {
-      final border = standard.border.copyWith(
-        color: CupertinoDynamicColor.resolve(standard.border.color, context),
-      );
-      final hasBorder = border.style != BorderStyle.none && border.color.a > 0;
-      if (hasBorder) {
-        // The outline sits above the levels and outside the backdrop clip.
-        surface = DecoratedBox(
-          position: DecorationPosition.foreground,
-          decoration: BoxDecoration(
-            borderRadius: style.borderRadius,
-            border: Border.fromBorderSide(border),
-          ),
-          child: surface,
-        );
-      }
-      if (standard.showEdgeHighlight) {
-        surface = CustomPaint(
-          foregroundPainter: SmartContextMenuHighlightPainter(
-            borderRadius: style.borderRadius.resolve(
-              Directionality.of(context),
-            ),
-            border: hasBorder ? border : const BorderSide(),
-            brightness: CupertinoTheme.brightnessOf(context),
-            lightDirection: standard.lightDirection,
-          ),
-          child: surface,
-        );
-      }
-    }
-    final opacity = widget.opacity;
-    if (blur == null) {
-      return FadeTransition(
-        opacity: opacity,
-        child: SmartContextMenuShadowBox(
-          borderRadius: style.borderRadius,
-          shadows: style.menuShadows,
-          child: surface,
+        child: SmartContextMenuPanel(
+          width: _config.menuWidth,
+          opacity: widget.opacity,
+          child: levels,
         ),
-      );
-    }
-
-    // Keep the backdrop outside the fade's temporary buffer so it samples
-    // the same scene throughout the transition.
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: SmartContextMenuShadowBox(
-            borderRadius: style.borderRadius,
-            shadows: style.menuShadows,
-            opacity: opacity,
-            child: const SizedBox.expand(),
-          ),
-        ),
-        Positioned.fill(
-          child: AnimatedBuilder(
-            animation: opacity,
-            child: const SizedBox.expand(),
-            builder: (context, child) => SmartContextMenuBlurBox(
-              blur: blur,
-              borderRadius: style.borderRadius,
-              strength: opacity.value,
-              child: child!,
-            ),
-          ),
-        ),
-        FadeTransition(opacity: opacity, child: surface),
-      ],
-    );
-  }
-
-  Widget _buildGlassSurface(
-    SmartContextMenuResolvedGlass glass,
-    Widget levels,
-  ) {
-    return SizedBox(
-      width: _config.menuWidth,
-      child: SmartContextMenuGlassSurface(
-        program: glass.program,
-        opacity: widget.opacity,
-        borderRadius: _config.style.borderRadius,
-        shadows: _config.style.menuShadows,
-        style: glass.style,
-        child: levels,
       ),
     );
   }

@@ -189,7 +189,7 @@ final class SmartContextMenu extends StatefulWidget {
 }
 
 final class _SmartContextMenuState extends State<SmartContextMenu> {
-  static final _glassShader = SmartContextMenuGlassShader();
+  static final _glassShader = SmartContextMenuGlassShader.shared;
 
   final GlobalKey _previewKey = GlobalKey();
   final GlobalKey _persistentKey = GlobalKey();

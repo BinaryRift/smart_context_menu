@@ -20,6 +20,7 @@ import '../state/smart_context_menu_glass_shader.dart';
 import '../state/smart_context_menu_header_animation.dart';
 import '../widgets/smart_context_menu_background.dart';
 import '../widgets/smart_context_menu_header.dart';
+import '../widgets/smart_context_menu_panel.dart';
 import '../widgets/smart_context_menu_preview.dart';
 import 'smart_context_menu_view.dart';
 
@@ -161,7 +162,11 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
             Positioned.fill(
               child: NotificationListener<ScrollNotification>(
                 onNotification: _handleScrollNotification,
-                child: _buildContent(),
+                child: SmartContextMenuPanelScope(
+                  style: _config.style,
+                  glass: widget.glass,
+                  child: _buildContent(),
+                ),
               ),
             ),
           ],
