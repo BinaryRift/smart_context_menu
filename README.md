@@ -1371,7 +1371,8 @@ highlight default to `1`. Use `0` to turn either effect off.
 Both styles use `BorderSide` for the border color, width and stroke alignment. Glass defaults
 to `BorderSide.none`. Standard defaults to a one-logical-pixel border with a directional
 highlight. Set `border: BorderSide.none` for the highlight alone, or set
-`showEdgeHighlight: false` to turn off the highlight.
+`showEdgeHighlight: false` to turn off the highlight. Set `standardStyle.lightDirection`
+to move the bright end of the gradient. For example, `Offset(1, 0)` lights the right edge.
 The menu's `borderRadius` sets the corner radius for both built-in surfaces. Each style's
 `blur` applies within the menu outline. Standard defaults to no local blur.
 `backgroundBlur` blurs the whole screen behind either surface.

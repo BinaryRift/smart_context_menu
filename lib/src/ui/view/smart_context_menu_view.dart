@@ -179,6 +179,7 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
             ),
             border: hasBorder ? border : const BorderSide(),
             brightness: CupertinoTheme.brightnessOf(context),
+            lightDirection: standard.lightDirection,
           ),
           child: surface,
         );

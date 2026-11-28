@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:ui' as ui show Brightness;
 
 import 'package:flutter/widgets.dart';
@@ -7,11 +8,13 @@ final class SmartContextMenuHighlightPainter extends CustomPainter {
   final BorderRadius borderRadius;
   final BorderSide border;
   final ui.Brightness brightness;
+  final Offset lightDirection;
 
   const SmartContextMenuHighlightPainter({
     required this.borderRadius,
     required this.border,
     required this.brightness,
+    required this.lightDirection,
   });
 
   @override
@@ -21,9 +24,13 @@ final class SmartContextMenuHighlightPainter extends CustomPainter {
     final strength =
         border.color.a * (brightness == ui.Brightness.dark ? 0.62 : 1);
     final contour = borderRadius.toRRect(Offset.zero & size).scaleRadii();
+    final extent = math.max(lightDirection.dx.abs(), lightDirection.dy.abs());
+    final start = extent.isFinite && extent > 0
+        ? Alignment(lightDirection.dx / extent, lightDirection.dy / extent)
+        : Alignment.topLeft;
     final gradient = LinearGradient(
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
+      begin: start,
+      end: Alignment(-start.x, -start.y),
       colors: [
         white.withValues(alpha: 0.78 * strength),
         white.withValues(alpha: 0.28 * strength),
@@ -46,5 +53,6 @@ final class SmartContextMenuHighlightPainter extends CustomPainter {
   bool shouldRepaint(SmartContextMenuHighlightPainter oldDelegate) =>
       borderRadius != oldDelegate.borderRadius ||
       border != oldDelegate.border ||
-      brightness != oldDelegate.brightness;
+      brightness != oldDelegate.brightness ||
+      lightDirection != oldDelegate.lightDirection;
 }

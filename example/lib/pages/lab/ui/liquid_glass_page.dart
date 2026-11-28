@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 // ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -29,6 +31,7 @@ final class _LiquidGlassPageState extends State<LiquidGlassPage> {
 
   _Surface _surface = _Surface.glass;
   bool _highlightStandard = true;
+  Offset _standardLight = const SmartContextMenuStandardStyle().lightDirection;
   bool _useSoftBackground = false;
   var _glassSettings = defaultGlassPreviewSettings;
 
@@ -101,6 +104,7 @@ final class _LiquidGlassPageState extends State<LiquidGlassPage> {
   }
 
   Widget _buildOptions() {
+    final standardAngle = _standardLight.direction * 180 / math.pi;
     return CupertinoListSection.insetGrouped(
       header: const Text('Options'),
       footer: kIsWeb
@@ -129,6 +133,28 @@ final class _LiquidGlassPageState extends State<LiquidGlassPage> {
             trailing: CupertinoSwitch(
               value: _highlightStandard,
               onChanged: (value) => setState(() => _highlightStandard = value),
+            ),
+          ),
+        if (_surface == _Surface.standard && _highlightStandard)
+          CupertinoListTile.notched(
+            title: const Text('Light direction'),
+            subtitle: Text('${standardAngle.round()}°'),
+            trailing: SizedBox(
+              width: 132,
+              child: Semantics(
+                label: 'Light direction',
+                child: CupertinoSlider(
+                  value: standardAngle.clamp(-180, 180),
+                  min: -180,
+                  max: 180,
+                  divisions: 360,
+                  onChanged: (degrees) => setState(
+                    () => _standardLight = Offset.fromDirection(
+                      degrees * math.pi / 180,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
         if (_surface == _Surface.glass && !kIsWeb)
@@ -163,6 +189,7 @@ final class _LiquidGlassPageState extends State<LiquidGlassPage> {
           standardStyle: SmartContextMenuStandardStyle(
             blur: SmartContextMenuBlur.small,
             showEdgeHighlight: _surface == _Surface.glass || _highlightStandard,
+            lightDirection: _standardLight,
           ),
           borderRadius: const BorderRadius.all(Radius.circular(20)),
           backgroundColor: _useSoftBackground ? _halfDimming : _standardDimming,

@@ -45,6 +45,7 @@ void main() {
     expect(defaultStyle.standardStyle.blur, isNull);
     expect(defaultStyle.standardStyle.border.width, 1);
     expect(defaultStyle.standardStyle.showEdgeHighlight, isTrue);
+    expect(defaultStyle.standardStyle.lightDirection, const Offset(-1, -1));
     final style = defaultStyle.copyWith(
       glassStyle: customGlass,
       standardStyle: customStandard,
@@ -106,6 +107,7 @@ void main() {
       standardStyle: SmartContextMenuStandardStyle(
         border: BorderSide(width: 3, strokeAlign: BorderSide.strokeAlignCenter),
         showEdgeHighlight: false,
+        lightDirection: Offset(1, 0),
       ),
     );
     const color = Color(0xFF123456);
@@ -115,6 +117,7 @@ void main() {
     expect(copy.standardStyle.border.width, 3);
     expect(copy.standardStyle.border.strokeAlign, BorderSide.strokeAlignCenter);
     expect(copy.standardStyle.showEdgeHighlight, isFalse);
+    expect(copy.standardStyle.lightDirection, const Offset(1, 0));
   });
 
   group('copyWith', () {

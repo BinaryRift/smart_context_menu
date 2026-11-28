@@ -23,7 +23,8 @@
   row independently.
 * Make the default hover highlight more visible in dark mode.
 * The standard panel draws an edge highlight by default. Use `border: BorderSide.none`
-  for the highlight alone and `showEdgeHighlight: false` to switch it off.
+  for the highlight alone, `standardStyle.lightDirection` to aim it, and
+  `showEdgeHighlight: false` to switch it off.
 * `SmartContextMenuStyle.backgroundBlur` is `null` by default. To restore the full-screen
   blur from 1.1.x, set `backgroundBlur: SmartContextMenuBlur.medium`.
 

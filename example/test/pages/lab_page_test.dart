@@ -111,9 +111,18 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.widget<CupertinoSwitch>(toggle).value, isTrue);
+    final direction = find.byType(CupertinoSlider);
+    expect(tester.widget<CupertinoSlider>(direction).value, -135);
+    tester.widget<CupertinoSlider>(direction).onChanged!(90);
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Open menu'));
     await tester.settleMenu();
     final painter = tester.element(highlight);
+    final edge =
+        (painter.widget as CustomPaint).foregroundPainter
+            as SmartContextMenuHighlightPainter;
+    expect(edge.lightDirection.dx, closeTo(0, 1e-9));
+    expect(edge.lightDirection.dy, 1);
     await tester.tap(find.text('Browse folders'));
     await tester.pumpAndSettle();
 
@@ -127,6 +136,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(toggle);
     await tester.pumpAndSettle();
+    expect(direction, findsNothing);
     await tester.tap(find.text('Open menu'));
     await tester.settleMenu();
     expect(find.text('Browse folders'), findsOneWidget);

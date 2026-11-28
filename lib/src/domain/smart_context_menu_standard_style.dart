@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart'
-    show BorderSide, Color, Decoration, immutable;
+    show BorderSide, Color, Decoration, Offset, immutable;
 
 import '../core/ui/styles/smart_context_menu_defaults.dart';
 import 'smart_context_menu_blur.dart';
@@ -29,6 +29,13 @@ final class SmartContextMenuStandardStyle {
   /// it draws a one-logical-pixel highlight inside the outline.
   final bool showEdgeHighlight;
 
+  /// The direction towards the highlight in the panel's coordinates.
+  ///
+  /// Positive x points right and positive y points down. The relative
+  /// components place the bright end of the gradient along the panel's bounds.
+  /// Defaults to the upper left, also used for zero and non-finite vectors.
+  final Offset lightDirection;
+
   /// A complete replacement for the built-in panel fill, border and highlight.
   ///
   /// The decoration also determines how the contents are clipped. The local
@@ -41,6 +48,7 @@ final class SmartContextMenuStandardStyle {
     this.border = const BorderSide(color: SmartContextMenuDefaults.borderColor),
     this.blur,
     this.showEdgeHighlight = true,
+    this.lightDirection = const Offset(-1, -1),
     this.decoration,
   });
 
@@ -53,6 +61,7 @@ final class SmartContextMenuStandardStyle {
     BorderSide? border,
     SmartContextMenuBlur? blur,
     bool? showEdgeHighlight,
+    Offset? lightDirection,
     Decoration? decoration,
   }) {
     return SmartContextMenuStandardStyle(
@@ -60,6 +69,7 @@ final class SmartContextMenuStandardStyle {
       border: border ?? this.border,
       blur: blur ?? this.blur,
       showEdgeHighlight: showEdgeHighlight ?? this.showEdgeHighlight,
+      lightDirection: lightDirection ?? this.lightDirection,
       decoration: decoration ?? this.decoration,
     );
   }
