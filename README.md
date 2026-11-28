@@ -43,7 +43,7 @@ Requires Flutter 3.32 or later (Dart 3.8). **[Get started →](#getting-started)
   a button, opens and closes its menu with `SmartContextMenu.of(context)`, no controller
   needed. A `SmartContextMenuController` does the same from anywhere else, and the
   gestures can be turned off.
-- **Liquid Glass** is the default surface. The menu uses Standard where the renderer
+- **[Liquid Glass](#liquid-glass)** is the default surface. The menu uses Standard where the renderer
   cannot run the glass effect or high contrast is enabled.
 
 **Motion**
@@ -107,6 +107,7 @@ styles and a lab of edge cases.
 
 - [Why not `CupertinoContextMenu`?](#why-not-cupertinocontextmenu)
 - [Getting started](#getting-started)
+- [Liquid Glass](#liquid-glass)
 - [Usage](#usage)
   - [Positioning](#positioning)
   - [Item types](#item-types)
@@ -128,7 +129,6 @@ styles and a lab of edge cases.
     - [Localization](#localization)
     - [Apps on `cupertino_ui`](#apps-on-cupertino_ui)
   - [Appearance](#appearance)
-    - [Liquid Glass](#liquid-glass)
     - [Item style](#item-style)
     - [Dividers](#dividers)
     - [Back item style](#back-item-style)
@@ -228,6 +228,104 @@ See [Usage](#usage) for everything else.
 - In debug builds, the first openings of the menu and its transitions may stutter while
   the code is compiled; release builds are smooth from the start. The iOS Simulator runs
   only debug builds, so check smoothness on a device or in a release build on macOS.
+
+[↑ Back to contents](#contents)
+
+## Liquid Glass
+
+Liquid Glass is the default menu surface. It blurs and refracts the live backdrop inside the
+panel on Impeller renderers that support shader filters. The menu uses Standard while the shader
+loads, if loading fails, if shader filters are unavailable, or when high contrast is enabled at
+the menu anchor. The chosen surface stays in place until the menu closes.
+
+### Configure Glass and Standard
+
+Set `SmartContextMenuStyle.surface` to `SmartContextMenuSurface.standard` to use Standard
+on every opening. Configure the two surfaces independently with `glassStyle` and
+`standardStyle`. Set `SmartContextMenuConfig.style` for a single menu or put the config
+in `SmartContextMenuTheme` to share it with menus in a subtree.
+
+```dart
+const style = SmartContextMenuStyle(
+  glassStyle: SmartContextMenuGlassStyle(
+    color: Color(0x90E1F5FE),
+    blur: SmartContextMenuBlur(5),
+    refraction: 1.2,
+    edgeHighlight: 0.8,
+    border: BorderSide(color: Color(0x90388AA0), width: 1.5),
+  ),
+  standardStyle: SmartContextMenuStandardStyle(
+    color: Color(0xFFE1F5FE),
+  ),
+);
+```
+
+**`SmartContextMenuGlassStyle` parameters**
+
+| Parameter | What it does |
+| --- | --- |
+| `color` | Glass tint. Its alpha sets the opacity. Defaults to the theme-aware `SmartContextMenuDefaults.glassTint`. |
+| `blur` | Blurs the backdrop inside the panel before refraction. Defaults to a sigma of `2` in light mode and `1.8` in dark mode. Use `SmartContextMenuBlur.none` to turn it off. |
+| `refraction` | Controls edge displacement and magnification. Defaults to `1`. Set `0` to disable both while keeping the other Glass settings. |
+| `edgeHighlight` | Controls reflection strength. Defaults to `1` in light mode and `0.45` in dark mode. Set `0` to turn off the reflection. |
+| `rimWidth` | Width of the rim reflection in logical pixels. Defaults to `5.8`. |
+| `bevelWidth` | Maximum width of the refracting bevel in logical pixels. Defaults to `24`. |
+| `lightDirection` | Direction towards the light. Defaults to `Offset(-0.6, -0.8)`, towards the upper left. |
+| `border` | Optional outline. Use a `BorderSide` to set its color, width and stroke alignment. Defaults to `BorderSide.none`. |
+
+**`SmartContextMenuStandardStyle` parameters**
+
+| Parameter | What it does |
+| --- | --- |
+| `color` | The panel's fill and the default fill of the pinned Back item. Defaults to the theme-aware `SmartContextMenuDefaults.menuColor`. |
+| `border` | Optional outline. Use a `BorderSide` to set its color, width and stroke alignment. Defaults to `BorderSide.none`. |
+| `blur` | Blurs the backdrop inside the panel. Defaults to `null`. |
+| `showEdgeHighlight` | Draws a directional highlight, `true` by default. It uses the width, stroke alignment and opacity of a visible border. With no visible border, it draws a one-logical-pixel highlight inside the outline. |
+| `lightDirection` | Places the bright end of the highlight gradient. Defaults to `Offset(-1, -1)`, towards the upper left. `Offset(1, 0)` lights the right edge. |
+| `decoration` | Replaces the built-in fill, border and highlight, and supplies the clip for the panel contents. Defaults to `null`. |
+
+The menu's `borderRadius` sets the corner radius for both built-in surfaces. `backgroundBlur`
+blurs the whole screen behind either surface. Try the surface settings in **Lab → Liquid Glass**
+in the example app.
+
+`standardStyle` also supplies the look when Glass falls back to Standard. The deprecated
+`menuColor`, `borderColor`, `menuDecoration` and `menuBlur` still configure Standard.
+Use `standardStyle.color`, `border` (a `BorderSide`), `decoration` and `blur` to migrate.
+
+### Reuse the surface with `SmartContextMenuPanel`
+
+Use `SmartContextMenuPanel` to apply the same surface, corner radius and shadows to a widget.
+Pass the style from the example above or omit `style` to use `SmartContextMenuTheme`.
+A standalone panel set to Glass starts on Standard while the shader loads and switches to Glass
+when it is ready.
+
+```dart
+SmartContextMenuPanel(
+  style: style,
+  child: const Padding(
+    padding: EdgeInsets.all(12),
+    child: Text('Quick actions'),
+  ),
+)
+```
+
+In a menu header, omit `style` to share the surface selected for that opening. Pass
+`header.animation` as the panel's `opacity` and set `fadeHeaderSlivers: false` on the menu
+to animate the panel's backdrop effects with the header.
+
+### Platform support
+
+The package requires Flutter 3.32.0 or later. Refraction is available when
+`ImageFilter.isShaderFilterSupported` is true. Standard is available on every supported platform.
+[Flutter's Impeller availability matrix](https://github.com/flutter/flutter/blob/3.50.1/engine/src/flutter/impeller/README.md#availability-matrix) · [Impeller defaults](https://docs.flutter.dev/perf/impeller)
+
+| Platform | Surface support | Checked in the example |
+| --- | --- | --- |
+| iOS | Glass on Impeller from Flutter 3.32 | Glass on 3.32.0 and 3.47.7 (iOS Simulator) |
+| Android | Glass with Impeller from Flutter 3.32 | Glass on 3.32.0 and 3.47.7 (OpenGLES emulator) |
+| macOS | Glass with Impeller. Impeller is on by default from Flutter 3.47 | Glass prototype on 3.47.7 |
+| Windows and Linux | Glass with Impeller, on by default from Flutter 3.47 | — |
+| Web | Standard on CanvasKit and Skwasm | Web builds on 3.32.0 and 3.50.1. Chromium fallback on 3.47.7 |
 
 [↑ Back to contents](#contents)
 
@@ -1282,7 +1380,8 @@ actions. Below are warm Paper with a serif font, Colorful with icons in colored 
 Indigo with a row of shortcuts and Drawing toolbar with seven tools. [Code in the
 example](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/ui/theme_styles.dart).*
 
-The look of the menu is set by `SmartContextMenuStyle`, the `style` of the config.
+The look of the menu is set by `SmartContextMenuStyle`, the `style` of the config. See
+[Liquid Glass](#liquid-glass) for the two surfaces and their controls.
 The Back item, the loading, error and empty items, and rows have their own parts of it:
 [`backButtonStyle`](#back-item-style), [`statusStyle`](#status-style) and
 [`rowStyle`](#row-style). All fields have defaults:
@@ -1341,63 +1440,6 @@ translucent color if the scrolling items show through too strongly. Its border r
 the clip; the `borderRadius` of `backButtonStyle` applies only without a `decoration`.
 
 [↑ Back to contents](#contents)
-
-#### Liquid Glass
-
-The default surface blurs and refracts the backdrop inside the menu on Impeller renderers
-that support shader filters. The menu uses Standard if the shader is unavailable or the menu's
-anchor requests high contrast. To use Standard everywhere, set `surface: SmartContextMenuSurface.standard`.
-
-```dart
-const style = SmartContextMenuStyle(
-  glassStyle: SmartContextMenuGlassStyle(
-    color: Color(0x90E1F5FE),
-    blur: SmartContextMenuBlur(5),
-    refraction: 1.2,
-    edgeHighlight: 0.8,
-    border: BorderSide(color: Color(0x90388AA0), width: 1.5),
-  ),
-  standardStyle: SmartContextMenuStandardStyle(
-    color: Color(0xFFE1F5FE),
-    border: BorderSide(color: Color(0x90388AA0), width: 1.5),
-  ),
-);
-```
-
-The glass blur defaults to `SmartContextMenuBlur(2)`. Use `SmartContextMenuBlur.none` to disable
-it. The color's alpha sets the tint opacity. The multipliers for refraction and the edge
-highlight default to `1`. Use `0` to turn either effect off.
-
-Both styles use `BorderSide` for the border color, width and stroke alignment. Glass defaults
-to `BorderSide.none`. Standard defaults to a one-logical-pixel border with a directional
-highlight. Set `border: BorderSide.none` for the highlight alone, or set
-`showEdgeHighlight: false` to turn off the highlight. Set `standardStyle.lightDirection`
-to move the bright end of the gradient. For example, `Offset(1, 0)` lights the right edge.
-The menu's `borderRadius` sets the corner radius for both built-in surfaces. Each style's
-`blur` applies within the menu outline. Standard defaults to no local blur.
-`backgroundBlur` blurs the whole screen behind either surface.
-
-`standardStyle` also supplies the look when Glass falls back to Standard. The deprecated
-`menuColor`, `borderColor`, `menuDecoration` and `menuBlur` still configure Standard.
-Use `standardStyle.color`, `border` (a `BorderSide`), `decoration` and `blur` to migrate.
-
-Use `SmartContextMenuPanel` to apply the same surface, corner radius and shadows to a widget.
-The panel uses `SmartContextMenuTheme` when `style` is omitted. A standalone panel uses Standard
-while the shader loads and switches to Glass when it is ready.
-
-```dart
-SmartContextMenuPanel(
-  style: style,
-  child: const Padding(
-    padding: EdgeInsets.all(12),
-    child: Text('Quick actions'),
-  ),
-)
-```
-
-In a menu header, omit `style` to share the surface selected for that opening. Pass
-`header.animation` as the panel's `opacity` and set `fadeHeaderSlivers: false` on the menu
-to animate the panel's backdrop effects with the header.
 
 #### Item style
 

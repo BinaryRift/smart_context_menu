@@ -5,8 +5,9 @@
   renderers with shader filter support. The default glass blur uses a sigma of 2 in light mode
   and 1.8 in dark mode. Set `SmartContextMenuGlassStyle.blur` to `SmartContextMenuBlur.none`
   to turn off the glass blur.
-  When the shader is unavailable or `MediaQuery.highContrast` is
-  enabled at the anchor, the menu opens as `SmartContextMenuSurface.standard`.
+  The menu opens as `SmartContextMenuSurface.standard` while the shader loads, if loading
+  fails, if shader filters are unsupported, or if high contrast is enabled at the anchor.
+  The selected surface stays in place until the menu closes.
 * Configure the two surfaces independently with `glassStyle` and `standardStyle`. Both have
   `color`, `border` and `blur`. Set a `BorderSide` to control the border color, width and
   stroke alignment. `standardStyle.decoration` replaces the built-in standard finish.
@@ -22,12 +23,13 @@
 * Set `SmartContextMenuBackButtonStyle.highlightColor` to style the pressed and hovered Back
   row independently.
 * Make the default hover highlight more visible in dark mode.
-* The standard panel draws an edge highlight by default. Use `border: BorderSide.none`
-  for the highlight alone, `standardStyle.lightDirection` to aim it, and
-  `showEdgeHighlight: false` to switch it off.
+* Standard draws a directional edge highlight by default and its border defaults to
+  `BorderSide.none`. Set `standardStyle.border` to add a border, `standardStyle.lightDirection`
+  to aim the highlight, or `showEdgeHighlight: false` to switch it off.
 * `SmartContextMenuPanel` applies the menu's Glass and Standard surfaces to any widget.
-  It can use an explicit style or inherit `SmartContextMenuTheme`. A panel in a menu header
-  can share the menu's selected surface, as the example app's reactions bar does.
+  It can use an explicit style or inherit `SmartContextMenuTheme`. A standalone panel set to
+  Glass switches from Standard once the shader is ready. A panel in a menu header can share
+  the menu's selected surface, as the example app's reactions bar does.
 * `SmartContextMenuStyle.backgroundBlur` is `null` by default. To restore the full-screen
   blur from 1.1.x, set `backgroundBlur: SmartContextMenuBlur.medium`.
 

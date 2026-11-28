@@ -43,7 +43,7 @@
 - **Открытие по кнопке или из кода**: любой виджет внутри обёрнутого, например кнопка,
   открывает и закрывает его меню через `SmartContextMenu.of(context)`, без контроллера.
   `SmartContextMenuController` делает то же самое откуда угодно ещё, а жесты можно отключить.
-- **Liquid Glass** — поверхность по умолчанию. Если движок не поддерживает эффект стекла
+- **[Liquid Glass](#liquid-glass)** — поверхность по умолчанию. Если движок не поддерживает эффект стекла
   или включена высокая контрастность, меню открывается в Standard.
 
 **Анимации**
@@ -108,6 +108,7 @@
 
 - [Почему не `CupertinoContextMenu`?](#почему-не-cupertinocontextmenu)
 - [Начало работы](#начало-работы)
+- [Liquid Glass](#liquid-glass)
 - [Использование](#использование)
   - [Позиционирование](#позиционирование)
   - [Виды пунктов](#виды-пунктов)
@@ -129,7 +130,6 @@
     - [Локализация](#локализация)
     - [Приложения на `cupertino_ui`](#приложения-на-cupertino_ui)
   - [Внешний вид](#внешний-вид)
-    - [Liquid Glass](#liquid-glass)
     - [Стиль пунктов](#стиль-пунктов)
     - [Линии между пунктами](#линии-между-пунктами)
     - [Стиль пункта «Назад»](#стиль-пункта-назад)
@@ -230,6 +230,105 @@ SmartContextMenu(
 - В debug-сборке первые открытия меню и переходы могут подтормаживать, пока код
   компилируется; в release всё плавно сразу. Симулятор iOS запускает только debug, поэтому
   плавность лучше смотреть на устройстве или в release-сборке на macOS.
+
+[↑ К содержанию](#содержание)
+
+## Liquid Glass
+
+Liquid Glass — поверхность меню по умолчанию. На Impeller с поддержкой шейдерных фильтров
+она размывает и преломляет живой фон внутри панели. Пока шейдер загружается, при ошибке
+загрузки, недоступных шейдерных фильтрах или высокой контрастности в месте открытия меню
+используется Standard. Выбранная поверхность сохраняется до закрытия меню.
+
+### Настройка Glass и Standard
+
+Чтобы меню всегда открывалось со Standard, задайте `SmartContextMenuSurface.standard`
+в `SmartContextMenuStyle.surface`. Стили `glassStyle` и `standardStyle` настраиваются
+независимо. Для отдельного меню задайте `SmartContextMenuConfig.style`. Чтобы задать общий
+стиль для меню в поддереве, передайте конфиг в `SmartContextMenuTheme`.
+
+```dart
+const style = SmartContextMenuStyle(
+  glassStyle: SmartContextMenuGlassStyle(
+    color: Color(0x90E1F5FE),
+    blur: SmartContextMenuBlur(5),
+    refraction: 1.2,
+    edgeHighlight: 0.8,
+    border: BorderSide(color: Color(0x90388AA0), width: 1.5),
+  ),
+  standardStyle: SmartContextMenuStandardStyle(
+    color: Color(0xFFE1F5FE),
+  ),
+);
+```
+
+**Параметры `SmartContextMenuGlassStyle`**
+
+| Параметр | Зачем нужен |
+| --- | --- |
+| `color` | Оттенок стекла, альфа задаёт его непрозрачность. По умолчанию используется `SmartContextMenuDefaults.glassTint`, который учитывает тему. |
+| `blur` | Размывает фон внутри панели перед преломлением. По умолчанию сигма равна `2` в светлой теме и `1.8` в тёмной. Чтобы отключить размытие, задайте `SmartContextMenuBlur.none`. |
+| `refraction` | Управляет смещением у края и увеличением фона. По умолчанию `1`. Значение `0` выключает оба эффекта и сохраняет остальные настройки Glass. |
+| `edgeHighlight` | Задаёт силу отражения. По умолчанию `1` в светлой теме и `0.45` в тёмной. Чтобы выключить отражение, задайте `0`. |
+| `rimWidth` | Ширина блика на кромке в логических пикселях. По умолчанию `5.8`. |
+| `bevelWidth` | Максимальная ширина преломляющей фаски в логических пикселях. По умолчанию `24`. |
+| `lightDirection` | Направление к источнику света. По умолчанию `Offset(-0.6, -0.8)`, вверх и влево. |
+| `border` | Рамка. `BorderSide` задаёт её цвет, толщину и положение относительно края. По умолчанию `BorderSide.none`. |
+
+**Параметры `SmartContextMenuStandardStyle`**
+
+| Параметр | Зачем нужен |
+| --- | --- |
+| `color` | Цвет заливки панели и штатной подложки закреплённого пункта «Назад». По умолчанию используется `SmartContextMenuDefaults.menuColor`, который учитывает тему. |
+| `border` | Рамка. `BorderSide` задаёт её цвет, толщину и положение относительно края. По умолчанию `BorderSide.none`. |
+| `blur` | Размывает фон внутри панели. По умолчанию `null`. |
+| `showEdgeHighlight` | Рисует направленный блик. По умолчанию `true`. При видимой рамке блик использует её толщину, положение и непрозрачность. При скрытой рамке блик шириной в один логический пиксель проходит внутри контура. |
+| `lightDirection` | Задаёт положение яркого края градиента. По умолчанию `Offset(-1, -1)`, вверх и влево. `Offset(1, 0)` направляет блик вправо. |
+| `decoration` | Заменяет штатную заливку, рамку и блик. Её форма обрезает содержимое панели. По умолчанию `null`. |
+
+`borderRadius` меню задаёт скругление обеих штатных поверхностей. `backgroundBlur` размывает
+весь экран за любой из них. Настройки поверхностей можно попробовать в **Lab → Liquid Glass**
+в приложении-примере.
+
+`standardStyle` оформляет Standard и при переходе с Glass. Устаревшие `menuColor`,
+`borderColor`, `menuDecoration` и `menuBlur` по-прежнему настраивают Standard.
+Для перехода используйте поля `standardStyle` — `color`, `border` (тип `BorderSide`),
+`decoration` и `blur`.
+
+### Поверхность для любого виджета через `SmartContextMenuPanel`
+
+`SmartContextMenuPanel` применяет поверхность, скругление и тени меню к любому виджету.
+Передайте стиль из примера выше или опустите `style`, чтобы взять его из
+`SmartContextMenuTheme`. Отдельная панель с выбранным Glass использует Standard во время
+загрузки шейдера и переключается на Glass, когда он готов.
+
+```dart
+SmartContextMenuPanel(
+  style: style,
+  child: const Padding(
+    padding: EdgeInsets.all(12),
+    child: Text('Быстрые действия'),
+  ),
+)
+```
+
+В заголовке меню опустите `style`, чтобы панель использовала поверхность текущего открытия.
+Передайте `header.animation` как `opacity` панели и задайте `fadeHeaderSlivers: false` у меню,
+чтобы эффекты фона анимировались вместе с заголовком.
+
+### Поддержка платформ
+
+Для пакета нужен Flutter 3.32.0 или новее. Преломление доступно, когда
+`ImageFilter.isShaderFilterSupported` возвращает `true`. Standard доступен на всех
+поддерживаемых платформах. [Матрица поддержки Impeller во Flutter](https://github.com/flutter/flutter/blob/3.50.1/engine/src/flutter/impeller/README.md#availability-matrix) · [Настройки Impeller по умолчанию](https://docs.flutter.dev/perf/impeller)
+
+| Платформа | Поддерживаемая поверхность | Проверено в приложении-примере |
+| --- | --- | --- |
+| iOS | Glass на Impeller с Flutter 3.32 | Glass на 3.32.0 и 3.47.7 (симулятор iOS) |
+| Android | Glass на Impeller с Flutter 3.32 | Glass на 3.32.0 и 3.47.7 (эмулятор OpenGLES) |
+| macOS | Glass на Impeller. Impeller включён по умолчанию с Flutter 3.47 | Прототип Glass на 3.47.7 |
+| Windows и Linux | Glass на Impeller, включённом по умолчанию с Flutter 3.47 | — |
+| Web | Standard на CanvasKit и Skwasm | Web-сборки на 3.32.0 и 3.50.1. Fallback в Chromium на 3.47.7 |
 
 [↑ К содержанию](#содержание)
 
@@ -1286,7 +1385,8 @@ builder: (context, child) => CupertinoUiCompatibilityBridge(
 с семью инструментами. [Код в
 примере](https://github.com/BinaryRift/smart_context_menu/blob/v1.1.0/example/lib/pages/appearance/ui/theme_styles.dart).*
 
-Внешний вид меню задаёт `SmartContextMenuStyle` — поле `style` в конфиге.
+Внешний вид меню задаёт `SmartContextMenuStyle` — поле `style` в конфиге. Обе поверхности
+и их настройки описаны в разделе [Liquid Glass](#liquid-glass).
 У пункта «Назад», пунктов загрузки, ошибки и пустого состояния и у рядов в нём свои части:
 [`backButtonStyle`](#стиль-пункта-назад), [`statusStyle`](#стиль-состояний) и
 [`rowStyle`](#стиль-рядов). У всех полей есть значения по умолчанию:
@@ -1345,66 +1445,6 @@ const style = SmartContextMenuStyle(
 `borderRadius` из `backButtonStyle` действует только без `decoration`.
 
 [↑ К содержанию](#содержание)
-
-#### Liquid Glass
-
-Поверхность по умолчанию размывает и преломляет фон внутри меню на движках Impeller с поддержкой
-шейдерных фильтров.
-При недоступном шейдере или высокой контрастности в месте открытия меню используется Standard.
-Чтобы всегда открывать Standard, задайте `surface: SmartContextMenuSurface.standard`.
-
-```dart
-const style = SmartContextMenuStyle(
-  glassStyle: SmartContextMenuGlassStyle(
-    color: Color(0x90E1F5FE),
-    blur: SmartContextMenuBlur(5),
-    refraction: 1.2,
-    edgeHighlight: 0.8,
-    border: BorderSide(color: Color(0x90388AA0), width: 1.5),
-  ),
-  standardStyle: SmartContextMenuStandardStyle(
-    color: Color(0xFFE1F5FE),
-    border: BorderSide(color: Color(0x90388AA0), width: 1.5),
-  ),
-);
-```
-
-По умолчанию стекло использует `SmartContextMenuBlur(2)`. Чтобы отключить локальное размытие,
-задайте `SmartContextMenuBlur.none`. Альфа оттенка задаёт его непрозрачность. Множители
-преломления и блика по умолчанию равны `1`. Значение `0` отключает соответствующий эффект.
-
-У обеих поверхностей `border` принимает `BorderSide` с цветом, толщиной и положением
-обводки относительно края. У Glass по умолчанию `BorderSide.none`, у Standard рамка
-толщиной 1 логический пиксель с направленным бликом. Чтобы оставить только блик,
-задайте `border: BorderSide.none`. Чтобы выключить блик, задайте `showEdgeHighlight: false`.
-`standardStyle.lightDirection` задаёт положение яркого края градиента. Например,
-`Offset(1, 0)` направляет блик к правому краю.
-`borderRadius` меню задаёт скругление обеих штатных поверхностей. Поле `blur` размывает
-фон внутри контура меню. У Standard локальное размытие по умолчанию выключено.
-`backgroundBlur` размывает весь экран позади любой поверхности.
-
-`standardStyle` оформляет Standard и при переходе с Glass. Устаревшие `menuColor`,
-`borderColor`, `menuDecoration` и `menuBlur` по-прежнему настраивают Standard.
-Для перехода используйте поля `standardStyle` — `color`, `border` (тип `BorderSide`),
-`decoration` и `blur`.
-
-`SmartContextMenuPanel` применяет поверхность, скругление и тени меню к любому виджету.
-Если опустить `style`, панель возьмёт стиль из `SmartContextMenuTheme`. Отдельная панель
-использует Standard во время загрузки шейдера и переключается на Glass, когда он готов.
-
-```dart
-SmartContextMenuPanel(
-  style: style,
-  child: const Padding(
-    padding: EdgeInsets.all(12),
-    child: Text('Быстрые действия'),
-  ),
-)
-```
-
-В заголовке меню опустите `style`, чтобы панель использовала поверхность текущего открытия.
-Передайте `header.animation` как `opacity` панели и задайте `fadeHeaderSlivers: false` у меню,
-чтобы эффекты фона анимировались вместе с заголовком.
 
 #### Стиль пунктов
 
