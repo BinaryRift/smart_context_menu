@@ -104,7 +104,7 @@ abstract final class SmartContextMenuDefaults {
         darkColor: Color(0x862C2D30),
       );
 
-  /// The default border color of [SmartContextMenuStandardStyle].
+  /// A theme-aware color for an optional [SmartContextMenuStandardStyle.border].
   static const CupertinoDynamicColor borderColor =
       CupertinoDynamicColor.withBrightness(
         color: Color(0xFF9D9D9F),

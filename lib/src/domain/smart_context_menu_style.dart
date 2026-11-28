@@ -65,9 +65,7 @@ final class SmartContextMenuStyle {
       _standardStyle ??
       SmartContextMenuStandardStyle(
         color: _menuColor ?? SmartContextMenuDefaults.menuColor,
-        border: BorderSide(
-          color: _borderColor ?? SmartContextMenuDefaults.borderColor,
-        ),
+        border: _borderColor == null ? null : BorderSide(color: _borderColor),
         decoration: _menuDecoration,
         blur: _menuBlur,
       );
@@ -596,7 +594,7 @@ final class SmartContextMenuStyle {
         color: menuColor,
         border: borderColor == null
             ? null
-            : currentStandard.border.copyWith(color: borderColor),
+            : currentStandard.borderWithLegacyColor(borderColor),
         decoration: menuDecoration,
         blur: menuBlur,
       );

@@ -22,22 +22,21 @@ void main() {
       if (box.position == DecorationPosition.foreground) box,
   ];
 
-  testWidgets('is painted over the menu content', (tester) async {
+  testWidgets('paints only the highlight by default in Standard fallback', (
+    tester,
+  ) async {
     await tester.pumpMenu(
       items: appearanceItems(),
       brightness: Brightness.light,
     );
     await tester.openMenu();
 
-    final foregrounds = foregroundsOf(tester);
-    expect(foregrounds, hasLength(1));
-    final border =
-        (foregrounds.single.decoration as BoxDecoration).border! as Border;
-    expect(
-      border.top.color,
-      isSameColorAs(light(SmartContextMenuDefaults.borderColor)),
-    );
+    expect(foregroundsOf(tester), isEmpty);
     expect(highlight, findsOneWidget);
+    expect(
+      find.descendant(of: highlight, matching: find.text('Enabled')),
+      findsOneWidget,
+    );
   });
 
   testWidgets('keeps an outside border above the local blur clip', (

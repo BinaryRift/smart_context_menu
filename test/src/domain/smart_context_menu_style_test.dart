@@ -43,7 +43,8 @@ void main() {
     expect(defaultStyle.glassStyle.bevelWidth, 24);
     expect(defaultStyle.glassStyle.lightDirection, const Offset(-0.6, -0.8));
     expect(defaultStyle.standardStyle.blur, isNull);
-    expect(defaultStyle.standardStyle.border.width, 1);
+    expect(defaultStyle.standardStyle.border, BorderSide.none);
+    expect(const SmartContextMenuStandardStyle().border, BorderSide.none);
     expect(defaultStyle.standardStyle.showEdgeHighlight, isTrue);
     expect(defaultStyle.standardStyle.lightDirection, const Offset(-1, -1));
     final style = defaultStyle.copyWith(
@@ -118,6 +119,30 @@ void main() {
     expect(copy.standardStyle.border.strokeAlign, BorderSide.strokeAlignCenter);
     expect(copy.standardStyle.showEdgeHighlight, isFalse);
     expect(copy.standardStyle.lightDirection, const Offset(1, 0));
+  });
+
+  test('legacy border color enables a border when the side was omitted', () {
+    const color = Color(0xFF123456);
+    const border = BorderSide(color: color);
+    const original = SmartContextMenuStyle(
+      standardStyle: SmartContextMenuStandardStyle(),
+    );
+    expect(
+      const SmartContextMenuStyle(borderColor: color).standardStyle.border,
+      border,
+    );
+    expect(
+      original.copyWith().copyWith(borderColor: color).standardStyle.border,
+      border,
+    );
+
+    final borderless = original.copyWith(
+      standardStyle: original.standardStyle.copyWith(border: BorderSide.none),
+    );
+    expect(
+      borderless.copyWith(borderColor: color).standardStyle.border.style,
+      BorderStyle.none,
+    );
   });
 
   group('copyWith', () {

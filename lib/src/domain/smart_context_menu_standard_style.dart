@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart'
     show BorderSide, Color, Decoration, Offset, immutable;
+import 'package:meta/meta.dart' show internal;
 
 import '../core/ui/styles/smart_context_menu_defaults.dart';
 import 'smart_context_menu_blur.dart';
@@ -15,9 +16,10 @@ final class SmartContextMenuStandardStyle {
 
   /// The uniform border drawn over the panel and its contents.
   ///
-  /// A [BorderSide] sets the color, width and stroke alignment. Use
-  /// [BorderSide.none] to hide it. A [decoration] supplies its own outline.
-  final BorderSide border;
+  /// Defaults to [BorderSide.none]. Set a [BorderSide] to choose the color,
+  /// width and stroke alignment. A [decoration] supplies its own outline.
+  BorderSide get border => _border ?? BorderSide.none;
+  final BorderSide? _border;
 
   /// The blur of the backdrop within the panel's outline. Defaults to null.
   final SmartContextMenuBlur? blur;
@@ -45,12 +47,17 @@ final class SmartContextMenuStandardStyle {
   /// Creates a standard panel style.
   const SmartContextMenuStandardStyle({
     this.color = SmartContextMenuDefaults.menuColor,
-    this.border = const BorderSide(color: SmartContextMenuDefaults.borderColor),
+    BorderSide? border,
     this.blur,
     this.showEdgeHighlight = true,
     this.lightDirection = const Offset(-1, -1),
     this.decoration,
-  });
+  }) : _border = border;
+
+  /// Uses the legacy one-pixel border when only a border color was supplied.
+  @internal
+  BorderSide borderWithLegacyColor(Color color) =>
+      _border?.copyWith(color: color) ?? BorderSide(color: color);
 
   /// Creates a copy with the given fields replaced.
   ///
@@ -66,7 +73,7 @@ final class SmartContextMenuStandardStyle {
   }) {
     return SmartContextMenuStandardStyle(
       color: color ?? this.color,
-      border: border ?? this.border,
+      border: border ?? _border,
       blur: blur ?? this.blur,
       showEdgeHighlight: showEdgeHighlight ?? this.showEdgeHighlight,
       lightDirection: lightDirection ?? this.lightDirection,
