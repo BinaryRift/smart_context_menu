@@ -21,6 +21,10 @@
 ///
 /// * [SmartContextMenuLabels] holds the strings shown by the menu itself.
 /// * [SmartContextMenuBlur] sets the strength of the blurs.
+/// * [SmartContextMenuSurface] selects Liquid Glass or the standard panel.
+///   [SmartContextMenuGlassStyle] and [SmartContextMenuStandardStyle] set
+///   the appearance of the two surfaces.
+/// * [SmartContextMenuPanel] applies those surfaces to any child widget.
 /// * [SmartContextMenuPagingMetadata] describes a page of a paginated
 ///   submenu.
 /// * [SmartContextMenuRowFlex] sets the share of a cell in a row,
@@ -46,6 +50,7 @@ export 'src/domain/smart_context_menu_activation_mode.dart';
 export 'src/domain/smart_context_menu_back_button_style.dart';
 export 'src/domain/smart_context_menu_blur.dart';
 export 'src/domain/smart_context_menu_config.dart';
+export 'src/domain/smart_context_menu_glass_style.dart';
 export 'src/domain/smart_context_menu_header_details.dart';
 export 'src/domain/smart_context_menu_item.dart';
 export 'src/domain/smart_context_menu_item_state.dart';
@@ -53,7 +58,11 @@ export 'src/domain/smart_context_menu_labels.dart';
 export 'src/domain/smart_context_menu_paging_metadata.dart';
 export 'src/domain/smart_context_menu_row_size.dart';
 export 'src/domain/smart_context_menu_row_style.dart';
+export 'src/domain/smart_context_menu_standard_style.dart';
 export 'src/domain/smart_context_menu_status_style.dart';
 export 'src/domain/smart_context_menu_style.dart';
+export 'src/domain/smart_context_menu_surface.dart';
 export 'src/ui/theme/smart_context_menu_theme.dart';
 export 'src/ui/view/smart_context_menu.dart';
+export 'src/ui/widgets/smart_context_menu_panel.dart'
+    show SmartContextMenuPanel;

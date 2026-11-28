@@ -18,7 +18,9 @@ import 'smart_context_menu_style.dart';
 /// const menuConfig = SmartContextMenuConfig(
 ///   menuWidth: 220,
 ///   labels: SmartContextMenuLabels(retry: 'Retry'),
-///   style: SmartContextMenuStyle(menuBlur: SmartContextMenuBlur.small),
+///   style: SmartContextMenuStyle(
+///     standardStyle: SmartContextMenuStandardStyle(blur: SmartContextMenuBlur.small),
+///   ),
 /// );
 ///
 /// SmartContextMenuTheme(

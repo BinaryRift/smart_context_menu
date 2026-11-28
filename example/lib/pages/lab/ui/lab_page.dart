@@ -9,6 +9,7 @@ import '../../../core/ui/reactions_bar.dart';
 import '../../../resources/assets/app_images.dart';
 import '../../settings/ui/widgets/settings_button.dart';
 import '../domain/lab_items.dart';
+import 'liquid_glass_page.dart';
 import 'widgets/tap_empty_area.dart';
 
 /// Content shown above the preview.
@@ -78,6 +79,21 @@ final class _LabPageState extends State<LabPage> {
             Expanded(
               child: ListView(
                 children: [
+                  CupertinoListSection.insetGrouped(
+                    header: const Text('Rendering'),
+                    children: [
+                      CupertinoListTile.notched(
+                        title: const Text('Liquid Glass'),
+                        subtitle: const Text('Compare menu surfaces'),
+                        trailing: const CupertinoListTileChevron(),
+                        onTap: () => Navigator.of(context).push<void>(
+                          CupertinoPageRoute<void>(
+                            builder: (_) => const LiquidGlassPage(),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                   _buildSettings(),
                   _buildMenu(
                     title: 'All submenu types',
@@ -238,6 +254,7 @@ final class _LabPageState extends State<LabPage> {
                   ),
                   items: items,
                   headerSliversBuilder: _headerBuilder(title),
+                  fadeHeaderSlivers: false,
                   headerSliversDelay: _delayHeader
                       ? _headerDelay
                       : Duration.zero,
@@ -264,6 +281,7 @@ final class _LabPageState extends State<LabPage> {
         items: items,
         onPreviewTap: () => DemoNotice.show('$title preview tapped'),
         headerSliversBuilder: _headerBuilder(title),
+        fadeHeaderSlivers: false,
         headerSliversDelay: _delayHeader ? _headerDelay : Duration.zero,
         child: DemoCard(title: title, subtitle: subtitle, height: height),
       ),
@@ -280,6 +298,7 @@ final class _LabPageState extends State<LabPage> {
         items: outerCardItems(),
         onPreviewTap: () => DemoNotice.show('$title preview tapped'),
         headerSliversBuilder: _headerBuilder(title),
+        fadeHeaderSlivers: false,
         headerSliversDelay: _delayHeader ? _headerDelay : Duration.zero,
         child: DemoCard(
           title: title,
@@ -317,6 +336,7 @@ final class _LabPageState extends State<LabPage> {
           // Grows from the bottom edge, next to the preview.
           alignment: Alignment(header.alignment.x, 1),
           child: ReactionsBar(
+            opacity: header.animation,
             onSelected: (reaction) async {
               DemoNotice.show('Reaction $reaction on $title (demo only)');
               await header.close();
@@ -336,12 +356,15 @@ final class _LabPageState extends State<LabPage> {
               padding: const EdgeInsets.only(top: 8),
               child: Align(
                 alignment: header.alignment,
-                child: const SizedBox(
-                  width: 240,
-                  height: 240,
-                  child: DemoCard(
-                    title: 'Tall header',
-                    subtitle: 'A sliver above the preview',
+                child: FadeTransition(
+                  opacity: header.animation,
+                  child: const SizedBox(
+                    width: 240,
+                    height: 240,
+                    child: DemoCard(
+                      title: 'Tall header',
+                      subtitle: 'A sliver above the preview',
+                    ),
                   ),
                 ),
               ),

@@ -20,18 +20,16 @@ import '../widgets/smart_context_menu_retry_row.dart';
 import '../widgets/smart_context_menu_row_layout.dart';
 import '../widgets/smart_context_menu_swipe_back_exclusion.dart';
 import 'item/smart_context_menu_item_view.dart';
+import 'smart_context_menu_submenu_view.dart';
 
 /// The content of a menu [level]: its items, the back item of a submenu
 /// and the loading, retry and paging rows.
 final class SmartContextMenuLevelView extends StatelessWidget {
-  // Covers the gap between the menu border and the pinned back item that
-  // shows while the items scroll under it.
-  static const double _backItemOverlap = 0.5;
-
   final SmartMenuLevel level;
   final SmartContextMenuOverlayController controller;
   final SmartContextMenuConfig config;
   final SmartContextMenuHoverController hoverController;
+  final Color? glassTint;
 
   const SmartContextMenuLevelView({
     super.key,
@@ -39,6 +37,7 @@ final class SmartContextMenuLevelView extends StatelessWidget {
     required this.controller,
     required this.config,
     required this.hoverController,
+    this.glassTint,
   });
 
   @override
@@ -49,34 +48,27 @@ final class SmartContextMenuLevelView extends StatelessWidget {
     final int itemsCount = level.items.length;
     final int headerOffset = hasBack ? 1 : 0;
 
-    return Stack(
-      children: [
-        ListView.builder(
-          shrinkWrap: true,
-          padding: EdgeInsets.zero,
-          physics: const BouncingScrollPhysics(),
-          itemCount: level.rowCount,
-          itemBuilder: (context, index) => _routeItem(
-            index: index,
-            hasBack: hasBack,
-            headerOffset: headerOffset,
-            itemsCount: itemsCount,
-            hasPaging: hasPaging,
-            hasError: hasError,
-          ),
-        ),
-        if (hasBack)
-          Positioned(
-            top: -_backItemOverlap,
-            left: 0,
-            right: 0,
-            child: SmartContextMenuBackItem(
-              config: config,
-              hoverController: hoverController,
-              onTap: controller.popSubmenu,
-            ),
-          ),
-      ],
+    final list = ListView.builder(
+      shrinkWrap: true,
+      padding: EdgeInsets.zero,
+      physics: const BouncingScrollPhysics(),
+      itemCount: level.rowCount,
+      itemBuilder: (context, index) => _routeItem(
+        index: index,
+        hasBack: hasBack,
+        headerOffset: headerOffset,
+        itemsCount: itemsCount,
+        hasPaging: hasPaging,
+        hasError: hasError,
+      ),
+    );
+    if (!hasBack) return list;
+    return SmartContextMenuSubmenuView(
+      list: list,
+      config: config,
+      hoverController: hoverController,
+      onBack: controller.popSubmenu,
+      glassTint: glassTint,
     );
   }
 

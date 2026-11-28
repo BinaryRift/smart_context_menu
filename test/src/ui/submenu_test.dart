@@ -77,7 +77,9 @@ void main() {
         config: SmartContextMenuConfig(
           style: SmartContextMenuStyle(
             backgroundBlur: null,
-            menuBlur: SmartContextMenuBlur.small,
+            standardStyle: const SmartContextMenuStandardStyle(
+              blur: SmartContextMenuBlur.small,
+            ),
             backButtonStyle: SmartContextMenuBackButtonStyle(
               blur: backButtonBlur,
             ),

@@ -8,6 +8,8 @@ import 'package:smart_context_menu/smart_context_menu.dart';
 /// The fields of a back item style, comparable by value.
 Object backFields(SmartContextMenuBackButtonStyle s) => (
   s.decoration,
+  s.backgroundColor,
+  s.highlightColor,
   s.blur,
   s.borderRadius,
   s.foregroundColor,
@@ -26,6 +28,123 @@ Object statusFields(SmartContextMenuStatusStyle s) => (
 );
 
 void main() {
+  test('defaults to Glass and keeps both styles when changing the surface', () {
+    const defaultStyle = SmartContextMenuStyle();
+    const customGlass = SmartContextMenuGlassStyle(refraction: 2);
+    const customStandard = SmartContextMenuStandardStyle(
+      blur: SmartContextMenuBlur.small,
+      showEdgeHighlight: false,
+    );
+
+    expect(defaultStyle.surface, SmartContextMenuSurface.glass);
+    expect(defaultStyle.glassStyle.blur.sigmaX, 2);
+    expect(defaultStyle.glassStyle.blur.sigmaY, 2);
+    expect(defaultStyle.glassStyle.rimWidth, 5.8);
+    expect(defaultStyle.glassStyle.bevelWidth, 24);
+    expect(defaultStyle.glassStyle.lightDirection, const Offset(-0.6, -0.8));
+    expect(defaultStyle.standardStyle.blur, isNull);
+    expect(defaultStyle.standardStyle.border, BorderSide.none);
+    expect(const SmartContextMenuStandardStyle().border, BorderSide.none);
+    expect(defaultStyle.standardStyle.showEdgeHighlight, isTrue);
+    expect(defaultStyle.standardStyle.lightDirection, const Offset(-1, -1));
+    final style = defaultStyle.copyWith(
+      glassStyle: customGlass,
+      standardStyle: customStandard,
+    );
+    final standard = style.copyWith(surface: SmartContextMenuSurface.standard);
+    expect(standard.surface, SmartContextMenuSurface.standard);
+    expect(standard.glassStyle, same(customGlass));
+    expect(standard.standardStyle, same(customStandard));
+    final glass = standard.copyWith(surface: SmartContextMenuSurface.glass);
+    expect(glass.surface, SmartContextMenuSurface.glass);
+    expect(glass.glassStyle, same(customGlass));
+    expect(glass.standardStyle, same(customStandard));
+  });
+
+  test('glass styles compare by value', () {
+    const tint = Color(0x90778899);
+    const blur = SmartContextMenuBlur(2);
+    const style = SmartContextMenuGlassStyle(
+      color: tint,
+      blur: blur,
+      refraction: 2,
+    );
+    final copy = const SmartContextMenuGlassStyle().copyWith(
+      color: tint,
+      blur: blur,
+      refraction: 2,
+    );
+
+    expect(copy, style);
+    expect(copy.hashCode, style.hashCode);
+    expect(copy.copyWith(color: const Color(0x00FFFFFF)), isNot(style));
+    expect(copy.copyWith(refraction: 0), isNot(style));
+    final withoutBlur = copy.copyWith(blur: SmartContextMenuBlur.none);
+    expect(withoutBlur.blur.sigmaX, 0);
+    expect(withoutBlur, isNot(style));
+    expect(
+      withoutBlur.copyWith(blur: SmartContextMenuBlur(style.blur.sigmaX)),
+      style,
+    );
+    final withoutHighlight = copy.copyWith(edgeHighlight: 0);
+    expect(withoutHighlight.color, tint);
+    expect(withoutHighlight.refraction, 2);
+    expect(withoutHighlight, isNot(style));
+
+    expect(copy.copyWith(rimWidth: 0), isNot(style));
+    expect(copy.copyWith(bevelWidth: 0), isNot(style));
+    expect(copy.copyWith(lightDirection: Offset.zero), isNot(style));
+
+    expect(copy.border, BorderSide.none);
+    const border = BorderSide(color: Color(0x6633FF99), width: 2);
+    final withBorder = copy.copyWith(border: border);
+    expect(withBorder.border, border);
+    expect(withBorder, isNot(style));
+    expect(withBorder.copyWith(border: BorderSide.none), copy);
+  });
+
+  test('legacy Standard setters update a configured Standard style', () {
+    const base = SmartContextMenuStyle(
+      standardStyle: SmartContextMenuStandardStyle(
+        border: BorderSide(width: 3, strokeAlign: BorderSide.strokeAlignCenter),
+        showEdgeHighlight: false,
+        lightDirection: Offset(1, 0),
+      ),
+    );
+    const color = Color(0xFF123456);
+    final copy = base.copyWith(borderColor: color);
+    expect(copy.borderColor, color);
+    expect(copy.standardStyle.border.color, color);
+    expect(copy.standardStyle.border.width, 3);
+    expect(copy.standardStyle.border.strokeAlign, BorderSide.strokeAlignCenter);
+    expect(copy.standardStyle.showEdgeHighlight, isFalse);
+    expect(copy.standardStyle.lightDirection, const Offset(1, 0));
+  });
+
+  test('legacy border color enables a border when the side was omitted', () {
+    const color = Color(0xFF123456);
+    const border = BorderSide(color: color);
+    const original = SmartContextMenuStyle(
+      standardStyle: SmartContextMenuStandardStyle(),
+    );
+    expect(
+      const SmartContextMenuStyle(borderColor: color).standardStyle.border,
+      border,
+    );
+    expect(
+      original.copyWith().copyWith(borderColor: color).standardStyle.border,
+      border,
+    );
+
+    final borderless = original.copyWith(
+      standardStyle: original.standardStyle.copyWith(border: BorderSide.none),
+    );
+    expect(
+      borderless.copyWith(borderColor: color).standardStyle.border.style,
+      BorderStyle.none,
+    );
+  });
+
   group('copyWith', () {
     const original = SmartContextMenuStyle(
       menuColor: Color(0xFF000001),
@@ -96,7 +215,10 @@ void main() {
     const blur = SmartContextMenuBlur(9);
     const decoration = BoxDecoration(color: color);
     const titleStyle = TextStyle(fontSize: 19);
-    const backButtonStyle = SmartContextMenuBackButtonStyle(blur: blur);
+    const backButtonStyle = SmartContextMenuBackButtonStyle(
+      backgroundColor: Color(0x660A84FF),
+      blur: blur,
+    );
     const rowStyle = SmartContextMenuRowStyle(childrenGap: 9);
     const statusStyle = SmartContextMenuStatusStyle(loaderVerticalPadding: 9);
     final changes = <String, (Object, SmartContextMenuStyle Function())>{

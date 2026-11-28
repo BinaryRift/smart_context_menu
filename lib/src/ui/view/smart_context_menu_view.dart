@@ -1,5 +1,3 @@
-// ignore: deprecated_member_use
-import 'package:flutter/cupertino.dart' show CupertinoDynamicColor;
 import 'package:flutter/widgets.dart';
 
 import '../../core/ui/motion/tokens/motion_curves.dart';
@@ -10,15 +8,15 @@ import '../../controllers/smart_context_menu_overlay_controller.dart';
 import '../../domain/smart_context_menu_level.dart';
 import '../../domain/smart_context_menu_navigator.dart';
 import '../extensions/animation_ext.dart';
+import '../state/smart_context_menu_glass_shader.dart';
 import '../state/smart_context_menu_hover_controller.dart';
 import '../state/smart_context_menu_stretch_controller.dart';
-import '../widgets/smart_context_menu_blur_box.dart';
 import '../widgets/smart_context_menu_level_switcher.dart';
+import '../widgets/smart_context_menu_panel.dart';
 import '../widgets/smart_context_menu_pointer_tracker.dart';
 import 'smart_context_menu_level_view.dart';
 import '../../domain/smart_context_menu_config.dart';
 import '../../domain/smart_context_menu_item.dart';
-import '../widgets/smart_context_menu_shadow_box.dart';
 import '../widgets/widget_size_listener.dart';
 
 final class SmartContextMenuView extends StatefulWidget {
@@ -26,6 +24,8 @@ final class SmartContextMenuView extends StatefulWidget {
   final SmartContextMenuConfig config;
   final ValueNotifier<double> heightNotifier;
   final ValueNotifier<Offset> previewMotionNotifier;
+  final SmartContextMenuResolvedGlass? glass;
+  final Animation<double> opacity;
 
   const SmartContextMenuView({
     super.key,
@@ -33,6 +33,8 @@ final class SmartContextMenuView extends StatefulWidget {
     required this.config,
     required this.heightNotifier,
     required this.previewMotionNotifier,
+    this.glass,
+    required this.opacity,
   });
 
   @override
@@ -47,20 +49,6 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
   final ValueNotifier<bool> _isSwiping = ValueNotifier(false);
 
   SmartContextMenuConfig get _config => widget.config;
-
-  BoxDecoration get _defaultDecoration => BoxDecoration(
-    color: CupertinoDynamicColor.resolve(_config.style.menuColor, context),
-    borderRadius: _config.style.borderRadius,
-  );
-
-  // The border is painted over the levels, so the back item does not
-  // cover it while a level slides.
-  BoxDecoration get _defaultBorder => BoxDecoration(
-    borderRadius: _config.style.borderRadius,
-    border: Border.all(
-      color: CupertinoDynamicColor.resolve(_config.style.borderColor, context),
-    ),
-  );
 
   @override
   void initState() {
@@ -98,8 +86,32 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-
-    // The stretch moves the shadow and the blur together with the menu.
+    final glass = widget.glass;
+    final backItemGlassTint = glass?.style.color;
+    final levels = ConstrainedBox(
+      constraints: BoxConstraints(
+        maxHeight: screenHeight * _config.menuHeightFactor,
+      ),
+      child: SmartContextMenuPointerTracker(
+        hoverController: _hoverController,
+        isSwiping: _isSwiping,
+        onDrag: _setMenuEffect,
+        onRelease: _resetMenuEffect,
+        child: SmartContextMenuLevelSwitcher(
+          isForward: _controller.isForward,
+          enableSwipeBack: _config.enableSwipeBack,
+          isSwiping: _isSwiping,
+          onSwipeBack: _controller.popSubmenu,
+          previous: _buildPreviousLevel(backItemGlassTint),
+          child: _buildLevel(
+            _controller.currentLevel,
+            depth: _controller.stackLength,
+            glassTint: backItemGlassTint,
+          ),
+        ),
+      ),
+    );
+    // The stretch moves the surface and its shadow together with the menu.
     return WidgetSizeListener(
       onSizeChanged: _onSizeChanged,
       child: ListenableBuilder(
@@ -111,63 +123,39 @@ final class _SmartContextMenuViewState extends State<SmartContextMenuView>
           transform: _stretchController.transform,
           child: child,
         ),
-        child: SmartContextMenuShadowBox(
-          borderRadius: _config.style.borderRadius,
-          shadows: _config.style.menuShadows,
-          child: SmartContextMenuBlurBox(
-            blur: _config.style.menuBlur,
-            borderRadius: _config.style.borderRadius,
-            child: Container(
-              width: _config.menuWidth,
-              decoration: _config.style.menuDecoration ?? _defaultDecoration,
-              foregroundDecoration: _config.style.menuDecoration == null
-                  ? _defaultBorder
-                  : null,
-              clipBehavior: Clip.antiAlias,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxHeight: screenHeight * _config.menuHeightFactor,
-                ),
-                child: SmartContextMenuPointerTracker(
-                  hoverController: _hoverController,
-                  isSwiping: _isSwiping,
-                  onDrag: _setMenuEffect,
-                  onRelease: _resetMenuEffect,
-                  child: SmartContextMenuLevelSwitcher(
-                    isForward: _controller.isForward,
-                    enableSwipeBack: _config.enableSwipeBack,
-                    isSwiping: _isSwiping,
-                    onSwipeBack: _controller.popSubmenu,
-                    previous: _buildPreviousLevel(),
-                    child: _buildLevel(
-                      _controller.currentLevel,
-                      depth: _controller.stackLength,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
+        child: SmartContextMenuPanel(
+          width: _config.menuWidth,
+          opacity: widget.opacity,
+          child: levels,
         ),
       ),
     );
   }
 
-  Widget? _buildPreviousLevel() {
+  Widget? _buildPreviousLevel(Color? glassTint) {
     final level = _controller.previousLevel;
     if (level == null) return null;
-    return _buildLevel(level, depth: _controller.stackLength - 1);
+    return _buildLevel(
+      level,
+      depth: _controller.stackLength - 1,
+      glassTint: glassTint,
+    );
   }
 
   // The key is the depth, so a level keeps its key when it becomes current
   // after a swipe back.
-  Widget _buildLevel(SmartMenuLevel level, {required int depth}) {
+  Widget _buildLevel(
+    SmartMenuLevel level, {
+    required int depth,
+    required Color? glassTint,
+  }) {
     return SmartContextMenuLevelView(
       key: ValueKey(depth),
       level: level,
       controller: _controller,
       config: _config,
       hoverController: _hoverController,
+      glassTint: glassTint,
     );
   }
 

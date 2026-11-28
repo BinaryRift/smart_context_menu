@@ -3,7 +3,11 @@ import 'dart:ui' show PointerDeviceKind;
 // ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:smart_context_menu/smart_context_menu.dart';
+// ignore: implementation_imports
+import 'package:smart_context_menu/src/ui/view/smart_context_menu_overlay.dart';
 import 'package:smart_context_menu_example/core/data/demo_loader.dart';
+import 'package:smart_context_menu_example/pages/appearance/ui/appearance_styles.dart';
 import 'package:smart_context_menu_example/pages/appearance/ui/theme_styles.dart';
 
 import '../helpers/menu_tester.dart';
@@ -29,27 +33,23 @@ void main() {
 
   for (final (preset, item) in [
     ('Default', find.text('Copy')),
-    ('Brand', find.text('Copy')),
-    ('Solid', find.text('Copy')),
-    ('Compact', find.text('Copy')),
-    ('Dividers', find.text('Copy')),
+    ('Compact', find.text('Duplicate')),
     ('Inset dividers', find.text('Copy')),
-    ('Custom content', find.text('Organize')),
-    ('Localized', find.text('Копировать')),
-    ('Status items', find.text('Syncing')),
+    ('Colorful', find.text('Favorite')),
+    ('Brand', find.text('Copy')),
+    ('Terminal', find.text('rm -rf')),
+    ('Glow', find.text('Duplicate')),
     ('Quick actions', find.text('Copy')),
     ('Only rows', find.text('Cut')),
-    ('Styled rows', find.text('Inbox')),
     // Small cells show only their icons.
     ('Wide row', find.byIcon(CupertinoIcons.lasso)),
-    ('Indigo', find.text('Rename')),
-    ('Terminal', find.text('rm -rf')),
-    ('Tiny', find.text('Duplicate')),
-    ('Colorful', find.text('Favorite')),
-    ('Paper', find.text('Rename')),
-    ('Glow', find.text('Duplicate')),
     ('Editing rows', find.text('Cut')),
     ('Drawing toolbar', find.byIcon(CupertinoIcons.lasso)),
+    ('Custom content', find.text('Organize')),
+    ('Styled rows', find.text('Inbox')),
+    ('Paper', find.text('Rename')),
+    ('Localized', find.text('Копировать')),
+    ('Status items', find.text('Syncing')),
   ]) {
     testWidgets('$preset opens its menu', (tester) async {
       await openAppearance(tester);
@@ -62,6 +62,91 @@ void main() {
       await tester.settleMenu();
     });
   }
+
+  for (final (name, style) in [
+    ('Colorful', colorfulStyle),
+    ('Brand', brandStyle),
+    ('Terminal', terminalStyle),
+    ('Glow', glowStyle),
+    ('Editing rows', editingRowsStyle),
+    ('Drawing toolbar', drawingToolbarStyle),
+  ]) {
+    testWidgets('$name switches surfaces and keeps its preset styles', (
+      tester,
+    ) async {
+      await openAppearance(tester);
+      final overlay = find.byType(SmartContextMenuOverlay);
+
+      for (final (surface, label) in [
+        (SmartContextMenuSurface.standard, 'Standard'),
+        (SmartContextMenuSurface.glass, 'Glass'),
+      ]) {
+        await tester.tap(find.byIcon(CupertinoIcons.gear));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(label));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Done'));
+        await tester.pumpAndSettle();
+        await openPreset(tester, name);
+        final menuStyle = tester
+            .widget<SmartContextMenuOverlay>(overlay)
+            .config
+            .style;
+        expect(menuStyle.surface, surface);
+        expect(menuStyle.glassStyle, same(style.glassStyle));
+        expect(menuStyle.standardStyle, same(style.standardStyle));
+        Navigator.of(tester.element(overlay)).pop();
+        await tester.pumpAndSettle();
+      }
+    });
+  }
+
+  testWidgets('Paper uses Standard when the app requests Glass', (
+    tester,
+  ) async {
+    await openAppearance(tester);
+    await openPreset(tester, 'Paper');
+
+    final overlay = tester.widget<SmartContextMenuOverlay>(
+      find.byType(SmartContextMenuOverlay),
+    );
+    expect(overlay.config.style.surface, SmartContextMenuSurface.standard);
+    expect(overlay.config.style.standardStyle, same(paperStyle.standardStyle));
+  });
+
+  testWidgets('Background blur applies to Glass and Standard presets', (
+    tester,
+  ) async {
+    await openAppearance(tester);
+    await tester.tap(find.byIcon(CupertinoIcons.gear));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.descendant(
+        of: find.widgetWithText(CupertinoListTile, 'Background blur'),
+        matching: find.byType(CupertinoSwitch),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Done'));
+    await tester.pumpAndSettle();
+
+    final overlay = find.byType(SmartContextMenuOverlay);
+    for (final (name, style) in [
+      ('Brand', brandStyle),
+      ('Paper', paperStyle),
+    ]) {
+      await openPreset(tester, name);
+      final menuStyle = tester
+          .widget<SmartContextMenuOverlay>(overlay)
+          .config
+          .style;
+      expect(menuStyle.backgroundBlur, SmartContextMenuBlur.medium);
+      expect(menuStyle.backgroundColor, style.backgroundColor);
+      expect(menuStyle.surface, style.surface);
+      Navigator.of(tester.element(overlay)).pop();
+      await tester.pumpAndSettle();
+    }
+  });
 
   testWidgets('Localized shows the strings of the menu in Russian', (
     tester,
@@ -136,7 +221,7 @@ void main() {
     expect(lasso.dx - scribble.dx, greaterThanOrEqualTo(44));
   });
 
-  testWidgets('Shapes in Wide row opens a row of medium cells', (tester) async {
+  testWidgets('Shapes in Wide row opens colored medium cells', (tester) async {
     await openAppearance(tester);
     await openPreset(tester, 'Wide row');
 
@@ -145,6 +230,23 @@ void main() {
 
     expect(find.text('Back'), findsWidgets);
     expect(find.text('Hexagon'), findsOneWidget);
+    final menu = find.byType(SmartContextMenuOverlay);
+    final colors = {
+      for (final icon in [
+        CupertinoIcons.square,
+        CupertinoIcons.circle,
+        CupertinoIcons.triangle,
+        CupertinoIcons.hexagon,
+        CupertinoIcons.star,
+      ])
+        tester
+            .widget<Icon>(
+              find.descendant(of: menu, matching: find.byIcon(icon)),
+            )
+            .color,
+    };
+    expect(colors, hasLength(5));
+    expect(colors, isNot(contains(null)));
   });
 
   testWidgets('editing rows keep independent formatting selections', (
@@ -167,6 +269,54 @@ void main() {
     expect(colorOf(italic), accent);
   });
 
+  testWidgets('Drawing toolbar highlights the capsule and Back separately', (
+    tester,
+  ) async {
+    await openAppearance(tester);
+    await openPreset(tester, 'Drawing toolbar');
+    final pen = find.byIcon(CupertinoIcons.pencil);
+    final capsule = find.ancestor(
+      of: pen,
+      matching: find.byWidgetPredicate(
+        (widget) => switch (widget) {
+          Container(decoration: BoxDecoration(shape: BoxShape.circle)) => true,
+          _ => false,
+        },
+      ),
+    );
+    BoxDecoration capsuleDecoration() =>
+        tester.widget<Container>(capsule).decoration! as BoxDecoration;
+    final resting = capsuleDecoration().color;
+
+    final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await mouse.addPointer(location: tester.getCenter(pen));
+    addTearDown(mouse.removePointer);
+    await tester.pump();
+
+    expect(capsuleDecoration().color, isNot(resting));
+    final cell = tester.widget<AnimatedContainer>(
+      find.ancestor(of: pen, matching: find.byType(AnimatedContainer)).first,
+    );
+    expect((cell.decoration as BoxDecoration).color, const Color(0x00000000));
+
+    await tester.tap(find.byIcon(CupertinoIcons.square_on_circle));
+    await tester.settleMenu();
+    final back = find.text('Back').last;
+    await mouse.moveTo(tester.getCenter(back));
+    await tester.pump();
+
+    final backRow = tester.widget<AnimatedContainer>(
+      find.ancestor(of: back, matching: find.byType(AnimatedContainer)).first,
+    );
+    expect(
+      (backRow.decoration as BoxDecoration).color,
+      CupertinoDynamicColor.resolve(
+        drawingToolbarStyle.backButtonStyle.highlightColor!,
+        tester.element(back),
+      ),
+    );
+  });
+
   for (final (preset, icon, light, dark) in [
     (
       'Editing rows',
@@ -180,6 +330,12 @@ void main() {
       drawingToolbarAccent.color,
       drawingToolbarAccent.darkColor,
     ),
+    (
+      'Wide row',
+      CupertinoIcons.paintbrush,
+      const Color(0xFF225BA9),
+      const Color(0xFF8ABEFF),
+    ),
   ]) {
     testWidgets('$preset follows brightness changes while open', (
       tester,
@@ -190,8 +346,11 @@ void main() {
       await openAppearance(tester);
       await openPreset(tester, preset);
 
-      int iconColor() =>
-          tester.widget<Icon>(find.byIcon(icon)).color!.toARGB32();
+      final menuIcon = find.descendant(
+        of: find.byType(SmartContextMenuOverlay),
+        matching: find.byIcon(icon),
+      );
+      int iconColor() => tester.widget<Icon>(menuIcon).color!.toARGB32();
       expect(iconColor(), light.toARGB32());
 
       dispatcher.platformBrightnessTestValue = Brightness.dark;

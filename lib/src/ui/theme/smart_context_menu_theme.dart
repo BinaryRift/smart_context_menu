@@ -13,7 +13,12 @@ import '../../domain/smart_context_menu_config.dart';
 /// MaterialApp(
 ///   builder: (context, child) => SmartContextMenuTheme(
 ///     config: const SmartContextMenuConfig(
-///       style: SmartContextMenuStyle(menuBlur: SmartContextMenuBlur.small),
+///       style: SmartContextMenuStyle(
+///         surface: SmartContextMenuSurface.standard,
+///         standardStyle: SmartContextMenuStandardStyle(
+///           blur: SmartContextMenuBlur.small,
+///         ),
+///       ),
 ///     ),
 ///     child: child!,
 ///   ),

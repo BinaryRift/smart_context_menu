@@ -88,16 +88,23 @@ abstract final class SmartContextMenuDefaults {
 
   // Colors
 
-  /// The menu background, the default of [SmartContextMenuStyle.menuColor].
+  /// The default fill of [SmartContextMenuStandardStyle].
   ///
-  /// Translucent, so [SmartContextMenuStyle.menuBlur] shows through it.
+  /// Translucent, so the Standard panel's local blur shows through it.
   static const CupertinoDynamicColor menuColor =
       CupertinoDynamicColor.withBrightness(
         color: Color(0xB3F2F2F7),
         darkColor: Color(0xB324252A),
       );
 
-  /// The menu border, the default of [SmartContextMenuStyle.borderColor].
+  /// The default tint of the Liquid Glass surface.
+  static const CupertinoDynamicColor glassTint =
+      CupertinoDynamicColor.withBrightness(
+        color: Color(0x92F7FAFF),
+        darkColor: Color(0x862C2D30),
+      );
+
+  /// A theme-aware color for an optional [SmartContextMenuStandardStyle.border].
   static const CupertinoDynamicColor borderColor =
       CupertinoDynamicColor.withBrightness(
         color: Color(0xFF9D9D9F),
@@ -187,20 +194,24 @@ abstract final class SmartContextMenuDefaults {
   /// The title and icon opacity of a disabled tinted item.
   static const double tintDisabledForegroundOpacity = 0.5;
 
-  /// The opacity of the title color in the press highlight of an item
-  /// in the light theme, used when [SmartContextMenuStyle.highlightColor]
+  /// The opacity of the title color in the hover and press highlights of an
+  /// item in the light theme, used when [SmartContextMenuStyle.highlightColor]
   /// is null.
   ///
   /// A dark highlight stands out more on a light menu, so it is lighter than
   /// [darkHighlightOpacity].
-  static const double highlightOpacity = 0.06;
+  static const double highlightOpacity = 0.1;
 
   /// The opacity of the title color in the press highlight of an item,
   /// including the back item, in the dark theme.
-  static const double darkHighlightOpacity = 0.1;
+  static const double darkHighlightOpacity = 0.12;
 
-  /// The opacity of the title color in the press highlight of the back item
-  /// in the light theme.
+  /// The opacity of the title color in the hover highlight of an item,
+  /// including the back item, in the dark theme.
+  static const double darkHoverHighlightOpacity = 0.16;
+
+  /// The opacity of the title color in the hover and press highlights of the
+  /// back item in the light theme.
   ///
   /// The back item has its own [menuColor] fill and is lighter than the menu,
   /// so its highlight is stronger than [highlightOpacity] to differ from

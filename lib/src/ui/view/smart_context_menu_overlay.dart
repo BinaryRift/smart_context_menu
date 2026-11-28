@@ -16,9 +16,11 @@ import '../extensions/animation_ext.dart';
 import '../extensions/render_object_ext.dart';
 import '../layout/smart_context_menu_horizontal_layout.dart';
 import '../layout/smart_context_menu_vertical_layout.dart';
+import '../state/smart_context_menu_glass_shader.dart';
 import '../state/smart_context_menu_header_animation.dart';
 import '../widgets/smart_context_menu_background.dart';
 import '../widgets/smart_context_menu_header.dart';
+import '../widgets/smart_context_menu_panel.dart';
 import '../widgets/smart_context_menu_preview.dart';
 import 'smart_context_menu_view.dart';
 
@@ -29,6 +31,7 @@ final class SmartContextMenuOverlay extends StatefulWidget {
   final String heroTag;
   final List<SmartContextMenuItem> items;
   final SmartContextMenuConfig config;
+  final SmartContextMenuResolvedGlass? glass;
   final FutureOr<void> Function()? onPreviewTap;
   final SmartContextMenuHeaderBuilder? headerSliversBuilder;
   final bool fadeHeaderSlivers;
@@ -42,6 +45,7 @@ final class SmartContextMenuOverlay extends StatefulWidget {
     required this.heroTag,
     required this.items,
     required this.config,
+    this.glass,
     this.onPreviewTap,
     this.headerSliversBuilder,
     this.fadeHeaderSlivers = true,
@@ -158,7 +162,11 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
             Positioned.fill(
               child: NotificationListener<ScrollNotification>(
                 onNotification: _handleScrollNotification,
-                child: _buildContent(),
+                child: SmartContextMenuPanelScope(
+                  style: _config.style,
+                  glass: widget.glass,
+                  child: _buildContent(),
+                ),
               ),
             ),
           ],
@@ -265,27 +273,28 @@ final class _SmartContextMenuOverlayState extends State<SmartContextMenuOverlay>
   }
 
   Widget _buildMenu() {
+    final glass = widget.glass;
+    final menu = Padding(
+      padding: _horizontalLayout.menuPadding,
+      child: GestureDetector(
+        onVerticalDragStart: (_) {},
+        child: SmartContextMenuView(
+          key: _menuKey,
+          config: _config,
+          initialItems: widget.items,
+          heightNotifier: _currentMenuHeight,
+          previewMotionNotifier: _previewMotion,
+          glass: glass,
+          opacity: widget.routeAnimation,
+        ),
+      ),
+    );
     return Align(
       alignment: _horizontalLayout.alignment,
       child: ScaleTransition(
         alignment: Alignment.center,
         scale: _menuAnimation,
-        child: FadeTransition(
-          opacity: widget.routeAnimation,
-          child: Padding(
-            padding: _horizontalLayout.menuPadding,
-            child: GestureDetector(
-              onVerticalDragStart: (_) {},
-              child: SmartContextMenuView(
-                key: _menuKey,
-                config: _config,
-                initialItems: widget.items,
-                heightNotifier: _currentMenuHeight,
-                previewMotionNotifier: _previewMotion,
-              ),
-            ),
-          ),
-        ),
+        child: menu,
       ),
     );
   }

@@ -1,3 +1,38 @@
+## 1.2.0 (unreleased)
+
+* `SmartContextMenuStyle.surface` selects the surface of the menu. The default,
+  `SmartContextMenuSurface.glass`, blurs and refracts the backdrop inside the menu on Impeller
+  renderers with shader filter support. The default glass blur uses a sigma of 2 in light mode
+  and 1.8 in dark mode. Set `SmartContextMenuGlassStyle.blur` to `SmartContextMenuBlur.none`
+  to turn off the glass blur.
+  The menu opens as `SmartContextMenuSurface.standard` while the shader loads, if loading
+  fails, if shader filters are unsupported, or if high contrast is enabled at the anchor.
+  The selected surface stays in place until the menu closes.
+* Configure the two surfaces independently with `glassStyle` and `standardStyle`. Both have
+  `color`, `border` and `blur`. Set a `BorderSide` to control the border color, width and
+  stroke alignment. `standardStyle.decoration` replaces the built-in standard finish.
+* Tune the glass rim reflection, refracting bevel and direction of the light with
+  `glassStyle.rimWidth`, `glassStyle.bevelWidth` and `glassStyle.lightDirection`.
+* Deprecate `SmartContextMenuStyle.menuColor`, `borderColor`, `menuDecoration` and `menuBlur`
+  in favor of `standardStyle`. The getters and arguments still configure or expose Standard,
+  including during fallback.
+* Default dark glass uses a more transparent tint and a softer edge highlight.
+  Dark glass reflections inherit some of the glass tint.
+* Keep the backdrop steady when a Liquid Glass menu moves or stretches.
+* Fix Impeller validation errors when animating Liquid Glass shadows.
+* Set `SmartContextMenuBackButtonStyle.highlightColor` to style the pressed and hovered Back
+  row independently.
+* Make the default hover highlight more visible in dark mode.
+* Standard draws a directional edge highlight by default and its border defaults to
+  `BorderSide.none`. Set `standardStyle.border` to add a border, `standardStyle.lightDirection`
+  to aim the highlight, or `showEdgeHighlight: false` to switch it off.
+* `SmartContextMenuPanel` applies the menu's Glass and Standard surfaces to any widget.
+  It can use an explicit style or inherit `SmartContextMenuTheme`. A standalone panel set to
+  Glass switches from Standard once the shader is ready. A panel in a menu header can share
+  the menu's selected surface, as the example app's reactions bar does.
+* `SmartContextMenuStyle.backgroundBlur` is `null` by default. To restore the full-screen
+  blur from 1.1.x, set `backgroundBlur: SmartContextMenuBlur.medium`.
+
 ## 1.1.0
 
 * `SmartContextMenuItem.row` shows items side by side as compact cells in one line, as in the

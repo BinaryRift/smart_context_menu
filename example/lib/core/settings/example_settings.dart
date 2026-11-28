@@ -8,6 +8,8 @@ import 'package:smart_context_menu/smart_context_menu.dart';
 /// The settings of the app that apply to all menus.
 final class ExampleSettings extends ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.system;
+  SmartContextMenuSurface _surface = SmartContextMenuSurface.glass;
+  bool _enableBackgroundBlur = false;
   bool _enableHaptics = true;
   bool _enableSwipeBack = true;
   bool _moveBackDown = false;
@@ -17,6 +19,13 @@ final class ExampleSettings extends ChangeNotifier {
 
   ThemeMode get themeMode => _themeMode;
   set themeMode(ThemeMode value) => _update(() => _themeMode = value);
+
+  SmartContextMenuSurface get surface => _surface;
+  set surface(SmartContextMenuSurface value) => _update(() => _surface = value);
+
+  bool get enableBackgroundBlur => _enableBackgroundBlur;
+  set enableBackgroundBlur(bool value) =>
+      _update(() => _enableBackgroundBlur = value);
 
   bool get enableHaptics => _enableHaptics;
   set enableHaptics(bool value) => _update(() => _enableHaptics = value);
@@ -55,6 +64,12 @@ final class ExampleSettings extends ChangeNotifier {
       enableHaptics: _enableHaptics,
       enableSwipeBack: _enableSwipeBack,
       moveBackDown: _moveBackDown,
+      style: config.style.copyWith(
+        surface: _surface,
+        backgroundBlur: _enableBackgroundBlur
+            ? SmartContextMenuBlur.medium
+            : null,
+      ),
     );
   }
 

@@ -1,10 +1,14 @@
+import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 // ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart'
     show CupertinoDynamicColor, CupertinoIcons;
 import 'package:flutter/widgets.dart';
 
+import '../../core/ui/motion/tokens/motion_curves.dart';
+import '../../core/ui/motion/tokens/motion_durations.dart';
 import '../../core/ui/styles/smart_context_menu_defaults.dart';
+import '../../domain/smart_context_menu_blur.dart';
 import '../../domain/smart_context_menu_config.dart';
 import '../../domain/smart_context_menu_item.dart';
 import '../keys/service_item_key.dart';
@@ -12,25 +16,35 @@ import '../state/smart_context_menu_hover_controller.dart';
 import '../view/item/smart_context_menu_item_view.dart';
 import 'smart_context_menu_blur_box.dart';
 import 'smart_context_menu_divider.dart';
+import 'smart_context_menu_glass_surface.dart';
 
 /// The item that returns to the parent menu level.
 final class SmartContextMenuBackItem extends StatelessWidget {
+  static const _glassDividerColor = CupertinoDynamicColor.withBrightness(
+    color: Color(0x2E000000),
+    darkColor: Color(0x38FFFFFF),
+  );
+
   final SmartContextMenuConfig config;
   final SmartContextMenuHoverController hoverController;
   final VoidCallback onTap;
+  final Color? glassTint;
+  final SmartContextMenuBackBlurClipper? glassBlurClipper;
+  final bool hasItemsUnderBack;
   final bool _isPlaceholder;
 
   /// The back item pinned to the top of a submenu.
   ///
-  /// Has the menu background or
-  /// [SmartContextMenuBackButtonStyle.decoration] and
-  /// [SmartContextMenuBackButtonStyle.blur], and keeps drags on it from
-  /// scrolling the items below.
+  /// Draws the back item background and keeps drags on it from scrolling
+  /// the items below.
   const SmartContextMenuBackItem({
     super.key,
     required this.config,
     required this.hoverController,
     required this.onTap,
+    this.glassTint,
+    this.glassBlurClipper,
+    this.hasItemsUnderBack = false,
   }) : _isPlaceholder = false;
 
   /// The invisible copy that reserves the space of the pinned back item
@@ -40,12 +54,17 @@ final class SmartContextMenuBackItem extends StatelessWidget {
     required this.config,
     required this.hoverController,
     required this.onTap,
-  }) : _isPlaceholder = true;
+  }) : glassTint = null,
+       glassBlurClipper = null,
+       hasItemsUnderBack = false,
+       _isPlaceholder = true;
 
   @override
   Widget build(BuildContext context) {
     final style = config.style;
     final backStyle = style.backButtonStyle;
+    final decoration = backStyle.decoration;
+    final glassTint = decoration == null ? this.glassTint : null;
     final item = SmartContextMenuItemView(
       key: _isPlaceholder
           ? ServiceItemKey.backPlaceholder
@@ -77,7 +96,14 @@ final class SmartContextMenuBackItem extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         item,
-        SmartContextMenuDivider(style: style),
+        SmartContextMenuDivider(
+          style: style,
+          color:
+              glassTint != null &&
+                  style.dividerColor == SmartContextMenuDefaults.dividerColor
+              ? _glassDividerColor
+              : null,
+        ),
       ],
     );
 
@@ -88,40 +114,53 @@ final class SmartContextMenuBackItem extends StatelessWidget {
       );
     }
 
-    final decoration = backStyle.decoration;
+    // The glass surface already clips the top corners of the default row.
+    final borderRadius =
+        glassTint != null &&
+            backStyle.borderRadius ==
+                SmartContextMenuDefaults.backButtonBorderRadius
+        ? BorderRadius.zero
+        : backStyle.borderRadius;
     final background = DecoratedBox(
       decoration:
           decoration ??
           BoxDecoration(
-            color: CupertinoDynamicColor.resolve(style.menuColor, context),
-            borderRadius: backStyle.borderRadius,
+            color:
+                CupertinoDynamicColor.maybeResolve(
+                  backStyle.backgroundColor,
+                  context,
+                ) ??
+                glassTint?.withValues(alpha: 0.14) ??
+                CupertinoDynamicColor.resolve(
+                  style.standardStyle.color,
+                  context,
+                ),
+            borderRadius: borderRadius,
           ),
       child: itemWithDivider,
     );
 
+    final blur = backStyle.blur;
     final Widget decoratedItem;
     if (decoration case final decoration?) {
-      final blur = backStyle.blur;
-      decoratedItem = ClipPath(
-        clipper: _BackItemDecorationClipper(
-          decoration: decoration,
-          textDirection: Directionality.of(context),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: blur == null
-            ? background
-            : BackdropFilter(
-                filter: ImageFilter.blur(
-                  sigmaX: blur.sigmaX,
-                  sigmaY: blur.sigmaY,
-                ),
-                child: background,
-              ),
+      decoratedItem = _buildCustomBackground(
+        context,
+        decoration: decoration,
+        blur: blur,
+        child: background,
+      );
+    } else if (glassBlurClipper case final clipper?) {
+      decoratedItem = _buildAnimatedGlassBackground(
+        context,
+        blur: blur,
+        borderRadius: borderRadius,
+        clipper: clipper,
+        child: background,
       );
     } else {
-      decoratedItem = SmartContextMenuBlurBox(
-        blur: backStyle.blur,
-        borderRadius: backStyle.borderRadius,
+      decoratedItem = _buildDefaultBackground(
+        blur: blur,
+        borderRadius: borderRadius,
         child: background,
       );
     }
@@ -132,6 +171,102 @@ final class SmartContextMenuBackItem extends StatelessWidget {
       child: decoratedItem,
     );
   }
+
+  Widget _buildCustomBackground(
+    BuildContext context, {
+    required Decoration decoration,
+    required SmartContextMenuBlur? blur,
+    required Widget child,
+  }) {
+    return ClipPath(
+      clipper: _BackItemDecorationClipper(
+        decoration: decoration,
+        textDirection: Directionality.of(context),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: blur == null
+          ? child
+          : BackdropFilter(
+              filter: ImageFilter.blur(
+                sigmaX: blur.sigmaX,
+                sigmaY: blur.sigmaY,
+              ),
+              child: child,
+            ),
+    );
+  }
+
+  Widget _buildAnimatedGlassBackground(
+    BuildContext context, {
+    required SmartContextMenuBlur? blur,
+    required BorderRadiusGeometry borderRadius,
+    required SmartContextMenuBackBlurClipper clipper,
+    required Widget child,
+  }) {
+    final targetStrength = hasItemsUnderBack ? 1.0 : 0.0;
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: targetStrength, end: targetStrength),
+      duration: MediaQuery.disableAnimationsOf(context)
+          ? Duration.zero
+          : MotionDurations.fast,
+      curve: MotionCurves.standard,
+      builder: (context, strength, child) => SmartContextMenuBlurBox(
+        blur: blur,
+        borderRadius: borderRadius,
+        strength: strength,
+        backdropClipper: clipper,
+        child: child!,
+      ),
+      child: child,
+    );
+  }
+
+  Widget _buildDefaultBackground({
+    required SmartContextMenuBlur? blur,
+    required BorderRadiusGeometry borderRadius,
+    required Widget child,
+  }) {
+    return SmartContextMenuBlurBox(
+      blur: blur,
+      borderRadius: borderRadius,
+      child: child,
+    );
+  }
+}
+
+/// Keeps the strongest part of the glass rim clear of the pinned row's blur.
+final class SmartContextMenuBackBlurClipper extends CustomClipper<RRect> {
+  static const _rimInset = 2.0;
+  final BorderRadius menuRadius;
+
+  const SmartContextMenuBackBlurClipper(this.menuRadius);
+
+  @override
+  RRect getClip(Size size) {
+    if (size.width <= 2 * _rimInset || size.height <= _rimInset) {
+      return RRect.zero;
+    }
+    // Use the largest top radii allowed by the width. A shorter panel can
+    // only reduce them, putting its top edge further outside this clip.
+    final radius = SmartContextMenuGlassClipper(
+      menuRadius,
+    ).radiusFor(Size.square(size.width));
+    final bounds = Rect.fromLTWH(
+      0,
+      0,
+      size.width,
+      math.max(size.width, size.height + _rimInset),
+    );
+    // The enclosing row clip limits the filter below the header.
+    return BorderRadius.only(
+      topLeft: radius.topLeft,
+      topRight: radius.topRight,
+    ).toRRect(bounds).deflate(_rimInset);
+  }
+
+  @override
+  bool shouldReclip(SmartContextMenuBackBlurClipper oldClipper) =>
+      menuRadius != oldClipper.menuRadius;
 }
 
 final class _BackItemDecorationClipper extends CustomClipper<Path> {

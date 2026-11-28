@@ -14,9 +14,9 @@ import 'smart_context_menu_blur.dart';
 /// The appearance of the back item pinned to the top of a submenu.
 ///
 /// Set it as [SmartContextMenuStyle.backButtonStyle]. The back item also
-/// takes [SmartContextMenuStyle.titleStyle], the item padding, the press
-/// highlight and [SmartContextMenuStyle.defaultIconSize] of the style, and
-/// always has a divider below it.
+/// takes [SmartContextMenuStyle.titleStyle], the item padding and
+/// [SmartContextMenuStyle.defaultIconSize] of the style, and always has a
+/// divider below it.
 ///
 /// ```dart
 /// const style = SmartContextMenuStyle(
@@ -29,13 +29,27 @@ import 'smart_context_menu_blur.dart';
 final class SmartContextMenuBackButtonStyle {
   /// The background decoration of the back item.
   ///
-  /// Replaces its default background from [SmartContextMenuStyle.menuColor]
-  /// and [borderRadius]. The decoration determines the clip of both the back
-  /// item and [blur]. It must support [Decoration.getClipPath] for clipping;
-  /// [BoxDecoration] and [ShapeDecoration] do. Use a transparent decoration
-  /// to show the blurred scrolling items underneath without painting a
-  /// background. If null, the default background is used.
+  /// Takes precedence over [backgroundColor] and [borderRadius]. Its shape
+  /// clips both the back item and [blur]. Use a decoration that supports
+  /// [Decoration.getClipPath], such as [BoxDecoration] or [ShapeDecoration].
+  /// A transparent decoration shows the blurred scrolling items underneath.
   final Decoration? decoration;
+
+  /// The fill of the pinned Back row at the top of a submenu.
+  ///
+  /// When [decoration] is null, an explicit color uses the supplied alpha
+  /// together with the row's usual shape, divider and blur.
+  /// A `CupertinoDynamicColor` is resolved in the menu.
+  /// If this color is null, the row uses `standardStyle.color` on Standard
+  /// and the glass tint at 14% opacity on Liquid Glass.
+  final Color? backgroundColor;
+
+  /// The overlay color when the Back row is pressed or hovered.
+  ///
+  /// Defaults to null, which uses [SmartContextMenuStyle.highlightColor]
+  /// or the built-in Back highlight. A `CupertinoDynamicColor` is resolved
+  /// in the menu.
+  final Color? highlightColor;
 
   /// The blur behind the back item.
   ///
@@ -72,6 +86,8 @@ final class SmartContextMenuBackButtonStyle {
   /// Creates a back item style.
   const SmartContextMenuBackButtonStyle({
     this.decoration,
+    this.backgroundColor,
+    this.highlightColor,
     this.blur = SmartContextMenuBlur.strong,
     this.borderRadius = SmartContextMenuDefaults.backButtonBorderRadius,
     this.foregroundColor,
@@ -81,10 +97,13 @@ final class SmartContextMenuBackButtonStyle {
 
   /// Creates a copy of this style with the given fields replaced.
   ///
-  /// Null arguments keep the current values, so nullable fields such as
-  /// [blur] cannot be reset to null with it.
+  /// Null arguments keep the current values, including for [blur] and
+  /// [backgroundColor]. Create a new style without [backgroundColor] to
+  /// restore the fill chosen by the menu surface.
   SmartContextMenuBackButtonStyle copyWith({
     Decoration? decoration,
+    Color? backgroundColor,
+    Color? highlightColor,
     SmartContextMenuBlur? blur,
     BorderRadiusGeometry? borderRadius,
     Color? foregroundColor,
@@ -93,6 +112,8 @@ final class SmartContextMenuBackButtonStyle {
   }) {
     return SmartContextMenuBackButtonStyle(
       decoration: decoration ?? this.decoration,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      highlightColor: highlightColor ?? this.highlightColor,
       blur: blur ?? this.blur,
       borderRadius: borderRadius ?? this.borderRadius,
       foregroundColor: foregroundColor ?? this.foregroundColor,

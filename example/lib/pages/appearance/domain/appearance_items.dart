@@ -6,6 +6,7 @@ import '../../../core/data/demo_loader.dart';
 import '../../../core/ui/demo_notice.dart';
 import '../../../resources/app_theme/tint_colors.dart';
 import '../ui/appearance_styles.dart';
+import '../ui/theme_styles.dart';
 import '../ui/widgets/count_badge.dart';
 import '../ui/widgets/tag_color_row.dart';
 
@@ -349,14 +350,16 @@ List<SmartContextMenuItem> wideRowItems() => [
   SmartContextMenuItem.row(
     size: SmartContextMenuRowSize.small,
     children: [
-      for (final (:title, :icon) in drawingToolActions) _action(title, icon),
+      for (final (:title, :icon) in drawingToolActions)
+        _action(title, icon, leading: _wideRowIcon(icon)),
       SmartContextMenuItem.submenu(
         title: 'Shapes',
-        leading: const Icon(CupertinoIcons.square_on_circle),
+        leading: _wideRowIcon(CupertinoIcons.square_on_circle),
         children: [
           SmartContextMenuItem.row(
             children: [
-              for (final (:title, :icon) in shapeActions) _action(title, icon),
+              for (final (:title, :icon) in shapeActions)
+                _action(title, icon, leading: _wideRowIcon(icon)),
             ],
           ),
         ],
@@ -364,6 +367,64 @@ List<SmartContextMenuItem> wideRowItems() => [
     ],
   ),
 ];
+
+/// The carousel palette with deeper shades for the light theme.
+Widget _wideRowIcon(IconData icon) => Builder(
+  builder: (context) {
+    final color = switch (icon) {
+      CupertinoIcons.pencil || CupertinoIcons.square => drawingToolbarAccent,
+      CupertinoIcons.paintbrush ||
+      CupertinoIcons.circle => const CupertinoDynamicColor.withBrightness(
+        color: Color(0xFF225BA9),
+        darkColor: Color(0xFF8ABEFF),
+      ),
+      CupertinoIcons.scribble ||
+      CupertinoIcons.triangle => const CupertinoDynamicColor.withBrightness(
+        color: Color(0xFFA42B56),
+        darkColor: Color(0xFFFFA1C5),
+      ),
+      CupertinoIcons.lasso ||
+      CupertinoIcons.hexagon => drawingToolbarEditingColor,
+      CupertinoIcons.textformat ||
+      CupertinoIcons.star => const CupertinoDynamicColor.withBrightness(
+        color: Color(0xFF8B6300),
+        darkColor: Color(0xFFFFE192),
+      ),
+      CupertinoIcons.eyedropper => const CupertinoDynamicColor.withBrightness(
+        color: Color(0xFF415A6B),
+        darkColor: Color(0xFFE4F4FB),
+      ),
+      CupertinoIcons.square_on_circle => drawingToolbarPaint,
+      _ => null,
+    };
+    final leading = Icon(
+      icon,
+      color: CupertinoDynamicColor.maybeResolve(color, context),
+    );
+    if (icon != CupertinoIcons.eyedropper) return leading;
+
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        leading,
+        PositionedDirectional(
+          end: -2,
+          bottom: 0,
+          child: Semantics(
+            label: 'Current color is apricot',
+            child: const DecoratedBox(
+              decoration: BoxDecoration(
+                color: Color(0xFFFFB48D),
+                shape: BoxShape.circle,
+              ),
+              child: SizedBox.square(dimension: 5),
+            ),
+          ),
+        ),
+      ],
+    );
+  },
+);
 
 /// A separator of a thin line with [title] in the middle.
 SmartContextMenuSeparatorItem _titledSeparator(String title) {
@@ -414,11 +475,12 @@ SmartContextMenuSimpleItem _action(
   bool isDestructive = false,
   bool isDisabled = false,
   Color? tintColor,
+  Widget? leading,
   String? notice,
 }) {
   return SmartContextMenuItem.simple(
     title: title,
-    leading: Icon(icon),
+    leading: leading ?? Icon(icon),
     isDestructive: isDestructive,
     isDisabled: isDisabled,
     tintColor: tintColor,

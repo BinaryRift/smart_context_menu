@@ -36,3 +36,7 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   # The version is pinned by flutter_test.
   leak_tracker_flutter_testing: any
+
+flutter:
+  shaders:
+    - lib/src/ui/shaders/smart_context_menu_glass.frag

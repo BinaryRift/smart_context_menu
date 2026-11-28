@@ -2,6 +2,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_context_menu/smart_context_menu.dart';
+import 'package:smart_context_menu/src/ui/view/smart_context_menu_overlay.dart';
+import 'package:smart_context_menu/src/ui/widgets/smart_context_menu_glass_surface.dart';
 
 import '../../../helpers/menu_tester.dart';
 
@@ -109,6 +111,89 @@ void main() {
     await tester.openMenu();
 
     expect(titleColor(tester), isSameColorAs(configColor));
+  });
+
+  testWidgets('inherits Standard and lets a menu explicitly select Glass', (
+    tester,
+  ) async {
+    const standard = SmartContextMenuConfig(
+      style: SmartContextMenuStyle(surface: SmartContextMenuSurface.standard),
+    );
+    const glass = SmartContextMenuConfig(
+      style: SmartContextMenuStyle(
+        surface: SmartContextMenuSurface.glass,
+        glassStyle: SmartContextMenuGlassStyle(refraction: 2),
+      ),
+    );
+    final overlay = find.byType(SmartContextMenuOverlay);
+    SmartContextMenuConfig activeConfig() =>
+        tester.widget<SmartContextMenuOverlay>(overlay).config;
+
+    await tester.pumpWidget(buildApp(theme: standard));
+    await tester.openMenu();
+    expect(activeConfig(), same(standard));
+
+    Navigator.of(tester.element(overlay)).pop();
+    await tester.settleMenu();
+    await tester.pumpWidget(buildApp(theme: standard, config: glass));
+    await tester.openMenu();
+    expect(activeConfig(), same(glass));
+  });
+
+  testWidgets('keeps the surface selected before capturing the preview', (
+    tester,
+  ) async {
+    const standardDecoration = BoxDecoration(color: configColor);
+    const style = SmartContextMenuStyle(
+      glassStyle: SmartContextMenuGlassStyle(refraction: 2),
+      standardStyle: SmartContextMenuStandardStyle(
+        decoration: standardDecoration,
+      ),
+    );
+    const theme = SmartContextMenuConfig(style: style);
+    final controller = SmartContextMenuController();
+    addTearDown(controller.dispose);
+
+    SmartContextMenuOverlay activeMenu() =>
+        tester.widget(find.byType(SmartContextMenuOverlay));
+    Widget app({SmartContextMenuConfig? config}) => CupertinoApp(
+      home: Builder(
+        builder: (context) => MediaQuery(
+          data: MediaQuery.of(context).copyWith(highContrast: true),
+          child: SmartContextMenuTheme(
+            config: theme,
+            child: buildMenu(config: config, controller: controller),
+          ),
+        ),
+      ),
+    );
+
+    await tester.pumpWidget(app());
+    final firstOpening = controller.open();
+    await tester.pumpWidget(
+      app(
+        config: theme.copyWith(
+          style: style.copyWith(surface: SmartContextMenuSurface.standard),
+        ),
+      ),
+    );
+    await tester.settleMenu();
+    expect(activeMenu().config.style.surface, SmartContextMenuSurface.glass);
+    expect(find.byType(SmartContextMenuGlassSurface), findsNothing);
+    final customPanel = find.byWidgetPredicate(
+      (widget) =>
+          widget is Container && widget.decoration == standardDecoration,
+    );
+    expect(customPanel, findsOneWidget);
+
+    final closing = controller.close();
+    await tester.settleMenu();
+    await closing;
+    await firstOpening;
+    await tester.openMenu();
+    expect(activeMenu().config.style.surface, SmartContextMenuSurface.standard);
+    expect(find.byType(SmartContextMenuGlassSurface), findsNothing);
+    expect(customPanel, findsOneWidget);
   });
 
   testWidgets('manual activation of the theme turns off the long press', (
